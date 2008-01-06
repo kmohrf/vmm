@@ -1,0 +1,14 @@
+# $Id$
+
+- general
+    - add transport to user tbl (per account) / fall back transport via dom tbl
+    - make default transport configurable via vmm.cfg (for domains and
+      accounts
+    - write manpages
+
+- vmm
+    - add support for relocated_map
+
+- VirtualMailManager/Alias.py
+    - check if account exists, when destination is in the same domain
+

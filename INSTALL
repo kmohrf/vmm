@@ -1,0 +1,154 @@
+Installation Prerequisites
+You should already have installed and configured Postfix, Dovecot and
+PostgreSQL.
+You have to install Python and pyPgSQL to use the Virtual Mail Manager.
+
+
+Configuring PostgreSQL
+
+* /etc/postgresql/8.2/main/pg_hba.conf
+    # IPv4 local connections:
+    host    mailsys     +mailsys    127.0.0.1/32          md5
+
+    # reload configuration
+    /etc/init.d/postgresql-8.2 force-reload
+
+* Create a DB user if necessary:
+    DB Superuser:
+    createuser -s -d -r -E -e -P $USERNAME
+    DB User:
+    createuser -d -E -e -P $USERNAME
+
+* Create Database and db users for Postfix and Dovecot
+    connecting to PostgreSQL:
+    psql template1
+    
+    # create database
+    CREATE DATABASE mailsys ENCODING 'UTF8';
+    # connect to the new database
+    \c mailsys
+    # import db structure
+    \i /path/to/create_tables.pgsql
+
+    # create users and group
+    CREATE USER postfix ENCRYPTED password 'DB PASSWORD for Postfix';
+    CREATE USER dovecot ENCRYPTED password 'DB PASSWORD for Dovecot';
+    CREATE ROLE mailsys WITH USER postfix, dovecot;
+
+    # set permissions
+    GRANT SELECT ON dovecot_password, dovecot_user TO dovecot;
+    GRANT SELECT ON postfix_alias, postfix_maildir, postfix_relocated,
+    postfix_uid, postfix_gid, postfix_transport TO postfix;
+
+    # leave psql
+    \q
+
+Create directory for your mails
+  mkdir /srv/mail
+  cd /srv/mail/
+  mkdir 0 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n o p q r s t u v w x y z
+  chmod 771 /srv/mail
+  chgrp -R mail /srv/mail
+  chmod 751 /srv/mail/*
+
+Configuring Dovecot
+
+* /etc/dovecot/dovecot.conf
+    # all your other settings
+    mail_location = maildir:~/Maildir
+    mail_extra_groups = mail
+    first_valid_uid = 70000
+    first_valid_gid = 70000
+    protocol lda {
+      postmaster_address = postmaster@domain.tld
+    }
+    auth default {
+      mechanisms = cram-md5
+      passdb sql {
+        args = /etc/dovecot/dovecot-sql.conf
+      }
+      userdb sql {
+        args = /etc/dovecot/dovecot-sql.conf
+      }
+      user = nobody
+      socket listen {
+        master {
+          path = /var/run/dovecot/auth-master
+          mode = 0600
+        }
+        client {
+          path = /var/spool/postfix/private/auth
+          mode = 0660
+          user = postfix
+          group = postfix
+        }
+      }
+    }
+
+* /etc/dovecot/dovecot-sql.conf
+    driver = pgsql
+    connect = host=localhost dbname=mailsys user=dovecot password=$Dovecot_PASS
+    default_pass_scheme = HMAC-MD5
+    password_query = SELECT "user", password FROM dovecot_password WHERE "user"= '%u'
+    user_query = SELECT home, uid, gid FROM dovecot_user WHERE userid = '%u'
+
+Provide a root SETUID copy of Dovecot's deliver agent for Postfix
+
+    mkdir -p /usr/local/lib/dovecot
+    chmod 700 /usr/local/lib/dovecot
+    chown nobody /usr/local/lib/dovecot
+    cp /usr/lib/dovecot/deliver /usr/local/lib/dovecot/
+    chmod u+s /usr/local/lib/dovecot/deliver
+
+
+Start or restart Dovecot
+
+
+Configuring Postfix's master.cf
+
+    # Add Dovecot's deliver agent
+    dovecot   unix  -       n       n       -       -       pipe
+      flags=DRhu user=nobody:mail argv=/usr/local/lib/dovecot/deliver -f ${sender} -d ${user}@${nexthop} -n -m ${extension}
+
+
+
+Configuring Postfix's main.cf
+
+    # virtual domains
+    virtual_mailbox_domains = pgsql:/etc/postfix/pgsql-transport.cf
+    virtual_alias_maps = pgsql:/etc/postfix/pgsql-virtual_alias_maps.cf
+    transport_maps = pgsql:/etc/postfix/pgsql-transport.cf
+    virtual_minimum_uid = 70000
+    virtual_uid_maps = pgsql:/etc/postfix/pgsql-virtual_uid_maps.cf
+    virtual_gid_maps = pgsql:/etc/postfix/pgsql-virtual_gid_maps.cf
+    virtual_mailbox_base = /
+    virtual_mailbox_maps = pgsql:/etc/postfix/pgsql-virtual_mailbox_maps.cf
+
+    # dovecot LDA
+    dovecot_destination_recipient_limit = 1
+    virtual_transport = dovecot:
+
+    # dovecot SASL
+    smtpd_sasl_type = dovecot
+    smtpd_sasl_path = private/auth
+    smtpd_sasl_auth_enable = yes
+    smtpd_sasl_local_domain = $myhostname
+    smtpd_sasl_security_options = noplaintext, noanonymous
+
+
+
+Installing the Virtual Mail Manager and configure the rest
+
+    Installing from SVN
+    after checking out type
+        ./install
+    edit all the pgsql-*.cf files in /etc/postfix
+
+    reload postfix
+
+    # configure the Virtual Mail Manager
+    vmm configure
+
+    # for help type
+    vmm help
+

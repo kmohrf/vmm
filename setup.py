@@ -1,0 +1,67 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright 2007-2008 VEB IT
+# See COPYING for distribution information.
+# $Id$
+
+import os
+from distutils.core import setup
+
+VERSION = '0.3'
+
+long_description = """
+Virtual Mail Manager is a command line tool for administrators/postmasters to
+manage domains, accounts and aliases. It's designed for Dovecot and Postfix
+with a PostgreSQL backend.
+"""
+
+libdir = '/usr/local/lib'
+
+# remove existing MANIFEST
+if os.path.exists('MANIFEST'):
+    os.remove('MANIFEST')
+
+
+setup(name='VirtualMailManager',
+      version=VERSION,
+      description='Tool to manage mail domains/accounts/aliases for Dovecot and Postfix',
+      long_description=long_description,
+      packages=['VirtualMailManager', 'VirtualMailManager.constants'],
+#      data_files=[(libdir, [
+#          'VirtualMailManager/Account.py',
+#          'VirtualMailManager/Alias.py',
+#          'VirtualMailManager/Config.py',
+#          'VirtualMailManager/Domain.py',
+#          'VirtualMailManager/Exceptions.py',
+#          'VirtualMailManager/__init__.py',
+#          'VirtualMailManager/VirtualMailManager.py']
+#          ),
+#          (libdir+'/constants', [
+#              'VirtualMailManager/constants/ERROR.py',
+#              'VirtualMailManager/constants/EXIT.py',
+#              'VirtualMailManager/constants/__init__.py']
+#          )
+#      ],
+      author='Pascal Volk',
+      author_email='p.volk@veb-it.de',
+      license='BSD License',
+      url='http://vmm.sf.net/',
+      download_url='http://sourceforge.net/project/showfiles.php?group_id=213727',
+      classifiers=[
+          'Development Status :: 4 - Beta',
+          'Development Status :: 5 - Production/Stable',
+          'Environment :: Console',
+          'Intended Audience :: System Administrators',
+          'License :: OSI Approved :: BSD License',
+          'Natural Language :: English',
+          'Operating System :: POSIX',
+          'Operating System :: POSIX :: BSD',
+          'Operating System :: POSIX :: Linux',
+          'Operating System :: POSIX :: Other',
+          'Programming Language :: Python',
+          'Topic :: Communications :: Email :: Mail Transport Agents',
+          'Topic :: Communications :: Email :: Post-Office :: IMAP',
+          'Topic :: Communications :: Email :: Post-Office :: POP3'
+      ],
+      requires=['pyPgSQL']
+      )

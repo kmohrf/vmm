@@ -1,0 +1,304 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+# Copyright 2007-2008 VEB IT
+# See COPYING for distribution information.
+# $Id$
+
+"""This is the vmm main script."""
+
+__author__ = 'Pascal Volk <p.volk@veb-it.de>'
+__version__ = 'rev '+'$Rev$'.split()[1]
+__date__ = '$Date$'.split()[1]
+
+import os
+import sys
+from getpass import getpass
+
+#sys.path.insert(0, '/usr/local/lib/VirtualMailManager')
+
+from VirtualMailManager.VirtualMailManager import VirtualMailManager
+from VirtualMailManager.Config import VMMConfig
+import VirtualMailManager.Exceptions as VMME
+import VirtualMailManager.constants.EXIT as EXIT
+
+def usage(excode=0, errMsg=None):
+    sys.stderr.write("""\
+Usage: vmm OPTION OBJECT ARGS*
+  short long
+  option                object           args (* = optional)
+
+  da    domainadd       domain.tld       transport*
+  di    domaininfo      domain.tld       detailed*
+  dt    domaintransport domain.tld       transport
+  dd    domaindelete    domain.tld       delalias*|deluser*|delall*
+  ua    useradd         user@domain.tld  password*
+  ui    userinfo        user@domain.tld  du*
+  un    username        user@domain.tld  'Users Name'
+  up    userpassword    user@domain.tld  password*
+  u0    userdisable     user@domain.tld
+  u1    userenable      user@domain.tld
+  ud    userdelete      user@domain.tld
+  aa    aliasadd        alias@domain.tld user@domain.tld
+  ai    aliasinfo       alias@domain.tld
+  ad    aliasdelete     alias@domain.tld
+  cf    configure                        section*
+  h     help
+  v     version
+
+""")
+    if not errMsg is None:
+        sys.stderr.write('Error: %s\n' % errMsg)
+    sys.exit(excode)
+
+def getVMM():
+    try:
+        vmm = VirtualMailManager()
+        return vmm
+    except VMME.MANotRootException, e:
+        sys.stderr.write(str(e))
+        sys.exit(EXIT.CONF_NOPERM)
+    except IOError, e:
+        sys.stderr.write(str(e))
+        sys.exit(EXIT.CONF_NOFILE)
+    except VMME.MAPermException, e:
+        sys.stderr.write(str(e))
+        sys.exit(EXIT.CONF_WRONGPERM)
+
+def configure():
+    try:
+        if len(sys.argv) < 3:
+            vmm.configure()
+        else:
+            vmm.configure(sys.argv[2])
+    except (EOFError, KeyboardInterrupt):
+        sys.stderr.write('\nOuch!\n')
+        sys.exit(EXIT.USER_INTERRUPT)
+    except VMME.VMMConfigException, e:
+        sys.stderr.write(str(e))
+        sys.exit(EXIT.CONF_ERROR)
+    sys.exit(0)
+
+def _readpass():
+    clear0 = ''
+    clear1 = '1'
+    while clear0 != clear1:
+        while len(clear0) < 1:
+            clear0 = getpass(prompt='Enter new password: ')
+            if len(clear0) < 1:
+                sys.stderr.write('Sorry, empty passwords are not permitted\n')
+        clear1 = getpass(prompt='Retype new password: ')
+        if clear0 != clear1:
+            clear0 = ''
+            sys.stderr.write('Sorry, passwords do not match\n')
+    return clear0
+
+def _printInfo(info, title):
+    msg = title+' information'
+    print '%s\n%s' % (msg, '-'*len(msg))
+    for k,v in info.items():
+        print '\t%s: %s' % (k.title().ljust(15, '.'), v)
+    print
+
+def _printUsers(users, title):
+    msg = 'Available '+title
+    print '%s\n%s' % (msg, '-'*len(msg))
+    if len(users) > 0:
+        for user in users:
+            print '\t%s' % user
+    else:
+        print '\tNone'
+    print
+
+def _printAliases(alias, targets):
+    msg = 'Alias information'
+    print '%s\n%s' % (msg, '-'*len(msg))
+    print '\tMail for %s goes to:' % alias
+    if len(targets) > 0:
+        for target in targets:
+            print '\t     -> %s' % target
+    else:
+        print '\tNone'
+    print
+
+def domain_add():
+    global argc
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS, 'Missing domain name.')
+    elif argc < 4:
+        vmm.domain_add(sys.argv[2].lower())
+    else:
+        vmm.domain_add(sys.argv[2].lower(), sys.argv[3])
+
+def domain_delete():
+    global argc
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS, 'Missing domain name.')
+    elif argc < 4:
+        vmm.domain_delete(sys.argv[2].lower())
+    else:
+        vmm.domain_delete(sys.argv[2].lower(), sys.argv[3])
+
+def domain_info():
+    global argc
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS, 'Missing domain name.')
+    elif argc < 4:
+        _printInfo(vmm.domain_info(sys.argv[2].lower()), 'Domain')
+    else:
+        infos = vmm.domain_info(sys.argv[2].lower(), sys.argv[3])
+        _printInfo(infos[0], 'Domain')
+        _printUsers(infos[1], 'accounts')
+        _printUsers(infos[2], 'aliases')
+
+def domain_transport():
+    global argc
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS, 'Missing domain name and new transport.')
+    if argc < 4:
+        usage(EXIT.MISSING_ARGS, 'Missing new transport.')
+    else:
+        vmm.domain_transport(sys.argv[2].lower(), sys.argv[3])
+
+def user_add():
+    global argc
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS, 'Missing email address.')
+    elif argc < 4:
+        password = _readpass()
+    else:
+        password = sys.argv[3]
+    vmm.user_add(sys.argv[2].lower(), password)
+
+def user_delete():
+    global argc
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS, 'Missing email address.')
+    else:
+        vmm.user_delete(sys.argv[2].lower())
+
+def user_info():
+    global argc
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS, 'Missing email address.')
+    elif argc < 4:
+        _printInfo(vmm.user_info(sys.argv[2].lower()), 'Account')
+    else:
+        _printInfo(vmm.user_info(sys.argv[2].lower(), True), 'Account')
+
+def user_name():
+    global argc
+    if argc < 4:
+        usage(EXIT.MISSING_ARGS, 'Missing email address an users name.')
+    else:
+        vmm.user_name(sys.argv[2].lower(), sys.argv[3])
+
+def user_enable():
+    global argc
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS, 'Missing email address.')
+    else:
+        vmm.user_enable(sys.argv[2].lower())
+
+def user_disable():
+    global argc
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS, 'Missing email address.')
+    else:
+        vmm.user_disable(sys.argv[2].lower())
+
+def user_password():
+    global argc
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS, 'Missing email address.')
+    elif argc < 4:
+        password = _readpass()
+    else:
+        password = sys.argv[3]
+    vmm.user_password(sys.argv[2].lower(), password)
+
+def alias_add():
+    global argc
+    if argc < 4:
+        usage(EXIT.MISSING_ARGS, 'Missing alias address and destination.')
+    else:
+        vmm.alias_add(sys.argv[2].lower(), sys.argv[3])
+
+def alias_info():
+    global argc
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS, 'Missing alias address')
+    else:
+        _printAliases(sys.argv[2], vmm.alias_info(sys.argv[2].lower()))
+
+def alias_delete():
+    global argc
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS, 'Missing alias address')
+    else:
+        vmm.alias_delete(sys.argv[2].lower())
+
+def showWarnings():
+    if vmm.hasWarnings():
+        print '\nWarnings:'
+        for w in vmm.getWarnings():
+            print " * ",w
+
+#def main():
+if __name__ == '__main__':
+    argc = len(sys.argv)
+    if argc < 2:
+        usage(EXIT.MISSING_ARGS) # -> exit
+    vmm = getVMM()
+    try:
+        if sys.argv[1] in ['cf',  'configure'] or not vmm.setupIsDone():
+            configure()
+    except VMME.VMMConfigException, e:
+        sys.stderr.write(str(e))
+        sys.exit(EXIT.CONF_ERROR)
+    except VMME.VMMException, e:
+        sys.stderr.write("\aERROR: %s\n" % e[0][0])
+        sys.exit(e[0][1])
+    try:
+        if sys.argv[1] in ['da', 'domainadd']:
+            domain_add()
+        elif sys.argv[1] in ['di', 'domaininfo']:
+            domain_info()
+        elif sys.argv[1] in ['dt', 'domaintransport']:
+            domain_transport()
+        elif sys.argv[1] in ['dd', 'domaindelete']:
+            domain_delete()
+        elif sys.argv[1] in ['ua', 'useradd']:
+            user_add()
+        elif sys.argv[1] in ['ui', 'userinfo']:
+            user_info()
+        elif sys.argv[1] in ['un', 'username']:
+            user_name()
+        elif sys.argv[1] in ['up', 'userpassword']:
+            user_password()
+        elif sys.argv[1] in ['u0', 'userdisable']:
+            user_disable()
+        elif sys.argv[1] in ['u1', 'userenable']:
+            user_enable()
+        elif sys.argv[1] in ['ud', 'userdelete']:
+            user_delete()
+        elif sys.argv[1] in ['aa', 'aliasadd']:
+            alias_add()
+        elif sys.argv[1] in ['ai', 'aliasinfo']:
+            alias_info()
+        elif sys.argv[1] in ['ad', 'aliasdelete']:
+            alias_delete()
+        elif sys.argv[1] in ['h', 'help']:
+            usage()
+        elif sys.argv[1] in ['v', 'version']:
+            print "%s: %s (Date: %s)\n" % (os.path.basename(sys.argv[0]),
+                    __version__, __date__)
+        else:
+            sys.stderr.write('Unknown option: "%s"\n' % sys.argv[1])
+            usage(EXIT.UNKNOWN_OPTION)
+        showWarnings()
+    except (EOFError, KeyboardInterrupt):
+        sys.stderr.write('\nOuch!\n')
+        sys.exit(EXIT.USER_INTERRUPT)
+    except VMME.VMMException, e:
+        sys.stderr.write("\aERROR: %s\n" % e[0][0])
+        sys.exit(e[0][1])
