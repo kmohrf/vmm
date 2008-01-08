@@ -7,7 +7,7 @@
 import os
 from distutils.core import setup
 
-VERSION = '0.3'
+VERSION = '0.3.1'
 
 long_description = """
 Virtual Mail Manager is a command line tool for administrators/postmasters to
@@ -27,26 +27,11 @@ setup(name='VirtualMailManager',
       description='Tool to manage mail domains/accounts/aliases for Dovecot and Postfix',
       long_description=long_description,
       packages=['VirtualMailManager', 'VirtualMailManager.constants'],
-#      data_files=[(libdir, [
-#          'VirtualMailManager/Account.py',
-#          'VirtualMailManager/Alias.py',
-#          'VirtualMailManager/Config.py',
-#          'VirtualMailManager/Domain.py',
-#          'VirtualMailManager/Exceptions.py',
-#          'VirtualMailManager/__init__.py',
-#          'VirtualMailManager/VirtualMailManager.py']
-#          ),
-#          (libdir+'/constants', [
-#              'VirtualMailManager/constants/ERROR.py',
-#              'VirtualMailManager/constants/EXIT.py',
-#              'VirtualMailManager/constants/__init__.py']
-#          )
-#      ],
       author='Pascal Volk',
       author_email='p.volk@veb-it.de',
       license='BSD License',
       url='http://vmm.sf.net/',
-      download_url='http://sourceforge.net/project/showfiles.php?group_id=213727',
+      download_url='http://sf.net/project/showfiles.php?group_id=213727',
       classifiers=[
           'Development Status :: 4 - Beta',
           'Development Status :: 5 - Production/Stable',

@@ -16,18 +16,18 @@ __date__ = '$Date$'.split()[1]
 import sys
 from shutil import copy2
 from ConfigParser import ConfigParser
+from cStringIO import StringIO
 
 from Exceptions import VMMConfigException
-import constants.EXIT as EXIT
+import constants.ERROR as ERR
 
 class VMMConfig(ConfigParser):
-    """This class is for configure the mailadmin.
+    """This class is for configure the Virtual Mail Manager.
 
     You can specify settings for the database connection
     and maildirectories.
 
     """
-    missingOptCtr = -1
 
     def __init__(self, filename):
         """Creates a new VMMConfig instance
@@ -41,7 +41,7 @@ class VMMConfig(ConfigParser):
         self.__VMMsections = ['database', 'maildir', 'domdir', 'bin', 'misc',
                 'config']
         self.__changes = False
-        self.__missingSect = []
+        self.__missing = {}
         self.__dbopts = [
                 ['host', 'localhot'],
                 ['user', 'vmm'],
@@ -77,6 +77,18 @@ class VMMConfig(ConfigParser):
             raise
         self.readfp(self.__cfgFile)
         self.__cfgFile.close()
+
+    def check(self):
+        if not self.__chkSections():
+            errmsg = StringIO()
+            for k,v in self.__missing.items():
+                if v[0] is True:
+                    errmsg.write("missing section: %s\n" % k)
+                else:
+                    errmsg.write("missing options in section %s:\n" % k)
+                    for o in v:
+                        errmsg.write(" * %s\n" % o)
+            raise VMMConfigException((errmsg.getvalue(), ERR.CONF_ERROR))
 
     def getsections(self):
         """Return a list with all configurable sections."""
@@ -122,13 +134,13 @@ class VMMConfig(ConfigParser):
 
     def __chkSections(self):
         """Checks if all configuration sections are existing."""
-        retval = False
+        errors = False
         for s in self.__VMMsections:
             if not self.has_section(s):
-                self.__missingSect.append(s)
-            else:
-                retval = self.__chkOptions(s)
-        return retval
+                self.__missing[s] = [True]
+            elif not self.__chkOptions(s):
+                errors = True
+        return not errors
 
     def __chkOptions(self, section):
         """Checks if all configuration options in section are existing.
@@ -137,18 +149,23 @@ class VMMConfig(ConfigParser):
         section -- the section to be checked
         """
         retval = True
-        VMMConfig.missingOptCtr += 1
-        self.__missingOpt.append([])
+        missing = []
         if section == 'database':
             opts = self.__dbopts
         elif section == 'maildir':
             opts = self.__mdopts
+        elif section == 'domdir':
+            opts = self.__domdopts
         elif section == 'bin':
             opts = self.__binopts
         elif section == 'misc':
             opts = self.__miscopts
+        elif section == 'config':
+            opts = [['done', 'false']]
         for o, v in opts:
             if not self.has_option(section, o):
-                self.__missingOpt[VMMConfig.missingOptCtr].append(o)
+                missing.append(o)
                 retval = False
+        if len(missing):
+            self.__missing[section] = missing
         return retval

@@ -14,8 +14,6 @@ import os
 import sys
 from getpass import getpass
 
-#sys.path.insert(0, '/usr/local/lib/VirtualMailManager')
-
 from VirtualMailManager.VirtualMailManager import VirtualMailManager
 from VirtualMailManager.Config import VMMConfig
 import VirtualMailManager.Exceptions as VMME
@@ -54,15 +52,10 @@ def getVMM():
     try:
         vmm = VirtualMailManager()
         return vmm
-    except VMME.VMMNotRootException, e:
-        sys.stderr.write(str(e))
-        sys.exit(EXIT.CONF_NOPERM)
-    except IOError, e:
-        sys.stderr.write(str(e))
-        sys.exit(EXIT.CONF_NOFILE)
-    except VMME.VMMPermException, e:
-        sys.stderr.write(str(e))
-        sys.exit(EXIT.CONF_WRONGPERM)
+    except (VMME.VMMException, VMME.VMMNotRootException, VMME.VMMPermException,
+            VMME.VMMConfigException), e:
+        sys.stderr.write("\aERROR: %s\n" % e[0][0])
+        sys.exit(e[0][1])
 
 def configure():
     try:
@@ -187,8 +180,10 @@ def user_info():
 
 def user_name():
     global argc
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS, 'Missing email address and users name.')
     if argc < 4:
-        usage(EXIT.MISSING_ARGS, 'Missing email address an users name.')
+        usage(EXIT.MISSING_ARGS, 'Missing users name.')
     else:
         vmm.user_name(sys.argv[2].lower(), sys.argv[3])
 
@@ -293,8 +288,7 @@ if __name__ == '__main__':
             print "%s: %s (Date: %s)\n" % (os.path.basename(sys.argv[0]),
                     __version__, __date__)
         else:
-            sys.stderr.write('Unknown option: "%s"\n' % sys.argv[1])
-            usage(EXIT.UNKNOWN_OPTION)
+            usage(EXIT.UNKNOWN_OPTION, 'Unknown option: »%s«' % sys.argv[1])
         showWarnings()
     except (EOFError, KeyboardInterrupt):
         sys.stderr.write('\nOuch!\n')

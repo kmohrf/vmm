@@ -26,7 +26,8 @@ class VMMPermException(Exception):
 
 class VMMNotRootException(Exception):
     """Ausnahmeklasse für unberechtige Zugriffe"""
-    pass
+    def __init__(self, msg):
+        Exception.__init__(self, msg)
 
 class VMMDomainException(VMMException):
     """Ausnahmeklasse für Domainausnamhem"""

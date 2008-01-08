@@ -49,18 +49,20 @@ class VirtualMailManager:
         self.__dbh = None
 
         if os.geteuid():
-            raise VMMNotRootException("You are not root.\n\tGood bye!\n")
+            raise VMMNotRootException(("You are not root.\n\tGood bye!\n",
+                ERR.CONF_NOPERM))
         if self.__chkCfgFile():
             self.__Cfg = Cfg(self.__cfgFileName)
             self.__Cfg.load()
+            self.__Cfg.check()
             self.__cfgSections = self.__Cfg.getsections()
         self.__chkenv()
 
     def __chkCfgFile(self):
         """Checks the configuration file, returns bool"""
         if not os.path.isfile(self.__cfgFileName):
-            raise IOError("Fatal error: The file "+self.__cfgFileName+ \
-                    " does not exists.\n")
+            raise VMMException(("The file »%s« does not exists." %
+                self.__cfgFileName, ERR.CONF_NOFILE))
         fstat = os.stat(self.__cfgFileName)
         try:
             fmode = self.__getFileMode()
@@ -68,7 +70,7 @@ class VirtualMailManager:
             raise
         if fmode % 100 and fstat.st_uid != fstat.st_gid \
         or fmode % 10 and fstat.st_uid == fstat.st_gid:
-            raise VMMPermException(self.__permWarnMsg)
+            raise VMMPermException((self.__permWarnMsg, ERR.CONF_ERROR))
         else:
             return True
 
