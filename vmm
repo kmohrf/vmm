@@ -54,13 +54,13 @@ def getVMM():
     try:
         vmm = VirtualMailManager()
         return vmm
-    except VMME.MANotRootException, e:
+    except VMME.VMMNotRootException, e:
         sys.stderr.write(str(e))
         sys.exit(EXIT.CONF_NOPERM)
     except IOError, e:
         sys.stderr.write(str(e))
         sys.exit(EXIT.CONF_NOFILE)
-    except VMME.MAPermException, e:
+    except VMME.VMMPermException, e:
         sys.stderr.write(str(e))
         sys.exit(EXIT.CONF_WRONGPERM)
 
