@@ -4,7 +4,7 @@
 # See COPYING for distribution information.
 # $Id$
 
-"""Virtual Mail Manager's Alias class to manage email aliases."""
+"""Virtual Mail Manager's Alias class to manage e-mail aliases."""
 
 __author__ = 'Pascal Volk <p.volk@veb-it.de>'
 __version__ = 'rev '+'$Rev$'.split()[1]
@@ -15,7 +15,7 @@ from Domain import Domain
 import constants.ERROR as ERR
 
 class Alias:
-    """Class to manage email accounts."""
+    """Class to manage e-mail accounts."""
     def __init__(self, dbh, address, basedir, destination=None):
         if address == destination:
             raise VMMAliasException(('Address and destination are identical.',
@@ -31,7 +31,7 @@ class Alias:
             self._exists()
         if self._isAccount():
             raise VMMAliasException(
-            ('There is already an account with address «%s»' % self._addr,
+            ('There is already an account with address »%s«' % self._addr,
                 ERR.ACCOUNT_EXISTS))
 
     def _exists(self):
@@ -62,7 +62,7 @@ class Alias:
         dom = Domain(self._dbh, d, basedir)
         self._gid = dom.getID()
         if self._gid == 0:
-            raise VMMAliasException(("Domain «%s» doesn't exist." % d,
+            raise VMMAliasException(("Domain »%s« doesn't exist." % d,
                 ERR.NO_SUCH_DOMAIN))
 
     def save(self):

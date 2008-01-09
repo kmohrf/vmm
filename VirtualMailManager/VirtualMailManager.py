@@ -42,8 +42,8 @@ class VirtualMailManager:
         Throws a VMMNotRootException if your uid is greater 0.
         """
         self.__cfgFileName = '/usr/local/etc/vmm.cfg'
-        self.__permWarnMsg = "fix permissions for '"+self.__cfgFileName \
-            +"'.\n`chmod 0600 "+self.__cfgFileName+"` would be great.\n"
+        self.__permWarnMsg = "fix permissions for '%s'\n`chmod 0600 %s` would\
+ be great." % (self.__cfgFileName, self.__cfgFileName)
         self.__warnings = []
         self.__Cfg = None
         self.__dbh = None
@@ -114,17 +114,17 @@ class VirtualMailManager:
             raise VMMException((str(e), ERR.DATABASE_ERROR))
 
     def __chkLocalpart(self, localpart):
-        """Validates the local part of an email address.
+        """Validates the local part of an e-mail address.
         
         Keyword arguments:
-        localpart -- the email address that should be validated (str)
+        localpart -- the e-mail address that should be validated (str)
         """
         if len(localpart) > 64:
             raise VMMException(('The local part is too long',
                 ERR.LOCALPART_TOO_LONG))
         if re.compile(RE_LOCALPART).search(localpart):
             raise VMMException((
-                'The local part «%s» contains invalid characters.' % localpart,
+                'The local part »%s« contains invalid characters.' % localpart,
                 ERR.LOCALPART_INVALID))
         return localpart
 
@@ -155,7 +155,7 @@ class VirtualMailManager:
         return '.'.join(tmp)
 
     def __chkDomainname(self, domainname):
-        """Validates the domain name of an email address.
+        """Validates the domain name of an e-mail address.
         
         Keyword arguments:
         domainname -- the domain name that should be validated
@@ -170,21 +170,21 @@ class VirtualMailManager:
                 ERR.DOMAIN_INVALID))
         return domainname
 
-    def __chkEmailadress(self, address):
+    def __chkEmailAddress(self, address):
         try:
             localpart, domain = address.split('@')
         except ValueError:
-            raise VMMException(("Missing '@' sign in emailaddress «%s»." %
+            raise VMMException(("Missing '@' sign in e-mail address »%s«." %
                 address, ERR.INVALID_ADDRESS))
         except AttributeError:
-            raise VMMException(("'%s' looks not like an email address." %
+            raise VMMException(("»%s« looks not like an e-mail address." %
                 address, ERR.INVALID_ADDRESS))
         domain = self.__chkDomainname(domain)
         localpart = self.__chkLocalpart(localpart)
         return '%s@%s' % (localpart, domain)
 
     def __getAccount(self, address, password=None):
-        address = self.__chkEmailadress(address)
+        address = self.__chkEmailAddress(address)
         self.__dbConnect()
         if not password is None:
             password = self.__pwhash(password)
@@ -192,10 +192,10 @@ class VirtualMailManager:
                 password)
 
     def __getAlias(self, address, destination=None):
-        address = self.__chkEmailadress(address)
+        address = self.__chkEmailAddress(address)
         if not destination is None:
             if destination.count('@'):
-                destination = self.__chkEmailadress(destination)
+                destination = self.__chkEmailAddress(destination)
             else:
                 destination = self.__chkLocalpart(destination)
         self.__dbConnect()
@@ -339,7 +339,7 @@ class VirtualMailManager:
             if not section:
                 self.__Cfg.configure(self.__cfgSections)
             elif section not in self.__cfgSections:
-                raise VMMException(("Invalid section: «%s»" % section,
+                raise VMMException(("Invalid section: »%s«" % section,
                     ERR.INVALID_SECTION))
             else:
                 self.__Cfg.configure([section])
@@ -357,7 +357,7 @@ class VirtualMailManager:
 
     def domain_delete(self, domainname, force=None):
         if not force is None and force not in ['deluser','delalias','delall']:
-            raise VMMDomainException(('Invalid option: «%s»' % force,
+            raise VMMDomainException(('Invalid argument: «%s»' % force,
                 ERR.INVALID_OPTION))
         dom = self.__getDomain(domainname)
         gid = dom.getID()
@@ -386,7 +386,7 @@ class VirtualMailManager:
         elif detailed == 'detailed':
             return dominfo, dom.getAccounts(), dom.getAliases()
         else:
-            raise VMMDomainException(('Invalid option: «%s»' % detailed,
+            raise VMMDomainException(('Invalid argument: »%s«' % detailed,
                 ERR.INVALID_OPTION))
 
     def user_add(self, emailaddress, password):

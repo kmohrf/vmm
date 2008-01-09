@@ -1,0 +1,26 @@
+=== 0.0.0 ===
+2008-01-09  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Account.py:
+	* VirtualMailManager/Alias.py:
+	* VirtualMailManager/Domain.py:
+	* VirtualMailManager/VirtualMailManager.py:
+	* vmm: Replaced email with e-mail.
+	Corrected opening/closing quotation marks («word» -> »word«).
+
+	* VirtualMailManager/VirtualMailManager.py: Renamed
+	VirtualMailManager.__chkEmailadress to
+	VirtualMailManager.__chkEmailAddress.
+
+	* ChangeLog: Added to repository.
+
+=== 0.3.1 ===
+2008-01-08  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* vmm (getVMM): Fixed names names of excepted errors.
+
+	* VirtualMailManager/VirtualMailManager.py (VirtualMailManager.__init__):
+	activated check for missing sections/options
+
+	* vmm-0.3.1.tar.bz2: It's really bzip2 compressed. ;-)
+

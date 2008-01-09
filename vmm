@@ -155,7 +155,7 @@ def domain_transport():
 def user_add():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing email address.')
+        usage(EXIT.MISSING_ARGS, 'Missing e-mail address.')
     elif argc < 4:
         password = _readpass()
     else:
@@ -165,14 +165,14 @@ def user_add():
 def user_delete():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing email address.')
+        usage(EXIT.MISSING_ARGS, 'Missing e-mail address.')
     else:
         vmm.user_delete(sys.argv[2].lower())
 
 def user_info():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing email address.')
+        usage(EXIT.MISSING_ARGS, 'Missing e-mail address.')
     elif argc < 4:
         _printInfo(vmm.user_info(sys.argv[2].lower()), 'Account')
     else:
@@ -181,7 +181,7 @@ def user_info():
 def user_name():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing email address and users name.')
+        usage(EXIT.MISSING_ARGS, 'Missing e-mail address and users name.')
     if argc < 4:
         usage(EXIT.MISSING_ARGS, 'Missing users name.')
     else:
@@ -190,21 +190,21 @@ def user_name():
 def user_enable():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing email address.')
+        usage(EXIT.MISSING_ARGS, 'Missing e-mail address.')
     else:
         vmm.user_enable(sys.argv[2].lower())
 
 def user_disable():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing email address.')
+        usage(EXIT.MISSING_ARGS, 'Missing e-mail address.')
     else:
         vmm.user_disable(sys.argv[2].lower())
 
 def user_password():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing email address.')
+        usage(EXIT.MISSING_ARGS, 'Missing e-mail address.')
     elif argc < 4:
         password = _readpass()
     else:

@@ -4,7 +4,7 @@
 # See COPYING for distribution information.
 # $Id$
 
-"""Virtual Mail Manager's Domain class to manage email domains."""
+"""Virtual Mail Manager's Domain class to manage e-mail domains."""
 
 __author__ = 'Pascal Volk <p.volk@veb-it.de>'
 __version__ = 'rev '+'$Rev$'.split()[1]
@@ -18,7 +18,7 @@ import constants.ERROR as ERR
 MAILDIR_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz'
 
 class Domain:
-    """Class to manage email domains."""
+    """Class to manage e-mail domains."""
     def __init__(self, dbh, domainname, basedir, transport=None):
         """Creates a new Domain instance.
         
