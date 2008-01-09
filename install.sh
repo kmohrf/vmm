@@ -1,15 +1,17 @@
 #!/bin/bash
 # $Id$
 #
-# Installation script for the vmm
+# Installation script for the Virtual Mail Manager
 # run: ./install.sh
 
 LANG=C
-PATH=/usr/sbin:/usr/bin
+PATH=/bin:/usr/sbin:/usr/bin
 INSTALL_OPTS="-g 0 -o 0 -p -v"
 PREFIX=/usr/local
 PF_CONFDIR=$(postconf -h config_directory)
 PF_GID=$(id -g postfix)
+DOC_DIR=${PREFIX}/share/doc/vmm
+DOCS="ChangeLog COPYING INSTALL README"
 
 if [ $(id -u) -ne 0 ]; then
     echo "Run this script as root."
@@ -21,7 +23,16 @@ python setup.py clean --all >/dev/null
 
 install -b -m 0600 ${INSTALL_OPTS} vmm.cfg ${PREFIX}/etc/
 install -b -m 0640 -g ${PF_GID} -o 0 -p -v pgsql-*.cf ${PF_CONFDIR}/
-install -m 0700 ${INSTALL_OPTS} vmm ${PREFIX}/sbin/
+install -m 0700 ${INSTALL_OPTS} vmm ${PREFIX}/sbin
+
+[ -d ${DOC_DIR} ] || mkdir -m 0755 -p ${DOC_DIR}
+for DOC in ${DOCS}; do
+    install -m 0644 ${INSTALL_OPTS} ${DOC} ${DOC_DIR}
+done
+
+[ -d ${DOC_DIR}/examples ] || mkdir -m 0755 -p ${DOC_DIR}/examples
+install -m 0644 ${INSTALL_OPTS} pgsql-*.cf ${DOC_DIR}/examples
+install -m 0644 ${INSTALL_OPTS} vmm.cfg ${DOC_DIR}/examples
 
 echo
 echo "Don't forget to edit ${PREFIX}/etc/vmm.cfg"

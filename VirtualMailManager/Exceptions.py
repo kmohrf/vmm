@@ -6,8 +6,11 @@
 
 """Exception classes for Virtual Mail Manager"""
 
+from constants.VERSION import VERSION
+
 __author__ = 'Pascal Volk <p.volk@veb-it.de>'
-__version__ = 'rev '+'$Rev$'.split()[1]
+__version__ = VERSION
+__revision__ = 'rev '+'$Rev$'.split()[1]
 __date__ = '$Date$'.split()[1]
 
 class VMMException(Exception):

@@ -7,15 +7,13 @@
 import os
 from distutils.core import setup
 
-VERSION = '0.3.1'
+from VirtualMailManager.constants.VERSION import VERSION
 
 long_description = """
 Virtual Mail Manager is a command line tool for administrators/postmasters to
 manage domains, accounts and aliases. It's designed for Dovecot and Postfix
 with a PostgreSQL backend.
 """
-
-libdir = '/usr/local/lib'
 
 # remove existing MANIFEST
 if os.path.exists('MANIFEST'):

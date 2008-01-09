@@ -6,8 +6,11 @@
 
 """This is the vmm main script."""
 
+from VirtualMailManager.constants.VERSION import VERSION
+
 __author__ = 'Pascal Volk <p.volk@veb-it.de>'
-__version__ = 'rev '+'$Rev$'.split()[1]
+__version__ = VERSION
+__revision__ = 'rev '+'$Rev$'.split()[1]
 __date__ = '$Date$'.split()[1]
 
 import os
@@ -19,9 +22,11 @@ from VirtualMailManager.Config import VMMConfig
 import VirtualMailManager.Exceptions as VMME
 import VirtualMailManager.constants.EXIT as EXIT
 
+__prog__ = os.path.basename(sys.argv[0])
+
 def usage(excode=0, errMsg=None):
     sys.stderr.write("""\
-Usage: vmm OPTION OBJECT ARGS*
+Usage: %s OPTION OBJECT ARGS*
   short long
   option                object           args (* = optional)
 
@@ -43,7 +48,7 @@ Usage: vmm OPTION OBJECT ARGS*
   h     help
   v     version
 
-""")
+""") % __prog__
     if not errMsg is None:
         sys.stderr.write('Error: %s\n' % errMsg)
     sys.exit(excode)
@@ -285,8 +290,8 @@ if __name__ == '__main__':
         elif sys.argv[1] in ['h', 'help']:
             usage()
         elif sys.argv[1] in ['v', 'version']:
-            print "%s: %s (Date: %s)\n" % (os.path.basename(sys.argv[0]),
-                    __version__, __date__)
+            print "%s, version %s (%s from %s)\n" % (__prog__, __version__,
+                    __revision__, __date__)
         else:
             usage(EXIT.UNKNOWN_OPTION, 'Unknown option: »%s«' % sys.argv[1])
         showWarnings()

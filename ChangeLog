@@ -1,6 +1,21 @@
 === 0.0.0 ===
 2008-01-09  Pascal Volk  <neverseen@users.sourceforge.net>
 
+	* install.sh: Also install docs
+
+	* VirtualMailManager/Account.py:
+	* VirtualMailManager/Alias.py:
+	* VirtualMailManager/Config.py:
+	* VirtualMailManager/Domain.py:
+	* VirtualMailManager/Exceptions.py:
+	* VirtualMailManager/VirtualMailManager.py:
+	* setup.py:
+	* vmm: 	Included global version number.
+
+	* VirtualMailManager/constants/VERSION.py: Added to repository.
+
+2008-01-09  Pascal Volk  <neverseen@users.sourceforge.net>
+
 	* VirtualMailManager/Account.py:
 	* VirtualMailManager/Alias.py:
 	* VirtualMailManager/Domain.py:
