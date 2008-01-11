@@ -1,4 +1,8 @@
 === 0.0.0 ===
+2008-01-11  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* vmm (usage): Fixed a syntax error.
+
 2008-01-09  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* install.sh: Also install docs

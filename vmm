@@ -48,7 +48,7 @@ Usage: %s OPTION OBJECT ARGS*
   h     help
   v     version
 
-""") % __prog__
+""" % __prog__)
     if not errMsg is None:
         sys.stderr.write('Error: %s\n' % errMsg)
     sys.exit(excode)
