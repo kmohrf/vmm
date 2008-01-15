@@ -1,4 +1,9 @@
 === 0.0.0 ===
+2008-01-15  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* create_tables.pgsql: Redesign of table layout, create separate tables for
+	maildir-folder and transport. Also assign transport to users not to domains
+
 2008-01-11  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* vmm (usage): Fixed a syntax error.
