@@ -1,4 +1,10 @@
 === 0.0.0 ===
+2008-01-18  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* create_tables.pgsql: Removed unneeded sequences 'alias_id' and
+	 'relocated_id'.
+	 Removed unneeded column 'id' from table 'alias' and 'relocated'.
+
 2008-01-15  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* create_tables.pgsql: Redesign of table layout, create separate tables for

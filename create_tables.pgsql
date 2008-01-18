@@ -61,9 +61,7 @@ CREATE TABLE users (
         REFERENCES transport (tid)
 );
 
-CREATE SEQUENCE alias_id;
 CREATE TABLE alias (
-    id          bigint NOT NULL DEFAULT nextval('alias_id'),
     gid         bigint NOT NULL,
     address     varchar(256) NOT NULL,
     destination varchar(320) NOT NULL,
@@ -72,9 +70,7 @@ CREATE TABLE alias (
         REFERENCES domains (gid)
 );
 
-CREATE SEQUENCE relocated_id;
 CREATE TABLE relocated (
-    id          bigint NOT NULL DEFAULT nextval('relocated_id'),
     gid         bigint NOT NULL,
     address     varchar(64) NOT NULL,
     destination varchar(320) NOT NULL,
