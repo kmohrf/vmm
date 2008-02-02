@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-# opyright 2007-2008 VEB IT
+# Copyright 2007-2008 VEB IT
 # See COPYING for distribution information.
 # $Id$
 
@@ -32,6 +32,7 @@ from Domain import Domain
 RE_ASCII_CHARS = """^[\x20-\x7E]*$"""
 RE_DOMAIN = """^(?:[a-z0-9-]{1,63}\.){1,}[a-z]{2,6}$"""
 RE_LOCALPART = """[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]"""
+RE_MAILLOCATION = """^[\w]{1,20}$"""
 re.compile(RE_ASCII_CHARS)
 re.compile(RE_DOMAIN)
 

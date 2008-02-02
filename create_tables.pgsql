@@ -3,22 +3,22 @@
 CREATE SEQUENCE transport_id;
 CREATE TABLE transport (
     tid         bigint NOT NULL DEFAULT nextval('transport_id'),
-    transport   varchar(268) NOT NULL, -- smtp:[255-char.host.name:50025]
+    transport   varchar(270) NOT NULL, -- smtps:[255-char.host.name:50025]
     CONSTRAINT pkey_transport PRIMARY KEY (tid),
     CONSTRAINT ukey_transport UNIQUE (transport)
 );
 -- Insert default transport
 INSERT INTO transport(transport) VALUES ('dovecot:');
 
-CREATE SEQUENCE maildir_id;
-CREATE TABLE maildir(
-    mid     bigint NOT NULL DEFAULT nextval('maildir_id'),
-    maildir varchar(20) NOT NULL,
-    CONSTRAINT pkey_maildir PRIMARY KEY (mid),
-    CONSTRAINT ukey_maildir UNIQUE (maildir)
+CREATE SEQUENCE maillocation_id;
+CREATE TABLE maillocation(
+    mid     bigint NOT NULL DEFAULT nextval('maillocation_id'),
+    maillocation varchar(20) NOT NULL,
+    CONSTRAINT pkey_maillocation PRIMARY KEY (mid),
+    CONSTRAINT ukey_maillocation UNIQUE (maillocation)
 );
 -- Insert default Maildir-folder name
-INSERT INTO maildir(maildir) VALUES ('Maildir');
+INSERT INTO maillocation(maillocation) VALUES ('Maildir');
 
 CREATE SEQUENCE domains_gid
     START WITH 70000
@@ -36,10 +36,13 @@ CREATE SEQUENCE users_uid
 
 CREATE TABLE domains (
     gid         bigint NOT NULL DEFAULT nextval('domains_gid'),
+    tid         bigint NOT NULL DEFAULT 1, -- defualt transport
     domainname  varchar(255) NOT NULL,
     domaindir   varchar(40) NOT NULL, --/srv/mail/$RAND/4294967294
     CONSTRAINT pkey_domains PRIMARY KEY (gid),
-    CONSTRAINT ukey_domains UNIQUE (domainname)
+    CONSTRAINT ukey_domains UNIQUE (domainname),
+    CONSTRAINT fkey_domains_tid_transport FOREIGN KEY (tid)
+        REFERENCES transport (tid)
 );
 
 CREATE TABLE users (
@@ -55,8 +58,8 @@ CREATE TABLE users (
     CONSTRAINT ukey_users_uid UNIQUE (uid),
     CONSTRAINT fkey_users_gid_domains FOREIGN KEY (gid)
         REFERENCES domains (gid),
-    CONSTRAINT fkey_users_mid_maildir FOREIGN KEY (mid)
-        REFERENCES maildir (mid),
+    CONSTRAINT fkey_users_mid_maillocation FOREIGN KEY (mid)
+        REFERENCES maillocation (mid),
     CONSTRAINT fkey_users_tid_transport FOREIGN KEY (tid)
         REFERENCES transport (tid)
 );
@@ -105,10 +108,10 @@ CREATE OR REPLACE VIEW postfix_uid AS
 
 CREATE OR REPLACE VIEW postfix_maildir AS
     SELECT local_part || '@' || domains.domainname AS address,
-           domains.domaindir||'/'||uid||'/'||maildir.maildir||'/' AS maildir
+           domains.domaindir||'/'||uid||'/'||maillocation.maillocation||'/' AS maildir
       FROM users
            LEFT JOIN domains USING (gid)
-           LEFT JOIN maildir USING (mid);
+           LEFT JOIN maillocation USING (mid);
 
 CREATE OR REPLACE VIEW postfix_relocated AS
     SELECT address || '@' || domains.domainname AS address, destination

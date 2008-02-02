@@ -1,4 +1,15 @@
 === 0.0.0 ===
+2008-02-02  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* create_tables: Renamed table maildir to maillocation
+	Added transport id to table domains, for default transport
+	* VirtualMailManager/Transport.py:
+	* VirtualMailManager/MailLocation.py: Added to repository
+	* VirtualMailManager/constants/ERROR.py: Added error codes for MailLocation
+	and Transport classes
+	* VirtualMailManager/Exceptions.py: Added exception classes for MailLocation
+	and Transport
+
 2008-01-18  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* create_tables.pgsql: Removed unneeded sequences 'alias_id' and

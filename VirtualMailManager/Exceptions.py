@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-# opyright 2007-2008 VEB IT
+# Copyright 2007-2008 VEB IT
 # See COPYING for distribution information.
 # $Id$
 
@@ -43,6 +43,17 @@ class VMMAccountException(VMMException):
         VMMException.__init__(self, msg)
 
 class VMMAliasException(VMMException):
-    """Ausnahmeklasse für Aliasausnamhem"""
+    """Exception class for Alias exceptions"""
     def __init__(self, msg):
         VMMException.__init__(self, msg)
+
+class VMMMailLocationException(VMMException):
+    """Exception class for MailLocation exceptions"""
+    def __init__(self, msg):
+        VMMException.__init__(self, msg)
+
+class VMMTransportException(VMMException):
+    """Exception class for Transport exceptions"""
+    def __init__(self, msg):
+        VMMException.__init__(self, msg)
+
