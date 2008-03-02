@@ -11,6 +11,8 @@
 	* VirtualMailManager/VirtualMailManager.py: some small fixes
 	* VirtualMailManager/Domain.py: Added Transport-stuff
 	* vmm.cfg: Added option transport in section misc
+	* pgsql-transport.cf: changed query for new table layout
+	* pgsql-smtpd_sender_login_maps.cf: added missing single quote in query
 
 2008-02-02  Pascal Volk  <neverseen@users.sourceforge.net>
 

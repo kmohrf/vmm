@@ -9,4 +9,4 @@ password = some_password
 dbname = mailsys
 
 # Postfix 2.2 and later The SQL query template. See pgsql_table(5).
-query = SELECT transport FROM postfix_transport WHERE domainname='%s'
+query = SELECT transport FROM postfix_transport WHERE address='%s'
