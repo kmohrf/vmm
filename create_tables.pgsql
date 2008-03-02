@@ -134,3 +134,12 @@ CREATE OR REPLACE VIEW vmm_alias_count AS
     SELECT count(DISTINCT address) AS aliases, gid
       FROM alias 
   GROUP BY gid;
+
+CREATE OR REPLACE VIEW vmm_domain_info AS
+    SELECT gid, domainname, transport, domaindir, count(uid) AS accounts,
+           aliases
+      FROM domains
+           LEFT JOIN transport USING (tid)
+           LEFT JOIN users USING (gid)
+           LEFT JOIN vmm_alias_count USING (gid)
+  GROUP BY gid, domainname, transport, domaindir, aliases;

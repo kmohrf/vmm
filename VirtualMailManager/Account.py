@@ -15,21 +15,23 @@ __date__ = '$Date$'.split()[1]
 
 from Exceptions import VMMAccountException
 from Domain import Domain
+from Transport import Transport
+from MailLocation import MailLocation
 import constants.ERROR as ERR
 
 class Account:
     """Class to manage e-mail accounts."""
-    def __init__(self, dbh, basedir, address, password=None):
+    def __init__(self, dbh, address, password=None):
         self._dbh = dbh
-        self._base = basedir
         self._base = None
         self._addr = address
         self._localpart = None
         self._name = None
         self._uid = 0
         self._gid = 0
+        self._mid = 0
+        self._tid = 0
         self._passwd = password
-        self._home = None
         self._setAddr(address)
         self._exists()
         if self._isAlias():
@@ -39,35 +41,37 @@ class Account:
 
     def _exists(self):
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT uid FROM users WHERE gid=%s AND local_part=%s",
+        dbc.execute("SELECT uid, mid, tid FROM users \
+WHERE gid=%s AND local_part=%s",
                 self._gid, self._localpart)
-        uid = dbc.fetchone()
+        result = dbc.fetchone()
         dbc.close()
-        if uid is not None:
-            self._uid = uid[0]
+        if result is not None:
+            self._uid, self._mid, self._tid = result
             return True
         else:
             return False
 
     def _isAlias(self):
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT id FROM alias WHERE gid=%s AND address=%s",
+        dbc.execute("SELECT gid FROM alias WHERE gid=%s AND address=%s",
                 self._gid, self._localpart)
-        aid = dbc.fetchone()
+        gid = dbc.fetchone()
         dbc.close()
-        if aid is not None:
+        if gid is not None:
             return True
         else:
             return False
 
     def _setAddr(self, address):
         self._localpart, d = address.split('@')
-        dom = Domain(self._dbh, d, self._base)
+        dom = Domain(self._dbh, d)
         self._gid = dom.getID()
-        self._base = dom.getDir()
         if self._gid == 0:
             raise VMMAccountException(("Domain »%s« doesn't exist." % d,
                 ERR.NO_SUCH_DOMAIN))
+        self._base = dom.getDir()
+        self._tid = dom.getTransportID()
 
     def _setID(self):
         dbc = self._dbh.cursor()
@@ -75,9 +79,9 @@ class Account:
         self._uid = dbc.fetchone()[0]
         dbc.close()
 
-    def _prepare(self):
+    def _prepare(self, maillocation):
         self._setID()
-        self._home = "%i" % self._uid
+        self._mid = MailLocation(self._dbh, maillocation=maillocation).getID()
 
     def _switchState(self, state):
         if not isinstance(state, bool):
@@ -110,13 +114,13 @@ class Account:
     def disable(self):
         self._switchState(True)
 
-    def save(self, mail):
+    def save(self, maillocation):
         if self._uid < 1:
-            self._prepare()
+            self._prepare(maillocation)
             dbc = self._dbh.cursor()
             dbc.execute("""INSERT INTO users (local_part, passwd, uid, gid,\
- home, mail) VALUES (%s, %s, %s, %s, %s, %s)""", self._localpart,
-                    self._passwd, self._uid, self._gid, self._home, mail)
+ mid, tid) VALUES (%s, %s, %s, %s, %s, %s)""", self._localpart, self._passwd,
+                    self._uid, self._gid, self._mid, self._tid )
             self._dbh.commit()
             dbc.close()
         else:
@@ -142,7 +146,7 @@ class Account:
 
     def getInfo(self):
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT name, uid, gid, home, mail, disabled FROM users\
+        dbc.execute("SELECT name, uid, gid, mid, tid, disabled FROM users\
  WHERE local_part=%s AND gid=%s", self._localpart, self._gid)
         info = dbc.fetchone()
         dbc.close()
@@ -150,14 +154,18 @@ class Account:
             raise VMMAccountException(("Account doesn't exists",
                 ERR.NO_SUCH_ACCOUNT))
         else:
-            keys = ['name', 'uid', 'gid', 'home', 'mail', 'disabled']
+            keys = ['name', 'uid', 'gid', 'maildir', 'transport', 'disabled']
             info = dict(zip(keys, info))
             if bool(info['disabled']):
                 info['disabled'] = 'Yes'
             else:
                 info['disabled'] = 'No'
             info['address'] = self._addr
-            info['home'] = '%s/%s' % (self._base, info['home'])
+            info['maildir'] = '%s/%s/%s' % (self._base, info['uid'],
+                    MailLocation(self._dbh,
+                        mid=info['maildir']).getMailLocation())
+            info['transport'] = Transport(self._dbh,
+                    tid=info['transport']).getTransport()
             return info
 
     def delete(self):

@@ -1,4 +1,17 @@
 === 0.0.0 ===
+2008-03-02  Pascal Volk <neverseen@users.sourceforge.net>
+
+	* create_tables.pgsql: Added view vmm_domain_info
+	* VirtualMailManager/Alias.py: Removed attribute Alias._aid
+	Removed parameter basedir from Alias.__init__() and Alias._setAddr()
+	* VirtualMailManager/MailLocation.py: Fixed typo in MailLocation.__init__()
+	* VirtualMailManager/Account.py: Integrated Transport- and
+	MailLocation-stuff
+	Removed attributes: Account._base and Account._home
+	* VirtualMailManager/VirtualMailManager.py: some small fixes
+	* VirtualMailManager/Domain.py: Added Transport-stuff
+	* vmm.cfg: Added option transport in section misc
+
 2008-02-02  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* create_tables: Renamed table maildir to maillocation

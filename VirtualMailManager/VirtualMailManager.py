@@ -192,8 +192,7 @@ class VirtualMailManager:
         self.__dbConnect()
         if not password is None:
             password = self.__pwhash(password)
-        return Account(self.__dbh, self.__Cfg.get('maildir', 'base'), address,
-                password)
+        return Account(self.__dbh, address, password)
 
     def __getAlias(self, address, destination=None):
         address = self.__chkEmailAddress(address)
@@ -203,11 +202,12 @@ class VirtualMailManager:
             else:
                 destination = self.__chkLocalpart(destination)
         self.__dbConnect()
-        return Alias(self.__dbh, address, self.__Cfg.get('maildir', 'base'),
-                destination)
+        return Alias(self.__dbh, address, destination)
 
     def __getDomain(self, domainname, transport=None):
         domainname = self.__chkDomainname(domainname)
+        if transport is None:
+            transport = self.__Cfg.get('misc', 'transport')
         self.__dbConnect()
         return Domain(self.__dbh, domainname,
                 self.__Cfg.get('maildir', 'base'), transport)
@@ -422,7 +422,7 @@ class VirtualMailManager:
         acc = self.__getAccount(emailaddress)
         info = acc.getInfo()
         if self.__Cfg.getboolean('maildir', 'diskusage') or diskusage:
-            info['disk usage'] = self.__getDiskUsage('%(home)s/%(mail)s' % info)
+            info['disk usage'] = self.__getDiskUsage('%(maildir)s' % info)
         return info
 
     def user_password(self, emailaddress, password):

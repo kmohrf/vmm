@@ -19,7 +19,7 @@ import constants.ERROR as ERR
 
 class Alias:
     """Class to manage e-mail accounts."""
-    def __init__(self, dbh, address, basedir, destination=None):
+    def __init__(self, dbh, address, destination=None):
         if address == destination:
             raise VMMAliasException(('Address and destination are identical.',
                 ERR.ALIAS_ADDR_DEST_IDENTICAL))
@@ -28,8 +28,8 @@ class Alias:
         self._dest = destination
         self._localpart = None
         self._gid = 0
-        self._aid = 0
-        self._setAddr(basedir)
+        self._isNew = False
+        self._setAddr()
         if not self._dest is None:
             self._exists()
         if self._isAccount():
@@ -39,15 +39,14 @@ class Alias:
 
     def _exists(self):
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT id FROM alias WHERE gid=%s AND address=%s\
+        dbc.execute("SELECT gid FROM alias WHERE gid=%s AND address=%s\
  AND destination=%s", self._gid, self._localpart, self._dest)
-        aid = dbc.fetchone()
+        gid = dbc.fetchone()
         dbc.close()
-        if aid is not None:
-            self._aid = aid[0]
-            return True
+        if gid is None:
+            self._isNew = True
         else:
-            return False
+            self._isNew = False
 
     def _isAccount(self):
         dbc = self._dbh.cursor()
@@ -60,9 +59,9 @@ class Alias:
         else:
             return False
         
-    def _setAddr(self, basedir):
+    def _setAddr(self):
         self._localpart, d = self._addr.split('@')
-        dom = Domain(self._dbh, d, basedir)
+        dom = Domain(self._dbh, d)
         self._gid = dom.getID()
         if self._gid == 0:
             raise VMMAliasException(("Domain »%s« doesn't exist." % d,
@@ -72,7 +71,7 @@ class Alias:
         if self._dest is None:
            raise VMMAliasException(('No destination address for alias denoted.',
                ERR.ALIAS_MISSING_DEST))
-        if self._aid < 1:
+        if self._isNew:
             dbc = self._dbh.cursor()
             dbc.execute("INSERT INTO alias (gid, address, destination) VALUES\
  (%s, %s, %s)", self._gid, self._localpart, self._dest)

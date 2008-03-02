@@ -17,24 +17,25 @@ from random import choice
 
 from Exceptions import VMMDomainException
 import constants.ERROR as ERR
+from Transport import Transport
 
 MAILDIR_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz'
 
 class Domain:
     """Class to manage e-mail domains."""
-    def __init__(self, dbh, domainname, basedir, transport=None):
+    def __init__(self, dbh, domainname, basedir=None, transport=None):
         """Creates a new Domain instance.
         
         Keyword arguments:
         dbh -- a pyPgSQL.PgSQL.connection
         domainname -- name of the domain (str)
-        transport -- see transport(5), default 'dovecot:'  (str)
+        transport -- default vmm.cfg/misc/transport  (str)
         """
         self._dbh = dbh
         self._name = domainname
         self._basedir = basedir
-        if transport is None:
-            self._transport = 'dovecot:'
+        if transport is not None:
+            self._transport = Transport(self._dbh, transport=transport)
         else:
             self._transport = transport
         self._id = 0
@@ -48,12 +49,13 @@ class Domain:
         will be returned.
         """
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT gid, domaindir FROM domains WHERE domainname=%s",
+        dbc.execute("SELECT gid,tid,domaindir FROM domains WHERE domainname=%s",
                 self._name)
         result = dbc.fetchone()
         dbc.close()
         if result is not None:
-            self._id, self._domaindir = result[0], result[1]
+            self._id, self._domaindir = result[0], result[2]
+            self._transport = Transport(self._dbh, tid=result[1])
             return True
         else:
             return False
@@ -122,8 +124,8 @@ class Domain:
         if self._id < 1:
             self._prepare()
             dbc = self._dbh.cursor()
-            dbc.execute("INSERT INTO domains (gid, domainname, transport,\
- domaindir) VALUES (%s, %s, %s, %s)", self._id, self._name, self._transport,
+            dbc.execute("INSERT INTO domains (gid, domainname, tid, domaindir)\
+ VALUES (%s, %s, %s, %s)", self._id, self._name, self._transport.getID(),
                 self._domaindir)
             self._dbh.commit()
             dbc.close()
@@ -158,9 +160,10 @@ class Domain:
         transport -- the new transport (str)
         """
         if self._id > 0:
+            trsp = Transport(self._dbh, transport=transport)
             dbc = self._dbh.cursor()
-            dbc.execute("UPDATE domains SET transport=%s WHERE gid=%s",
-                    transport, self._id)
+            dbc.execute("UPDATE domains SET tid=%s WHERE gid=%s", trsp.getID(),
+                    self._id)
             if dbc.rowcount > 0:
                 self._dbh.commit()
             dbc.close()
@@ -176,15 +179,20 @@ class Domain:
         """Returns the directory of the domain."""
         return self._domaindir
 
+    def getTransport(self):
+        """Returns domain's transport."""
+        return self._transport.getTransport()
+
+    def getTransportID(self):
+        """Returns the ID from the domain's transport."""
+        return self._transport.getID()
+
     def getInfo(self):
         """Returns a dictionary with information about the domain."""
         sql = """\
-SELECT gid, domainname, transport, domaindir, count(uid) AS accounts, aliases
-  FROM domains
-       LEFT JOIN users USING (gid)
-       LEFT JOIN vmm_alias_count USING (gid)
- WHERE gid = %i
-GROUP BY gid, domainname, transport, domaindir, aliases""" % self._id
+SELECT gid, domainname, transport, domaindir, accounts, aliases
+  FROM vmm_domain_info
+ WHERE gid = %i""" % self._id
         dbc = self._dbh.cursor()
         dbc.execute(sql)
         info = dbc.fetchone()

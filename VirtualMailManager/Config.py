@@ -69,7 +69,8 @@ class VMMConfig(ConfigParser):
         self.__miscopts = [
                 ['passwdscheme', 'CRAM-MD5'],
                 ['gid_mail', 8],
-                ['forcedel', 'false']
+                ['forcedel', 'false'],
+                ['transport', 'dovecot:']
                 ]
 
     def load(self):

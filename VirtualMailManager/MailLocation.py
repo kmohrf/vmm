@@ -36,7 +36,7 @@ class MailLocation:
                 ERR.MAILLOCATION_INIT))
         elif mid is not None:
             try:
-                self.__id = long(tid)
+                self.__id = long(mid)
             except ValueError:
                 raise MLE(('mid must be an int/long.', ERR.MAILLOCATION_INIT))
             self._loadByID()
