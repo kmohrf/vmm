@@ -115,7 +115,7 @@ Configuring Postfix's master.cf
 Configuring Postfix's main.cf
 
     # virtual domains
-    virtual_mailbox_domains = pgsql:/etc/postfix/pgsql-transport.cf
+    virtual_mailbox_domains =  pgsql:/etc/postfix/pgsql-virtual_mailbox_domains.cf
     virtual_alias_maps = pgsql:/etc/postfix/pgsql-virtual_alias_maps.cf
     transport_maps = pgsql:/etc/postfix/pgsql-transport.cf
     virtual_minimum_uid = 70000

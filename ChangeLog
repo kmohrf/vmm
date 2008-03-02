@@ -1,5 +1,9 @@
 === 0.0.0 ===
-2008-03-02  Pascal Volk <neverseen@users.sourceforge.net>
+2008-03-03	Pascal Volk  <neverseen@users.sourceforge.net>
+	* pgsql-virtual_mailbox_domains.cf: Added to repository
+	* INSTALL: fixed postfix docu
+
+2008-03-02  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* create_tables.pgsql: Added view vmm_domain_info
 	* VirtualMailManager/Alias.py: Removed attribute Alias._aid
