@@ -43,7 +43,7 @@ Usage: %s OPTION OBJECT ARGS*
   ud    userdelete      user@domain.tld
   aa    aliasadd        alias@domain.tld user@domain.tld
   ai    aliasinfo       alias@domain.tld
-  ad    aliasdelete     alias@domain.tld
+  ad    aliasdelete     alias@domain.tld user@domain.tld*
   cf    configure                        section*
   h     help
   v     version
@@ -234,8 +234,10 @@ def alias_delete():
     global argc
     if argc < 3:
         usage(EXIT.MISSING_ARGS, 'Missing alias address')
-    else:
+    elif argc < 4:
         vmm.alias_delete(sys.argv[2].lower())
+    else:
+        vmm.alias_delete(sys.argv[2].lower(), sys.argv[3].lower())
 
 def showWarnings():
     if vmm.hasWarnings():

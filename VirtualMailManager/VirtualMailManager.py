@@ -414,8 +414,8 @@ class VirtualMailManager:
         alias = self.__getAlias(aliasaddress)
         return alias.getInfo()
 
-    def alias_delete(self, aliasaddress):
-        alias = self.__getAlias(aliasaddress)
+    def alias_delete(self, aliasaddress, targetaddress=None):
+        alias = self.__getAlias(aliasaddress, targetaddress)
         alias.delete()
 
     def user_info(self, emailaddress, diskusage=False):

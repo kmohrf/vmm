@@ -1,5 +1,12 @@
 === 0.0.0 ===
-2008-03-03	Pascal Volk  <neverseen@users.sourceforge.net>
+2008-03-04  Pascal Volk	 <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Alias.py:
+	* VirtualMailManager/VirtualMailManager.py:
+	* vmm: Now it's possible to delete an alias with a specific destination
+
+2008-03-03  Pascal Volk  <neverseen@users.sourceforge.net>
+
 	* pgsql-virtual_mailbox_domains.cf: Added to repository
 	* INSTALL: fixed postfix docu
 

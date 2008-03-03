@@ -96,8 +96,12 @@ class Alias:
 
     def delete(self):
         dbc = self._dbh.cursor()
-        dbc.execute("DELETE FROM alias WHERE gid=%s AND address=%s",
-                self._gid, self._localpart)
+        if self._dest is None:
+            dbc.execute("DELETE FROM alias WHERE gid=%s AND address=%s",
+                    self._gid, self._localpart)
+        else:
+            dbc.execute("DELETE FROM alias WHERE gid=%s AND address=%s AND \
+ destination=%s", self._gid, self._localpart, self._dest)
         rowcount = dbc.rowcount
         dbc.close()
         if rowcount > 0:
