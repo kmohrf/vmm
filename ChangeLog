@@ -1,4 +1,11 @@
 === 0.0.0 ===
+2008-03-05  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* create_tables.pgsql: Removed unneeded newlines from views dovecot_user and
+	postfix_uid
+	* update_tables_0.2.x-0.3.pgsql: Removed from repository
+	* update_tables_0.3.x-0.4.py: Added to repository
+
 2008-03-04  Pascal Volk	 <neverseen@users.sourceforge.net>
 
 	* VirtualMailManager/Alias.py:

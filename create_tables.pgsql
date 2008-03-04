@@ -90,9 +90,7 @@ CREATE OR REPLACE VIEW dovecot_password AS
 
 CREATE OR REPLACE VIEW dovecot_user AS
     SELECT local_part || '@' || domains.domainname AS userid,
-           domains.domaindir || '/' || uid AS home,
-           uid,
-           gid
+           domains.domaindir || '/' || uid AS home, uid, gid
       FROM users
            LEFT JOIN domains USING (gid);
 
@@ -101,8 +99,7 @@ CREATE OR REPLACE VIEW postfix_gid AS
       FROM domains;
 
 CREATE OR REPLACE VIEW postfix_uid AS
-    SELECT local_part || '@' || domains.domainname AS address,
-           uid
+    SELECT local_part || '@' || domains.domainname AS address, uid
       FROM users
            LEFT JOIN domains USING (gid);
 
