@@ -1,7 +1,9 @@
 Installation Prerequisites
 You should already have installed and configured Postfix, Dovecot and
 PostgreSQL.
-You have to install Python and pyPgSQL to use the Virtual Mail Manager.
+You have to install Python and pyPgSQL* to use the Virtual Mail Manager.
+
+* = http://pypgsql.sourceforge.net/ (Debian: python-pgsql)
 
 
 Configuring PostgreSQL
@@ -135,6 +137,10 @@ Configuring Postfix's main.cf
     smtpd_sasl_local_domain = $myhostname
     smtpd_sasl_security_options = noplaintext, noanonymous
 
+    smtpd_recipient_restrictions =
+      permit_mynetworks
+      permit_sasl_authenticated
+      reject_unauth_destination
 
 
 Installing the Virtual Mail Manager and configure the rest

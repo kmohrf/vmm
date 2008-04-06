@@ -60,7 +60,8 @@ class VirtualMailManager:
             self.__Cfg.load()
             self.__Cfg.check()
             self.__cfgSections = self.__Cfg.getsections()
-        self.__chkenv()
+        if not sys.argv[1] in ['cf', 'configure']:
+            self.__chkenv()
 
     def __chkCfgFile(self):
         """Checks the configuration file, returns bool"""
@@ -89,9 +90,11 @@ class VirtualMailManager:
                 self.__Cfg.get('maildir', 'base'), ERR.NO_SUCH_DIRECTORY))
         for opt, val in self.__Cfg.items('bin'):
             if not os.path.exists(val):
-                raise VMMException(("%s doesn't exists.", ERR.NO_SUCH_BINARY))
+                raise VMMException(("%s doesn't exists." % val,
+                    ERR.NO_SUCH_BINARY))
             elif not os.access(val, os.X_OK):
-                raise VMMException(("%s is not executable.", ERR.NOT_EXECUTABLE))
+                raise VMMException(("%s is not executable." % val,
+                    ERR.NOT_EXECUTABLE))
 
     def __getFileMode(self):
         """Determines the file access mode from file __cfgFileName,

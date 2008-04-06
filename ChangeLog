@@ -1,4 +1,17 @@
 === 0.0.0 ===
+2008-04-06  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* install.sh: Removed $PF_GID
+	* INSTALL: Added hints for pyPgSQL and smtpd_recipient_restrictions
+	* update_config_0.3.x-0.4.py:
+	* upgrade.sh:
+	* UPGRADE: Added to repository
+	* VirtualMailManager/VirtualMailManager.py (VirtualMailManager.__init__):
+	Don't call VirtualMailManager.__chkenv() if vmm is started with
+	option configure.
+	* VirtualMailManager/VirtualMailManager.py (VirtualMailManager.__chkenv):
+	Added value for placeholder in error message.
+
 2008-03-05  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* create_tables.pgsql: Removed unneeded newlines from views dovecot_user and
