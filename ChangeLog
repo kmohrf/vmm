@@ -1,4 +1,12 @@
 === 0.0.0 ===
+2008-04-10  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* update_tables_0.3.x-0.4.py: Replaced view dovecot_user
+	* create_tables.pgsql (VIEW: dovecot_user): Added extra field mail
+	* UPGRADE: fixed filename, hint for view permissions and user_query
+	* INSTALL: Replaced mail_extra_groups with mail_privileged_group, updated
+	user_query
+
 2008-04-06  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* install.sh: Removed $PF_GID

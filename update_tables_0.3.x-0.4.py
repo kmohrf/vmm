@@ -108,12 +108,16 @@ dbc.execute("""CREATE OR REPLACE VIEW postfix_maildir AS
             LEFT JOIN maillocation USING (mid)""")
 dbh.commit()
 
-# Update VIEW dovecot_user
+# Replace VIEW dovecot_user
+dbc.execute("DROP VIEW dovecot_user")
+dbh.commit()
 dbc.execute("""CREATE OR REPLACE VIEW dovecot_user AS
     SELECT local_part || '@' || domains.domainname AS userid,
-           domains.domaindir || '/' || uid AS home, uid, gid
+           uid, gid, domains.domaindir || '/' || uid AS home,
+           '~/' || maillocation.maillocation AS mail
       FROM users
-           LEFT JOIN domains USING (gid)""")
+           LEFT JOIN domains USING (gid)
+           LEFT JOIN maillocation USING (mid);""")
 dbh.commit()
 
 # fix table users (Part II)

@@ -39,8 +39,8 @@ Configuring PostgreSQL
 
     # set permissions
     GRANT SELECT ON dovecot_password, dovecot_user TO dovecot;
-    GRANT SELECT ON postfix_alias, postfix_maildir, postfix_relocated,
-    postfix_uid, postfix_gid, postfix_transport TO postfix;
+    GRANT SELECT ON postfix_alias, postfix_gid, postfix_maildir,
+    postfix_relocated, postfix_transport, postfix_uid TO postfix;
 
     # leave psql
     \q
@@ -58,7 +58,7 @@ Configuring Dovecot
 * /etc/dovecot/dovecot.conf
     # all your other settings
     mail_location = maildir:~/Maildir
-    mail_extra_groups = mail
+    mail_privileged_group = mail
     first_valid_uid = 70000
     first_valid_gid = 70000
     protocol lda {
@@ -92,7 +92,7 @@ Configuring Dovecot
     connect = host=localhost dbname=mailsys user=dovecot password=$Dovecot_PASS
     default_pass_scheme = HMAC-MD5
     password_query = SELECT "user", password FROM dovecot_password WHERE "user"= '%u'
-    user_query = SELECT home, uid, gid FROM dovecot_user WHERE userid = '%u'
+    user_query = SELECT home, uid, gid, mail FROM dovecot_user WHERE userid='%u'
 
 Provide a root SETUID copy of Dovecot's deliver agent for Postfix
 
