@@ -2,6 +2,8 @@ Installation Prerequisites
 You should already have installed and configured Postfix, Dovecot and
 PostgreSQL.
 You have to install Python and pyPgSQL* to use the Virtual Mail Manager.
+If you want to store the passwords as PLAIN-MD4 digest you have also to install
+python-crypto <http://www.amk.ca/python/code/crypto.html>.
 
 * = http://pypgsql.sourceforge.net/ (Debian: python-pgsql)
 
@@ -91,8 +93,8 @@ Configuring Dovecot
     driver = pgsql
     connect = host=localhost dbname=mailsys user=dovecot password=$Dovecot_PASS
     default_pass_scheme = HMAC-MD5
-    password_query = SELECT "user", password FROM dovecot_password WHERE "user"= '%u'
-    user_query = SELECT home, uid, gid, mail FROM dovecot_user WHERE userid='%u'
+    password_query = SELECT "user", password FROM dovecot_password WHERE "user"='%u'
+    user_query = SELECT home, uid, gid, 'maildir:'||mail AS mail FROM dovecot_user WHERE userid = '%u'
 
 Provide a root SETUID copy of Dovecot's deliver agent for Postfix
 

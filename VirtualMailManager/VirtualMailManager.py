@@ -29,6 +29,7 @@ from Account import Account
 from Alias import Alias
 from Domain import Domain
 
+SALTCHARS = './0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 RE_ASCII_CHARS = """^[\x20-\x7E]*$"""
 RE_DOMAIN = """^(?:[a-z0-9-]{1,63}\.){1,}[a-z]{2,6}$"""
 RE_LOCALPART = """[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]"""
@@ -60,6 +61,7 @@ class VirtualMailManager:
             self.__Cfg.load()
             self.__Cfg.check()
             self.__cfgSections = self.__Cfg.getsections()
+            self.__scheme = self.__Cfg.get('misc', 'passwdscheme')
         if not sys.argv[1] in ['cf', 'configure']:
             self.__chkenv()
 
@@ -307,12 +309,66 @@ class VirtualMailManager:
                         ERR.DOMAINDIR_GROUP_MISMATCH))
                 rmtree(domdirdirs[1], ignore_errors=True)
 
+    def __getSalt(self):
+        from random import choice
+        salt = None
+        if self.__scheme == 'CRYPT':
+            salt = '%s%s' % (choice(SALTCHARS), choice(SALTCHARS))
+        elif self.__scheme in ['MD5', 'MD5-CRYPT']:
+            salt = '$1$'
+            for i in range(8):
+                salt += choice(SALTCHARS)
+            salt += '$'
+        return salt
+
+    def __pwCrypt(self, password):
+        # for: CRYPT, MD5 and MD5-CRYPT
+        from crypt import crypt
+        return crypt(password, self.__getSalt())
+
+    def __pwSHA1(self, password):
+        # for: SHA/SHA1
+        import sha
+        from base64 import standard_b64encode
+        sha1 = sha.new(password)
+        return standard_b64encode(sha1.digest())
+
+    def __pwMD5(self, password, emailaddress=None):
+        import md5
+        _md5 = md5.new(password)
+        if self.__scheme == 'LDAP-MD5':
+            from base64 import standard_b64encode
+            return standard_b64encode(_md5.digest())
+        elif self.__scheme == 'PLAIN-MD5':
+            return _md5.hexdigest()
+        elif self.__scheme == 'DIGEST-MD5' and emailaddress is not None:
+            _md5 = md5.new('%s:%s:' % tuple(emailaddress.split('@')))
+            _md5.update(password)
+            return _md5.hexdigest()
+
+    def __pwMD4(self, password):
+        # for: PLAIN-MD4
+        from Crypto.Hash import MD4
+        _md4 = MD4.new(password)
+        return _md4.hexdigest()
+
     def __pwhash(self, password, scheme=None, user=None):
-        # XXX alle Schemen berücksichtigen XXX
-        if scheme is None:
-            scheme = self.__Cfg.get('misc', 'passwdscheme')
-        return Popen([self.__Cfg.get('bin', 'dovecotpw'), '-s', scheme, '-p',
-            password], stdout=PIPE).communicate()[0][len(scheme)+2:-1]
+        if scheme is not None:
+            self.__scheme = scheme
+        if self.__scheme in ['CRYPT', 'MD5', 'MD5-CRYPT']:
+            return '{%s}%s' % (self.__scheme, self.__pwCrypt(password))
+        elif self.__scheme in ['SHA', 'SHA1']:
+            return '{%s}%s' % (self.__scheme, self.__pwSHA1(password))
+        elif self.__scheme in ['PLAIN-MD5', 'LDAP-MD5', 'DIGEST-MD5']:
+            return '{%s}%s' % (self.__scheme, self.__pwMD5(password, user))
+        elif self.__scheme == 'MD4':
+            return '{%s}%s' % (self.__scheme, self.__pwMD4(password))
+        elif self.__scheme in ['SMD5', 'SSHA', 'CRAM-MD5', 'HMAC-MD5',
+                'LANMAN', 'NTLM', 'RPA']:
+            return Popen([self.__Cfg.get('bin', 'dovecotpw'), '-s',
+                self.__scheme,'-p',password],stdout=PIPE).communicate()[0][:-1]
+        else:
+            return '{%s}%s' % (self.__scheme, password)
 
     def hasWarnings(self):
         """Checks if warnings are present, returns bool."""

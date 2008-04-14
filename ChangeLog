@@ -1,4 +1,15 @@
 === 0.0.0 ===
+2008-04-14  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/VirtualMailManager.py: Implemented:
+	VirtualMailManager.__getSalt(), VirtualMailManager.__pwCrypt(),
+	VirtualMailManager.__pwSHA1(), VirtualMailManager.__pwMD5() and
+	VirtualMailManager.__pwMD4()
+	updated VirtualMailManager.__pwhash()
+	* VirtualMailManager/constants/VERSION.py: Set Version to 0.4-dev
+	* INSTALL: Added hint for python-crypto, fixed user_query
+
+
 2008-04-10  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* update_tables_0.3.x-0.4.py: Replaced view dovecot_user
