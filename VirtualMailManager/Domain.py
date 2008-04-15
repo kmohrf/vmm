@@ -153,11 +153,12 @@ class Domain:
             raise VMMDomainException(("Domain doesn't exist yet.",
                 ERR.NO_SUCH_DOMAIN))
 
-    def updateTransport(self, transport):
+    def updateTransport(self, transport, force = False):
         """Sets a new transport for the domain.
 
         Keyword arguments:
         transport -- the new transport (str)
+        force -- True/False force new transport for all accounts (bool)
         """
         if self._id > 0:
             trsp = Transport(self._dbh, transport=transport)
@@ -166,6 +167,11 @@ class Domain:
                     self._id)
             if dbc.rowcount > 0:
                 self._dbh.commit()
+            if force:
+                dbc.execute("UPDATE users SET tid=%s WHERE gid=%s",
+                        trsp.getID(), self._id)
+                if dbc.rowcount > 0:
+                    self._dbh.commit()
             dbc.close()
         else:
             raise VMMDomainException(("Domain doesn't exist yet.",

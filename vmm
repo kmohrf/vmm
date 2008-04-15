@@ -32,12 +32,13 @@ Usage: %s OPTION OBJECT ARGS*
 
   da    domainadd       domain.tld       transport*
   di    domaininfo      domain.tld       detailed*
-  dt    domaintransport domain.tld       transport
+  dt    domaintransport domain.tld       transport force*
   dd    domaindelete    domain.tld       delalias*|deluser*|delall*
   ua    useradd         user@domain.tld  password*
   ui    userinfo        user@domain.tld  du*
   un    username        user@domain.tld  'Users Name'
   up    userpassword    user@domain.tld  password*
+  ut    usertransport   user@domain.tld  transport
   u0    userdisable     user@domain.tld
   u1    userenable      user@domain.tld
   ud    userdelete      user@domain.tld
@@ -154,8 +155,10 @@ def domain_transport():
         usage(EXIT.MISSING_ARGS, 'Missing domain name and new transport.')
     if argc < 4:
         usage(EXIT.MISSING_ARGS, 'Missing new transport.')
-    else:
+    elif argc < 5:
         vmm.domain_transport(sys.argv[2].lower(), sys.argv[3])
+    else:
+        vmm.domain_transport(sys.argv[2].lower(), sys.argv[3], sys.argv[4])
 
 def user_add():
     global argc

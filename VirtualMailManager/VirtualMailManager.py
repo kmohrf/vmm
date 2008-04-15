@@ -414,13 +414,19 @@ class VirtualMailManager:
         dom.save()
         self.__domdirmake(dom.getDir(), dom.getID())
 
-    def domain_transport(self, domainname, transport):
+    def domain_transport(self, domainname, transport, force=None):
+        if force is not None and force != 'force':
+            raise VMMDomainException(('Invalid argument: »%s«' % force,
+                ERR.INVALID_OPTION))
         dom = self.__getDomain(domainname, None)
-        dom.updateTransport(transport)
+        if force is None:
+            dom.updateTransport(transport)
+        else:
+            dom.updateTransport(transport, force=True)
 
     def domain_delete(self, domainname, force=None):
         if not force is None and force not in ['deluser','delalias','delall']:
-            raise VMMDomainException(('Invalid argument: «%s»' % force,
+            raise VMMDomainException(('Invalid argument: »%s«' % force,
                 ERR.INVALID_OPTION))
         dom = self.__getDomain(domainname)
         gid = dom.getID()

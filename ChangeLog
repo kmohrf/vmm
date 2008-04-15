@@ -5,6 +5,11 @@
 	* vmm (main): Added code for modify user's transport
 	* VirtualMailManager/VirtualMailManager.py: Implemented
 	VirtualMailManager.user_transport()
+	* VirtualMailManager/VirtualMailManager.py
+	(VirtualMailManager.domain_transport()):
+	* vmm:
+	* VirtualMailManager/Domain.py (Domain.updateTransport()): Added code to
+	optional force new transport for all existing accounts.
 
 2008-04-14  Pascal Volk  <neverseen@users.sourceforge.net>
 
