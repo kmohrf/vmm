@@ -192,6 +192,15 @@ def user_name():
     else:
         vmm.user_name(sys.argv[2].lower(), sys.argv[3])
 
+def user_transport():
+    global argc
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS, 'Missing e-mail address and transport.')
+    if argc <4:
+        usage(EXIT.MISSING_ARGS, 'Missing transport.')
+    else:
+        vmm.user_transport(sys.argv[2].lower(), sys.argv[3])
+
 def user_enable():
     global argc
     if argc < 3:
@@ -277,6 +286,8 @@ if __name__ == '__main__':
             user_name()
         elif sys.argv[1] in ['up', 'userpassword']:
             user_password()
+        elif sys.argv[1] in ['ut', 'usertransport']:
+            user_transport()
         elif sys.argv[1] in ['u0', 'userdisable']:
             user_disable()
         elif sys.argv[1] in ['u1', 'userenable']:

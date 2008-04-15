@@ -120,7 +120,7 @@ WHERE gid=%s AND local_part=%s",
             dbc = self._dbh.cursor()
             dbc.execute("""INSERT INTO users (local_part, passwd, uid, gid,\
  mid, tid) VALUES (%s, %s, %s, %s, %s, %s)""", self._localpart, self._passwd,
-                    self._uid, self._gid, self._mid, self._tid )
+                    self._uid, self._gid, self._mid, self._tid)
             self._dbh.commit()
             dbc.close()
         else:
@@ -131,12 +131,16 @@ WHERE gid=%s AND local_part=%s",
         if self._uid == 0:
             raise VMMAccountException(("Account doesn't exists",
                 ERR.NO_SUCH_ACCOUNT))
-        if what not in ['name', 'password']:
+        if what not in ['name', 'password', 'transport']:
             return False
         dbc = self._dbh.cursor()
         if what == 'password':
             dbc.execute("UPDATE users SET passwd=%s WHERE local_part=%s AND\
  gid=%s", value, self._localpart, self._gid)
+        elif what == 'transport':
+            self._tid = Transport(self._dbh, transport=value).getID()
+            dbc.execute("UPDATE users SET tid=%s WHERE local_part=%s AND\
+ gid=%s", self._tid, self._localpart, self._gid)
         else:
             dbc.execute("UPDATE users SET name=%s WHERE local_part=%s AND\
  gid=%s", value, self._localpart, self._gid)

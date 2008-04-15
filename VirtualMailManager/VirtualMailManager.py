@@ -492,6 +492,10 @@ class VirtualMailManager:
         acc = self.__getAccount(emailaddress)
         acc.modify('name', name)
 
+    def user_transport(self, emailaddress, transport):
+        acc = self.__getAccount(emailaddress)
+        acc.modify('transport', transport)
+
     def user_disable(self, emailaddress):
         acc = self.__getAccount(emailaddress)
         acc.disable()

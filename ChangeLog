@@ -1,4 +1,11 @@
 === 0.0.0 ===
+2008-04-15  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Account.py (Account.modify()): 
+	* vmm (main): Added code for modify user's transport
+	* VirtualMailManager/VirtualMailManager.py: Implemented
+	VirtualMailManager.user_transport()
+
 2008-04-14  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* VirtualMailManager/VirtualMailManager.py: Implemented:
