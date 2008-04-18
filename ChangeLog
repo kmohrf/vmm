@@ -1,4 +1,10 @@
 === 0.0.0 ===
+2008-04-18  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Account.py: Implemented getAccountByID()
+	* VirtualMailManager/VirtualMailManager.py (VirtualMailManager): 
+	* vmm: Implemented user_byID()
+
 2008-04-15  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* VirtualMailManager/Account.py (Account.modify()): 

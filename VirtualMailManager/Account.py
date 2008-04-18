@@ -183,3 +183,26 @@ WHERE gid=%s AND local_part=%s",
         else:
             raise VMMAccountException(("Account doesn't exists",
                 ERR.NO_SUCH_ACCOUNT))
+
+
+def getAccountByID(uid, dbh):
+    try:
+        uid = long(uid)
+    except ValueError:
+        raise VMMAccountException(('uid must be an int/long.',
+            ERR.INVALID_AGUMENT))
+    if uid < 1:
+        raise VMMAccountException(('uid must be greater than 0.',
+            ERR.INVALID_AGUMENT))
+    dbc = dbh.cursor()
+    dbc.execute("SELECT local_part||'@'||domains.domainname AS address, uid,\
+ gid FROM users LEFT JOIN domains USING(gid) WHERE uid=%s", uid)
+    info = dbc.fetchone()
+    dbc.close()
+    if info is None:
+        raise VMMAccountException(("Account doesn't exists",
+            ERR.NO_SUCH_ACCOUNT))
+    keys = ['address', 'uid', 'gid']
+    info = dict(zip(keys, info))
+    return info
+

@@ -490,6 +490,11 @@ class VirtualMailManager:
             info['disk usage'] = self.__getDiskUsage('%(maildir)s' % info)
         return info
 
+    def user_byID(self, uid):
+        from Account import getAccountByID
+        self.__dbConnect()
+        return getAccountByID(uid, self.__dbh)
+
     def user_password(self, emailaddress, password):
         acc = self.__getAccount(emailaddress)
         acc.modify('password', self.__pwhash(password))

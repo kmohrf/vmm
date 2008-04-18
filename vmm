@@ -45,6 +45,7 @@ Usage: %s OPTION OBJECT ARGS*
   aa    aliasadd        alias@domain.tld user@domain.tld
   ai    aliasinfo       alias@domain.tld
   ad    aliasdelete     alias@domain.tld user@domain.tld*
+  gu    getuser         userid
   cf    configure                        section*
   h     help
   v     version
@@ -251,6 +252,13 @@ def alias_delete():
     else:
         vmm.alias_delete(sys.argv[2].lower(), sys.argv[3].lower())
 
+def user_byID():
+    global argc
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS, 'Missing userid')
+    else:
+        _printInfo(vmm.user_byID(sys.argv[2]), 'Account')
+
 def showWarnings():
     if vmm.hasWarnings():
         print '\nWarnings:'
@@ -303,6 +311,8 @@ if __name__ == '__main__':
             alias_info()
         elif sys.argv[1] in ['ad', 'aliasdelete']:
             alias_delete()
+        elif sys.argv[1] in ['gu', 'getuser']:
+            user_byID()
         elif sys.argv[1] in ['h', 'help']:
             usage()
         elif sys.argv[1] in ['v', 'version']:
