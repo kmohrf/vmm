@@ -53,7 +53,10 @@ CREATE TABLE users (
     gid         bigint NOT NULL,
     mid         bigint NOT NULL DEFAULT 1,
     tid         bigint NOT NULL DEFAULT 1,
-    disabled    boolean NOT NULL DEFAULT FALSE,
+    smpt        boolean NOT NULL DEFAULT TRUE,
+    pop3        boolean NOT NULL DEFAULT TRUE,
+    imap        boolean NOT NULL DEFAULT TRUE,
+    managesieve boolean NOT NULL DEFAULT TRUE,
     CONSTRAINT pkye_users PRIMARY KEY (local_part, gid),
     CONSTRAINT ukey_users_uid UNIQUE (uid),
     CONSTRAINT fkey_users_gid_domains FOREIGN KEY (gid)
@@ -84,7 +87,7 @@ CREATE TABLE relocated (
 
 CREATE OR REPLACE VIEW dovecot_password AS
     SELECT local_part || '@' || domains.domainname AS "user",
-           passwd AS "password"
+           passwd AS "password", smtp, pop3, imap, managesieve
       FROM users
            LEFT JOIN domains USING (gid);
 

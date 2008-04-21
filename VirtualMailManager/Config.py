@@ -58,6 +58,12 @@ class VMMConfig(ConfigParser):
                 ['diskusage', 'false'],
                 ['delete', 'false']
                 ]
+        self.__serviceopts = [
+                ['smtp', 'true'],
+                ['pop3', 'true'],
+                ['imap', 'true'],
+                ['managesieve', 'true']
+                ]
         self.__domdopts = [
                 ['mode', 504],
                 ['delete', 'false']
@@ -158,6 +164,8 @@ class VMMConfig(ConfigParser):
             opts = self.__dbopts
         elif section == 'maildir':
             opts = self.__mdopts
+        elif section == 'services':
+            opts = self.__serviceopts
         elif section == 'domdir':
             opts = self.__domdopts
         elif section == 'bin':

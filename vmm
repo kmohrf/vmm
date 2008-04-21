@@ -26,9 +26,9 @@ __prog__ = os.path.basename(sys.argv[0])
 
 def usage(excode=0, errMsg=None):
     sys.stderr.write("""\
-Usage: %s OPTION OBJECT ARGS*
+Usage: %s COMMAND OBJECT ARGS*
   short long
-  option                object           args (* = optional)
+  command               object           args (* = optional)
 
   da    domainadd       domain.tld       transport*
   di    domaininfo      domain.tld       detailed*
@@ -39,8 +39,8 @@ Usage: %s OPTION OBJECT ARGS*
   un    username        user@domain.tld  'Users Name'
   up    userpassword    user@domain.tld  password*
   ut    usertransport   user@domain.tld  transport
-  u0    userdisable     user@domain.tld
-  u1    userenable      user@domain.tld
+  u0    userdisable     user@domain.tld  smtp*|pop3*|imap*|managesieve*|all*
+  u1    userenable      user@domain.tld  smtp*|pop3*|imap*|managesieve*|all*
   ud    userdelete      user@domain.tld
   aa    aliasadd        alias@domain.tld user@domain.tld
   ai    aliasinfo       alias@domain.tld
@@ -209,15 +209,19 @@ def user_enable():
     global argc
     if argc < 3:
         usage(EXIT.MISSING_ARGS, 'Missing e-mail address.')
-    else:
+    elif argc < 4:
         vmm.user_enable(sys.argv[2].lower())
+    else:
+        vmm.user_enable(sys.argv[2].lower(), sys.argv[3].lower())
 
 def user_disable():
     global argc
     if argc < 3:
         usage(EXIT.MISSING_ARGS, 'Missing e-mail address.')
-    else:
+    elif argc < 4:
         vmm.user_disable(sys.argv[2].lower())
+    else:
+        vmm.user_disable(sys.argv[2].lower(), sys.argv[3].lower())
 
 def user_password():
     global argc
@@ -319,7 +323,7 @@ if __name__ == '__main__':
             print "%s, version %s (%s from %s)\n" % (__prog__, __version__,
                     __revision__, __date__)
         else:
-            usage(EXIT.UNKNOWN_OPTION, 'Unknown option: »%s«' % sys.argv[1])
+            usage(EXIT.UNKNOWN_COMMAND, 'Unknown command: »%s«' % sys.argv[1])
         showWarnings()
     except (EOFError, KeyboardInterrupt):
         sys.stderr.write('\nOuch!\n')

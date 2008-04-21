@@ -1,4 +1,29 @@
 === 0.0.0 ===
+2008-04-21  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* create_tables.pgsql (table users):
+		Replaced column 'disabled' with columns smpt, pop3, imap and managesieve
+	* create_tables.pgsql (view dovecot_password):
+		updated view, added service columns smpt, pop3, imap and  managesieve
+	* update_tables_0.3.x-0.4.py:
+		Updated to consider the points above mentioned
+	* vmm.cfg:
+		Added section »services« with options: smtp, pop3, imap and managesieve 
+	* update_config_0.3.x-0.4.py:
+	* VirtualMailManager/Config.py:
+		Updated, to add new section »services«
+	* VirtualMailManager/Account.py (Account._switchState(), Account.enable(),
+	Account.disable(), Account.save(), Account.getInfo()):
+	* VirtualMailManager/VirtualMailManager.py (VirtualMailManager.user_add(),
+	VirtualMailManager.user_disable(), VirtualMailManager.user_enable()):
+	* vmm (usage(), user_disable(), user_enable()):
+		Modified, to fit new database structure
+	* UPGRADE:
+	* INSTALL:
+		Updated information
+	* update_tables_0.4-dev_r24.py:
+		Added temporary to the repository
+
 2008-04-18  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* VirtualMailManager/Account.py: Implemented getAccountByID()

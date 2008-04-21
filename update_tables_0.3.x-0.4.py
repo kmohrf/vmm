@@ -70,6 +70,10 @@ dbc.execute("ALTER TABLE users ADD mid bigint NOT NULL DEFAULT 1")
 dbh.commit()
 dbc.execute("ALTER TABLE users ADD tid bigint NOT NULL DEFAULT 1")
 dbh.commit()
+for service in ['smtp', 'pop3', 'imap', 'managesieve']:
+    dbc.execute(
+            "ALTER TABLE users ADD %s boolean NOT NULL DEFAULT TRUE" % service)
+    dbh.commit()
 dbc.execute("ALTER TABLE users ADD CONSTRAINT fkey_users_mid_maillocation \
  FOREIGN KEY (mid) REFERENCES maillocation (mid)")
 dbh.commit()
@@ -90,6 +94,14 @@ if len(res):
     for mid, mailloc in res:
         dbc.execute("UPDATE users SET mid = %s WHERE mail = %s", mid,
                 maillocation)
+    dbh.commit()
+
+dbc.execute("SELECT uid FROM users WHERE disabled")
+res = dbc.fetchall()
+if len(res):
+    for uid in res:
+        dbc.execute("UPDATE users SET smtp = FALSE, pop3 = FALSE, imap = FALSE,\
+ managesieve = FALSE WHERE uid = %s", uid[0])
     dbh.commit()
 
 dbc.execute("SELECT gid, tid FROM domains")
@@ -120,10 +132,22 @@ dbc.execute("""CREATE OR REPLACE VIEW dovecot_user AS
            LEFT JOIN maillocation USING (mid);""")
 dbh.commit()
 
+# Replace VIEW dovecot_password
+dbc.execute("DROP VIEW dovecot_password")
+dbh.commit()
+dbc.execute("""CREATE OR REPLACE VIEW dovecot_password AS
+    SELECT local_part || '@' || domains.domainname AS "user",
+           passwd AS "password", smtp, pop3, imap, managesieve
+      FROM users
+           LEFT JOIN domains USING (gid)""")
+dbh.commit()
+
 # fix table users (Part II)
 dbc.execute("ALTER TABLE users DROP home")
 dbh.commit()
 dbc.execute("ALTER TABLE users DROP mail")
+dbh.commit()
+dbc.execute("ALTER TABLE users DROP disabled")
 dbh.commit()
 
 

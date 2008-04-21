@@ -83,15 +83,28 @@ WHERE gid=%s AND local_part=%s",
         self._setID()
         self._mid = MailLocation(self._dbh, maillocation=maillocation).getID()
 
-    def _switchState(self, state):
+    def _switchState(self, state, service):
         if not isinstance(state, bool):
             return False
+        if not service in ['smtp', 'pop3', 'imap', 'managesieve', 'all', None]:
+            raise VMMAccountException(("Unknown service »%s«" % service,
+                ERR.UNKNOWN_SERVICE))
         if self._uid < 1:
             raise VMMAccountException(("Account doesn't exists",
                 ERR.NO_SUCH_ACCOUNT))
         dbc = self._dbh.cursor()
-        dbc.execute("""UPDATE users SET disabled=%s WHERE local_part=%s\
- AND gid=%s""", state, self._localpart, self._gid)
+        if service in ['smtp', 'pop3', 'imap', 'managesieve']:
+            dbc.execute(
+                    "UPDATE users SET %s=%s WHERE local_part='%s' AND gid=%s"
+                    % (service, state, self._localpart, self._gid))
+        elif state:
+            dbc.execute("UPDATE users SET smtp = TRUE, pop3 = TRUE,\
+ imap = TRUE, managesieve = TRUE WHERE local_part = %s AND gid = %s",
+                self._localpart, self._gid)
+        else:
+            dbc.execute("UPDATE users SET smtp = FALSE, pop3 = FALSE,\
+ imap = FALSE, managesieve = FALSE WHERE local_part = %s AND gid = %s",
+                self._localpart, self._gid)
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
@@ -108,19 +121,21 @@ WHERE gid=%s AND local_part=%s",
         elif directory == 'home':
             return '%s/%i' % (self._base, self._uid)
 
-    def enable(self):
-        self._switchState(False)
+    def enable(self, service=None):
+        self._switchState(True, service)
 
-    def disable(self):
-        self._switchState(True)
+    def disable(self, service=None):
+        self._switchState(False, service)
 
-    def save(self, maillocation):
+    def save(self, maillocation, smtp, pop3, imap, managesieve):
         if self._uid < 1:
             self._prepare(maillocation)
             dbc = self._dbh.cursor()
             dbc.execute("""INSERT INTO users (local_part, passwd, uid, gid,\
- mid, tid) VALUES (%s, %s, %s, %s, %s, %s)""", self._localpart, self._passwd,
-                    self._uid, self._gid, self._mid, self._tid)
+ mid, tid, smtp, pop3, imap, managesieve)\
+ VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                self._localpart, self._passwd, self._uid, self._gid, self._mid,
+                self._tid, smtp, pop3, imap, managesieve)
             self._dbh.commit()
             dbc.close()
         else:
@@ -150,20 +165,23 @@ WHERE gid=%s AND local_part=%s",
 
     def getInfo(self):
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT name, uid, gid, mid, tid, disabled FROM users\
- WHERE local_part=%s AND gid=%s", self._localpart, self._gid)
+        dbc.execute("SELECT name, uid, gid, mid, tid, smtp, pop3, imap, \
+ managesieve FROM users WHERE local_part=%s AND gid=%s",
+            self._localpart, self._gid)
         info = dbc.fetchone()
         dbc.close()
         if info is None:
             raise VMMAccountException(("Account doesn't exists",
                 ERR.NO_SUCH_ACCOUNT))
         else:
-            keys = ['name', 'uid', 'gid', 'maildir', 'transport', 'disabled']
+            keys = ['name', 'uid', 'gid', 'maildir', 'transport', 'smtp',
+                    'pop3', 'imap', 'managesieve']
             info = dict(zip(keys, info))
-            if bool(info['disabled']):
-                info['disabled'] = 'Yes'
-            else:
-                info['disabled'] = 'No'
+            for service in ['smtp', 'pop3', 'imap', 'managesieve']:
+                if bool(info[service]):
+                    info[service] = 'enabled'
+                else:
+                    info[service] = 'disabled'
             info['address'] = self._addr
             info['maildir'] = '%s/%s/%s' % (self._base, info['uid'],
                     MailLocation(self._dbh,

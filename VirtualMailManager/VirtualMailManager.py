@@ -460,7 +460,11 @@ class VirtualMailManager:
 
     def user_add(self, emailaddress, password):
         acc = self.__getAccount(emailaddress, password)
-        acc.save(self.__Cfg.get('maildir', 'folder'))
+        acc.save(self.__Cfg.get('maildir', 'folder'),
+                self.__Cfg.getboolean('services', 'smtp'),
+                self.__Cfg.getboolean('services', 'pop3'),
+                self.__Cfg.getboolean('services', 'imap'),
+                self.__Cfg.getboolean('services', 'managesieve'))
         self.__maildirmake(acc.getDir('domain'), acc.getUID(), acc.getGID())
 
     def alias_add(self, aliasaddress, targetaddress):
@@ -507,13 +511,13 @@ class VirtualMailManager:
         acc = self.__getAccount(emailaddress)
         acc.modify('transport', transport)
 
-    def user_disable(self, emailaddress):
+    def user_disable(self, emailaddress, service=None):
         acc = self.__getAccount(emailaddress)
-        acc.disable()
+        acc.disable(service)
 
-    def user_enable(self, emailaddress):
+    def user_enable(self, emailaddress, service=None):
         acc = self.__getAccount(emailaddress)
-        acc.enable()
+        acc.enable(service)
 
     def __del__(self):
         if not self.__dbh is None and self.__dbh._isOpen:
