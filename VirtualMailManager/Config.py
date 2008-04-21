@@ -41,8 +41,8 @@ class VMMConfig(ConfigParser):
         ConfigParser.__init__(self)
         self.__cfgFileName = filename
         self.__cfgFile = None
-        self.__VMMsections = ['database', 'maildir', 'domdir', 'bin', 'misc',
-                'config']
+        self.__VMMsections = ['database', 'maildir', 'services', 'domdir',
+                'bin', 'misc', 'config']
         self.__changes = False
         self.__missing = {}
         self.__dbopts = [

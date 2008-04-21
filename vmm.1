@@ -1,0 +1,129 @@
+.TH "VMM" "1" "21. April 2008" "Pascal Volk" "Virtual Mail Manager"
+.SH NAME
+vmm \- commandline tool to manage e-mail domains/accounts/alias
+.SH SYNOPSIS
+.B vmm
+\fIcommand\fP \fIobject\fP [ \fIargs\fP ]
+.SH DESCRIPTION
+\fBvmm\fP (Virtual Mail Manager) is a command line tool for
+administrators/postmasters to manage domains, accounts and aliases. It's
+designed for Dovecot and Postfix with a PostgreSQL backend.
+.SH COMMANDS
+Each command has both a long and a short form. Both forms are case sensitive.
+.SS GENERAL COMMANDS
+.TP
+\fBconfigure\fP (\fBcf\fP) [ \fIsection\fP ]
+Starts the interactive configuration for all configuration sections.
+.br
+If the optional argument »section« is given, only the configuration options
+from the given section will be displayed and be configurable. The following
+sections are available:
+.RS
+.PD 0
+.TP
+-
+.B
+database
+.TP
+-
+.B
+maildir
+.TP
+-
+.B
+services
+.TP
+-
+.B
+domdir
+.TP
+-
+.B
+bin
+.TP
+-
+.B
+misc
+.PD
+.RE
+.LP
+.PP
+.nf
+        Example:
+
+        \fBvmm configure services\fP
+        * Config section: services
+        Enter new value for pop3 [True]: 
+        Enter new value for smtp [True]: 
+        Enter new value for imap [True]: 
+        Enter new value for managesieve [True]: false
+.fi
+.PP
+.TP
+\fBgetuser\fP (\fBgu\fP) \fIuserid\fP
+If only the userid is available, for example from process list, the command
+\fBgetuser\fP will show the user's address.
+.PP
+.nf
+        Example:
+.PP
+        \fBvmm getuser 70004\fP
+        Account information
+        -------------------
+                Gid............: 70000
+                Uid............: 70004
+                Address........: c.user@example.com
+.fi
+.TP
+\fBhelp\fP (\fBh\fP)
+Prints all available commands to stdout. After this \fBvmm\fP exits.
+.TP
+\fBversion\fP (\fBv\fP)
+Prints the version information from \fBvmm\fB.
+.\"
+.SS DOMAIN COMMANDS
+.TP
+\fBdomainadd\fP (\fBda\fP) \fIdomain\fP [ \fItransport\fP ]
+Adds the new domain »domain« into the database.
+.TP
+\fBdomaininfo\fP (\fBdi\fP)
+.TP
+\fBdomaintransport\fP (\fBdt\fP)
+.TP
+\fBdomaindelete\fP (\fBdd\fP)
+.\"
+.SS ACCOUNT COMMANDS
+.TP
+\fBuseradd\fP (\fBua\fP)
+.TP
+\fBuserinfo\fP (\fBui\fP)
+.TP
+\fBusername\fP (\fBun\fP)
+.TP
+\fBuserpassword\fP (\fBup\fP)
+.TP
+\fBusertransport\fP (\fBut\fP)
+.TP
+\fBuserdisable\fP (\fBu0\fP)
+.TP
+\fBuserenable\fP (\fBu1\fP)
+.TP
+\fBuserdelete\fP (\fBud\fP)
+.\"
+.SS ALIAS COMMANDS
+.TP
+\fBaliasadd\fP (\fBaa\fP)
+.TP
+\fBaliasinfo\fP (\fBai\fP)
+.TP
+\fBaliasdelete\fP (\fBad\fP)
+
+.SH FILES
+/usr/local/etc/vmm.cfg
+.SH SEE ALSO
+vmm.cgf(5), vmm configuration parameters
+.SH AUTHOR
+\fBvmm\fP and it's man pages were written by Pascal Volk
+<\fIp.volk@veb-it.de\fP> and are licensed under the terms of the
+BSD License.
+

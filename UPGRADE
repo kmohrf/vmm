@@ -8,8 +8,8 @@ If you have installed vmm 0.3.x you have to proceed this steps:
         GRANT SELECT ON dovecot_user, dovecot_password TO your_dovecot_dbuser;
         GRANT SELECT ON postfix_transport TO your_postfix_dbuser;
     * update user_query in /etc/dovecot/dovecot-sql.conf:
-        user_query = \
-         SELECT home, uid, gid, mail FROM dovecot_user WHERE userid='%u'
+    * user_query = \
+         SELECT home, uid, gid, 'maildir:'||mail AS mail FROM dovecot_user WHERE userid = '%u'
     * update password_query in /etc/dovecot/dovecot-sql.conf:
         password_query = \
          SELECT "user", password FROM dovecot_password WHERE "user"='%u' AND %Ls
