@@ -1,16 +1,16 @@
-.TH "VMM" "1" "21. April 2008" "Pascal Volk" "Virtual Mail Manager"
+.TH "VMM" "1" "22. April 2008" "Pascal Volk" "Virtual Mail Manager"
 .SH NAME
-vmm \- commandline tool to manage e-mail domains/accounts/alias
+vmm \- commandline tool to manage email domains/accounts/aliases
 .SH SYNOPSIS
 .B vmm
-\fIcommand\fP \fIobject\fP [ \fIargs\fP ]
+\fIsubcommand\fP \fIobject\fP [ \fIargs\fP ]
 .SH DESCRIPTION
 \fBvmm\fP (Virtual Mail Manager) is a command line tool for
 administrators/postmasters to manage domains, accounts and aliases. It's
 designed for Dovecot and Postfix with a PostgreSQL backend.
-.SH COMMANDS
-Each command has both a long and a short form. Both forms are case sensitive.
-.SS GENERAL COMMANDS
+.SH SUBCOMMANDS
+Each subcommand has both a long and a short form. Both forms are case sensitive.
+.SS GENERAL SUBCOMMANDS
 .TP
 \fBconfigure\fP (\fBcf\fP) [ \fIsection\fP ]
 Starts the interactive configuration for all configuration sections.
@@ -61,7 +61,7 @@ misc
 .PP
 .TP
 \fBgetuser\fP (\fBgu\fP) \fIuserid\fP
-If only the userid is available, for example from process list, the command
+If only the userid is available, for example from process list, the subcommand
 \fBgetuser\fP will show the user's address.
 .PP
 .nf
@@ -76,54 +76,107 @@ If only the userid is available, for example from process list, the command
 .fi
 .TP
 \fBhelp\fP (\fBh\fP)
-Prints all available commands to stdout. After this \fBvmm\fP exits.
+Prints all available commands to stderr. After this \fBvmm\fP exits.
 .TP
 \fBversion\fP (\fBv\fP)
 Prints the version information from \fBvmm\fB.
 .\"
-.SS DOMAIN COMMANDS
+.SS DOMAIN SUBCOMMANDS
 .TP
 \fBdomainadd\fP (\fBda\fP) \fIdomain\fP [ \fItransport\fP ]
 Adds the new domain »domain« into the database.
+.br
+If the optional argument »transport« is given, it will overwrite the default
+transport from \fBvmm.cfg\fP (misc/transport). The specified transport will be
+the default transport for all new accounts in this domain.
+.PP
+.nf
+        Examples:
+
+        \fBvmm domainadd support.example.com smtp:mx1.example.com
+        vmm domainadd sales.example.com\fP
+.fi
 .TP
-\fBdomaininfo\fP (\fBdi\fP)
+\fBdomaininfo\fP (\fBdi\fP) \fIdomain\fP [ \fIdetailed\fP ]
+This subcommand shows some information about the given domain.
+.br
+If the optional argument detailed is specified, all available accounts and
+aliases will be listed.
+.PP
+.nf
+        Example:
+
+        \fBvmm domaininfo sales.example.com\fP
+        Domain information
+        ------------------
+                Domainname.....: sales.example.com
+                Domaindir......: /home/mail/5/70002
+                Gid............: 70002
+                Accounts.......: 0
+                Transport......: dovecot:
+                Aliases........: 0
+
+.fi
 .TP
-\fBdomaintransport\fP (\fBdt\fP)
+\fBdomaintransport\fP (\fBdt\fP) \fIdomain\fP \fItransport\fP [ \fIforce\fP ]
+A new transport for the given domain can be set with this subcommand.
+.br
+If the optional argument \fIforce\fP is given all account specific transport
+settings will be overwritten.
+.br
+Otherwise this setting will affect only new created accounts.
+.PP
+.nf
+        Example:
+
+        \fBvmm domaintransport support.example.com dovecot:\fP
+.fi
 .TP
-\fBdomaindelete\fP (\fBdd\fP)
+\fBdomaindelete\fP (\fBdd\fP) \fIdomain\fP [ \fIdelalias\fP | \fIdeluser\fP |\
+ \fIdelall\fP ]
+This subcommand deletes the specified domain.
+.br
+If there are accounts and/or aliases assigned to the given domain, \fBvmm\fP
+will abort the requested operation and show a error message. If you know, what
+you are doing, you can specify one of this arguments: \fIdelalias\fP,
+\fIdeluser\fP or \fIdelall\fP.
+.br
+If you really always know what you are doing, edit your \fBvmm.cfg\fP and set
+the option \fIforcedel\fP, in section \fImisc\fP, to true.
 .\"
-.SS ACCOUNT COMMANDS
+.SS ACCOUNT SUBCOMMANDS
 .TP
-\fBuseradd\fP (\fBua\fP)
+\fBuseradd\fP (\fBua\fP) \fIaddress\fP [ \fIpassword\fP ]
 .TP
-\fBuserinfo\fP (\fBui\fP)
+\fBuserinfo\fP (\fBui\fP) \fIaddress\fP [ \fIdu\fP ]
 .TP
-\fBusername\fP (\fBun\fP)
+\fBusername\fP (\fBun\fP) \fIaddress\fP [ \fI'Users Name'\fP ]
 .TP
-\fBuserpassword\fP (\fBup\fP)
+\fBuserpassword\fP (\fBup\fP) \fIaddress\fP [ \fIpassword\fP ]
 .TP
-\fBusertransport\fP (\fBut\fP)
+\fBusertransport\fP (\fBut\fP) \fIaddress\fP [ \fItransport\fP ]
 .TP
-\fBuserdisable\fP (\fBu0\fP)
+\fBuserdisable\fP (\fBu0\fP) \fIaddress\fP [ \fIsmtp\fP | \fIpop3\fP |\
+ \fIimap\fP | \fImanagesieve\fP | \fIall\fP ]
 .TP
-\fBuserenable\fP (\fBu1\fP)
+\fBuserenable\fP (\fBu1\fP) \fIaddress\fP [ \fIsmtp\fP | \fIpop3\fP |\
+ \fIimap\fP | \fImanagesieve\fP | \fIall\fP ]
 .TP
-\fBuserdelete\fP (\fBud\fP)
+\fBuserdelete\fP (\fBud\fP) \fIaddress\fP
 .\"
-.SS ALIAS COMMANDS
+.SS ALIAS SUBCOMMANDS
 .TP
-\fBaliasadd\fP (\fBaa\fP)
+\fBaliasadd\fP (\fBaa\fP) \fIalias\fP \fItarget\fP
 .TP
-\fBaliasinfo\fP (\fBai\fP)
+\fBaliasinfo\fP (\fBai\fP) \fIalias\fP
 .TP
-\fBaliasdelete\fP (\fBad\fP)
+\fBaliasdelete\fP (\fBad\fP) \fIalias\fP [ \fItarget\fP ]
 
 .SH FILES
 /usr/local/etc/vmm.cfg
 .SH SEE ALSO
 vmm.cgf(5), vmm configuration parameters
 .SH AUTHOR
-\fBvmm\fP and it's man pages were written by Pascal Volk
-<\fIp.volk@veb-it.de\fP> and are licensed under the terms of the
-BSD License.
+\fBvmm\fP and its man pages were written by Pascal Volk
+<\fIp.volk@veb-it.de\fP> and are licensed under the terms of the BSD License.
 

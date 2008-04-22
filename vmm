@@ -26,9 +26,9 @@ __prog__ = os.path.basename(sys.argv[0])
 
 def usage(excode=0, errMsg=None):
     sys.stderr.write("""\
-Usage: %s COMMAND OBJECT ARGS*
+Usage: %s SUBCOMMAND OBJECT ARGS*
   short long
-  command               object           args (* = optional)
+  subcommand            object           args (* = optional)
 
   da    domainadd       domain.tld       transport*
   di    domaininfo      domain.tld       detailed*
@@ -323,7 +323,8 @@ if __name__ == '__main__':
             print "%s, version %s (%s from %s)\n" % (__prog__, __version__,
                     __revision__, __date__)
         else:
-            usage(EXIT.UNKNOWN_COMMAND, 'Unknown command: »%s«' % sys.argv[1])
+            usage(EXIT.UNKNOWN_COMMAND,
+                    'Unknown subcommand: »%s«' % sys.argv[1])
         showWarnings()
     except (EOFError, KeyboardInterrupt):
         sys.stderr.write('\nOuch!\n')
