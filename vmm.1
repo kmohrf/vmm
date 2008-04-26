@@ -1,4 +1,4 @@
-.TH "VMM" "1" "22. April 2008" "Pascal Volk" "Virtual Mail Manager"
+.TH "VMM" "1" "26. April 2008" "Pascal Volk" "Virtual Mail Manager"
 .SH NAME
 vmm \- commandline tool to manage email domains/accounts/aliases
 .SH SYNOPSIS
@@ -15,7 +15,7 @@ Each subcommand has both a long and a short form. Both forms are case sensitive.
 \fBconfigure\fP (\fBcf\fP) [ \fIsection\fP ]
 Starts the interactive configuration for all configuration sections.
 .br
-If the optional argument »section« is given, only the configuration options
+If the optional argument \fIsection\fP is given, only the configuration options
 from the given section will be displayed and be configurable. The following
 sections are available:
 .RS
@@ -66,7 +66,7 @@ If only the userid is available, for example from process list, the subcommand
 .PP
 .nf
         Example:
-.PP
+
         \fBvmm getuser 70004\fP
         Account information
         -------------------
@@ -84,11 +84,11 @@ Prints the version information from \fBvmm\fB.
 .SS DOMAIN SUBCOMMANDS
 .TP
 \fBdomainadd\fP (\fBda\fP) \fIdomain\fP [ \fItransport\fP ]
-Adds the new domain »domain« into the database.
+Adds the new \fIdomain\fP into the database.
 .br
-If the optional argument »transport« is given, it will overwrite the default
-transport from \fBvmm.cfg\fP (misc/transport). The specified transport will be
-the default transport for all new accounts in this domain.
+If the optional argument \fItransport\fP is given, it will overwrite the
+default transport from \fBvmm.cfg\fP (misc/transport). The specified transport
+will be the default transport for all new accounts in this domain.
 .PP
 .nf
         Examples:
@@ -100,8 +100,8 @@ the default transport for all new accounts in this domain.
 \fBdomaininfo\fP (\fBdi\fP) \fIdomain\fP [ \fIdetailed\fP ]
 This subcommand shows some information about the given domain.
 .br
-If the optional argument detailed is specified, all available accounts and
-aliases will be listed.
+If the keyword '\fBdetailed\fP' is specified as optional argument, all
+available accounts and aliases will be listed.
 .PP
 .nf
         Example:
@@ -121,7 +121,7 @@ aliases will be listed.
 \fBdomaintransport\fP (\fBdt\fP) \fIdomain\fP \fItransport\fP [ \fIforce\fP ]
 A new transport for the given domain can be set with this subcommand.
 .br
-If the optional argument \fIforce\fP is given all account specific transport
+If the additional keyword '\fBforce\fP' is given all account specific transport
 settings will be overwritten.
 .br
 Otherwise this setting will affect only new created accounts.
@@ -134,44 +134,132 @@ Otherwise this setting will affect only new created accounts.
 .TP
 \fBdomaindelete\fP (\fBdd\fP) \fIdomain\fP [ \fIdelalias\fP | \fIdeluser\fP |\
  \fIdelall\fP ]
-This subcommand deletes the specified domain.
+This subcommand deletes the specified \fIdomain\fP.
 .br
 If there are accounts and/or aliases assigned to the given domain, \fBvmm\fP
 will abort the requested operation and show a error message. If you know, what
-you are doing, you can specify one of this arguments: \fIdelalias\fP,
-\fIdeluser\fP or \fIdelall\fP.
+you are doing, you can specify one of the following keywords: '\fPdelalias\fP', '\fBdeluser\fP' or '\fBdelall\fP'.
 .br
+
 If you really always know what you are doing, edit your \fBvmm.cfg\fP and set
 the option \fIforcedel\fP, in section \fImisc\fP, to true.
 .\"
 .SS ACCOUNT SUBCOMMANDS
 .TP
 \fBuseradd\fP (\fBua\fP) \fIaddress\fP [ \fIpassword\fP ]
+Use this subcommand to create a new email account for the given \fIaddress\fP.
+.br
+If the \fIpassword\fP is not provided, \fBvmm\fP will prompt for it
+interactively.
+.PP
+.nf
+        Examples:
+
+        \fBvmm ua d.user@example.com 'A 5ecR3t P4s5\\/\\/0rd'\fP
+        \fBvmm ua e.user@example.com\fP
+        Enter new password:
+        Retype new password:
+.fi
 .TP
 \fBuserinfo\fP (\fBui\fP) \fIaddress\fP [ \fIdu\fP ]
+This subcommand displays some information about the account specified by
+\fIaddress\fP.
+.br
+If the optional argument \fIdu\fP is given, the disk usage of users maildir will
+be summarized and displayed too.
 .TP
-\fBusername\fP (\fBun\fP) \fIaddress\fP [ \fI'Users Name'\fP ]
+\fBusername\fP (\fBun\fP) \fIaddress\fP \fI'Users Name'\fP
+The users real name can be set/updated with this subcommand.
+.PP
+.nf
+        Example:
+
+        \fBvmm un d.user@example.com 'John Doe'\fP
+.fi
 .TP
 \fBuserpassword\fP (\fBup\fP) \fIaddress\fP [ \fIpassword\fP ]
+The \fIpassword\fP from an account can be updated with this subcommand.
+.br
+If the \fIpassword\fP is not provided, \fBvmm\fP will prompt for it
+interactively.
+.PP
+.nf
+        Example:
+
+        \fBvmm up d.user@example.com 'A |\\/|0r3 5ecur3 P4s5\\/\\/0rd?'\fP
+.fi
 .TP
-\fBusertransport\fP (\fBut\fP) \fIaddress\fP [ \fItransport\fP ]
+\fBusertransport\fP (\fBut\fP) \fIaddress\fP \fItransport\fP
+A different transport for an account can be specified with this subcommand.
+.PP
+.nf
+        Example:
+
+        \fBvmm ut d.user@example.com smtp:pc105.it.example.com\fP
+.fi
 .TP
 \fBuserdisable\fP (\fBu0\fP) \fIaddress\fP [ \fIsmtp\fP | \fIpop3\fP |\
  \fIimap\fP | \fImanagesieve\fP | \fIall\fP ]
+If a user shouldn't have access to one or all services you can restrict the 
+access with this subcommand.
+.br
+If no service or the keyword '\fIall\fP' is given all services ('smtp', 'pop3', 'imap', and 'managesieve') will be disabled for the account with the specified
+\fIaddress\fP. Otherwise only the specified service will be restricted.
+.PP
+.nf
+        Examples:
+
+        \fBvmm u0 b.user@example.com imap\fP
+        \fBvmm userdisable c.user@example.com\fP
+.fi
 .TP
 \fBuserenable\fP (\fBu1\fP) \fIaddress\fP [ \fIsmtp\fP | \fIpop3\fP |\
  \fIimap\fP | \fImanagesieve\fP | \fIall\fP ]
+To allow access to one or all restricted services use this subcommand.
+.br
+If no service or the keyword '\fIall\fP' is given all services ('smtp', 'pop3', 'imap', and 'managesieve') will be enabled for the account with the specified
+\fIaddress\fP. Otherwise only the specified service will be enabled.
 .TP
 \fBuserdelete\fP (\fBud\fP) \fIaddress\fP
+Use this subcommand to delete the account with the given \fIaddress\fP.
 .\"
 .SS ALIAS SUBCOMMANDS
 .TP
 \fBaliasadd\fP (\fBaa\fP) \fIalias\fP \fItarget\fP
+This subcommand is used to create a new alias.
+.PP
+.nf
+        Examples:
+
+        \fBvmm aliasadd john.doe@example.com d.user@example.com\fP
+        \fBvmm aa support@example.com d.user@example.com\fP
+        \fBvmm aa support@example.com e.user@example.com\fP
+.fi
 .TP
 \fBaliasinfo\fP (\fBai\fP) \fIalias\fP
+Information about an alias can be displayed with this subcommand.
+.PP
+.nf
+        Example:
+
+        \fBvmm aliasinfo support@example.com\fP
+        Alias information
+        -----------------
+                Mail for support@example.com goes to:
+                     -> d.user@example.com
+                     -> e.user@example.com
+.fi
 .TP
 \fBaliasdelete\fP (\fBad\fP) \fIalias\fP [ \fItarget\fP ]
-
+Use this subcommand to delete the \fIalias\fP.
+.br
+If the optional destination address \fItarget\fP is given, only this
+destination will be removed from the \fIalias\fP.
+.PP
+.nf
+        Example:
+        \fBvmm ad support@example.com d.user@example.com\fP
+.fi
 .SH FILES
 /usr/local/etc/vmm.cfg
 .SH SEE ALSO
