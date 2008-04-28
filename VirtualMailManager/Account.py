@@ -32,7 +32,7 @@ class Account:
         self._mid = 0
         self._tid = 0
         self._passwd = password
-        self._setAddr(address)
+        self._setAddr()
         self._exists()
         if self._isAlias():
             raise VMMAccountException(
@@ -63,8 +63,8 @@ WHERE gid=%s AND local_part=%s",
         else:
             return False
 
-    def _setAddr(self, address):
-        self._localpart, d = address.split('@')
+    def _setAddr(self):
+        self._localpart, d = self._addr.split('@')
         dom = Domain(self._dbh, d)
         self._gid = dom.getID()
         if self._gid == 0:

@@ -29,6 +29,9 @@ install -m 0700 ${INSTALL_OPTS} vmm ${PREFIX}/sbin
 [ -d ${MAN1DIR} ] || mkdir -m 0755 -p ${MAN1DIR}
 install -m 0644 ${INSTALL_OPTS} vmm.1 ${MAN1DIR}
 
+[ -d ${MAN5DIR} ] || mkdir -m 0755 -p ${MAN5DIR}
+install -m 0644 ${INSTALL_OPTS} vmm.cfg.5 ${MAN5DIR}
+
 [ -d ${DOC_DIR} ] || mkdir -m 0755 -p ${DOC_DIR}
 for DOC in ${DOCS}; do
     install -m 0644 ${INSTALL_OPTS} ${DOC} ${DOC_DIR}

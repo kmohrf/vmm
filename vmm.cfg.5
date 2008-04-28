@@ -1,0 +1,199 @@
+.\" $Id$
+.TH vmm.cfg 5 "28. April 2008" "Pascal Volk"
+.SH NAME
+vmm.cfg \- configuration file for vmm
+.SH SYNOPSIS
+/usr/local/etc/vmm.cfg
+.SH DESCRIPTION
+\fBvmm\fR(1) reads configuration data form \fI/usr/local/etc/vmm.cfg\fP.
+.br
+The configuration file is split in multiple sections. Sections begins with the
+section  name, enclosed in square brackets '[' and ']' (e.g. \fB[database]\fP),
+followed by \'option=value' pairs (e.g. \fBhost = 127.0.0.1\fP).
+.br
+Whitespace around the '=' and at the end of a value is ignored.
+.PP
+Empty lines and lines starting with '#' or ';' will be ignored.
+.PP
+Each value uses one of the following data types:
+.IP \(bu
+.I Boolean
+to indicate if something is enabled/activated (true) or disabled/deactivated
+(false). Accepted values for \fBtrue\fP are: \fB1\fP, \fByes\fP, \fBtrue\fP and
+\fBon\fP.
+.br
+Accepted values for \fBfalse\fP are: \fB0\fP, \fBno\fP, \fBfalse\fP and
+\fBoff\fP.
+.IP \(bu
+.I Int
+a integer number, written without a fractional or decimal component. For example
+\fB1\fP, \fB50\fP or \fB321\fP are integers.
+.IP \(bu
+.I String
+a sequence of characters and numbers. For example '\fBword\fP', '\fBhello
+world\fP', or '\fB/usr/bin/strings\fP'
+.\" -----
+.SH DATABASE SECTION
+This section contains options required for the database connection.
+.TP
+\fBhost\fP (\fIString\fP)
+Hostname or IP address of the database server.
+.TP
+\fBuser\fP (\fIString\fP)
+Name of the database user.
+.TP
+\fBpass\fP (\fIString\fP)
+Database password
+.TP
+\fBname\fP (\fIString\fP)
+Name of the database.
+.TP
+\fBExample\fP:
+[database]
+.br
+host = localhost
+.br
+user = vmm
+.br
+pass = T~_:L4OYyl]TU?)
+.br
+name = mailsys
+.\" -----
+.SH MAILDIR SECTION
+This section defines some options for the Maildirs.
+.TP
+\fBfolder\fP (\fIString\fP)
+Default name of the maildir folder in users home directory.
+.TP
+\fBmode\fP (\fIInt\fP)
+Access mode for the maildir in decimal (base 10) notation. For example:
+\'drwx------' -> octal 0700 -> decimal 448
+.TP
+\fBdiskusage\fP (\fIBoolean\fP)
+Decides if the disk usage of users maildir always should be summarized an
+displayed with account information.
+.TP
+\fBdelete\fP (\fIBoolean\fP)
+Decides if the maildir should be deleted recursive when the account is deleted.
+.TP
+\fBExample\fP:
+[maildir]
+.br
+folder = Maildir
+.br
+mode = 448
+.br
+diskusage = false
+.br
+delete = false
+.\" -----
+.SH SERVICES SECTION
+This section specifies the default restrictions for each account.
+.TP
+\fBsmtp\fP (\fIBoolean\fP)
+Decides if users can login via smtp by default. 
+.TP
+\fBpop3\fP (\fIBoolean\fP)
+Decides if users can login via pop3 by default. 
+.TP
+\fBimap\fP (\fIBoolean\fP)
+Decides if users can login via imap by default. 
+.TP
+\fBmanagesieve\fP (\fIBoolean\fP)
+Decides if users can login via managesieve by default. 
+.TP
+\fBExample\fP:
+[services]
+.br
+smtp = true
+.br
+pop3 = true
+.br
+imap = false
+.br
+managesieve = false
+.\" -----
+.SH DOMDIR SECTION
+This section defines some options for the directories of the domains.
+.TP
+\fBbase\fP (\fIString\fP)
+All domain directories will be created inside this directory.
+.TP
+\fBmode\fP (\fIInt\fP)
+Access mode for the domain directory in decimal (base 10) notation. For
+example: 'drwxrwx---' -> octal 0770 -> decimal 504
+.TP
+\fBdelete\fP (\fIBoolean\fP)
+Decides if the domain directory and all user directories inside should be
+deleted when a domain is deleted.
+.TP
+\fBExample\fP:
+[domdir]
+.br
+base = /home/mail
+.br
+mode = 504
+.br
+delete = false
+.\" -----
+.SH BIN SECTION
+This section contains some paths to some binaries.
+.TP
+\fBdovecotpw\fP (\fIString\fP)
+The absolute path to the dovecotpw binary. This binary is used to generate a
+password hash, if the \fIpasswdscheme\fP is one of 'SMD5', 'SSHA', 'CRAM-MD5',
+\'HMAC-MD5', 'LANMAN', 'NTLM' or 'RPA'.
+.TP
+\fBdu\fP (\fIString\fP)
+The absolute path to \fBdu\fR(1). This binary is used to summarize the disk
+usage of a maildir.
+.TP
+\fBExample\fP:
+[bin]
+.br
+dovecotpw = /usr/sbin/dovecotpw
+.br
+du = /usr/bin/du
+.\" -----
+.SH MISC SECTION
+This sections defines miscellaneous settings.
+.TP
+\fBpasswdscheme\fP (\fIString\fP)
+Password scheme to use (see also: dovecotpw -l)
+.TP
+\fBgid_mail\fP (\fIInt\fP)
+Numeric group ID of group mail (mail_privileged_group from dovecot.conf)
+.TP
+\fBforcedel\fP (\fIBoolean\fP)
+Force deletion of accounts and aliases when a domain is deleted.
+.TP
+\fBtransport\fP (\fIString\fP)
+Default transport for domains and accounts.
+.TP
+\fBExample\fP:
+[misc]
+.br
+passwdscheme = CRAM-MD5
+.br
+gid_mail = 8
+.br
+forcedel = false
+.br
+transport = dovecot:
+.\" -----
+.SH CONFIG SECTION
+This section is a internal control section.
+.TP
+\fBdone\fP (\fIBoolean\fP)
+This option is set to \fIfalse\fP when \fBvmm\fP is installed for the first
+time. When you edit \fIvmm.cfg\fP, set this option to \fItrue\fP. This option is
+also set to \fItrue\fP when you configure vmm with the command \fBvmm
+configure\fP.
+.br
+If this option is set to \fIfalse\fP, \fBvmm\fP will start in the interactive
+configurations mode.
+.TP
+\fBExample\fP:
+[config]
+.br
+done = true

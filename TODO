@@ -1,8 +1,5 @@
 # $Id$
 
-- general
-    - write manpages
-
 - vmm
     - add support for relocated_map
 

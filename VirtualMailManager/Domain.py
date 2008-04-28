@@ -214,7 +214,8 @@ SELECT gid, domainname, transport, domaindir, accounts, aliases
     def getAccounts(self):
         """Returns a list with all accounts from the domain."""
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT userid AS users FROM dovecot_user WHERE gid = %s",
+        dbc.execute("SELECT userid AS users FROM dovecot_user WHERE gid = %s\
+ ORDER BY users",
                 self._id)
         users = dbc.fetchall()
         dbc.close()
@@ -227,7 +228,8 @@ SELECT gid, domainname, transport, domaindir, accounts, aliases
     def getAliases(self):
         """Returns a list with all aliases from the domain."""
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT DISTINCT address FROM postfix_alias WHERE gid=%s",
+        dbc.execute("SELECT DISTINCT address FROM postfix_alias WHERE gid=%s\
+ ORDER BY address",
                 self._id)
         addresses = dbc.fetchall()
         dbc.close()

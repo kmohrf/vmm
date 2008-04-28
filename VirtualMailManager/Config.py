@@ -52,7 +52,6 @@ class VMMConfig(ConfigParser):
                 ['name', 'mailsys']
                 ]
         self.__mdopts = [
-                ['base', '/home/mail'],
                 ['folder', 'Maildir'],
                 ['mode', 448],
                 ['diskusage', 'false'],
@@ -65,6 +64,7 @@ class VMMConfig(ConfigParser):
                 ['managesieve', 'true']
                 ]
         self.__domdopts = [
+                ['base', '/home/mail'],
                 ['mode', 504],
                 ['delete', 'false']
                 ]
@@ -73,7 +73,7 @@ class VMMConfig(ConfigParser):
                 ['du', '/usr/bin/du']
                 ]
         self.__miscopts = [
-                ['passwdscheme', 'CRAM-MD5'],
+                ['passwdscheme', 'PLAIN'],
                 ['gid_mail', 8],
                 ['forcedel', 'false'],
                 ['transport', 'dovecot:']

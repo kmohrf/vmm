@@ -42,9 +42,8 @@ setup(name='VirtualMailManager',
           'Operating System :: POSIX :: Linux',
           'Operating System :: POSIX :: Other',
           'Programming Language :: Python',
-          'Topic :: Communications :: Email :: Mail Transport Agents',
-          'Topic :: Communications :: Email :: Post-Office :: IMAP',
-          'Topic :: Communications :: Email :: Post-Office :: POP3'
+          'Topic :: Communications :: Email',
+          'Topic :: System :: Systems Administration'
       ],
       requires=['pyPgSQL']
       )

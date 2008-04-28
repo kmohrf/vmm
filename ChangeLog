@@ -1,4 +1,18 @@
-=== 0.0.0 ===
+=== 0.4 ===
+2008-04-28  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* vmm.cfg:
+	* update_config_0.3.x-0.4.py:
+	* VirtualMailManager/VirtualMailManager.py:
+	* VirtualMailManager/Config.py:
+		Moved option 'base' from section 'maildir' to section 'domdir'
+	* VirtualMailManager/Account.py (Account._setAddr()):
+		Removed parameter 'address'
+	* VirtualMailManager/Domain.py (Domain.getAccounts(), Domain.getAliases()):
+		Added 'ORDER BY' clause in queries.
+	+ setup.py:
+		Adjusted trove classifiers.
+
 2008-04-21  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* create_tables.pgsql (table users):

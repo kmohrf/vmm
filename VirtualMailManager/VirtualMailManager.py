@@ -83,13 +83,13 @@ class VirtualMailManager:
 
     def __chkenv(self):
         """"""
-        if not os.path.exists(self.__Cfg.get('maildir', 'base')):
+        if not os.path.exists(self.__Cfg.get('domdir', 'base')):
             old_umask = os.umask(0007)
-            os.makedirs(self.__Cfg.get('maildir', 'base'), 0770)
+            os.makedirs(self.__Cfg.get('domdir', 'base'), 0770)
             os.umask(old_umask)
-        elif not os.path.isdir(self.__Cfg.get('maildir', 'base')):
+        elif not os.path.isdir(self.__Cfg.get('domdir', 'base')):
             raise VMMException(('%s is not a directory' %
-                self.__Cfg.get('maildir', 'base'), ERR.NO_SUCH_DIRECTORY))
+                self.__Cfg.get('domdir', 'base'), ERR.NO_SUCH_DIRECTORY))
         for opt, val in self.__Cfg.items('bin'):
             if not os.path.exists(val):
                 raise VMMException(("%s doesn't exists." % val,
@@ -215,7 +215,7 @@ class VirtualMailManager:
             transport = self.__Cfg.get('misc', 'transport')
         self.__dbConnect()
         return Domain(self.__dbh, domainname,
-                self.__Cfg.get('maildir', 'base'), transport)
+                self.__Cfg.get('domdir', 'base'), transport)
 
     def __getDiskUsage(self, directory):
         """Estimate file space usage for the given directory.
@@ -239,7 +239,7 @@ class VirtualMailManager:
     def __domdirmake(self, domdir, gid):
         os.umask(0006)
         oldpwd = os.getcwd()
-        basedir = self.__Cfg.get('maildir', 'base')
+        basedir = self.__Cfg.get('domdir', 'base')
         domdirdirs = domdir.replace(basedir+'/', '').split('/')
 
         os.chdir(basedir)
@@ -295,7 +295,7 @@ class VirtualMailManager:
 
     def __domdirdelete(self, domdir, gid):
         if gid > 0:
-            basedir = '%s' % self.__Cfg.get('maildir', 'base')
+            basedir = '%s' % self.__Cfg.get('domdir', 'base')
             domdirdirs = domdir.replace(basedir+'/', '').split('/')
             if basedir.count('..') or domdir.count('..'):
                 raise VMMException(
