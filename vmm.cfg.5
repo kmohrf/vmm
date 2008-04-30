@@ -1,13 +1,13 @@
 .\" $Id$
-.TH vmm.cfg 5 "28. April 2008" "Pascal Volk"
+.TH vmm.cfg 5 "30. April 2008" "Pascal Volk"
 .SH NAME
 vmm.cfg \- configuration file for vmm
 .SH SYNOPSIS
 /usr/local/etc/vmm.cfg
 .SH DESCRIPTION
-\fBvmm\fR(1) reads configuration data form \fI/usr/local/etc/vmm.cfg\fP.
+\fBvmm\fR(1) reads configuration data from \fI/usr/local/etc/vmm.cfg\fP.
 .br
-The configuration file is split in multiple sections. Sections begins with the
+The configuration file is split in multiple sections. A section starts with the
 section  name, enclosed in square brackets '[' and ']' (e.g. \fB[database]\fP),
 followed by \'option=value' pairs (e.g. \fBhost = 127.0.0.1\fP).
 .br
@@ -19,7 +19,9 @@ Each value uses one of the following data types:
 .IP \(bu
 .I Boolean
 to indicate if something is enabled/activated (true) or disabled/deactivated
-(false). Accepted values for \fBtrue\fP are: \fB1\fP, \fByes\fP, \fBtrue\fP and
+(false).
+.br
+Accepted values for \fBtrue\fP are: \fB1\fP, \fByes\fP, \fBtrue\fP and
 \fBon\fP.
 .br
 Accepted values for \fBfalse\fP are: \fB0\fP, \fBno\fP, \fBfalse\fP and
@@ -34,7 +36,8 @@ a sequence of characters and numbers. For example '\fBword\fP', '\fBhello
 world\fP', or '\fB/usr/bin/strings\fP'
 .\" -----
 .SH DATABASE SECTION
-This section contains options required for the database connection.
+The \fBdatabase\fP section is used to specify some options required to
+connect to the database.
 .TP
 \fBhost\fP (\fIString\fP)
 Hostname or IP address of the database server.
@@ -60,7 +63,7 @@ pass = T~_:L4OYyl]TU?)
 name = mailsys
 .\" -----
 .SH MAILDIR SECTION
-This section defines some options for the Maildirs.
+The \fBmaildir\fP section is used to specify some options for the Maildirs.
 .TP
 \fBfolder\fP (\fIString\fP)
 Default name of the maildir folder in users home directory.
@@ -88,7 +91,8 @@ diskusage = false
 delete = false
 .\" -----
 .SH SERVICES SECTION
-This section specifies the default restrictions for each account.
+The \fBservices\fP section is used to specify the default restrictions for
+all accounts.
 .TP
 \fBsmtp\fP (\fIBoolean\fP)
 Decides if users can login via smtp by default. 
@@ -114,7 +118,8 @@ imap = false
 managesieve = false
 .\" -----
 .SH DOMDIR SECTION
-This section defines some options for the directories of the domains.
+The \fBdomdir\fP section is used to specify options for the directories of the
+domains.
 .TP
 \fBbase\fP (\fIString\fP)
 All domain directories will be created inside this directory.
@@ -137,7 +142,8 @@ mode = 504
 delete = false
 .\" -----
 .SH BIN SECTION
-This section contains some paths to some binaries.
+The \fBbin\fP section is used to specify some paths to some binaries required
+by \fBvmm\fP.
 .TP
 \fBdovecotpw\fP (\fIString\fP)
 The absolute path to the dovecotpw binary. This binary is used to generate a
@@ -156,7 +162,7 @@ dovecotpw = /usr/sbin/dovecotpw
 du = /usr/bin/du
 .\" -----
 .SH MISC SECTION
-This sections defines miscellaneous settings.
+The \fBmisc\fP section is used to define miscellaneous settings.
 .TP
 \fBpasswdscheme\fP (\fIString\fP)
 Password scheme to use (see also: dovecotpw -l)
@@ -182,7 +188,7 @@ forcedel = false
 transport = dovecot:
 .\" -----
 .SH CONFIG SECTION
-This section is a internal control section.
+The \fBconfig\fP section is a internal used control section.
 .TP
 \fBdone\fP (\fIBoolean\fP)
 This option is set to \fIfalse\fP when \fBvmm\fP is installed for the first
@@ -201,7 +207,7 @@ done = true
 .SH FILES
 /usr/local/etc/vmm.cfg
 .SH SEE ALSO
-vmm(1), commandline tool to manage email domains/accounts/aliases
+vmm(1), command line tool to manage email domains/accounts/aliases
 .SH AUTHOR
 \fBvmm\fP and its man pages were written by Pascal Volk
 <\fIp.volk@veb-it.de\fP> and are licensed under the terms of the BSD License.

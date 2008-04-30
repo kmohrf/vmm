@@ -1,4 +1,11 @@
 === 0.4 ===
+2008-04-30  Pascal Volk  <neverseen@users.sourceforge.net>
+	* vmm.1, vmm.cfg.5:
+		Reworded some parts.
+	* vmm:
+		Added function _getOrder() for a (hopefully) better structured output
+		from the domaininfo, userinfo and getuser subcommands.
+
 2008-04-28  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* vmm.cfg:

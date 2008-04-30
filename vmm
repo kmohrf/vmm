@@ -92,11 +92,34 @@ def _readpass():
             sys.stderr.write('Sorry, passwords do not match\n')
     return clear0
 
+def _getOrder():
+    global argc
+    order = ()
+    if sys.argv[1] in ['di', 'domaininfo']:
+        order = (('domainname', 0), ('gid', 1), ('transport', 0),
+                ('domaindir', 0), ('accounts', 0), ('aliases', 0))
+    elif sys.argv[1] in ['ui', 'userinfo']:
+        if argc == 3:
+            order = (('address', 0), ('name', 0), ('uid', 1), ('gid', 1),
+                    ('transport', 0), ('maildir', 0), ('smtp', 1), ('pop3', 1),
+                    ('imap', 1), ('managesieve', 1))
+        else:
+            order = (('address', 0), ('name', 0), ('uid', 1), ('gid', 1),
+                    ('transport', 0), ('maildir', 0), ('disk usage', 0),
+                    ('smtp', 1), ('pop3', 1), ('imap', 1), ('managesieve', 1))
+    elif sys.argv[1] in ['gu', 'getuser']:
+        order = (('uid', 1), ('gid', 1), ('address', 0))
+    return order
+
+
 def _printInfo(info, title):
     msg = title+' information'
     print '%s\n%s' % (msg, '-'*len(msg))
-    for k,v in info.items():
-        print '\t%s: %s' % (k.title().ljust(15, '.'), v)
+    for k,u in _getOrder():
+        if u:
+            print '\t%s: %s' % (k.upper().ljust(15, '.'), info[k])
+        else:
+            print '\t%s: %s' % (k.title().ljust(15, '.'), info[k])
     print
 
 def _printUsers(users, title):

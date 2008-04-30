@@ -1,7 +1,7 @@
 .\" $Id$
-.TH "VMM" "1" "26. April 2008" "Pascal Volk" "Virtual Mail Manager"
+.TH "VMM" "1" "30. April 2008" "Pascal Volk"
 .SH NAME
-vmm \- commandline tool to manage email domains/accounts/aliases
+vmm \- command line tool to manage email domains/accounts/aliases
 .SH SYNOPSIS
 .B vmm
 \fIsubcommand\fP \fIobject\fP [ \fIargs\fP ]
@@ -17,7 +17,7 @@ Each subcommand has both a long and a short form. Both forms are case sensitive.
 Starts the interactive configuration for all configuration sections.
 .br
 If the optional argument \fIsection\fP is given, only the configuration options
-from the given section will be displayed and be configurable. The following
+from the given section will be displayed and will be configurable. The following
 sections are available:
 .RS
 .PD 0
@@ -120,7 +120,7 @@ available accounts and aliases will be listed.
 .fi
 .TP
 \fBdomaintransport\fP (\fBdt\fP) \fIdomain\fP \fItransport\fP [ \fIforce\fP ]
-A new transport for the given domain can be set with this subcommand.
+A new transport for the indicated domain can be set with this subcommand.
 .br
 If the additional keyword '\fBforce\fP' is given all account specific transport
 settings will be overwritten.
@@ -170,7 +170,7 @@ If the optional argument \fIdu\fP is given, the disk usage of users maildir will
 be summarized and displayed too.
 .TP
 \fBusername\fP (\fBun\fP) \fIaddress\fP \fI'Users Name'\fP
-The users real name can be set/updated with this subcommand.
+The user's real name can be set/updated with this subcommand.
 .PP
 .nf
         Example:
@@ -204,7 +204,7 @@ A different transport for an account can be specified with this subcommand.
 If a user shouldn't have access to one or all services you can restrict the 
 access with this subcommand.
 .br
-If no service or the keyword '\fIall\fP' is given all services ('smtp', 'pop3', 'imap', and 'managesieve') will be disabled for the account with the specified
+If neither a service nor the keyword '\fIall\fP' is given all services ('smtp', 'pop3', 'imap', and 'managesieve') will be disabled for the account with the specified
 \fIaddress\fP. Otherwise only the specified service will be restricted.
 .PP
 .nf
@@ -218,7 +218,7 @@ If no service or the keyword '\fIall\fP' is given all services ('smtp', 'pop3', 
  \fIimap\fP | \fImanagesieve\fP | \fIall\fP ]
 To allow access to one or all restricted services use this subcommand.
 .br
-If no service or the keyword '\fIall\fP' is given all services ('smtp', 'pop3', 'imap', and 'managesieve') will be enabled for the account with the specified
+If neither a service nor the keyword '\fIall\fP' is given all services ('smtp', 'pop3', 'imap', and 'managesieve') will be enabled for the account with the specified
 \fIaddress\fP. Otherwise only the specified service will be enabled.
 .TP
 \fBuserdelete\fP (\fBud\fP) \fIaddress\fP
