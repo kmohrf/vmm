@@ -53,7 +53,7 @@ CREATE TABLE users (
     gid         bigint NOT NULL,
     mid         bigint NOT NULL DEFAULT 1,
     tid         bigint NOT NULL DEFAULT 1,
-    smpt        boolean NOT NULL DEFAULT TRUE,
+    smtp        boolean NOT NULL DEFAULT TRUE,
     pop3        boolean NOT NULL DEFAULT TRUE,
     imap        boolean NOT NULL DEFAULT TRUE,
     managesieve boolean NOT NULL DEFAULT TRUE,
