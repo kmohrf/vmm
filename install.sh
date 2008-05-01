@@ -9,6 +9,7 @@ PATH=/bin:/usr/sbin:/usr/bin
 INSTALL_OPTS="-g 0 -o 0 -p -v"
 PREFIX=/usr/local
 PF_CONFDIR=$(postconf -h config_directory)
+PF_GID=$(id -g postfix)
 DOC_DIR=${PREFIX}/share/doc/vmm
 MAN1DIR=${PREFIX}/share/man/man1
 MAN5DIR=${PREFIX}/share/man/man5
@@ -23,7 +24,7 @@ python setup.py install --prefix ${PREFIX}
 python setup.py clean --all >/dev/null
 
 install -b -m 0600 ${INSTALL_OPTS} vmm.cfg ${PREFIX}/etc/
-install -b -m 0640 ${INSTALL_OPTS} pgsql-*.cf ${PF_CONFDIR}/
+install -b -m 0640 -g ${PF_GID} -o 0 -p -v pgsql-*.cf ${PF_CONFDIR}/
 install -m 0700 ${INSTALL_OPTS} vmm ${PREFIX}/sbin
 
 [ -d ${MAN1DIR} ] || mkdir -m 0755 -p ${MAN1DIR}
