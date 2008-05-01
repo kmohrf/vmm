@@ -1,5 +1,13 @@
+=== 0.0.0 ===
+2008-05-01  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/VirtualMailManager.py (VirtualMailManager.__chkenv()):
+		Create the base directory with correct access mode and gid, if it does
+		not exist yet.
+
 === 0.4 ===
 2008-04-30  Pascal Volk  <neverseen@users.sourceforge.net>
+
 	* vmm.1, vmm.cfg.5:
 		Reworded some parts.
 	* vmm:

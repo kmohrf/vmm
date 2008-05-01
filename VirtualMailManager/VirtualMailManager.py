@@ -84,8 +84,10 @@ class VirtualMailManager:
     def __chkenv(self):
         """"""
         if not os.path.exists(self.__Cfg.get('domdir', 'base')):
-            old_umask = os.umask(0007)
-            os.makedirs(self.__Cfg.get('domdir', 'base'), 0770)
+            old_umask = os.umask(0006)
+            os.makedirs(self.__Cfg.get('domdir', 'base'), 0771)
+            os.chown(self.__Cfg.get('domdir', 'base'), 0,
+                    self.__Cfg.getint('misc', 'gid_mail'))
             os.umask(old_umask)
         elif not os.path.isdir(self.__Cfg.get('domdir', 'base')):
             raise VMMException(('%s is not a directory' %
