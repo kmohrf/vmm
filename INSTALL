@@ -150,7 +150,7 @@ Installing the Virtual Mail Manager and configure the rest
     Installing from SVN or vmm-x.y.z.tar.bz2
     after checking out from svn or extracting the archive change into the new
     directory and type:
-        ./install
+        ./install.sh
     edit all the pgsql-*.cf files in /etc/postfix
 
     reload postfix
