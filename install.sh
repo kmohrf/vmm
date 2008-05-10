@@ -1,19 +1,29 @@
-#!/bin/bash
+#!/bin/sh
 # $Id$
 #
 # Installation script for the Virtual Mail Manager
 # run: ./install.sh
 
 LANG=C
-PATH=/bin:/usr/sbin:/usr/bin
-INSTALL_OPTS="-g 0 -o 0 -p -v"
+PATH=/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 PREFIX=/usr/local
 PF_CONFDIR=$(postconf -h config_directory)
-PF_GID=$(id -g postfix)
+PF_GID=$(id -g $(postconf -h mail_owner))
 DOC_DIR=${PREFIX}/share/doc/vmm
 MAN1DIR=${PREFIX}/share/man/man1
 MAN5DIR=${PREFIX}/share/man/man5
 DOCS="ChangeLog COPYING INSTALL README"
+
+case "$(uname -s)" in
+    'OpenBSD' | 'NetBSD')
+        INSTALL_OPTS="-g 0 -o 0 -p"
+        INSTALL_OPTS_CF="-b -m 0640 -g ${PF_GID} -o 0 -p"
+        ;;
+    *)
+        INSTALL_OPTS="-g 0 -o 0 -p -v"
+        INSTALL_OPTS_CF="-b -m 0640 -g ${PF_GID} -o 0 -p -v"
+        ;;
+esac
 
 if [ $(id -u) -ne 0 ]; then
     echo "Run this script as root."
@@ -24,7 +34,7 @@ python setup.py install --prefix ${PREFIX}
 python setup.py clean --all >/dev/null
 
 install -b -m 0600 ${INSTALL_OPTS} vmm.cfg ${PREFIX}/etc/
-install -b -m 0640 -g ${PF_GID} -o 0 -p -v pgsql-*.cf ${PF_CONFDIR}/
+install ${INSTALL_OPTS_CF} pgsql-*.cf ${PF_CONFDIR}/
 install -m 0700 ${INSTALL_OPTS} vmm ${PREFIX}/sbin
 
 [ -d ${MAN1DIR} ] || mkdir -m 0755 -p ${MAN1DIR}
