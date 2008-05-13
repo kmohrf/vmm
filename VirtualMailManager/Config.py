@@ -17,12 +17,17 @@ __revision__ = 'rev '+'$Rev$'.split()[1]
 __date__ = '$Date$'.split()[1]
 
 import sys
+import gettext
 from shutil import copy2
 from ConfigParser import ConfigParser
 from cStringIO import StringIO
 
 from Exceptions import VMMConfigException
 import constants.ERROR as ERR
+
+gettext.bindtextdomain('vmm', '/usr/local/share/locale')
+gettext.textdomain('vmm')
+_ = gettext.gettext
 
 class VMMConfig(ConfigParser):
     """This class is for configure the Virtual Mail Manager.

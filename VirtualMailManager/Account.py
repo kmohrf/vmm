@@ -13,11 +13,17 @@ __version__ = VERSION
 __revision__ = 'rev '+'$Rev$'.split()[1]
 __date__ = '$Date$'.split()[1]
 
+import gettext
+
 from Exceptions import VMMAccountException
 from Domain import Domain
 from Transport import Transport
 from MailLocation import MailLocation
 import constants.ERROR as ERR
+
+gettext.bindtextdomain('vmm', '/usr/local/share/locale')
+gettext.textdomain('vmm')
+_ = gettext.gettext
 
 class Account:
     """Class to manage e-mail accounts."""
@@ -36,7 +42,7 @@ class Account:
         self._exists()
         if self._isAlias():
             raise VMMAccountException(
-            ('There is already an alias with address »%s«' % address,
+            (_('There is already an alias with address »%s«') % address,
                 ERR.ALIAS_EXISTS))
 
     def _exists(self):
@@ -68,8 +74,9 @@ WHERE gid=%s AND local_part=%s",
         dom = Domain(self._dbh, d)
         self._gid = dom.getID()
         if self._gid == 0:
-            raise VMMAccountException(("Domain »%s« doesn't exist." % d,
-                ERR.NO_SUCH_DOMAIN))
+            #raise VMMAccountException(("Domain »%s« doesn't exist." % d,
+            errmsg = _('Domain »%s« does not exists.')
+            raise VMMAccountException((errmsg % d, ERR.NO_SUCH_DOMAIN))
         self._base = dom.getDir()
         self._tid = dom.getTransportID()
 

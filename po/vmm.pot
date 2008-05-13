@@ -1,0 +1,227 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2008 VEB IT
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2008-05-13 03:54+CEST\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: VirtualMailManager/Account.py:45
+msgid "There is already an alias with address \302\273%s\302\253"
+msgstr ""
+
+#: VirtualMailManager/Account.py:78
+msgid "Domain \302\273%s\302\253 does not exists."
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:55
+msgid ""
+"fix permissions for '%s'\n"
+"`chmod 0600 %s` would be great."
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:62
+msgid ""
+"You are not root.\n"
+"\tGood bye!\n"
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:76
+msgid "The file \302\273%s\302\253 does not exists."
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:98
+msgid "%s is not a directory"
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:102
+msgid "%s doesn't exists."
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:105
+msgid "%s is not executable."
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:139
+msgid "The local part is too long"
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:143
+msgid "The local part \302\273%s\302\253 contains invalid characters."
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:182
+msgid "The domain name is too long."
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:185
+msgid "The domain name is invalid."
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:193
+msgid "Missing '@' sign in e-mail address \302\273%s\302\253."
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:196
+msgid "\302\273%s\302\253 looks not like an e-mail address."
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:291
+msgid "FATAL: \"..\" in maildir path detected."
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:299
+msgid "FATAL: owner/group mismatch in maildir detected"
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:309
+msgid "FATAL: \"..\" in domain directory path detected."
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:315
+msgid "FATAL: group mismatch in domain directory detected"
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:393
+msgid ""
+"Configurtion error: \"%s\"\n"
+"(in section \"connfig\", option \"done\")'\n"
+"see also: vmm.cfg(5)\n"
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:412
+msgid "Invalid section: \302\273%s\302\253"
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:426
+#: VirtualMailManager/VirtualMailManager.py:436
+msgid "Invalid argument: \302\273%s\302\253"
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:465
+msgid "Invalid argument"
+msgstr ""
+
+#: vmm:34
+msgid ""
+"Usage: %s SUBCOMMAND OBJECT ARGS*\n"
+"  short long\n"
+"  subcommand            object           args (* = optional)\n"
+"\n"
+msgstr ""
+
+#: vmm:61 vmm:70 vmm:363
+msgid "Error"
+msgstr ""
+
+#: vmm:80 vmm:360
+msgid "Ouch"
+msgstr ""
+
+#: vmm:92
+msgid "Enter new password: "
+msgstr ""
+
+#: vmm:95
+msgid "Sorry, empty passwords are not permitted"
+msgstr ""
+
+#: vmm:96
+msgid "Retype new password: "
+msgstr ""
+
+#: vmm:99
+msgid "Sorry, passwords do not match"
+msgstr ""
+
+#: vmm:123
+msgid "information"
+msgstr ""
+
+#: vmm:133
+msgid "Available"
+msgstr ""
+
+#: vmm:139 vmm:150
+msgid "\tNone"
+msgstr ""
+
+#: vmm:143
+msgid "Alias information"
+msgstr ""
+
+#: vmm:145
+msgid "\tMail for %s goes to:"
+msgstr ""
+
+#: vmm:156 vmm:165 vmm:174
+msgid "Missing domain name."
+msgstr ""
+
+#: vmm:180
+msgid "accounts"
+msgstr ""
+
+#: vmm:181
+msgid "aliases"
+msgstr ""
+
+#: vmm:186
+msgid "Missing domain name and new transport."
+msgstr ""
+
+#: vmm:188
+msgid "Missing new transport."
+msgstr ""
+
+#: vmm:197 vmm:207 vmm:214 vmm:241 vmm:250 vmm:259
+msgid "Missing e-mail address."
+msgstr ""
+
+#: vmm:223
+msgid "Missing e-mail address and users name."
+msgstr ""
+
+#: vmm:225
+msgid "Missing users name."
+msgstr ""
+
+#: vmm:232
+msgid "Missing e-mail address and transport."
+msgstr ""
+
+#: vmm:234
+msgid "Missing transport."
+msgstr ""
+
+#: vmm:269
+msgid "Missing alias address and destination."
+msgstr ""
+
+#: vmm:276 vmm:283
+msgid "Missing alias address"
+msgstr ""
+
+#: vmm:292
+msgid "Missing userid"
+msgstr ""
+
+#: vmm:298
+msgid ""
+"\n"
+"Warnings:"
+msgstr ""
+
+#: vmm:357
+msgid "Unknown subcommand"
+msgstr ""
+

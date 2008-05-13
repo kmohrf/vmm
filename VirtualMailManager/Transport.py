@@ -14,8 +14,14 @@ __version__ = VERSION
 __revision__ = 'rev '+'$Rev$'.split()[1]
 __date__ = '$Date$'.split()[1]
 
+import gettext
+
 from Exceptions import VMMTransportException
 import constants.ERROR as ERR
+
+gettext.bindtextdomain('vmm', '/usr/local/share/locale')
+gettext.textdomain('vmm')
+_ = gettext.gettext
 
 class Transport:
     """A wrapper class thats provide access to the transport table"""

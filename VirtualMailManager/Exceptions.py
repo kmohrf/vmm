@@ -14,31 +14,31 @@ __revision__ = 'rev '+'$Rev$'.split()[1]
 __date__ = '$Date$'.split()[1]
 
 class VMMException(Exception):
-    """Ausnahmeklasse für die Klasse VirtualMailManager"""
+    """Exception class for VirtualMailManager exceptions"""
     def __init__(self, msg):
         Exception.__init__(self, msg)
 
 class VMMConfigException(Exception):
-    """Ausnahmeklasse für Konfigurationssausnamhem"""
+    """Exception class for Configurtion exceptions"""
     def __init__(self, msg):
         Exception.__init__(self, msg)
 
 class VMMPermException(Exception):
-    """Ausnahmeklasse für Berechtigungsausnamhem"""
+    """Exception class for permissions exceptions"""
     pass
 
 class VMMNotRootException(Exception):
-    """Ausnahmeklasse für unberechtige Zugriffe"""
+    """Exception class for non-root exceptions"""
     def __init__(self, msg):
         Exception.__init__(self, msg)
 
 class VMMDomainException(VMMException):
-    """Ausnahmeklasse für Domainausnamhem"""
+    """Exception class for Domain exceptions"""
     def __init__(self, msg):
         VMMException.__init__(self, msg)
 
 class VMMAccountException(VMMException):
-    """Ausnahmeklasse für Accountausnamhem"""
+    """Exception class for Account exceptions"""
     def __init__(self, msg):
         VMMException.__init__(self, msg)
 

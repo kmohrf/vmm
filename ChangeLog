@@ -1,4 +1,14 @@
 === 0.0.0 ===
+2008-05-13  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Alias.py, VirtualMailManager/MailLocation.py,
+	VirtualMailManager/Account.py, VirtualMailManager/Transport.py,
+	VirtualMailManager/VirtualMailManager.py, VirtualMailManager/Config.py,
+	VirtualMailManager/Domain.py, vmm:
+		Added i18n (gettext) support
+	* install.sh:
+		+Install message objects
+
 2008-05-01  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* VirtualMailManager/VirtualMailManager.py (VirtualMailManager.__chkenv()):

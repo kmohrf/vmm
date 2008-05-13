@@ -13,9 +13,15 @@ __version__ = VERSION
 __revision__ = 'rev '+'$Rev$'.split()[1]
 __date__ = '$Date$'.split()[1]
 
+import gettext
+
 from Exceptions import VMMAliasException
 from Domain import Domain
 import constants.ERROR as ERR
+
+gettext.bindtextdomain('vmm', '/usr/local/share/locale')
+gettext.textdomain('vmm')
+_ = gettext.gettext
 
 class Alias:
     """Class to manage e-mail accounts."""

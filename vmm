@@ -15,21 +15,27 @@ __date__ = '$Date$'.split()[1]
 
 import os
 import sys
+import gettext
 from getpass import getpass
 
 from VirtualMailManager.VirtualMailManager import VirtualMailManager
 from VirtualMailManager.Config import VMMConfig
 import VirtualMailManager.Exceptions as VMME
 import VirtualMailManager.constants.EXIT as EXIT
+import VirtualMailManager.constants.ERROR as ERR
 
 __prog__ = os.path.basename(sys.argv[0])
 
+gettext.bindtextdomain(__prog__, '/usr/local/share/locale')
+gettext.textdomain(__prog__)
+_ = gettext.gettext
+
 def usage(excode=0, errMsg=None):
-    sys.stderr.write("""\
+    sys.stderr.write(_("""\
 Usage: %s SUBCOMMAND OBJECT ARGS*
   short long
-  subcommand            object           args (* = optional)
-
+  subcommand            object           args (* = optional)\n\n""")% __prog__)
+    sys.stderr.write("""\
   da    domainadd       domain.tld       transport*
   di    domaininfo      domain.tld       detailed*
   dt    domaintransport domain.tld       transport force*
@@ -50,9 +56,9 @@ Usage: %s SUBCOMMAND OBJECT ARGS*
   h     help
   v     version
 
-""" % __prog__)
+""")
     if not errMsg is None:
-        sys.stderr.write('Error: %s\n' % errMsg)
+        sys.stderr.write('%s: %s\n' % (_('Error'), errMsg))
     sys.exit(excode)
 
 def getVMM():
@@ -61,7 +67,7 @@ def getVMM():
         return vmm
     except (VMME.VMMException, VMME.VMMNotRootException, VMME.VMMPermException,
             VMME.VMMConfigException), e:
-        sys.stderr.write("\aERROR: %s\n" % e[0][0])
+        sys.stderr.write("\a%s: %s\n" % (_('Error'),e[0][0]))
         sys.exit(e[0][1])
 
 def configure():
@@ -71,11 +77,11 @@ def configure():
         else:
             vmm.configure(sys.argv[2])
     except (EOFError, KeyboardInterrupt):
-        sys.stderr.write('\nOuch!\n')
+        sys.stderr.write('\n%s!\n' % _('Ouch'))
         sys.exit(EXIT.USER_INTERRUPT)
     except VMME.VMMConfigException, e:
         sys.stderr.write(str(e))
-        sys.exit(EXIT.CONF_ERROR)
+        sys.exit(ERR.CONF_ERROR)
     sys.exit(0)
 
 def _readpass():
@@ -83,13 +89,14 @@ def _readpass():
     clear1 = '1'
     while clear0 != clear1:
         while len(clear0) < 1:
-            clear0 = getpass(prompt='Enter new password: ')
+            clear0 = getpass(prompt=_('Enter new password: '))
             if len(clear0) < 1:
-                sys.stderr.write('Sorry, empty passwords are not permitted\n')
-        clear1 = getpass(prompt='Retype new password: ')
+                sys.stderr.write('%s\n'
+                        % _('Sorry, empty passwords are not permitted'))
+        clear1 = getpass(prompt=_('Retype new password: '))
         if clear0 != clear1:
             clear0 = ''
-            sys.stderr.write('Sorry, passwords do not match\n')
+            sys.stderr.write('%s\n' % _('Sorry, passwords do not match'))
     return clear0
 
 def _getOrder():
@@ -113,7 +120,7 @@ def _getOrder():
 
 
 def _printInfo(info, title):
-    msg = title+' information'
+    msg = '%s %s' % (title, _('information'))
     print '%s\n%s' % (msg, '-'*len(msg))
     for k,u in _getOrder():
         if u:
@@ -123,30 +130,30 @@ def _printInfo(info, title):
     print
 
 def _printUsers(users, title):
-    msg = 'Available '+title
+    msg = '%s %s' % (_('Available'), title)
     print '%s\n%s' % (msg, '-'*len(msg))
     if len(users) > 0:
         for user in users:
             print '\t%s' % user
     else:
-        print '\tNone'
+        print _('\tNone')
     print
 
 def _printAliases(alias, targets):
-    msg = 'Alias information'
+    msg = _('Alias information')
     print '%s\n%s' % (msg, '-'*len(msg))
-    print '\tMail for %s goes to:' % alias
+    print _('\tMail for %s goes to:') % alias
     if len(targets) > 0:
         for target in targets:
             print '\t     -> %s' % target
     else:
-        print '\tNone'
+        print _('\tNone')
     print
 
 def domain_add():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing domain name.')
+        usage(EXIT.MISSING_ARGS, _('Missing domain name.'))
     elif argc < 4:
         vmm.domain_add(sys.argv[2].lower())
     else:
@@ -155,7 +162,7 @@ def domain_add():
 def domain_delete():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing domain name.')
+        usage(EXIT.MISSING_ARGS, _('Missing domain name.'))
     elif argc < 4:
         vmm.domain_delete(sys.argv[2].lower())
     else:
@@ -164,21 +171,21 @@ def domain_delete():
 def domain_info():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing domain name.')
+        usage(EXIT.MISSING_ARGS, _('Missing domain name.'))
     elif argc < 4:
         _printInfo(vmm.domain_info(sys.argv[2].lower()), 'Domain')
     else:
         infos = vmm.domain_info(sys.argv[2].lower(), sys.argv[3])
         _printInfo(infos[0], 'Domain')
-        _printUsers(infos[1], 'accounts')
-        _printUsers(infos[2], 'aliases')
+        _printUsers(infos[1], _('accounts'))
+        _printUsers(infos[2], _('aliases'))
 
 def domain_transport():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing domain name and new transport.')
+        usage(EXIT.MISSING_ARGS, _('Missing domain name and new transport.'))
     if argc < 4:
-        usage(EXIT.MISSING_ARGS, 'Missing new transport.')
+        usage(EXIT.MISSING_ARGS, _('Missing new transport.'))
     elif argc < 5:
         vmm.domain_transport(sys.argv[2].lower(), sys.argv[3])
     else:
@@ -187,7 +194,7 @@ def domain_transport():
 def user_add():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing e-mail address.')
+        usage(EXIT.MISSING_ARGS, _('Missing e-mail address.'))
     elif argc < 4:
         password = _readpass()
     else:
@@ -197,14 +204,14 @@ def user_add():
 def user_delete():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing e-mail address.')
+        usage(EXIT.MISSING_ARGS, _('Missing e-mail address.'))
     else:
         vmm.user_delete(sys.argv[2].lower())
 
 def user_info():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing e-mail address.')
+        usage(EXIT.MISSING_ARGS, _('Missing e-mail address.'))
     elif argc < 4:
         _printInfo(vmm.user_info(sys.argv[2].lower()), 'Account')
     else:
@@ -213,25 +220,25 @@ def user_info():
 def user_name():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing e-mail address and users name.')
+        usage(EXIT.MISSING_ARGS, _('Missing e-mail address and users name.'))
     if argc < 4:
-        usage(EXIT.MISSING_ARGS, 'Missing users name.')
+        usage(EXIT.MISSING_ARGS, _('Missing users name.'))
     else:
         vmm.user_name(sys.argv[2].lower(), sys.argv[3])
 
 def user_transport():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing e-mail address and transport.')
+        usage(EXIT.MISSING_ARGS, _('Missing e-mail address and transport.'))
     if argc <4:
-        usage(EXIT.MISSING_ARGS, 'Missing transport.')
+        usage(EXIT.MISSING_ARGS, _('Missing transport.'))
     else:
         vmm.user_transport(sys.argv[2].lower(), sys.argv[3])
 
 def user_enable():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing e-mail address.')
+        usage(EXIT.MISSING_ARGS, _('Missing e-mail address.'))
     elif argc < 4:
         vmm.user_enable(sys.argv[2].lower())
     else:
@@ -240,7 +247,7 @@ def user_enable():
 def user_disable():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing e-mail address.')
+        usage(EXIT.MISSING_ARGS, _('Missing e-mail address.'))
     elif argc < 4:
         vmm.user_disable(sys.argv[2].lower())
     else:
@@ -249,7 +256,7 @@ def user_disable():
 def user_password():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing e-mail address.')
+        usage(EXIT.MISSING_ARGS, _('Missing e-mail address.'))
     elif argc < 4:
         password = _readpass()
     else:
@@ -259,21 +266,21 @@ def user_password():
 def alias_add():
     global argc
     if argc < 4:
-        usage(EXIT.MISSING_ARGS, 'Missing alias address and destination.')
+        usage(EXIT.MISSING_ARGS, _('Missing alias address and destination.'))
     else:
         vmm.alias_add(sys.argv[2].lower(), sys.argv[3])
 
 def alias_info():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing alias address')
+        usage(EXIT.MISSING_ARGS, _('Missing alias address'))
     else:
         _printAliases(sys.argv[2], vmm.alias_info(sys.argv[2].lower()))
 
 def alias_delete():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing alias address')
+        usage(EXIT.MISSING_ARGS, _('Missing alias address'))
     elif argc < 4:
         vmm.alias_delete(sys.argv[2].lower())
     else:
@@ -282,13 +289,13 @@ def alias_delete():
 def user_byID():
     global argc
     if argc < 3:
-        usage(EXIT.MISSING_ARGS, 'Missing userid')
+        usage(EXIT.MISSING_ARGS, _('Missing userid'))
     else:
         _printInfo(vmm.user_byID(sys.argv[2]), 'Account')
 
 def showWarnings():
     if vmm.hasWarnings():
-        print '\nWarnings:'
+        print _('\nWarnings:')
         for w in vmm.getWarnings():
             print " * ",w
 
@@ -303,7 +310,7 @@ if __name__ == '__main__':
             configure()
     except VMME.VMMConfigException, e:
         sys.stderr.write(str(e))
-        sys.exit(EXIT.CONF_ERROR)
+        sys.exit(ERR.CONF_ERROR)
     except VMME.VMMException, e:
         sys.stderr.write("\aERROR: %s\n" % e[0][0])
         sys.exit(e[0][1])
@@ -347,11 +354,11 @@ if __name__ == '__main__':
                     __revision__, __date__)
         else:
             usage(EXIT.UNKNOWN_COMMAND,
-                    'Unknown subcommand: »%s«' % sys.argv[1])
+                    '%s: »%s«' % (_('Unknown subcommand'), sys.argv[1]))
         showWarnings()
     except (EOFError, KeyboardInterrupt):
-        sys.stderr.write('\nOuch!\n')
+        sys.stderr.write('\n%s!\n' % _('Ouch'))
         sys.exit(EXIT.USER_INTERRUPT)
     except VMME.VMMException, e:
-        sys.stderr.write("\aERROR: %s\n" % e[0][0])
+        sys.stderr.write("\a%s: %s\n" % (_('Error'), e[0][0]))
         sys.exit(e[0][1])
