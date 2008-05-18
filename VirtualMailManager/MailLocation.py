@@ -37,13 +37,13 @@ class MailLocation:
         """
         self._dbh = dbh
         if mid is None and maillocation is None:
-            raise MLE(('Either mid or maillocation must be specified.',
+            raise MLE((_('Either mid or maillocation must be specified.'),
                 ERR.MAILLOCATION_INIT))
         elif mid is not None:
             try:
                 self.__id = long(mid)
             except ValueError:
-                raise MLE(('mid must be an int/long.', ERR.MAILLOCATION_INIT))
+                raise MLE((_('mid must be an int/long.'),ERR.MAILLOCATION_INIT))
             self._loadByID()
         else:
             self.__maillocation = maillocation
@@ -58,7 +58,7 @@ class MailLocation:
         if result is not None:
             self.__maillocation = result[0]
         else:
-            raise MLE(('Unknown mid specified.', ERR.UNKNOWN_MAILLOCATION_ID))
+            raise MLE((_('Unknown mid specified.'),ERR.UNKNOWN_MAILLOCATION_ID))
 
     def _loadByName(self):
         dbc = self._dbh.cursor()

@@ -69,7 +69,7 @@ class VMMConfig(ConfigParser):
                 ['managesieve', 'true']
                 ]
         self.__domdopts = [
-                ['base', '/home/mail'],
+                ['base', '/srv/mail'],
                 ['mode', 504],
                 ['delete', 'false']
                 ]
@@ -98,9 +98,9 @@ class VMMConfig(ConfigParser):
             errmsg = StringIO()
             for k,v in self.__missing.items():
                 if v[0] is True:
-                    errmsg.write("missing section: %s\n" % k)
+                    errmsg.write(_("missing section: %s\n") % k)
                 else:
-                    errmsg.write("missing options in section %s:\n" % k)
+                    errmsg.write(_("missing options in section %s:\n") % k)
                     for o in v:
                         errmsg.write(" * %s\n" % o)
             raise VMMConfigException((errmsg.getvalue(), ERR.CONF_ERROR))
@@ -116,7 +116,7 @@ class VMMConfig(ConfigParser):
         sections -- list of strings
         """
         if not isinstance(sections, list):
-            raise TypeError("Argument 'sections' is not a list.")
+            raise TypeError(_("Argument 'sections' is not a list."))
         # if [config] done = false (default at 1st run),
         # then set changes true
         try:
@@ -129,9 +129,10 @@ class VMMConfig(ConfigParser):
             if s == 'config':
                 pass
             else:
-                print '* Config section: %s' % s
+                print _('* Config section: %s') % s
             for opt, val in self.items(s):
-                newval = raw_input('Enter new value for %s [%s]: ' %(opt, val))
+                newval = raw_input(_('Enter new value for %s [%s]: ')
+                        %(opt, val))
                 if newval and newval != val:
                     self.set(s, opt, newval)
                     self.__changes = True

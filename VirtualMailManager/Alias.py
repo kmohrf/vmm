@@ -27,7 +27,8 @@ class Alias:
     """Class to manage e-mail accounts."""
     def __init__(self, dbh, address, destination=None):
         if address == destination:
-            raise VMMAliasException(('Address and destination are identical.',
+            raise VMMAliasException((
+                _('Address and destination are identical.'),
                 ERR.ALIAS_ADDR_DEST_IDENTICAL))
         self._dbh = dbh
         self._addr = address
@@ -40,7 +41,7 @@ class Alias:
             self._exists()
         if self._isAccount():
             raise VMMAliasException(
-            ('There is already an account with address »%s«' % self._addr,
+            (_(u'There is already an account with address »%s«') % self._addr,
                 ERR.ACCOUNT_EXISTS))
 
     def _exists(self):
@@ -70,12 +71,13 @@ class Alias:
         dom = Domain(self._dbh, d)
         self._gid = dom.getID()
         if self._gid == 0:
-            raise VMMAliasException(("Domain »%s« doesn't exist." % d,
+            raise VMMAliasException((_(u"Domain »%s« doesn't exist.") % d,
                 ERR.NO_SUCH_DOMAIN))
 
     def save(self):
         if self._dest is None:
-           raise VMMAliasException(('No destination address for alias denoted.',
+           raise VMMAliasException((
+               _('No destination address for alias denoted.'),
                ERR.ALIAS_MISSING_DEST))
         if self._isNew:
             dbc = self._dbh.cursor()
@@ -84,7 +86,8 @@ class Alias:
             self._dbh.commit()
             dbc.close()
         else:
-            raise VMMAliasException(("Alias already exists.", ERR.ALIAS_EXISTS))
+            raise VMMAliasException((_("Alias already exists."),
+                ERR.ALIAS_EXISTS))
 
     def getInfo(self):
         dbc = self._dbh.cursor()
@@ -98,7 +101,8 @@ class Alias:
                 targets.append(destination[0])
             return targets
         else:
-            raise VMMAliasException(("Alias doesn't exists", ERR.NO_SUCH_ALIAS))
+            raise VMMAliasException((_("Alias doesn't exists"),
+                ERR.NO_SUCH_ALIAS))
 
     def delete(self):
         dbc = self._dbh.cursor()
@@ -113,5 +117,6 @@ class Alias:
         if rowcount > 0:
             self._dbh.commit()
         else:
-            raise VMMAliasException(("Alias doesn't exists", ERR.NO_SUCH_ALIAS))
+            raise VMMAliasException((_("Alias doesn't exists"),
+                ERR.NO_SUCH_ALIAS))
 

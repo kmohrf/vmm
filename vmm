@@ -312,7 +312,7 @@ if __name__ == '__main__':
         sys.stderr.write(str(e))
         sys.exit(ERR.CONF_ERROR)
     except VMME.VMMException, e:
-        sys.stderr.write("\aERROR: %s\n" % e[0][0])
+        sys.stderr.write("\a%s: %s\n" % (_('Error'), e[0][0]))
         sys.exit(e[0][1])
     try:
         if sys.argv[1] in ['da', 'domainadd']:

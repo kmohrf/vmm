@@ -42,7 +42,7 @@ class Account:
         self._exists()
         if self._isAlias():
             raise VMMAccountException(
-            (_('There is already an alias with address »%s«') % address,
+            (_(u'There is already an alias with address »%s«') % address,
                 ERR.ALIAS_EXISTS))
 
     def _exists(self):
@@ -74,9 +74,8 @@ WHERE gid=%s AND local_part=%s",
         dom = Domain(self._dbh, d)
         self._gid = dom.getID()
         if self._gid == 0:
-            #raise VMMAccountException(("Domain »%s« doesn't exist." % d,
-            errmsg = _('Domain »%s« does not exists.')
-            raise VMMAccountException((errmsg % d, ERR.NO_SUCH_DOMAIN))
+            raise VMMAccountException((_(u"Domain »%s« doesn't exist.") % d,
+                ERR.NO_SUCH_DOMAIN))
         self._base = dom.getDir()
         self._tid = dom.getTransportID()
 
@@ -94,10 +93,10 @@ WHERE gid=%s AND local_part=%s",
         if not isinstance(state, bool):
             return False
         if not service in ['smtp', 'pop3', 'imap', 'managesieve', 'all', None]:
-            raise VMMAccountException(("Unknown service »%s«" % service,
+            raise VMMAccountException((_(u"Unknown service »%s«") % service,
                 ERR.UNKNOWN_SERVICE))
         if self._uid < 1:
-            raise VMMAccountException(("Account doesn't exists",
+            raise VMMAccountException((_("Account doesn't exists"),
                 ERR.NO_SUCH_ACCOUNT))
         dbc = self._dbh.cursor()
         if service in ['smtp', 'pop3', 'imap', 'managesieve']:
@@ -146,12 +145,12 @@ WHERE gid=%s AND local_part=%s",
             self._dbh.commit()
             dbc.close()
         else:
-            raise VMMAccountException(('Account already exists.',
+            raise VMMAccountException((_('Account already exists.'),
                 ERR.ACCOUNT_EXISTS))
        
     def modify(self, what, value):
         if self._uid == 0:
-            raise VMMAccountException(("Account doesn't exists",
+            raise VMMAccountException((_("Account doesn't exists"),
                 ERR.NO_SUCH_ACCOUNT))
         if what not in ['name', 'password', 'transport']:
             return False
@@ -178,7 +177,7 @@ WHERE gid=%s AND local_part=%s",
         info = dbc.fetchone()
         dbc.close()
         if info is None:
-            raise VMMAccountException(("Account doesn't exists",
+            raise VMMAccountException((_("Account doesn't exists"),
                 ERR.NO_SUCH_ACCOUNT))
         else:
             keys = ['name', 'uid', 'gid', 'maildir', 'transport', 'smtp',
@@ -206,7 +205,7 @@ WHERE gid=%s AND local_part=%s",
                 self._dbh.commit()
             dbc.close()
         else:
-            raise VMMAccountException(("Account doesn't exists",
+            raise VMMAccountException((_("Account doesn't exists"),
                 ERR.NO_SUCH_ACCOUNT))
 
 
@@ -214,10 +213,10 @@ def getAccountByID(uid, dbh):
     try:
         uid = long(uid)
     except ValueError:
-        raise VMMAccountException(('uid must be an int/long.',
+        raise VMMAccountException((_('uid must be an int/long.'),
             ERR.INVALID_AGUMENT))
     if uid < 1:
-        raise VMMAccountException(('uid must be greater than 0.',
+        raise VMMAccountException((_('uid must be greater than 0.'),
             ERR.INVALID_AGUMENT))
     dbc = dbh.cursor()
     dbc.execute("SELECT local_part||'@'||domains.domainname AS address, uid,\
@@ -225,7 +224,7 @@ def getAccountByID(uid, dbh):
     info = dbc.fetchone()
     dbc.close()
     if info is None:
-        raise VMMAccountException(("Account doesn't exists",
+        raise VMMAccountException((_("Account doesn't exists"),
             ERR.NO_SUCH_ACCOUNT))
     keys = ['address', 'uid', 'gid']
     info = dict(zip(keys, info))

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2008-05-13 03:54+CEST\n"
+"POT-Creation-Date: 2008-05-18 06:21+CEST\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,8 +19,117 @@ msgstr ""
 msgid "There is already an alias with address \302\273%s\302\253"
 msgstr ""
 
-#: VirtualMailManager/Account.py:78
-msgid "Domain \302\273%s\302\253 does not exists."
+#: VirtualMailManager/Account.py:77 VirtualMailManager/Alias.py:74
+msgid "Domain \302\273%s\302\253 doesn't exist."
+msgstr ""
+
+#: VirtualMailManager/Account.py:96
+msgid "Unknown service \302\273%s\302\253"
+msgstr ""
+
+#: VirtualMailManager/Account.py:99 VirtualMailManager/Account.py:153
+#: VirtualMailManager/Account.py:180 VirtualMailManager/Account.py:208
+#: VirtualMailManager/Account.py:227
+msgid "Account doesn't exists"
+msgstr ""
+
+#: VirtualMailManager/Account.py:148
+msgid "Account already exists."
+msgstr ""
+
+#: VirtualMailManager/Account.py:216
+msgid "uid must be an int/long."
+msgstr ""
+
+#: VirtualMailManager/Account.py:219
+msgid "uid must be greater than 0."
+msgstr ""
+
+#: VirtualMailManager/Alias.py:31
+msgid "Address and destination are identical."
+msgstr ""
+
+#: VirtualMailManager/Alias.py:44
+msgid "There is already an account with address \302\273%s\302\253"
+msgstr ""
+
+#: VirtualMailManager/Alias.py:80
+msgid "No destination address for alias denoted."
+msgstr ""
+
+#: VirtualMailManager/Alias.py:89
+msgid "Alias already exists."
+msgstr ""
+
+#: VirtualMailManager/Alias.py:104 VirtualMailManager/Alias.py:120
+msgid "Alias doesn't exists"
+msgstr ""
+
+#: VirtualMailManager/Config.py:101
+msgid ""
+"missing section: %s\n"
+msgstr ""
+
+#: VirtualMailManager/Config.py:103
+msgid ""
+"missing options in section %s:\n"
+msgstr ""
+
+#: VirtualMailManager/Config.py:119
+msgid "Argument 'sections' is not a list."
+msgstr ""
+
+#: VirtualMailManager/Config.py:132
+msgid "* Config section: %s"
+msgstr ""
+
+#: VirtualMailManager/Config.py:134
+msgid "Enter new value for %s [%s]: "
+msgstr ""
+
+#: VirtualMailManager/Domain.py:119
+msgid "There are accounts and aliases."
+msgstr ""
+
+#: VirtualMailManager/Domain.py:122
+msgid "There are accounts."
+msgstr ""
+
+#: VirtualMailManager/Domain.py:125
+msgid "There are aliases."
+msgstr ""
+
+#: VirtualMailManager/Domain.py:139
+msgid "Domain already exists."
+msgstr ""
+
+#: VirtualMailManager/Domain.py:159 VirtualMailManager/Domain.py:183
+#: VirtualMailManager/Domain.py:213
+msgid "Domain doesn't exist yet."
+msgstr ""
+
+#: VirtualMailManager/MailLocation.py:40
+msgid "Either mid or maillocation must be specified."
+msgstr ""
+
+#: VirtualMailManager/MailLocation.py:46
+msgid "mid must be an int/long."
+msgstr ""
+
+#: VirtualMailManager/MailLocation.py:61
+msgid "Unknown mid specified."
+msgstr ""
+
+#: VirtualMailManager/Transport.py:41
+msgid "Either tid or transport must be specified."
+msgstr ""
+
+#: VirtualMailManager/Transport.py:47
+msgid "tid must be an int/long."
+msgstr ""
+
+#: VirtualMailManager/Transport.py:62
+msgid "Unknown tid specified."
 msgstr ""
 
 #: VirtualMailManager/VirtualMailManager.py:55
@@ -119,7 +228,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: vmm:61 vmm:70 vmm:363
+#: vmm:61 vmm:70 vmm:315 vmm:363
 msgid "Error"
 msgstr ""
 

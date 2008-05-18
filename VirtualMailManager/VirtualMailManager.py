@@ -73,7 +73,7 @@ class VirtualMailManager:
     def __chkCfgFile(self):
         """Checks the configuration file, returns bool"""
         if not os.path.isfile(self.__cfgFileName):
-            raise VMMException((_("The file »%s« does not exists.") %
+            raise VMMException((_(u"The file »%s« does not exists.") %
                 self.__cfgFileName, ERR.CONF_NOFILE))
         fstat = os.stat(self.__cfgFileName)
         try:
@@ -140,7 +140,7 @@ class VirtualMailManager:
                 ERR.LOCALPART_TOO_LONG))
         if re.compile(RE_LOCALPART).search(localpart):
             raise VMMException((
-                _('The local part »%s« contains invalid characters.') %
+                _(u'The local part »%s« contains invalid characters.') %
                 localpart, ERR.LOCALPART_INVALID))
         return localpart
 
@@ -190,10 +190,10 @@ class VirtualMailManager:
         try:
             localpart, domain = address.split('@')
         except ValueError:
-            raise VMMException((_("Missing '@' sign in e-mail address »%s«.") %
+            raise VMMException((_(u"Missing '@' sign in e-mail address »%s«.") %
                 address, ERR.INVALID_ADDRESS))
         except AttributeError:
-            raise VMMException((_("»%s« looks not like an e-mail address.") %
+            raise VMMException((_(u"»%s« looks not like an e-mail address.") %
                 address, ERR.INVALID_ADDRESS))
         domain = self.__chkDomainname(domain)
         localpart = self.__chkLocalpart(localpart)
@@ -409,7 +409,7 @@ see also: vmm.cfg(5)\n""") % str(e))
             if not section:
                 self.__Cfg.configure(self.__cfgSections)
             elif section not in self.__cfgSections:
-                raise VMMException((_("Invalid section: »%s«") % section,
+                raise VMMException((_(u"Invalid section: »%s«") % section,
                     ERR.INVALID_SECTION))
             else:
                 self.__Cfg.configure([section])
@@ -423,7 +423,7 @@ see also: vmm.cfg(5)\n""") % str(e))
 
     def domain_transport(self, domainname, transport, force=None):
         if force is not None and force != 'force':
-            raise VMMDomainException((_('Invalid argument: »%s«') % force,
+            raise VMMDomainException((_(u'Invalid argument: »%s«') % force,
                 ERR.INVALID_OPTION))
         dom = self.__getDomain(domainname, None)
         if force is None:
@@ -433,7 +433,7 @@ see also: vmm.cfg(5)\n""") % str(e))
 
     def domain_delete(self, domainname, force=None):
         if not force is None and force not in ['deluser','delalias','delall']:
-            raise VMMDomainException((_('Invalid argument: »%s«') % force,
+            raise VMMDomainException((_(u'Invalid argument: »%s«') % force,
                 ERR.INVALID_OPTION))
         dom = self.__getDomain(domainname)
         gid = dom.getID()

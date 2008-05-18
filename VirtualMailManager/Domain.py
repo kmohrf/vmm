@@ -116,13 +116,14 @@ class Domain:
         else:
             hasAlias = False
         if hasUser and hasAlias:
-            raise VMMDomainException(('There are accounts and aliases.',
+            raise VMMDomainException((_('There are accounts and aliases.'),
                 ERR.ACCOUNT_AND_ALIAS_PRESENT))
         elif hasUser:
-            raise VMMDomainException(('There are accounts.',
+            raise VMMDomainException((_('There are accounts.'),
                 ERR.ACCOUNT_PRESENT))
         elif hasAlias:
-            raise VMMDomainException(('There are aliases.', ERR.ALIAS_PRESENT))
+            raise VMMDomainException((_('There are aliases.'),
+                ERR.ALIAS_PRESENT))
 
     def save(self):
         """Stores the new domain in the database."""
@@ -135,7 +136,7 @@ class Domain:
             self._dbh.commit()
             dbc.close()
         else:
-            raise VMMDomainException(('Domain already exists.',
+            raise VMMDomainException((_('Domain already exists.'),
                 ERR.DOMAIN_EXISTS))
 
     def delete(self, delUser=False, delAlias=False):
@@ -155,7 +156,7 @@ class Domain:
             self._dbh.commit()
             dbc.close()
         else:
-            raise VMMDomainException(("Domain doesn't exist yet.",
+            raise VMMDomainException((_("Domain doesn't exist yet."),
                 ERR.NO_SUCH_DOMAIN))
 
     def updateTransport(self, transport, force = False):
@@ -179,7 +180,7 @@ class Domain:
                     self._dbh.commit()
             dbc.close()
         else:
-            raise VMMDomainException(("Domain doesn't exist yet.",
+            raise VMMDomainException((_("Domain doesn't exist yet."),
                 ERR.NO_SUCH_DOMAIN))
 
     def getID(self):
@@ -209,7 +210,7 @@ SELECT gid, domainname, transport, domaindir, accounts, aliases
         info = dbc.fetchone()
         dbc.close()
         if info is None:
-            raise VMMDomainException(("Domain doesn't exist yet.",
+            raise VMMDomainException((_("Domain doesn't exist yet."),
                 ERR.NO_SUCH_DOMAIN))
         else:
             keys = ['gid', 'domainname', 'transport', 'domaindir', 'accounts',
