@@ -33,10 +33,9 @@ from Domain import Domain
 SALTCHARS = './0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 RE_ASCII_CHARS = """^[\x20-\x7E]*$"""
 RE_DOMAIN = """^(?:[a-z0-9-]{1,63}\.){1,}[a-z]{2,6}$"""
+RE_DOMAIN_SRCH = """^[a-z0-9-\.]+$"""
 RE_LOCALPART = """[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]"""
 RE_MAILLOCATION = """^[\w]{1,20}$"""
-re.compile(RE_ASCII_CHARS)
-re.compile(RE_DOMAIN)
 
 ENCODING_IN = sys.getfilesystemencoding()
 ENCODING_OUT = sys.stdout.encoding or sys.getfilesystemencoding()
@@ -117,7 +116,7 @@ class VirtualMailManager:
     def __dbConnect(self):
         """Creates a pyPgSQL.PgSQL.connection instance."""
         try:
-            self.__dbh =  PgSQL.connect(
+            self.__dbh = PgSQL.connect(
                     database=self.__Cfg.get('database', 'name'),
                     user=self.__Cfg.get('database', 'user'),
                     host=self.__Cfg.get('database', 'host'),
@@ -144,7 +143,7 @@ class VirtualMailManager:
                 localpart, ERR.LOCALPART_INVALID))
         return localpart
 
-    def __idn2ascii(self, domainname):
+    def idn2ascii(self, domainname):
         """Converts an idn domainname in punycode.
         
         Keyword arguments:
@@ -157,7 +156,7 @@ class VirtualMailManager:
             tmp.append(ToASCII(unicode(label, ENCODING_IN)))
         return '.'.join(tmp)
 
-    def __ace2idna(self, domainname):
+    def ace2idna(self, domainname):
         """Convertis a domainname from ACE according to IDNA
         
         Keyword arguments:
@@ -176,11 +175,13 @@ class VirtualMailManager:
         Keyword arguments:
         domainname -- the domain name that should be validated
         """
+        re.compile(RE_ASCII_CHARS)
         if not re.match(RE_ASCII_CHARS, domainname):
-            domainname = self.__idn2ascii(domainname)
+            domainname = self.idn2ascii(domainname)
         if len(domainname) > 255:
             raise VMMException((_('The domain name is too long.'),
                 ERR.DOMAIN_TOO_LONG))
+        re.compile(RE_DOMAIN)
         if not re.match(RE_DOMAIN, domainname):
             raise VMMException((_('The domain name is invalid.'),
                 ERR.DOMAIN_INVALID))
@@ -454,7 +455,7 @@ see also: vmm.cfg(5)\n""") % str(e))
         dominfo = dom.getInfo()
         if dominfo['domainname'].startswith('xn--'):
             dominfo['domainname'] += ' (%s)'\
-                % self.__ace2idna(dominfo['domainname'])
+                % self.ace2idna(dominfo['domainname'])
         if dominfo['aliases'] is None:
             dominfo['aliases'] = 0
         if detailed is None:
@@ -464,6 +465,28 @@ see also: vmm.cfg(5)\n""") % str(e))
         else:
             raise VMMDomainException(('%s: »%s«' % (_('Invalid argument'),
                 detailed),  ERR.INVALID_OPTION))
+
+    def domain_list(self, pattern=None):
+        from Domain import search
+        like = False
+        if pattern is not None:
+            if pattern.startswith('%') or pattern.endswith('%'):
+                like = True
+                if pattern.startswith('%') and pattern.endswith('%'):
+                    domain = pattern[1:-1]
+                elif pattern.startswith('%'):
+                    domain = pattern[1:]
+                elif pattern.endswith('%'):
+                    domain = pattern[:-1]
+                re.compile(RE_DOMAIN_SRCH)
+                if not re.match(RE_DOMAIN_SRCH, domain):
+                    raise VMMException((
+                    _(u'The pattern »%s« contains invalid characters.') %
+                    pattern, ERR.DOMAIN_INVALID))
+            else:
+                pattern = self.__chkDomainname(pattern)
+        self.__dbConnect()
+        return search(self.__dbh, pattern=pattern, like=like)
 
     def user_add(self, emailaddress, password):
         acc = self.__getAccount(emailaddress, password)

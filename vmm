@@ -52,6 +52,7 @@ Usage: %s SUBCOMMAND OBJECT ARGS*
   ai    aliasinfo       alias@domain.tld
   ad    aliasdelete     alias@domain.tld user@domain.tld*
   gu    getuser         userid
+  ld    listdomains                      pattern*
   cf    configure                        section*
   h     help
   v     version
@@ -100,7 +101,6 @@ def _readpass():
     return clear0
 
 def _getOrder():
-    global argc
     order = ()
     if sys.argv[1] in ['di', 'domaininfo']:
         order = (('domainname', 0), ('gid', 1), ('transport', 0),
@@ -117,7 +117,6 @@ def _getOrder():
     elif sys.argv[1] in ['gu', 'getuser']:
         order = (('uid', 1), ('gid', 1), ('address', 0))
     return order
-
 
 def _printInfo(info, title):
     msg = '%s %s' % (title, _('information'))
@@ -150,8 +149,24 @@ def _printAliases(alias, targets):
         print _('\tNone')
     print
 
+def _printDomList(domains):
+    if argc < 3:
+        msg = _('Available domains')
+    else:
+        msg = _('Matching domains')
+    print '%s\n%s' % (msg, '-'*len(msg))
+    if not len(domains):
+        print _('\tNone')
+    else:
+        for domain in domains:
+            d = domain[0]
+            if not d.startswith('xn--'):
+                print '\t%s' % d
+            else:
+                print "\t%s (%s)" % (d, vmm.ace2idna(d))
+    print
+
 def domain_add():
-    global argc
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing domain name.'))
     elif argc < 4:
@@ -160,7 +175,6 @@ def domain_add():
         vmm.domain_add(sys.argv[2].lower(), sys.argv[3])
 
 def domain_delete():
-    global argc
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing domain name.'))
     elif argc < 4:
@@ -169,7 +183,6 @@ def domain_delete():
         vmm.domain_delete(sys.argv[2].lower(), sys.argv[3])
 
 def domain_info():
-    global argc
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing domain name.'))
     elif argc < 4:
@@ -181,7 +194,6 @@ def domain_info():
         _printUsers(infos[2], _('aliases'))
 
 def domain_transport():
-    global argc
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing domain name and new transport.'))
     if argc < 4:
@@ -192,7 +204,6 @@ def domain_transport():
         vmm.domain_transport(sys.argv[2].lower(), sys.argv[3], sys.argv[4])
 
 def user_add():
-    global argc
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing e-mail address.'))
     elif argc < 4:
@@ -202,14 +213,12 @@ def user_add():
     vmm.user_add(sys.argv[2].lower(), password)
 
 def user_delete():
-    global argc
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing e-mail address.'))
     else:
         vmm.user_delete(sys.argv[2].lower())
 
 def user_info():
-    global argc
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing e-mail address.'))
     elif argc < 4:
@@ -218,7 +227,6 @@ def user_info():
         _printInfo(vmm.user_info(sys.argv[2].lower(), True), 'Account')
 
 def user_name():
-    global argc
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing e-mail address and users name.'))
     if argc < 4:
@@ -227,7 +235,6 @@ def user_name():
         vmm.user_name(sys.argv[2].lower(), sys.argv[3])
 
 def user_transport():
-    global argc
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing e-mail address and transport.'))
     if argc <4:
@@ -236,7 +243,6 @@ def user_transport():
         vmm.user_transport(sys.argv[2].lower(), sys.argv[3])
 
 def user_enable():
-    global argc
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing e-mail address.'))
     elif argc < 4:
@@ -245,7 +251,6 @@ def user_enable():
         vmm.user_enable(sys.argv[2].lower(), sys.argv[3].lower())
 
 def user_disable():
-    global argc
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing e-mail address.'))
     elif argc < 4:
@@ -254,7 +259,6 @@ def user_disable():
         vmm.user_disable(sys.argv[2].lower(), sys.argv[3].lower())
 
 def user_password():
-    global argc
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing e-mail address.'))
     elif argc < 4:
@@ -264,21 +268,18 @@ def user_password():
     vmm.user_password(sys.argv[2].lower(), password)
 
 def alias_add():
-    global argc
     if argc < 4:
         usage(EXIT.MISSING_ARGS, _('Missing alias address and destination.'))
     else:
         vmm.alias_add(sys.argv[2].lower(), sys.argv[3])
 
 def alias_info():
-    global argc
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing alias address'))
     else:
         _printAliases(sys.argv[2], vmm.alias_info(sys.argv[2].lower()))
 
 def alias_delete():
-    global argc
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing alias address'))
     elif argc < 4:
@@ -287,11 +288,16 @@ def alias_delete():
         vmm.alias_delete(sys.argv[2].lower(), sys.argv[3].lower())
 
 def user_byID():
-    global argc
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing userid'))
     else:
         _printInfo(vmm.user_byID(sys.argv[2]), 'Account')
+
+def domain_list():
+    if argc < 3:
+        _printDomList(vmm.domain_list())
+    else:
+        _printDomList(vmm.domain_list(sys.argv[2].lower()))
 
 def showWarnings():
     if vmm.hasWarnings():
@@ -347,6 +353,8 @@ if __name__ == '__main__':
             alias_delete()
         elif sys.argv[1] in ['gu', 'getuser']:
             user_byID()
+        elif sys.argv[1] in ['ld', 'listdomains']:
+            domain_list()
         elif sys.argv[1] in ['h', 'help']:
             usage()
         elif sys.argv[1] in ['v', 'version']:

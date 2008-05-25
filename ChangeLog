@@ -1,4 +1,18 @@
 === 0.0.0 ===
+2008-05-25  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/VirtualMailManager.py (VirtualMailManager):
+		Renamed:
+		  __idn2ascii() -> idn2ascii()
+		  __ace2idna()  -> ace2idna()
+		Implemented domain_list()
+		some small code cleanups
+	* vmm:
+		Implemented domain_list()
+		some small code cleanups
+	* VirtualMailManager/Domain.py:
+		Implemented search()
+
 2008-05-13  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* VirtualMailManager/Alias.py, VirtualMailManager/MailLocation.py,

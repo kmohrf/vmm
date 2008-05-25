@@ -244,3 +244,18 @@ SELECT gid, domainname, transport, domaindir, accounts, aliases
             for alias in addresses:
                 aliases.append(alias[0])
         return aliases
+
+def search(dbh, pattern=None, like=False):
+    sql = 'SELECT domainname FROM domains'
+    if pattern is None:
+        pass
+    elif like:
+        sql += " WHERE domainname LIKE '%s'" % pattern
+    else:
+        sql += " WHERE domainname = '%s'" % pattern
+    sql += ' ORDER BY domainname'
+    dbc = dbh.cursor()
+    dbc.execute(sql)
+    domains = dbc.fetchall()
+    dbc.close()
+    return domains
