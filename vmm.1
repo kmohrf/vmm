@@ -1,5 +1,5 @@
 .\" $Id$
-.TH "VMM" "1" "30. April 2008" "Pascal Volk"
+.TH "VMM" "1" "27. May 2008" "Pascal Volk"
 .SH NAME
 vmm \- command line tool to manage email domains/accounts/aliases
 .SH SYNOPSIS
@@ -75,6 +75,26 @@ If only the userid is available, for example from process list, the subcommand
                 Uid............: 70004
                 Address........: c.user@example.com
 .fi
+.\"
+.TP
+\fBlistdomains\fP (\fBld\fP) [ \fIpattern\fP ]
+This subcommand lists all available domains. The output can be limited with an
+optional \fIpattern\fP.
+.br
+To perform a wild card search, the % character can be used at the start and/or
+the end of the \fIpattern\fP.
+.PP
+.nf
+        Example:
+
+        \fBvmm listdomains example%\fP
+        Matching domains
+        ----------------
+                example.com
+                example.net
+                example.org
+.fi
+.\"
 .TP
 \fBhelp\fP (\fBh\fP)
 Prints all available commands to stderr. After this \fBvmm\fP exits.
