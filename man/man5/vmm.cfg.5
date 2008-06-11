@@ -1,5 +1,5 @@
 .\" $Id$
-.TH vmm.cfg 5 "30. April 2008" "Pascal Volk"
+.TH vmm.cfg 5 "11. Jun 2008" "Pascal Volk"
 .SH NAME
 vmm.cfg \- configuration file for vmm
 .SH SYNOPSIS
@@ -21,15 +21,14 @@ Each value uses one of the following data types:
 to indicate if something is enabled/activated (true) or disabled/deactivated
 (false).
 .br
-Accepted values for \fBtrue\fP are: \fB1\fP, \fByes\fP, \fBtrue\fP and
-\fBon\fP.
+Accepted values for \fBtrue\fP are: \fB1\fP, \fByes\fP, \fBtrue\fP and \fBon\fP.
 .br
 Accepted values for \fBfalse\fP are: \fB0\fP, \fBno\fP, \fBfalse\fP and
 \fBoff\fP.
 .IP \(bu
 .I Int
-a integer number, written without a fractional or decimal component. For example
-\fB1\fP, \fB50\fP or \fB321\fP are integers.
+an integer number, written without a fractional or decimal component. For
+example \fB1\fP, \fB50\fP or \fB321\fP are integers.
 .IP \(bu
 .I String
 a sequence of characters and numbers. For example '\fBword\fP', '\fBhello
@@ -73,7 +72,7 @@ Access mode for the maildir in decimal (base 10) notation. For example:
 \'drwx------' -> octal 0700 -> decimal 448
 .TP
 \fBdiskusage\fP (\fIBoolean\fP)
-Decides if the disk usage of users maildir always should be summarized an
+Decides if the disk usage of users maildir always should be summarized and
 displayed with account information.
 .TP
 \fBdelete\fP (\fIBoolean\fP)
@@ -135,7 +134,7 @@ deleted when a domain is deleted.
 \fBExample\fP:
 [domdir]
 .br
-base = /home/mail
+base = /srv/mail
 .br
 mode = 504
 .br

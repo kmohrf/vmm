@@ -1,5 +1,5 @@
 .\" $Id$
-.TH "VMM" "1" "27. May 2008" "Pascal Volk"
+.TH "VMM" "1" "11. Jun 2008" "Pascal Volk"
 .SH NAME
 vmm \- command line tool to manage email domains/accounts/aliases
 .SH SYNOPSIS
@@ -71,8 +71,8 @@ If only the userid is available, for example from process list, the subcommand
         \fBvmm getuser 70004\fP
         Account information
         -------------------
-                Gid............: 70000
-                Uid............: 70004
+                UID............: 70004
+                GID............: 70000
                 Address........: c.user@example.com
 .fi
 .\"
@@ -100,7 +100,7 @@ the end of the \fIpattern\fP.
 Prints all available commands to stderr. After this \fBvmm\fP exits.
 .TP
 \fBversion\fP (\fBv\fP)
-Prints the version information from \fBvmm\fB.
+Prints the version information from \fBvmm\fP.
 .\"
 .SS DOMAIN SUBCOMMANDS
 .TP
@@ -131,10 +131,10 @@ available accounts and aliases will be listed.
         Domain information
         ------------------
                 Domainname.....: sales.example.com
-                Domaindir......: /home/mail/5/70002
-                Gid............: 70002
-                Accounts.......: 0
+                GID............: 70002
                 Transport......: dovecot:
+                Domaindir......: /home/mail/5/70002
+                Accounts.......: 0
                 Aliases........: 0
 
 .fi
@@ -153,13 +153,12 @@ Otherwise this setting will affect only new created accounts.
         \fBvmm domaintransport support.example.com dovecot:\fP
 .fi
 .TP
-\fBdomaindelete\fP (\fBdd\fP) \fIdomain\fP [ \fIdelalias\fP | \fIdeluser\fP |\
- \fIdelall\fP ]
+\fBdomaindelete\fP (\fBdd\fP) \fIdomain\fP [ \fIdelalias\fP | \fIdeluser\fP | \fIdelall\fP ]
 This subcommand deletes the specified \fIdomain\fP.
 .br
 If there are accounts and/or aliases assigned to the given domain, \fBvmm\fP
 will abort the requested operation and show a error message. If you know, what
-you are doing, you can specify one of the following keywords: '\fPdelalias\fP', '\fBdeluser\fP' or '\fBdelall\fP'.
+you are doing, you can specify one of the following keywords: '\fBdelalias\fP', '\fBdeluser\fP' or '\fBdelall\fP'.
 .br
 
 If you really always know what you are doing, edit your \fBvmm.cfg\fP and set
@@ -219,8 +218,7 @@ A different transport for an account can be specified with this subcommand.
         \fBvmm ut d.user@example.com smtp:pc105.it.example.com\fP
 .fi
 .TP
-\fBuserdisable\fP (\fBu0\fP) \fIaddress\fP [ \fIsmtp\fP | \fIpop3\fP |\
- \fIimap\fP | \fImanagesieve\fP | \fIall\fP ]
+\fBuserdisable\fP (\fBu0\fP) \fIaddress\fP [ \fIsmtp\fP | \fIpop3\fP | \fIimap\fP | \fImanagesieve\fP | \fIall\fP ]
 If a user shouldn't have access to one or all services you can restrict the 
 access with this subcommand.
 .br
@@ -234,8 +232,7 @@ If neither a service nor the keyword '\fIall\fP' is given all services ('smtp', 
         \fBvmm userdisable c.user@example.com\fP
 .fi
 .TP
-\fBuserenable\fP (\fBu1\fP) \fIaddress\fP [ \fIsmtp\fP | \fIpop3\fP |\
- \fIimap\fP | \fImanagesieve\fP | \fIall\fP ]
+\fBuserenable\fP (\fBu1\fP) \fIaddress\fP [ \fIsmtp\fP | \fIpop3\fP | \fIimap\fP | \fImanagesieve\fP | \fIall\fP ]
 To allow access to one or all restricted services use this subcommand.
 .br
 If neither a service nor the keyword '\fIall\fP' is given all services ('smtp', 'pop3', 'imap', and 'managesieve') will be enabled for the account with the specified

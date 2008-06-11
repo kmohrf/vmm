@@ -67,11 +67,11 @@ msgstr "Der Alias existiert nicht."
 
 #: VirtualMailManager/Config.py:101
 msgid "missing section: %s\n"
-msgstr "Fehlender Bereich: %s\n"
+msgstr "Fehlender Abschnitt: %s\n"
 
 #: VirtualMailManager/Config.py:103
 msgid "missing options in section %s:\n"
-msgstr "Fehlende Optionen im Bereich %s:\n"
+msgstr "Fehlende Optionen im Abschnitt %s:\n"
 
 #: VirtualMailManager/Config.py:119
 msgid "Argument 'sections' is not a list."
@@ -79,7 +79,7 @@ msgstr "Argument 'section' ist nicht vom Typ List."
 
 #: VirtualMailManager/Config.py:132
 msgid "* Config section: %s"
-msgstr "* Konfigurations Bereich: »%s«"
+msgstr "* Konfigurations Abschnitt: %s"
 
 #: VirtualMailManager/Config.py:134
 msgid "Enter new value for %s [%s]: "
@@ -209,12 +209,12 @@ msgid ""
 "see also: vmm.cfg(5)\n"
 msgstr ""
 "Konfigurations Fehler: \"%s\"\n"
-"(im Bereich \"connfig\", Option \"done\")'\n"
+"(im Abschnitt \"connfig\", Option \"done\")'\n"
 "Siehe auch: vmm.cfg(5)\n"
 
 #: VirtualMailManager/VirtualMailManager.py:413
 msgid "Invalid section: »%s«"
-msgstr "Ungültiger Bereich: »%s«"
+msgstr "Ungültiger Abschnitt: »%s«"
 
 #: VirtualMailManager/VirtualMailManager.py:427
 #: VirtualMailManager/VirtualMailManager.py:437

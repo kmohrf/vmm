@@ -1,0 +1,310 @@
+.\" $Id$
+.TH "VMM" "1" "11. Jun 2008" "Pascal Volk"
+.SH NAME
+vmm \- Programm für die Kommandozeile, um E-Mail-Domains, -Konten und -Aliase zu
+verwalten.
+.SH SYNOPSIS
+.B vmm
+\fIUnterbefehl\fP \fIObjekt\fP [ \fIArgumente\fP ]
+.SH BESCHREIBUNG
+\fBvmm\fP (Virtual Mail Manager) ist ein Kommandozeilen-Werkzeug für
+Administratoren/Postmaster zur Verwaltung von Domains, Konten und Aliase. Es
+wurde entwickelt für Dovecot und Postfix mit einem PostgreSQL-Backend.
+.SH UNTERBEFEHLE
+Von jedem Unterbefehl gibt es jeweils eine lange und kurze Variante. Bei beiden
+Formen ist die Groß-/Kleinschreibung zu berücksichtigen.
+.SS ALLGEMEINE UNTERBEFEHLE
+.TP
+\fBconfigure\fP (\fBcf\fP) [ \fIAbschnitt\fP ]
+Startet den interaktiven Konfiguration-Modus für alle Konfigurations-Abschnitte.
+.br
+Wurde das optionale Argument \fIAbschnitt\fP angegeben, werden nur die Optionen
+des angegebenen Abschnitts angezeigt und können geändert werden. Folgende
+Abschnitte sind vorhanden:
+.RS
+.PD 0
+.TP
+-
+.B
+database
+.TP
+-
+.B
+maildir
+.TP
+-
+.B
+services
+.TP
+-
+.B
+domdir
+.TP
+-
+.B
+bin
+.TP
+-
+.B
+misc
+.PD
+.RE
+.LP
+.PP
+.nf
+        Beispiel:
+
+        \fBvmm configure services\fP
+        * Konfigurations Abschnitt: services
+        Neuer Wert für pop3 [True]: 
+        Neuer Wert für smtp [True]: 
+        Neuer Wert für imap [True]: 
+        Neuer Wert für managesieve [True]: false
+.fi
+.PP
+.TP
+\fBgetuser\fP (\fBgu\fP) \fIuserid\fP
+Wenn nur eine UserID vorhanden ist, z. B. aus der Prozessliste, kann mit dem
+Unterbefehl \fBgetuser\fP die E-Mail-Adresse des Users ermittelt werden.
+.PP
+.nf
+        Beispiel:
+
+        \fBvmm getuser 70004\fP
+        Account Informationen
+        ---------------------
+                UID............: 70004
+                GID............: 70000
+                Address........: c.user@example.com
+.fi
+.\"
+.TP
+\fBlistdomains\fP (\fBld\fP) [ \fIMuster\fP ]
+Dieser Unterbefehl listet alle verfügbaren Domains auf. Die Ausgabe kann
+reduziert werden, indem ein optionales \fIMuster\fP angegeben wird.
+.br
+Um eine Wildcard-Suche durchzuführen kann das %-Zeichen am Anfang und/oder Ende
+des \fIMusters\fP verwendet werden.
+.PP
+.nf
+        Beispiel:
+
+        \fBvmm listdomains example%\fP
+        Übereinstimmende Domains
+        -------------------------
+                example.com
+                example.net
+                example.org
+.fi
+.\"
+.TP
+\fBhelp\fP (\fBh\fP)
+Dieser Unterbefehl gibt alle verfügbaren Kommandos auf stderr aus. Danach
+beendet sich \fBvmm\fP.
+.TP
+\fBversion\fP (\fBv\fP)
+Gibt Versions-Informationen zu \fBvmm\fP aus.
+.\"
+.SS DOMAIN UNTERBEFEHLE
+.TP
+\fBdomainadd\fP (\fBda\fP) \fIDomain\fP [ \fITransport\fP ]
+Fügt eine neue \fIDomain\fP in die Datenbank ein.
+.br
+Ist das optionale Argument \fITransport\fP angegeben, wird der Vorgabe-Transport
+aus \fBvmm.cfg\fP (misc/transport) für diese \fIDomain\fP ignoriert und der
+angegebene \fITransport\fP verwendet. Der angegebene \fITransport\fP ist
+gleichzeitig der Vorgabe-Transport für alle neuen Konten, die unter dieser
+Domain eingerichtet werden.
+.PP
+.nf
+        Beispiele:
+
+        \fBvmm domainadd support.example.com smtp:mx1.example.com
+        vmm domainadd sales.example.com\fP
+.fi
+.TP
+\fBdomaininfo\fP (\fBdi\fP) \fIDomain\fP [ \fIdetailed\fP ]
+Dieser Unterbefehl zeigt Information zur angegeben \fIDomain\fP an.
+.br
+Wurde das optionale Schlüsselwort '\fBdetailed\fP' angegeben, werden zusätzlich
+alle eingerichteten Konten und Aliase aufgelistet.
+.PP
+.nf
+        Beispiel:
+
+        \fBvmm domaininfo sales.example.com\fP
+        Domain Informationen
+        --------------------
+                Domainname.....: sales.example.com
+                GID............: 70002
+                Transport......: dovecot:
+                Domaindir......: /home/mail/5/70002
+                Accounts.......: 0
+                Aliases........: 0
+
+.fi
+.TP
+\fBdomaintransport\fP (\fBdt\fP) \fIDomain\fP \fITransport\fP [ \fIforce\fP ]
+Ein neuer \fITransport\fP für die angegebene \fIDomain\fP kann mit diesem
+Unterbefehl festgelegt werden.
+.br
+Wurde das optionale Schlüsselwort '\fBforce\fP' angegeben, so werden alle
+bisherigen Transport-Einstellungen, der in dieser Domain vorhandenen Konten,
+mit dem neuen \fITransport\fP überschrieben.
+.br
+Andernfalls gilt der neue \fITransport\fP nur für Konten, die neu erstellt
+werden.
+.PP
+.nf
+        Beispiel:
+
+        \fBvmm domaintransport support.example.com dovecot:\fP
+.fi
+.TP
+\fBdomaindelete\fP (\fBdd\fP) \fIDomain\fP [ \fIdelalias\fP | \fIdeluser\fP | \fIdelall\fP ]
+Mit diesem Unterbefehl wird die angegebene \fIDomain\fP gelöscht.
+.br
+Sollten der \fIDomain\fP Konten und/oder Aliase zugeordnet sein, wird \fBvmm\fP
+die Ausführung des Befehls mit einer entsprechenden Fehlermeldung beenden.
+
+Sollten Sie sich Ihres Vorhabens sicher sein, so kann optional eines der
+folgenden Schlüsselwörter angegeben werden: '\fBdelalias\fP', '\fBdeluser\fP' oder '\fBdelall\fP'
+
+Sollten Sie wirklich immer wissen was Sie tun, so editieren Sie Ihre
+\fBvmm.cfg\fP und setzen den Wert der Option \fIforcedel\fP, im Abschnitt
+\fImisc\fP, auf true. Dann werden Sie beim Löschen von Domains nicht mehr wegen
+vorhanden Konten/Aliase gewarnt.
+.\"
+.SS KONTO UNTERBEFEHLE
+.TP
+\fBuseradd\fP (\fBua\fP) \fIAdresse\fP [ \fIPasswort\fP ]
+Mit diesem Unterbefehl wird ein neues Konto für die angegebene \fIAdresse\fP
+angelegt.
+.br
+Wurde keine \fIPasswort\fP angegeben wird \fBvmm\fP dieses im interaktiven
+Modus erfragen.
+.PP
+.nf
+        Beispiele:
+
+        \fBvmm ua d.user@example.com 'A 5ecR3t P4s5\\/\\/0rd'\fP
+        \fBvmm ua e.user@example.com\fP
+        Neues Passwort eingeben:
+        Neues Passwort wiederholen:
+.fi
+.TP
+\fBuserinfo\fP (\fBui\fP) \fIAdresse\fP [ \fIdu\fP ]
+Dieser Unterbefehl zeigt einige Informationen über das Konto mit der angegebenen
+\fIAdresse\fP an.
+.br
+Wurde das optionale Argument \fIdu\fP angegeben, wird zusätzlich die
+Festplattenbelegung des Kontos ermittelt und ausgegeben.
+.TP
+\fBusername\fP (\fBun\fP) \fIAdresse\fP \fI'Bürgerlicher Name'\fP
+Der Bürgerliche Name des Konto-Inhabers mit der angegebenen \fIAdresse\fP kann
+mit diesem Unterbefehl gesetzt/aktualisiert werden.
+.PP
+.nf
+        Beispiel:
+
+        \fBvmm un d.user@example.com 'John Doe'\fP
+.fi
+.TP
+\fBuserpassword\fP (\fBup\fP) \fIAdresse\fP [ \fIPasswort\fP ]
+Das \fIPasswort\fP eines Kontos kann mit diesem Unterbefehl aktualisiert werden.
+.br
+Wurde keine \fIPasswort\fP angegeben wird \fBvmm\fP dieses im interaktiven
+Modus erfragen.
+.PP
+.nf
+        Beispiel:
+
+        \fBvmm up d.user@example.com 'A |\\/|0r3 5ecur3 P4s5\\/\\/0rd?'\fP
+.fi
+.TP
+\fBusertransport\fP (\fBut\fP) \fIAdresse\fP \fITransport\fP
+Mit diesem Unterbefehl kann ein abweichender \fITransport\fP für das Konto mit
+der angegebenen \fIAdresse\fP festgelegt werden.
+.PP
+.nf
+        Beispiel:
+
+        \fBvmm ut d.user@example.com smtp:pc105.it.example.com\fP
+.fi
+.TP
+\fBuserdisable\fP (\fBu0\fP) \fIAdresse\fP [ \fIsmtp\fP | \fIpop3\fP | \fIimap\fP | \fImanagesieve\fP | \fIall\fP ]
+Soll ein Anwender keinen Zugriff auf einen oder alle Service haben, kann der
+Zugriff mit diesem Unterbefehl beschränkt werden.
+.br
+Wurde weder der Name eines Services noch das Schlüsselwort '\fIall\fP'
+angegeben, werden alle Service ('smtp', 'pop3', 'imap', und 'managesieve') für
+das Konto mit der angegebenen  \fIAdresse\fP deaktiviert.
+.br
+Andernfalls wird nur der Zugriff auf den angegeben Service gesperrt.
+.PP
+.nf
+        Beispiele:
+
+        \fBvmm u0 b.user@example.com imap\fP
+        \fBvmm userdisable c.user@example.com\fP
+.fi
+.TP
+\fBuserenable\fP (\fBu1\fP) \fIAdresse\fP [ \fIsmtp\fP | \fIpop3\fP | \fIimap\fP | \fImanagesieve\fP | \fIall\fP ]
+Um den Zugriff auf bestimmte oder alle gesperrten Service zu gewähren, wird
+dieser Unterbefehl verwendet.
+.br
+Wurde weder der Name eines Services noch das Schlüsselwort '\fIall\fP'
+angegeben, werden alle Service ('smtp', 'pop3', 'imap', und 'managesieve') für
+das Konto mit der angegebenen  \fIAdresse\fP aktiviert.
+.br
+Andernfalls wird nur der Zugriff auf den angegeben Service gestattet.
+.TP
+\fBuserdelete\fP (\fBud\fP) \fIAdresse\fP
+Verwenden Sie diesen Unterbefehl um, das Konto mit der angegebenen \fIAdresse\fP
+zu löschen.
+.\"
+.SS ALIAS UNTERBEFEHLE
+.TP
+\fBaliasadd\fP (\fBaa\fP) \fIAlias\fP \fIZiel\fP
+Mit diesem Unterbefehl werden neue Aliase erstellt.
+.PP
+.nf
+        Beispiele:
+
+        \fBvmm aliasadd john.doe@example.com d.user@example.com\fP
+        \fBvmm aa support@example.com d.user@example.com\fP
+        \fBvmm aa support@example.com e.user@example.com\fP
+.fi
+.TP
+\fBaliasinfo\fP (\fBai\fP) \fIAlias\fP
+Informationen zu einem Alias können mit diesem Unterbefehl ausgegeben werden.
+.PP
+.nf
+        Beispiel:
+
+        \fBvmm aliasinfo support@example.com\fP
+        Alias Informationen
+        -------------------
+                E-Mails für support@example.com gehen an:
+                     -> d.user@example.com
+                     -> e.user@example.com
+.fi
+.TP
+\fBaliasdelete\fP (\fBad\fP) \fIAlias\fP [ \fIZiel\fP ]
+Verwenden Sie diesen Unterbefehl um den angegebenen \fIAlias\fP zu löschen.
+.br
+Wurde die optionale Ziel-Adresse \fIZiel\fP angegeben, so wird nur diese
+Ziel-Adresse vom angegebenen \fIAlias\fP entfernt.
+.PP
+.nf
+        Beispiel:
+        \fBvmm ad support@example.com d.user@example.com\fP
+.fi
+.SH DATEIEN
+/usr/local/etc/vmm.cfg
+.SH SIEHE AUCH
+vmm.cfg(5), Konfigurationsdatei für vmm
+.SH AUTOR
+\fBvmm\fP und die dazugehörigen Manualseiten wurden von Pascal Volk
+<\fIp.volk@veb-it.de\fP> geschrieben und sind unter den Bedingungen der BSD
+Lizenz lizenziert.

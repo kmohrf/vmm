@@ -11,20 +11,11 @@ PF_CONFDIR=$(postconf -h config_directory)
 PF_GID=$(id -g $(postconf -h mail_owner))
 LOCALE_DIR=${PREFIX}/share/locale
 DOC_DIR=${PREFIX}/share/doc/vmm
-MAN1DIR=${PREFIX}/share/man/man1
-MAN5DIR=${PREFIX}/share/man/man5
+MANDIR=${PREFIX}/share/man
 DOCS="ChangeLog COPYING INSTALL README"
 
-case "$(uname -s)" in
-    'OpenBSD' | 'NetBSD')
-        INSTALL_OPTS="-g 0 -o 0 -p"
-        INSTALL_OPTS_CF="-b -m 0640 -g ${PF_GID} -o 0 -p"
-        ;;
-    *)
-        INSTALL_OPTS="-g 0 -o 0 -p -v"
-        INSTALL_OPTS_CF="-b -m 0640 -g ${PF_GID} -o 0 -p -v"
-        ;;
-esac
+INSTALL_OPTS="-g 0 -o 0 -p"
+INSTALL_OPTS_CF="-b -m 0640 -g ${PF_GID} -o 0 -p"
 
 if [ $(id -u) -ne 0 ]; then
     echo "Run this script as root."
@@ -46,13 +37,28 @@ for po in $(ls -1 *.po); do
     [ -d ${ddir}  ] || mkdir -m 0755 -p ${ddir}
     msgfmt -o ${LOCALE_DIR}/${lang}/LC_MESSAGES/vmm.mo ${po}
 done
-cd -
+cd - >/dev/null
 
-[ -d ${MAN1DIR} ] || mkdir -m 0755 -p ${MAN1DIR}
-install -m 0644 ${INSTALL_OPTS} vmm.1 ${MAN1DIR}
+cd man
+[ -d ${MANDIR}/man1 ] || mkdir -m 0755 -p ${MANDIR}/man1
+install -m 0644 ${INSTALL_OPTS} man1/vmm.1 ${MANDIR}/man1
 
-[ -d ${MAN5DIR} ] || mkdir -m 0755 -p ${MAN5DIR}
-install -m 0644 ${INSTALL_OPTS} vmm.cfg.5 ${MAN5DIR}
+[ -d ${MANDIR}/man5 ] || mkdir -m 0755 -p ${MANDIR}/man5
+install -m 0644 ${INSTALL_OPTS} man5/vmm.cfg.5 ${MANDIR}/man5
+
+for l in $(find . -maxdepth 1 -mindepth 1 -type d \! -name man\? \! -name .svn)
+do
+    for s in man1 man5; do
+        [ -d ${MANDIR}/${l}/${s} ] || mkdir -m 0755 -p ${MANDIR}/${l}/${s}
+    done
+    if [ -f ${l}/man1/vmm.1 ]; then
+        install -m 0644 ${INSTALL_OPTS} ${l}/man1/vmm.1 ${MANDIR}/${l}/man1
+    fi
+    if [ -f ${l}/man5/vmm.cfg.5 ]; then
+        install -m 0644 ${INSTALL_OPTS} ${l}/man5/vmm.cfg.5 ${MANDIR}/${l}/man5
+    fi
+done
+cd - >/dev/null
 
 [ -d ${DOC_DIR} ] || mkdir -m 0755 -p ${DOC_DIR}
 for DOC in ${DOCS}; do
