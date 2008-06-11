@@ -42,7 +42,7 @@ class Account:
         self._exists()
         if self._isAlias():
             raise VMMAccountException(
-            (_(u'There is already an alias with address »%s«') % address,
+            (_(u"There is already an alias with address '%s'") % address,
                 ERR.ALIAS_EXISTS))
 
     def _exists(self):
@@ -74,7 +74,7 @@ WHERE gid=%s AND local_part=%s",
         dom = Domain(self._dbh, d)
         self._gid = dom.getID()
         if self._gid == 0:
-            raise VMMAccountException((_(u"Domain »%s« doesn't exist.") % d,
+            raise VMMAccountException((_(u"Domain '%s' doesn't exist.") % d,
                 ERR.NO_SUCH_DOMAIN))
         self._base = dom.getDir()
         self._tid = dom.getTransportID()
@@ -93,7 +93,7 @@ WHERE gid=%s AND local_part=%s",
         if not isinstance(state, bool):
             return False
         if not service in ['smtp', 'pop3', 'imap', 'managesieve', 'all', None]:
-            raise VMMAccountException((_(u"Unknown service »%s«") % service,
+            raise VMMAccountException((_(u"Unknown service '%s'") % service,
                 ERR.UNKNOWN_SERVICE))
         if self._uid < 1:
             raise VMMAccountException((_("Account doesn't exists"),
@@ -114,6 +114,9 @@ WHERE gid=%s AND local_part=%s",
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
+
+    def setPassword(self, password):
+        self._passwd = password
 
     def getUID(self):
         return self._uid

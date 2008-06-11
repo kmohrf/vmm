@@ -16,7 +16,6 @@ __date__ = '$Date$'.split()[1]
 import os
 import sys
 import gettext
-from getpass import getpass
 
 from VirtualMailManager.VirtualMailManager import VirtualMailManager
 from VirtualMailManager.Config import VMMConfig
@@ -84,21 +83,6 @@ def configure():
         sys.stderr.write(str(e))
         sys.exit(ERR.CONF_ERROR)
     sys.exit(0)
-
-def _readpass():
-    clear0 = ''
-    clear1 = '1'
-    while clear0 != clear1:
-        while len(clear0) < 1:
-            clear0 = getpass(prompt=_('Enter new password: '))
-            if len(clear0) < 1:
-                sys.stderr.write('%s\n'
-                        % _('Sorry, empty passwords are not permitted'))
-        clear1 = getpass(prompt=_('Retype new password: '))
-        if clear0 != clear1:
-            clear0 = ''
-            sys.stderr.write('%s\n' % _('Sorry, passwords do not match'))
-    return clear0
 
 def _getOrder():
     order = ()
@@ -207,7 +191,7 @@ def user_add():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing e-mail address.'))
     elif argc < 4:
-        password = _readpass()
+        password = None
     else:
         password = sys.argv[3]
     vmm.user_add(sys.argv[2].lower(), password)
@@ -262,7 +246,7 @@ def user_password():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing e-mail address.'))
     elif argc < 4:
-        password = _readpass()
+        password = None
     else:
         password = sys.argv[3]
     vmm.user_password(sys.argv[2].lower(), password)
@@ -362,7 +346,7 @@ if __name__ == '__main__':
                     __revision__, __date__)
         else:
             usage(EXIT.UNKNOWN_COMMAND,
-                    '%s: »%s«' % (_('Unknown subcommand'), sys.argv[1]))
+                    "%s: '%s'" % (_('Unknown subcommand'), sys.argv[1]))
         showWarnings()
     except (EOFError, KeyboardInterrupt):
         sys.stderr.write('\n%s!\n' % _('Ouch'))

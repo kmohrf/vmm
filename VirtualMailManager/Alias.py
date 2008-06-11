@@ -41,7 +41,7 @@ class Alias:
             self._exists()
         if self._isAccount():
             raise VMMAliasException(
-            (_(u'There is already an account with address »%s«') % self._addr,
+            (_(u"There is already an account with address '%s'") % self._addr,
                 ERR.ACCOUNT_EXISTS))
 
     def _exists(self):
@@ -71,7 +71,7 @@ class Alias:
         dom = Domain(self._dbh, d)
         self._gid = dom.getID()
         if self._gid == 0:
-            raise VMMAliasException((_(u"Domain »%s« doesn't exist.") % d,
+            raise VMMAliasException((_(u"Domain '%s' doesn't exist.") % d,
                 ERR.NO_SUCH_DOMAIN))
 
     def save(self):

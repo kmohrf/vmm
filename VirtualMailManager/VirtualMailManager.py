@@ -18,6 +18,7 @@ import re
 import sys
 import gettext
 from encodings.idna import ToASCII, ToUnicode
+from getpass import getpass
 from shutil import rmtree
 from subprocess import Popen, PIPE
 
@@ -72,7 +73,7 @@ class VirtualMailManager:
     def __chkCfgFile(self):
         """Checks the configuration file, returns bool"""
         if not os.path.isfile(self.__cfgFileName):
-            raise VMMException((_(u"The file »%s« does not exists.") %
+            raise VMMException((_(u"The file '%s' does not exists.") %
                 self.__cfgFileName, ERR.CONF_NOFILE))
         fstat = os.stat(self.__cfgFileName)
         try:
@@ -139,7 +140,7 @@ class VirtualMailManager:
                 ERR.LOCALPART_TOO_LONG))
         if re.compile(RE_LOCALPART).search(localpart):
             raise VMMException((
-                _(u'The local part »%s« contains invalid characters.') %
+                _(u"The local part '%s' contains invalid characters.") %
                 localpart, ERR.LOCALPART_INVALID))
         return localpart
 
@@ -191,10 +192,10 @@ class VirtualMailManager:
         try:
             localpart, domain = address.split('@')
         except ValueError:
-            raise VMMException((_(u"Missing '@' sign in e-mail address »%s«.") %
+            raise VMMException((_(u"Missing '@' sign in e-mail address '%s'.") %
                 address, ERR.INVALID_ADDRESS))
         except AttributeError:
-            raise VMMException((_(u"»%s« looks not like an e-mail address.") %
+            raise VMMException((_(u"'%s' looks not like an e-mail address.") %
                 address, ERR.INVALID_ADDRESS))
         domain = self.__chkDomainname(domain)
         localpart = self.__chkLocalpart(localpart)
@@ -206,6 +207,21 @@ class VirtualMailManager:
         if not password is None:
             password = self.__pwhash(password)
         return Account(self.__dbh, address, password)
+
+    def _readpass(self):
+        clear0 = ''
+        clear1 = '1'
+        while clear0 != clear1:
+            while len(clear0) < 1:
+                clear0 = getpass(prompt=_('Enter new password: '))
+                if len(clear0) < 1:
+                    sys.stderr.write('%s\n'
+                            % _('Sorry, empty passwords are not permitted'))
+            clear1 = getpass(prompt=_('Retype new password: '))
+            if clear0 != clear1:
+                clear0 = ''
+                sys.stderr.write('%s\n' % _('Sorry, passwords do not match'))
+        return clear0
 
     def __getAlias(self, address, destination=None):
         address = self.__chkEmailAddress(address)
@@ -410,7 +426,7 @@ see also: vmm.cfg(5)\n""") % str(e))
             if not section:
                 self.__Cfg.configure(self.__cfgSections)
             elif section not in self.__cfgSections:
-                raise VMMException((_(u"Invalid section: »%s«") % section,
+                raise VMMException((_(u"Invalid section: '%s'") % section,
                     ERR.INVALID_SECTION))
             else:
                 self.__Cfg.configure([section])
@@ -424,7 +440,7 @@ see also: vmm.cfg(5)\n""") % str(e))
 
     def domain_transport(self, domainname, transport, force=None):
         if force is not None and force != 'force':
-            raise VMMDomainException((_(u'Invalid argument: »%s«') % force,
+            raise VMMDomainException((_(u"Invalid argument: '%s'") % force,
                 ERR.INVALID_OPTION))
         dom = self.__getDomain(domainname, None)
         if force is None:
@@ -434,7 +450,7 @@ see also: vmm.cfg(5)\n""") % str(e))
 
     def domain_delete(self, domainname, force=None):
         if not force is None and force not in ['deluser','delalias','delall']:
-            raise VMMDomainException((_(u'Invalid argument: »%s«') % force,
+            raise VMMDomainException((_(u"Invalid argument: '%s'") % force,
                 ERR.INVALID_OPTION))
         dom = self.__getDomain(domainname)
         gid = dom.getID()
@@ -463,7 +479,7 @@ see also: vmm.cfg(5)\n""") % str(e))
         elif detailed == 'detailed':
             return dominfo, dom.getAccounts(), dom.getAliases()
         else:
-            raise VMMDomainException(('%s: »%s«' % (_('Invalid argument'),
+            raise VMMDomainException(("%s: '%s'" % (_('Invalid argument'),
                 detailed),  ERR.INVALID_OPTION))
 
     def domain_list(self, pattern=None):
@@ -481,7 +497,7 @@ see also: vmm.cfg(5)\n""") % str(e))
                 re.compile(RE_DOMAIN_SRCH)
                 if not re.match(RE_DOMAIN_SRCH, domain):
                     raise VMMException((
-                    _(u'The pattern »%s« contains invalid characters.') %
+                    _(u"The pattern '%s' contains invalid characters.") %
                     pattern, ERR.DOMAIN_INVALID))
             else:
                 pattern = self.__chkDomainname(pattern)
@@ -490,6 +506,9 @@ see also: vmm.cfg(5)\n""") % str(e))
 
     def user_add(self, emailaddress, password):
         acc = self.__getAccount(emailaddress, password)
+        if password is None:
+            password = self._readpass()
+            acc.setPassword(self.__pwhash(password))
         acc.save(self.__Cfg.get('maildir', 'folder'),
                 self.__Cfg.getboolean('services', 'smtp'),
                 self.__Cfg.getboolean('services', 'pop3'),
@@ -531,6 +550,10 @@ see also: vmm.cfg(5)\n""") % str(e))
 
     def user_password(self, emailaddress, password):
         acc = self.__getAccount(emailaddress)
+        if acc.getUID() == 0:
+           raise VMMException((_("Account doesn't exists"),ERR.NO_SUCH_ACCOUNT))
+        if password is None:
+            password = self._readpass()
         acc.modify('password', self.__pwhash(password))
 
     def user_name(self, emailaddress, name):
