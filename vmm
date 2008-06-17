@@ -67,7 +67,7 @@ def getVMM():
         return vmm
     except (VMME.VMMException, VMME.VMMNotRootException, VMME.VMMPermException,
             VMME.VMMConfigException), e:
-        sys.stderr.write("\a%s: %s\n" % (_('Error'),e[0][0]))
+        sys.stderr.write("%s: %s\n" % (_('Error'),e[0][0]))
         sys.exit(e[0][1])
 
 def configure():
@@ -293,7 +293,7 @@ def showWarnings():
 if __name__ == '__main__':
     argc = len(sys.argv)
     if argc < 2:
-        usage(EXIT.MISSING_ARGS) # -> exit
+        usage(EXIT.MISSING_ARGS)
     vmm = getVMM()
     try:
         if sys.argv[1] in ['cf',  'configure'] or not vmm.setupIsDone():
@@ -302,7 +302,7 @@ if __name__ == '__main__':
         sys.stderr.write(str(e))
         sys.exit(ERR.CONF_ERROR)
     except VMME.VMMException, e:
-        sys.stderr.write("\a%s: %s\n" % (_('Error'), e[0][0]))
+        sys.stderr.write("%s: %s\n" % (_('Error'), e[0][0]))
         sys.exit(e[0][1])
     try:
         if sys.argv[1] in ['da', 'domainadd']:
@@ -352,5 +352,5 @@ if __name__ == '__main__':
         sys.stderr.write('\n%s!\n' % _('Ouch'))
         sys.exit(EXIT.USER_INTERRUPT)
     except VMME.VMMException, e:
-        sys.stderr.write("\a%s: %s\n" % (_('Error'), e[0][0]))
+        sys.stderr.write("%s: %s\n" % (_('Error'), e[0][0]))
         sys.exit(e[0][1])

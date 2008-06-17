@@ -1,5 +1,5 @@
 .\" $Id$
-.TH vmm.cfg 5 "11. Jun 2008" "Pascal Volk"
+.TH vmm.cfg 5 "17. Jun 2008" "Pascal Volk"
 .SH NAME
 vmm.cfg \- Konfigurationsdatei für vmm
 .SH SYNOPSIS
@@ -139,7 +139,7 @@ Zugriffsbits des Domain-Verzeichnisses in Dezimal-Schreibweise (Basis 10).
 Beispiel: 'drwxrwx---' -> oktal 0770 -> dezimal 504
 .TP
 \fBdelete\fP (\fIBoolean\fP)
-Bestimmt ob beim Löschen einer Domain das Verzeichnis einer Domain, inklusive
+Bestimmt, ob beim Löschen einer Domain das Verzeichnis einer Domain, inklusive
 aller Anwender-Verzeichnisse, rekursiv gelöscht werden soll.
 .TP
 \fBBeispiel\fP:
@@ -161,7 +161,7 @@ Passwort-Schema eines der folgenden verwendet wird: 'SMD5', 'SSHA', 'CRAM-MD5',
 \'HMAC-MD5', 'LANMAN', 'NTLM' oder 'RPA'.
 .TP
 \fBdu\fP (\fIString\fP)
-Der absolute Pfad zu \fBdu\fR(1). Diese Binary wird verwendet, wenn die
+Der absolute Pfad zu \fBdu\fR(1). Dieses Binary wird verwendet, wenn die
 Festplattenbelegung eines Kontos ermittelt wird.
 .TP
 \fBBeispiel\fP:
@@ -175,7 +175,7 @@ du = /usr/bin/du
 Im \fBmisc\fP-Abschnitt werden verschiedene Einstellungen festgelegt.
 .TP
 \fBpasswdscheme\fP (\fIString\fP)
-Das zu verwende Passwort-Schema (siehe auch: dovecotpw -l)
+Das zu verwendende Passwort-Schema (siehe auch: dovecotpw -l)
 .TP
 \fBgid_mail\fP (\fIInt\fP)
 Die numerische Gruppen-ID der Gruppe mail, bzw. der Gruppe aus
@@ -205,7 +205,7 @@ Steuerungs-Abschnitt.
 .TP
 \fBdone\fP (\fIBoolean\fP)
 Diese Option hat den den Wert \fIfalse\fP, wenn vmm zum ersten Mal installiert
-wurde. Wenn die Datei \fIvmm.cfg\fP von Hand editiert wird, weißen Sie dieser
+wurde. Wenn die Datei \fIvmm.cfg\fP von Hand editiert wird, weisen Sie dieser
 Option abschließend den Wert \fItrue\fP zu.
 .br
 Wird die Konfiguration über das Kommando \fBvmm configure\fP angepasst, wird der

@@ -7,11 +7,16 @@
 LANG=C
 PATH=/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 PREFIX=/usr/local
+
 PF_CONFDIR=$(postconf -h config_directory)
 PF_GID=$(id -g $(postconf -h mail_owner))
 LOCALE_DIR=${PREFIX}/share/locale
 DOC_DIR=${PREFIX}/share/doc/vmm
-MANDIR=${PREFIX}/share/man
+if [ ${PREFIX} == "/usr" ]; then
+    MANDIR=${PREFIX}/share/man
+else
+    MANDIR=${PREFIX}/man
+fi
 DOCS="ChangeLog COPYING INSTALL README"
 
 INSTALL_OPTS="-g 0 -o 0 -p"

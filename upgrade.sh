@@ -7,11 +7,16 @@
 LANG=C
 PATH=/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 PREFIX=/usr/local
+
 PF_CONFDIR=$(postconf -h config_directory)
 PF_GID=$(id -g $(postconf -h mail_owner))
 LOCALE_DIR=${PREFIX}/share/locale
 DOC_DIR=${PREFIX}/share/doc/vmm
-MANDIR=${PREFIX}/share/man
+if [ ${PREFIX} == "/usr" ]; then
+    MANDIR=${PREFIX}/share/man
+else
+    MANDIR=${PREFIX}/man
+fi
 DOCS="ChangeLog COPYING INSTALL README"
 
 INSTALL_OPTS="-g 0 -o 0 -p"
@@ -37,6 +42,15 @@ for po in $(ls -1 *.po); do
 done
 cd - >/dev/null
 
+# remove misplaced manual pages
+if [ -f /usr/local/share/man/man1/vmm.1 ]; then
+    rm -f /usr/local/share/man/man1/vmm.1
+fi
+if [ -f /usr/local/share/man/man5/vmm.cfg.5 ]; then
+    rm -f /usr/local/share/man/man5/vmm.cfg.5
+fi
+
+# install manual pages
 cd man
 [ -d ${MANDIR}/man1 ] || mkdir -m 0755 -p ${MANDIR}/man1
 install -m 0644 ${INSTALL_OPTS} man1/vmm.1 ${MANDIR}/man1
