@@ -90,14 +90,14 @@ def _getOrder():
         order = (('domainname', 0), ('gid', 1), ('transport', 0),
                 ('domaindir', 0), ('accounts', 0), ('aliases', 0))
     elif sys.argv[1] in ['ui', 'userinfo']:
-        if argc == 3:
-            order = (('address', 0), ('name', 0), ('uid', 1), ('gid', 1),
-                    ('transport', 0), ('maildir', 0), ('smtp', 1), ('pop3', 1),
-                    ('imap', 1), ('managesieve', 1))
-        else:
+        if argc == 4 or vmm.cfgGetBoolean('maildir', 'diskusage'):
             order = (('address', 0), ('name', 0), ('uid', 1), ('gid', 1),
                     ('transport', 0), ('maildir', 0), ('disk usage', 0),
                     ('smtp', 1), ('pop3', 1), ('imap', 1), ('managesieve', 1))
+        else:
+            order = (('address', 0), ('name', 0), ('uid', 1), ('gid', 1),
+                    ('transport', 0), ('maildir', 0), ('smtp', 1), ('pop3', 1),
+                    ('imap', 1), ('managesieve', 1))
     elif sys.argv[1] in ['gu', 'getuser']:
         order = (('uid', 1), ('gid', 1), ('address', 0))
     return order

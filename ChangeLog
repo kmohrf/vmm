@@ -1,4 +1,21 @@
 === 0.0.0 ===
+2008-08-06  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* vmm (_getOrder):
+		Respect vmm.cfg/maildir/diskusage settings
+	* VirtualMailManager/VirtualMailManager.py:
+		Adds a warning if a directory not exists:
+		  VirtualMailManager.__getDiskUsage()
+		  VirtualMailManager.__maildirdelete()
+		  VirtualMailManager.__domdirdelete()
+		Implemented:
+		  VirtualMailManager.__isdir()
+		  VirtualMailManager.cfgGetBoolean()
+		  VirtualMailManager.cfgGetInt()
+		  VirtualMailManager.cfgGetString()
+	* po/vmm.pot, po/de.po:
+		Updated
+
 2008-05-25  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* VirtualMailManager/VirtualMailManager.py (VirtualMailManager):

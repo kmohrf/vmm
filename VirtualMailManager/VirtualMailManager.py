@@ -247,8 +247,17 @@ class VirtualMailManager:
         Keyword arguments:
         directory -- the directory to summarize recursively disk usage for
         """
-        return Popen([self.__Cfg.get('bin', 'du'), "-hs", directory],
+        if self.__isdir(directory):
+            return Popen([self.__Cfg.get('bin', 'du'), "-hs", directory],
                 stdout=PIPE).communicate()[0].split('\t')[0]
+        else:
+            return 0
+
+    def __isdir(self, directory):
+        isdir = os.path.isdir(directory)
+        if not isdir:
+            self.__warnings.append(_('No such directory: %s') % directory)
+        return isdir
 
     def __makedir(self, directory, mode=None, uid=None, gid=None):
         if mode is None:
@@ -316,9 +325,14 @@ class VirtualMailManager:
                            _('FATAL: owner/group mismatch in maildir detected'),
                            ERR.MAILDIR_PERM_MISMATCH))
                     rmtree(maildir, ignore_errors=True)
+                else:
+                    self.__warnings.append(_('No such directory: %s/%s') %
+                            (domdir,uid))
 
     def __domdirdelete(self, domdir, gid):
         if gid > 0:
+            if not self.__isdir(domdir):
+                return
             basedir = '%s' % self.__Cfg.get('domdir', 'base')
             domdirdirs = domdir.replace(basedir+'/', '').split('/')
             if basedir.count('..') or domdir.count('..'):
@@ -401,6 +415,15 @@ class VirtualMailManager:
     def getWarnings(self):
         """Returns a list with all available warnings."""
         return self.__warnings
+
+    def cfgGetBoolean(self, section, option):
+        return self.__Cfg.getboolean(section, option)
+
+    def cfgGetInt(self, section, option):
+        return self.__Cfg.getint(section, option)
+
+    def cfgGetString(self, section, option):
+        return self.__Cfg.get(section, option)
 
     def setupIsDone(self):
         """Checks if vmm is configured, returns bool"""
