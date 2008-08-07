@@ -188,9 +188,9 @@ WHERE gid=%s AND local_part=%s",
             info = dict(zip(keys, info))
             for service in ['smtp', 'pop3', 'imap', 'managesieve']:
                 if bool(info[service]):
-                    info[service] = 'enabled'
+                    info[service] = _('enabled')
                 else:
-                    info[service] = 'disabled'
+                    info[service] = _('disabled')
             info['address'] = self._addr
             info['maildir'] = '%s/%s/%s' % (self._base, info['uid'],
                     MailLocation(self._dbh,

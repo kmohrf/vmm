@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vmm 0.4\n"
-"POT-Creation-Date: 2008-08-06 23:07+CEST\n"
-"PO-Revision-Date: 2008-06-11 23:09+0200\n"
+"Project-Id-Version: vmm 0.5\n"
+"POT-Creation-Date: 2008-08-08 00:12+CEST\n"
+"PO-Revision-Date: 2008-08-08 00:18+0200\n"
 "Last-Translator: Pascal Volk <p.volk@veb-it.de>\n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
@@ -37,6 +37,14 @@ msgstr "Der Account existiert nicht"
 #: VirtualMailManager/Account.py:151
 msgid "Account already exists."
 msgstr "Der Account existiert bereits."
+
+#: VirtualMailManager/Account.py:191
+msgid "enabled"
+msgstr "aktiviert"
+
+#: VirtualMailManager/Account.py:193
+msgid "disabled"
+msgstr "deaktiviert"
 
 #: VirtualMailManager/Account.py:219
 msgid "uid must be an int/long."

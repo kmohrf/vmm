@@ -4,8 +4,8 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2008-08-06 23:07+CEST\n"
+"Project-Id-Version: vmm 0.5\n"
+"POT-Creation-Date: 2008-08-08 00:12+CEST\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -36,6 +36,14 @@ msgstr ""
 
 #: VirtualMailManager/Account.py:151
 msgid "Account already exists."
+msgstr ""
+
+#: VirtualMailManager/Account.py:191
+msgid "enabled"
+msgstr ""
+
+#: VirtualMailManager/Account.py:193
+msgid "disabled"
 msgstr ""
 
 #: VirtualMailManager/Account.py:219
