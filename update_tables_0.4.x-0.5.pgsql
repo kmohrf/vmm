@@ -3,48 +3,13 @@
 SET client_encoding = 'UTF8';
 SET client_min_messages = warning;
 
+ALTER SEQUENCE domains_gid RENAME TO domain_gid;
 
-CREATE SEQUENCE transport_id;
-
-CREATE SEQUENCE maillocation_id;
-
-CREATE SEQUENCE domain_gid
-    START WITH 70000
-    INCREMENT BY 1
-    MINVALUE 70000
-    MAXVALUE 4294967294
-    NO CYCLE;
-
-CREATE SEQUENCE users_uid
-    START WITH 70000
-    INCREMENT BY 1
-    MINVALUE 70000
-    MAXVALUE 4294967294
-    NO CYCLE;
-
-
-CREATE TABLE transport (
-    tid         bigint NOT NULL DEFAULT nextval('transport_id'),
-    transport   varchar(270) NOT NULL, -- smtps:[255-char.host.name:50025]
-    CONSTRAINT  pkey_transport PRIMARY KEY (tid),
-    CONSTRAINT  ukey_transport UNIQUE (transport)
-);
--- Insert default transport
-INSERT INTO transport(transport) VALUES ('dovecot:');
-
-CREATE TABLE maillocation(
-    mid     bigint NOT NULL DEFAULT nextval('maillocation_id'),
-    maillocation varchar(20) NOT NULL,
-    CONSTRAINT  pkey_maillocation PRIMARY KEY (mid),
-    CONSTRAINT  ukey_maillocation UNIQUE (maillocation)
-);
--- Insert default Maildir-folder name
-INSERT INTO maillocation(maillocation) VALUES ('Maildir');
 
 CREATE TABLE domain_data (
     gid         bigint NOT NULL DEFAULT nextval('domain_gid'),
-    tid         bigint NOT NULL DEFAULT 1, -- defualt transport
-    domaindir   varchar(40) NOT NULL, --/srv/mail/$RAND/4294967294
+    tid         bigint NOT NULL DEFAULT 1,
+    domaindir   varchar(40) NOT NULL,
     CONSTRAINT  pkey_domain_data PRIMARY KEY (gid),
     CONSTRAINT  fkey_domain_data_tid_transport FOREIGN KEY (tid)
         REFERENCES transport (tid)
@@ -59,45 +24,27 @@ CREATE TABLE domain_name (
         REFERENCES domain_data (gid)
 );
 
-CREATE TABLE users (
-    local_part  varchar(64) NOT NULL,-- only localpart w/o '@'
-    passwd      varchar(74) NOT NULL,-- {CRAM-MD5}+64hex numbers
-    name        varchar(128) NULL,
-    uid         bigint NOT NULL DEFAULT nextval('users_uid'),
-    gid         bigint NOT NULL,
-    mid         bigint NOT NULL DEFAULT 1,
-    tid         bigint NOT NULL DEFAULT 1,
-    smtp        boolean NOT NULL DEFAULT TRUE,
-    pop3        boolean NOT NULL DEFAULT TRUE,
-    imap        boolean NOT NULL DEFAULT TRUE,
-    managesieve boolean NOT NULL DEFAULT TRUE,
-    CONSTRAINT  pkye_users PRIMARY KEY (local_part, gid),
-    CONSTRAINT  ukey_users_uid UNIQUE (uid),
-    CONSTRAINT  fkey_users_gid_domain_data FOREIGN KEY (gid)
-        REFERENCES domain_data (gid),
-    CONSTRAINT  fkey_users_mid_maillocation FOREIGN KEY (mid)
-        REFERENCES maillocation (mid),
-    CONSTRAINT  fkey_users_tid_transport FOREIGN KEY (tid)
-        REFERENCES transport (tid)
-);
+INSERT INTO domain_data (gid, tid, domaindir) 
+    SELECT gid, tid, domaindir
+      FROM domains;
 
-CREATE TABLE alias (
-    gid         bigint NOT NULL,
-    address     varchar(256) NOT NULL,
-    destination varchar(320) NOT NULL,
-    CONSTRAINT  pkey_alias PRIMARY KEY (gid, address, destination),
-    CONSTRAINT  fkey_alias_gid_domain_data FOREIGN KEY (gid)
-        REFERENCES domain_data (gid)
-);
+INSERT INTO domain_name (domainname, gid, is_primary) 
+    SELECT domainname, gid, TRUE
+      FROM domains;
 
-CREATE TABLE relocated (
-    gid         bigint NOT NULL,
-    address     varchar(64) NOT NULL,
-    destination varchar(320) NOT NULL,
-    CONSTRAINT  pkey_relocated PRIMARY KEY (gid, address),
-    CONSTRAINT  fkey_relocated_gid_domain_data FOREIGN KEY (gid)
-        REFERENCES domain_data (gid)
-);
+
+ALTER TABLE users DROP CONSTRAINT fkey_users_gid_domains;
+ALTER TABLE users ADD CONSTRAINT fkey_users_gid_domain_data FOREIGN KEY (gid)
+    REFERENCES domain_data (gid);
+
+ALTER TABLE alias DROP CONSTRAINT fkey_alias_gid_domains;
+ALTER TABLE alias ADD CONSTRAINT fkey_alias_gid_domain_data FOREIGN KEY (gid)
+    REFERENCES domain_data (gid);
+
+ALTER TABLE relocated DROP CONSTRAINT fkey_relocated_gid_domains;
+ALTER TABLE relocated ADD CONSTRAINT fkey_relocated_gid_domain_data
+    FOREIGN KEY (gid) REFERENCES domain_data (gid);
+
 
 CREATE OR REPLACE VIEW dovecot_password AS
     SELECT local_part || '@' || domain_name.domainname AS "user",
@@ -149,11 +96,7 @@ CREATE OR REPLACE VIEW postfix_transport AS
            LEFT JOIN transport USING (tid)
            LEFT JOIN domain_name USING (gid);
 
-CREATE OR REPLACE VIEW vmm_alias_count AS
-    SELECT count(DISTINCT address) AS aliases, gid
-      FROM alias 
-  GROUP BY gid;
-
+DROP VIEW vmm_domain_info;
 CREATE OR REPLACE VIEW vmm_domain_info AS
     SELECT gid, domainname, transport, domaindir,
            count(uid) AS accounts,
@@ -171,8 +114,10 @@ CREATE OR REPLACE VIEW vmm_domain_info AS
   GROUP BY gid, domainname, transport, domaindir, aliases;
 
 
-CREATE LANGUAGE plpgsql;
+DROP TABLE domains;
 
+
+CREATE LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION domain_primary_trigger() RETURNS TRIGGER AS $$
 DECLARE
@@ -190,7 +135,6 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql STABLE;
-
 
 CREATE TRIGGER primary_count BEFORE INSERT OR UPDATE ON domain_name
     FOR EACH ROW EXECUTE PROCEDURE domain_primary_trigger();
