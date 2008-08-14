@@ -222,8 +222,9 @@ def getAccountByID(uid, dbh):
         raise VMMAccountException((_('uid must be greater than 0.'),
             ERR.INVALID_AGUMENT))
     dbc = dbh.cursor()
-    dbc.execute("SELECT local_part||'@'||domains.domainname AS address, uid,\
- gid FROM users LEFT JOIN domains USING(gid) WHERE uid=%s", uid)
+    dbc.execute("SELECT local_part||'@'|| domain_name.domainname AS address,\
+ uid, users.gid FROM users LEFT JOIN domain_name ON (domain_name.gid \
+ = users.gid AND is_primary) WHERE uid = %s;", uid)
     info = dbc.fetchone()
     dbc.close()
     if info is None:

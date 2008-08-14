@@ -54,8 +54,9 @@ class Domain:
         will be returned.
         """
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT gid,tid,domaindir FROM domains WHERE domainname=%s",
-                self._name)
+        # XXX check for primary
+        dbc.execute("SELECT gid, tid, domaindir FROM domain_data WHERE gid =\
+ (SELECT gid FROM domain_name WHERE domainname = %s)", self._name)
         result = dbc.fetchone()
         dbc.close()
         if result is not None:
@@ -68,7 +69,7 @@ class Domain:
     def _setID(self):
         """Sets the ID of the domain."""
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT nextval('domains_gid')")
+        dbc.execute("SELECT nextval('domain_gid')")
         self._id = dbc.fetchone()[0]
         dbc.close()
 
@@ -130,9 +131,10 @@ class Domain:
         if self._id < 1:
             self._prepare()
             dbc = self._dbh.cursor()
-            dbc.execute("INSERT INTO domains (gid, domainname, tid, domaindir)\
- VALUES (%s, %s, %s, %s)", self._id, self._name, self._transport.getID(),
-                self._domaindir)
+            dbc.execute("INSERT INTO domain_data (gid, tid, domaindir)\
+ VALUES (%s, %s, %s)", self._id, self._transport.getID(), self._domaindir)
+            dbc.execute("INSERT INTO domain_name (domainname, gid, is_primary)\
+ VALUES (%s, %s, %s)", self._name, self._id, True)
             self._dbh.commit()
             dbc.close()
         else:
@@ -152,7 +154,8 @@ class Domain:
             dbc.execute('DELETE FROM alias WHERE gid=%s', self._id)
             dbc.execute('DELETE FROM users WHERE gid=%s', self._id)
             dbc.execute('DELETE FROM relocated WHERE gid=%s', self._id)
-            dbc.execute('DELETE FROM domains WHERE gid=%s', self._id)
+            dbc.execute('DELETE FROM domain_data WHERE gid=%s', self._id)
+            dbc.execute('DELETE FROM domain_name WHERE gid=%s', self._id)
             self._dbh.commit()
             dbc.close()
         else:
@@ -169,12 +172,12 @@ class Domain:
         if self._id > 0:
             trsp = Transport(self._dbh, transport=transport)
             dbc = self._dbh.cursor()
-            dbc.execute("UPDATE domains SET tid=%s WHERE gid=%s", trsp.getID(),
-                    self._id)
+            dbc.execute("UPDATE domain_data SET tid = %s WHERE gid = %s",
+                    trsp.getID(), self._id)
             if dbc.rowcount > 0:
                 self._dbh.commit()
             if force:
-                dbc.execute("UPDATE users SET tid=%s WHERE gid=%s",
+                dbc.execute("UPDATE users SET tid = %s WHERE gid = %s",
                         trsp.getID(), self._id)
                 if dbc.rowcount > 0:
                     self._dbh.commit()
@@ -201,6 +204,7 @@ class Domain:
 
     def getInfo(self):
         """Returns a dictionary with information about the domain."""
+        # XXX add alias domain count
         sql = """\
 SELECT gid, domainname, transport, domaindir, accounts, aliases
   FROM vmm_domain_info
@@ -246,7 +250,7 @@ SELECT gid, domainname, transport, domaindir, accounts, aliases
         return aliases
 
 def search(dbh, pattern=None, like=False):
-    sql = 'SELECT domainname FROM domains'
+    sql = 'SELECT domainname FROM domain_name'
     if pattern is None:
         pass
     elif like:
@@ -254,6 +258,7 @@ def search(dbh, pattern=None, like=False):
     else:
         sql += " WHERE domainname = '%s'" % pattern
     sql += ' ORDER BY domainname'
+    # XXX + is_primary // add prefix like [P] || [A]
     dbc = dbh.cursor()
     dbc.execute(sql)
     domains = dbc.fetchall()
