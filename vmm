@@ -88,7 +88,8 @@ def _getOrder():
     order = ()
     if sys.argv[1] in ['di', 'domaininfo']:
         order = (('domainname', 0), ('gid', 1), ('transport', 0),
-                ('domaindir', 0), ('accounts', 0), ('aliases', 0))
+                ('domaindir', 0), ('aliasdomains', 0), ('accounts', 0),
+                ('aliases', 0))
     elif sys.argv[1] in ['ui', 'userinfo']:
         if argc == 4 or vmm.cfgGetBoolean('maildir', 'diskusage'):
             order = (('address', 0), ('name', 0), ('uid', 1), ('gid', 1),
@@ -112,12 +113,12 @@ def _printInfo(info, title):
             print '\t%s: %s' % (k.title().ljust(15, '.'), info[k])
     print
 
-def _printUsers(users, title):
+def _printList(alist, title):
     msg = '%s %s' % (_('Available'), title)
     print '%s\n%s' % (msg, '-'*len(msg))
-    if len(users) > 0:
-        for user in users:
-            print '\t%s' % user
+    if len(alist) > 0:
+        for val in alist:
+            print '\t%s' % val
     else:
         print _('\tNone')
     print
@@ -133,7 +134,16 @@ def _printAliases(alias, targets):
         print _('\tNone')
     print
 
-def _printDomList(domains):
+def _formatDom(domain, main=True):
+    if domain.startswith('xn--'):
+        domain = '%s (%s)' % (domain, vmm.ace2idna(domain))
+    if main:
+        return '\t[+] %s' %  domain
+    else:
+        return '\t[-]     %s' % domain
+
+
+def _printDomList(dids, domains):
     if argc < 3:
         msg = _('Available domains')
     else:
@@ -142,12 +152,12 @@ def _printDomList(domains):
     if not len(domains):
         print _('\tNone')
     else:
-        for domain in domains:
-            d = domain[0]
-            if not d.startswith('xn--'):
-                print '\t%s' % d
-            else:
-                print "\t%s (%s)" % (d, vmm.ace2idna(d))
+        for id in dids:
+            if domains[id][0] is not None:
+                print _formatDom(domains[id][0])
+            if len(domains[id]) > 1:
+                for alias in domains[id][1:]:
+                    print _formatDom(alias, main=False)
     print
 
 def domain_add():
@@ -170,12 +180,13 @@ def domain_info():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing domain name.'))
     elif argc < 4:
-        _printInfo(vmm.domain_info(sys.argv[2].lower()), 'Domain')
+        _printInfo(vmm.domain_info(sys.argv[2].lower()), _('Domain'))
     else:
         infos = vmm.domain_info(sys.argv[2].lower(), sys.argv[3])
-        _printInfo(infos[0], 'Domain')
-        _printUsers(infos[1], _('accounts'))
-        _printUsers(infos[2], _('aliases'))
+        _printInfo(infos[0], _('Domain'))
+        _printList(infos[1], _('alias domains'))
+        _printList(infos[2], _('accounts'))
+        _printList(infos[3], _('aliases'))
 
 def domain_transport():
     if argc < 3:
@@ -279,9 +290,10 @@ def user_byID():
 
 def domain_list():
     if argc < 3:
-        _printDomList(vmm.domain_list())
+        order, doms = vmm.domain_list()
     else:
-        _printDomList(vmm.domain_list(sys.argv[2].lower()))
+        order, doms = vmm.domain_list(sys.argv[2].lower())
+    _printDomList(order, doms)
 
 def showWarnings():
     if vmm.hasWarnings():

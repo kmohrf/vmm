@@ -154,8 +154,8 @@ class Domain:
             dbc.execute('DELETE FROM alias WHERE gid=%s', self._id)
             dbc.execute('DELETE FROM users WHERE gid=%s', self._id)
             dbc.execute('DELETE FROM relocated WHERE gid=%s', self._id)
-            dbc.execute('DELETE FROM domain_data WHERE gid=%s', self._id)
             dbc.execute('DELETE FROM domain_name WHERE gid=%s', self._id)
+            dbc.execute('DELETE FROM domain_data WHERE gid=%s', self._id)
             self._dbh.commit()
             dbc.close()
         else:
@@ -204,9 +204,8 @@ class Domain:
 
     def getInfo(self):
         """Returns a dictionary with information about the domain."""
-        # XXX add alias domain count
         sql = """\
-SELECT gid, domainname, transport, domaindir, accounts, aliases
+SELECT gid, domainname, transport, domaindir, aliasdomains, accounts, aliases
   FROM vmm_domain_info
  WHERE gid = %i""" % self._id
         dbc = self._dbh.cursor()
@@ -217,50 +216,76 @@ SELECT gid, domainname, transport, domaindir, accounts, aliases
             raise VMMDomainException((_("Domain doesn't exist yet."),
                 ERR.NO_SUCH_DOMAIN))
         else:
-            keys = ['gid', 'domainname', 'transport', 'domaindir', 'accounts',
-                    'aliases']
+            keys = ['gid', 'domainname', 'transport', 'domaindir',
+                    'aliasdomains', 'accounts', 'aliases']
             return dict(zip(keys, info))
 
     def getAccounts(self):
         """Returns a list with all accounts from the domain."""
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT userid AS users FROM dovecot_user WHERE gid = %s\
- ORDER BY users",
-                self._id)
+        dbc.execute("SELECT local_part from users where gid = %s ORDER BY\
+ local_part", self._id)
         users = dbc.fetchall()
         dbc.close()
         accounts = []
         if len(users) > 0:
             for account in users:
-                accounts.append(account[0])
+                accounts.append('%s@%s' % (account[0], self._name))
         return accounts
 
     def getAliases(self):
         """Returns a list with all aliases from the domain."""
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT DISTINCT address FROM postfix_alias WHERE gid=%s\
- ORDER BY address",
+        dbc.execute("SELECT address from alias where gid = %s ORDER BY address",
                 self._id)
         addresses = dbc.fetchall()
         dbc.close()
         aliases = []
         if len(addresses) > 0:
             for alias in addresses:
-                aliases.append(alias[0])
+                aliases.append('%s@%s' % (alias[0], self._name))
         return aliases
 
+    def getAliaseNames(self):
+        """Returns a list with all alias names from the domain."""
+        dbc = self._dbh.cursor()
+        dbc.execute("SELECT domainname FROM domain_name WHERE gid = %s\
+ AND NOT is_primary", self._id)
+        anames = dbc.fetchall()
+        dbc.close()
+        aliasdomains = []
+        if len(anames) > 0:
+            for aname in anames:
+                aliasdomains.append(aname[0])
+        return aliasdomains
+
 def search(dbh, pattern=None, like=False):
-    sql = 'SELECT domainname FROM domain_name'
+    sql = 'SELECT gid, domainname, is_primary FROM domain_name'
     if pattern is None:
         pass
     elif like:
         sql += " WHERE domainname LIKE '%s'" % pattern
     else:
         sql += " WHERE domainname = '%s'" % pattern
-    sql += ' ORDER BY domainname'
-    # XXX + is_primary // add prefix like [P] || [A]
+    sql += ' ORDER BY is_primary DESC, domainname'
     dbc = dbh.cursor()
     dbc.execute(sql)
-    domains = dbc.fetchall()
+    doms = dbc.fetchall()
     dbc.close()
-    return domains
+
+    domdict = {}
+    order = [dom[0] for dom in doms if dom[2]]
+    if len(order) == 0:
+        for dom in doms:
+            if dom[0] not in order:
+                order.append(dom[0])
+    for gid, dom, is_primary in doms:
+        if is_primary:
+            domdict[gid] = [dom]
+        else:
+            try:
+                domdict[gid].append(dom)
+            except KeyError:
+                domdict[gid] = [None, dom]
+    del doms
+    return order, domdict

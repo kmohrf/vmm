@@ -500,7 +500,8 @@ see also: vmm.cfg(5)\n""") % str(e))
         if detailed is None:
             return dominfo
         elif detailed == 'detailed':
-            return dominfo, dom.getAccounts(), dom.getAliases()
+            return (dominfo, dom.getAliaseNames(), dom.getAccounts(),
+                    dom.getAliases())
         else:
             raise VMMDomainException(("%s: '%s'" % (_('Invalid argument'),
                 detailed),  ERR.INVALID_OPTION))
