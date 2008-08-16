@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vmm 0.5\n"
-"POT-Creation-Date: 2008-08-08 00:12+CEST\n"
+"POT-Creation-Date: 2008-08-16 04:27+CEST\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,8 +29,8 @@ msgstr ""
 
 #: VirtualMailManager/Account.py:99 VirtualMailManager/Account.py:156
 #: VirtualMailManager/Account.py:183 VirtualMailManager/Account.py:211
-#: VirtualMailManager/Account.py:230
-#: VirtualMailManager/VirtualMailManager.py:577
+#: VirtualMailManager/Account.py:231
+#: VirtualMailManager/VirtualMailManager.py:600
 msgid "Account doesn't exists"
 msgstr ""
 
@@ -96,24 +96,28 @@ msgstr ""
 msgid "Enter new value for %s [%s]: "
 msgstr ""
 
-#: VirtualMailManager/Domain.py:119
-msgid "There are accounts and aliases."
-msgstr ""
-
-#: VirtualMailManager/Domain.py:122
-msgid "There are accounts."
-msgstr ""
-
-#: VirtualMailManager/Domain.py:125
-msgid "There are aliases."
-msgstr ""
-
-#: VirtualMailManager/Domain.py:139
+#: VirtualMailManager/Domain.py:78 VirtualMailManager/Domain.py:156
 msgid "Domain already exists."
 msgstr ""
 
-#: VirtualMailManager/Domain.py:159 VirtualMailManager/Domain.py:183
-#: VirtualMailManager/Domain.py:213
+#: VirtualMailManager/Domain.py:81
+msgid "Domain alias already exists."
+msgstr ""
+
+#: VirtualMailManager/Domain.py:135
+msgid "There are accounts and aliases."
+msgstr ""
+
+#: VirtualMailManager/Domain.py:138
+msgid "There are accounts."
+msgstr ""
+
+#: VirtualMailManager/Domain.py:141
+msgid "There are aliases."
+msgstr ""
+
+#: VirtualMailManager/Domain.py:174 VirtualMailManager/Domain.py:198
+#: VirtualMailManager/Domain.py:215 VirtualMailManager/Domain.py:245
 msgid "Domain doesn't exist yet."
 msgstr ""
 
@@ -249,11 +253,11 @@ msgstr ""
 msgid "Invalid argument: '%s'"
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:505
+#: VirtualMailManager/VirtualMailManager.py:506
 msgid "Invalid argument"
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:523
+#: VirtualMailManager/VirtualMailManager.py:546
 msgid "The pattern '%s' contains invalid characters."
 msgstr ""
 
@@ -261,105 +265,125 @@ msgstr ""
 msgid ""
 "Usage: %s SUBCOMMAND OBJECT ARGS*\n"
 "  short long\n"
-"  subcommand            object           args (* = optional)\n"
+"  subcommand               object            args (* = optional)\n"
 "\n"
 msgstr ""
 
-#: vmm:61 vmm:70 vmm:305 vmm:355
+#: vmm:64 vmm:73 vmm:341 vmm:395
 msgid "Error"
 msgstr ""
 
-#: vmm:80 vmm:352
+#: vmm:83 vmm:392
 msgid "Ouch"
 msgstr ""
 
-#: vmm:106
+#: vmm:110
 msgid "information"
 msgstr ""
 
-#: vmm:116
+#: vmm:120
 msgid "Available"
 msgstr ""
 
-#: vmm:122 vmm:133 vmm:143
+#: vmm:123 vmm:196
+msgid "alias domains"
+msgstr ""
+
+#: vmm:133 vmm:144 vmm:162
 msgid "\tNone"
 msgstr ""
 
-#: vmm:126
+#: vmm:137
 msgid "Alias information"
 msgstr ""
 
-#: vmm:128
+#: vmm:139
 msgid "\tMail for %s goes to:"
 msgstr ""
 
-#: vmm:138
+#: vmm:157
 msgid "Available domains"
 msgstr ""
 
-#: vmm:140
+#: vmm:159
 msgid "Matching domains"
 msgstr ""
 
-#: vmm:155 vmm:163 vmm:171
+#: vmm:174 vmm:182 vmm:190
 msgid "Missing domain name."
 msgstr ""
 
-#: vmm:177
+#: vmm:192 vmm:195
+msgid "Domain"
+msgstr ""
+
+#: vmm:197
 msgid "accounts"
 msgstr ""
 
-#: vmm:178
+#: vmm:198
 msgid "aliases"
 msgstr ""
 
-#: vmm:182
+#: vmm:202
 msgid "Missing domain name and new transport."
 msgstr ""
 
-#: vmm:184
+#: vmm:204
 msgid "Missing new transport."
 msgstr ""
 
-#: vmm:192 vmm:201 vmm:207 vmm:231 vmm:239 vmm:247
-msgid "Missing e-mail address."
+#: vmm:213
+msgid "Missing alias domain name and target domain name."
 msgstr ""
 
 #: vmm:215
+msgid "Missing target domain name."
+msgstr ""
+
+#: vmm:221
+msgid "Missing alias domain name."
+msgstr ""
+
+#: vmm:227 vmm:236 vmm:242 vmm:266 vmm:274 vmm:282
+msgid "Missing e-mail address."
+msgstr ""
+
+#: vmm:250
 msgid "Missing e-mail address and users name."
 msgstr ""
 
-#: vmm:217
+#: vmm:252
 msgid "Missing users name."
 msgstr ""
 
-#: vmm:223
+#: vmm:258
 msgid "Missing e-mail address and transport."
 msgstr ""
 
-#: vmm:225
+#: vmm:260
 msgid "Missing transport."
 msgstr ""
 
-#: vmm:256
+#: vmm:291
 msgid "Missing alias address and destination."
 msgstr ""
 
-#: vmm:262 vmm:268
+#: vmm:297 vmm:303
 msgid "Missing alias address"
 msgstr ""
 
-#: vmm:276
+#: vmm:311
 msgid "Missing userid"
 msgstr ""
 
-#: vmm:288
+#: vmm:324
 msgid ""
 "\n"
 "Warnings:"
 msgstr ""
 
-#: vmm:349
+#: vmm:389
 msgid "Unknown subcommand"
 msgstr ""
 
