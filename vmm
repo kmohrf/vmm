@@ -33,26 +33,29 @@ def usage(excode=0, errMsg=None):
     sys.stderr.write(_("""\
 Usage: %s SUBCOMMAND OBJECT ARGS*
   short long
-  subcommand            object           args (* = optional)\n\n""")% __prog__)
+  subcommand               object            args (* = optional)\n\n""")%
+  __prog__)
     sys.stderr.write("""\
-  da    domainadd       domain.tld       transport*
-  di    domaininfo      domain.tld       detailed*
-  dt    domaintransport domain.tld       transport force*
-  dd    domaindelete    domain.tld       delalias*|deluser*|delall*
-  ua    useradd         user@domain.tld  password*
-  ui    userinfo        user@domain.tld  du*
-  un    username        user@domain.tld  'Users Name'
-  up    userpassword    user@domain.tld  password*
-  ut    usertransport   user@domain.tld  transport
-  u0    userdisable     user@domain.tld  smtp*|pop3*|imap*|managesieve*|all*
-  u1    userenable      user@domain.tld  smtp*|pop3*|imap*|managesieve*|all*
-  ud    userdelete      user@domain.tld
-  aa    aliasadd        alias@domain.tld user@domain.tld
-  ai    aliasinfo       alias@domain.tld
-  ad    aliasdelete     alias@domain.tld user@domain.tld*
-  gu    getuser         userid
-  ld    listdomains                      pattern*
-  cf    configure                        section*
+  da    domainadd          domain.tld        transport*
+  di    domaininfo         domain.tld        detailed*
+  dt    domaintransport    domain.tld        transport force*
+  dd    domaindelete       domain.tld        delalias*|deluser*|delall*
+  daa   domainaliasadd     aliasdomain.tld   domain.tld
+  dad   domainaliasdelete  aliasdomain.tld
+  ua    useradd            user@domain.tld   password*
+  ui    userinfo           user@domain.tld   du*
+  un    username           user@domain.tld   'Users Name'
+  up    userpassword       user@domain.tld   password*
+  ut    usertransport      user@domain.tld   transport
+  u0    userdisable        user@domain.tld   smtp*|pop3*|imap*|managesieve*|all*
+  u1    userenable         user@domain.tld   smtp*|pop3*|imap*|managesieve*|all*
+  ud    userdelete         user@domain.tld
+  aa    aliasadd           alias@domain.tld  user@domain.tld
+  ai    aliasinfo          alias@domain.tld
+  ad    aliasdelete        alias@domain.tld  user@domain.tld*
+  gu    getuser            userid
+  ld    listdomains                          pattern*
+  cf    configure                            section*
   h     help
   v     version
 
@@ -117,8 +120,15 @@ def _printList(alist, title):
     msg = '%s %s' % (_('Available'), title)
     print '%s\n%s' % (msg, '-'*len(msg))
     if len(alist) > 0:
-        for val in alist:
-            print '\t%s' % val
+        if title != _('alias domains'):
+            for val in alist:
+                print '\t%s' % val
+        else:
+            for dom in alist:
+                if not dom.startswith('xn--'):
+                    print '\t%s' % dom
+                else:
+                    print '\t%s (%s)' % (dom, vmm.ace2idna(dom))
     else:
         print _('\tNone')
     print
@@ -141,7 +151,6 @@ def _formatDom(domain, main=True):
         return '\t[+] %s' %  domain
     else:
         return '\t[-]     %s' % domain
-
 
 def _printDomList(dids, domains):
     if argc < 3:
@@ -197,6 +206,21 @@ def domain_transport():
         vmm.domain_transport(sys.argv[2].lower(), sys.argv[3])
     else:
         vmm.domain_transport(sys.argv[2].lower(), sys.argv[3], sys.argv[4])
+
+def domain_alias_add():
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS,
+                _('Missing alias domain name and target domain name.'))
+    elif argc < 4:
+        usage(EXIT.MISSING_ARGS, _('Missing target domain name.'))
+    else:
+        vmm.domain_alias_add(sys.argv[2].lower(), sys.argv[3].lower())
+
+def domain_alias_delete():
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS, _('Missing alias domain name.'))
+    else:
+        vmm.domain_alias_delete(sys.argv[2].lower())
 
 def user_add():
     if argc < 3:
@@ -325,6 +349,10 @@ if __name__ == '__main__':
             domain_transport()
         elif sys.argv[1] in ['dd', 'domaindelete']:
             domain_delete()
+        elif sys.argv[1] in ['daa', 'domainaliasadd']:
+            domain_alias_add()
+        elif sys.argv[1] in ['dad', 'domainaliasdelete']:
+            domain_alias_delete()
         elif sys.argv[1] in ['ua', 'useradd']:
             user_add()
         elif sys.argv[1] in ['ui', 'userinfo']:

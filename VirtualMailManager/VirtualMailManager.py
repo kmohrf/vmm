@@ -506,6 +506,28 @@ see also: vmm.cfg(5)\n""") % str(e))
             raise VMMDomainException(("%s: '%s'" % (_('Invalid argument'),
                 detailed),  ERR.INVALID_OPTION))
 
+    def domain_alias_add(self, aliasname, domainname):
+        """Adds an alias name to the domain.
+        
+        Keyword arguments:
+        aliasname -- the alias name of the domain (str)
+        domainname -- name of the target domain (str)
+        """
+        dom = self.__getDomain(domainname)
+        aliasname = self.__chkDomainname(aliasname)
+        dom.saveAlias(aliasname)
+
+    def domain_alias_delete(self, aliasname):
+        """Deletes the specified alias name.
+        
+        Keyword arguments:
+        aliasname -- the alias name of the domain (str)
+        """
+        from Domain import deleteAlias
+        aliasname = self.__chkDomainname(aliasname)
+        self.__dbConnect()
+        deleteAlias(self.__dbh, aliasname)
+
     def domain_list(self, pattern=None):
         from Domain import search
         like = False

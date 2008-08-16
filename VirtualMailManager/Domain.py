@@ -54,9 +54,9 @@ class Domain:
         will be returned.
         """
         dbc = self._dbh.cursor()
-        # XXX check for primary
         dbc.execute("SELECT gid, tid, domaindir FROM domain_data WHERE gid =\
- (SELECT gid FROM domain_name WHERE domainname = %s)", self._name)
+ (SELECT gid FROM domain_name WHERE domainname = %s AND is_primary)",
+            self._name)
         result = dbc.fetchone()
         dbc.close()
         if result is not None:
@@ -65,6 +65,21 @@ class Domain:
             return True
         else:
             return False
+
+    def _aliasExists(self, aliasname):
+        dbc = self._dbh.cursor()
+        dbc.execute("SELECT gid, is_primary FROM domain_name\
+ WHERE domainname = %s", aliasname)
+        result = dbc.fetchone()
+        dbc.close()
+        if result is None:
+            return False
+        elif result[1]:
+            raise VMMDomainException((_('Domain already exists.'),
+                ERR.DOMAIN_EXISTS))
+        else:
+            raise VMMDomainException((_('Domain alias already exists.'),
+                ERR.DOMAIN_ALIAS_EXISTS))
 
     def _setID(self):
         """Sets the ID of the domain."""
@@ -151,11 +166,8 @@ class Domain:
         if self._id > 0:
             self._chkDelete(delUser, delAlias)
             dbc = self._dbh.cursor()
-            dbc.execute('DELETE FROM alias WHERE gid=%s', self._id)
-            dbc.execute('DELETE FROM users WHERE gid=%s', self._id)
-            dbc.execute('DELETE FROM relocated WHERE gid=%s', self._id)
-            dbc.execute('DELETE FROM domain_name WHERE gid=%s', self._id)
-            dbc.execute('DELETE FROM domain_data WHERE gid=%s', self._id)
+            for t in ('alias','users','relocated','domain_name','domain_data'):
+                dbc.execute("DELETE FROM %s WHERE gid = %d" % (t, self._id))
             self._dbh.commit()
             dbc.close()
         else:
@@ -181,6 +193,23 @@ class Domain:
                         trsp.getID(), self._id)
                 if dbc.rowcount > 0:
                     self._dbh.commit()
+            dbc.close()
+        else:
+            raise VMMDomainException((_("Domain doesn't exist yet."),
+                ERR.NO_SUCH_DOMAIN))
+
+    def saveAlias(self, aliasname):
+        """Stores the alias name for the domain in the database.
+
+        Keyword arguments:
+        aliasname -- the alias name of the domain (str)
+        """
+        if self._id > 0 and not self._aliasExists(aliasname):
+            dbc = self._dbh.cursor()
+            dbc.execute('INSERT INTO domain_name VALUES (%s, %s, %s)',
+                    aliasname, self._id, False)
+            if dbc.rowcount == 1:
+                self._dbh.commit()
             dbc.close()
         else:
             raise VMMDomainException((_("Domain doesn't exist yet."),
@@ -289,3 +318,11 @@ def search(dbh, pattern=None, like=False):
                 domdict[gid] = [None, dom]
     del doms
     return order, domdict
+
+def deleteAlias(dbh, aliasname):
+    dbc = dbh.cursor()
+    dbc.execute('DELETE FROM domain_name WHERE domainname = %s', aliasname)
+    if dbc.rowcount > 0:
+        dbh.commit()
+    dbc.close()
+
