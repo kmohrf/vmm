@@ -16,8 +16,8 @@ __version__ = VERSION
 __revision__ = 'rev '+'$Rev$'.split()[1]
 __date__ = '$Date$'.split()[1]
 
+import locale
 import sys
-import gettext
 from shutil import copy2
 from ConfigParser import ConfigParser
 from cStringIO import StringIO
@@ -25,9 +25,8 @@ from cStringIO import StringIO
 from Exceptions import VMMConfigException
 import constants.ERROR as ERR
 
-gettext.bindtextdomain('vmm', '/usr/local/share/locale')
-gettext.textdomain('vmm')
-_ = gettext.gettext
+locale.setlocale(locale.LC_ALL, '')
+ENCODING = locale.nl_langinfo(locale.CODESET)
 
 class VMMConfig(ConfigParser):
     """This class is for configure the Virtual Mail Manager.
@@ -98,9 +97,9 @@ class VMMConfig(ConfigParser):
             errmsg = StringIO()
             for k,v in self.__missing.items():
                 if v[0] is True:
-                    errmsg.write(_("missing section: %s\n") % k)
+                    errmsg.write(_(u"missing section: %s\n") % k)
                 else:
-                    errmsg.write(_("missing options in section %s:\n") % k)
+                    errmsg.write(_(u"missing options in section %s:\n") % k)
                     for o in v:
                         errmsg.write(" * %s\n" % o)
             raise VMMConfigException((errmsg.getvalue(), ERR.CONF_ERROR))
@@ -116,7 +115,7 @@ class VMMConfig(ConfigParser):
         sections -- list of strings
         """
         if not isinstance(sections, list):
-            raise TypeError(_("Argument 'sections' is not a list."))
+            raise TypeError(_(u"Argument 'sections' is not a list."))
         # if [config] done = false (default at 1st run),
         # then set changes true
         try:
@@ -129,10 +128,11 @@ class VMMConfig(ConfigParser):
             if s == 'config':
                 pass
             else:
-                print _('* Config section: %s') % s
+                print _(u'* Config section: »%s«') % s
             for opt, val in self.items(s):
-                newval = raw_input(_('Enter new value for %s [%s]: ')
-                        %(opt, val))
+                newval = raw_input(
+                _('Enter new value for option %s [%s]: ').encode(
+                    ENCODING, 'replace') % (opt, val))
                 if newval and newval != val:
                     self.set(s, opt, newval)
                     self.__changes = True

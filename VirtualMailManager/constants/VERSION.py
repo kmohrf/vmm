@@ -4,4 +4,4 @@
 # See COPYING for distribution information.
 # $Id$
 
-VERSION = '0.5'
+VERSION = '0.5-dev'

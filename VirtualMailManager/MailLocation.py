@@ -14,14 +14,8 @@ __version__ = VERSION
 __revision__ = 'rev '+'$Rev$'.split()[1]
 __date__ = '$Date$'.split()[1]
 
-import gettext
-
 from Exceptions import VMMMailLocationException as MLE
 import constants.ERROR as ERR
-
-gettext.bindtextdomain('vmm', '/usr/local/share/locale')
-gettext.textdomain('vmm')
-_ = gettext.gettext
 
 class MailLocation:
     """A wrapper class thats provide access to the maillocation table"""

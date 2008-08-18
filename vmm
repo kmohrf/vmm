@@ -13,6 +13,7 @@ __version__ = VERSION
 __revision__ = 'rev '+'$Rev$'.split()[1]
 __date__ = '$Date$'.split()[1]
 
+import locale
 import os
 import sys
 import gettext
@@ -23,11 +24,22 @@ import VirtualMailManager.Exceptions as VMME
 import VirtualMailManager.constants.EXIT as EXIT
 import VirtualMailManager.constants.ERROR as ERR
 
+locale.setlocale(locale.LC_ALL, '')
+ENCODING = locale.nl_langinfo(locale.CODESET)
 __prog__ = os.path.basename(sys.argv[0])
 
-gettext.bindtextdomain(__prog__, '/usr/local/share/locale')
-gettext.textdomain(__prog__)
-_ = gettext.gettext
+gettext.install(__prog__, '/usr/local/share/locale', unicode=1)
+
+def w_err(code, *args):
+    for arg in args:
+        sys.stderr.write(arg.encode(ENCODING, 'replace'))
+    sys.stderr.write('\n')
+    sys.exit(code)
+
+def w_std(*args):
+    for arg in args:
+        sys.stdout.write(arg.encode(ENCODING, 'replace'))
+        sys.stdout.write('\n')
 
 def usage(excode=0, errMsg=None):
     sys.stderr.write(_("""\
@@ -70,30 +82,31 @@ def getVMM():
         return vmm
     except (VMME.VMMException, VMME.VMMNotRootException, VMME.VMMPermException,
             VMME.VMMConfigException), e:
-        sys.stderr.write("%s: %s\n" % (_('Error'),e[0][0]))
-        sys.exit(e[0][1])
+        w_err(e[0][1], "%s: %s\n" % (_('Error'),e[0][0]))
 
 def configure():
     try:
-        if len(sys.argv) < 3:
+        if len(argv) < 3:
             vmm.configure()
         else:
-            vmm.configure(sys.argv[2])
+            vmm.configure(argv[2])
     except (EOFError, KeyboardInterrupt):
-        sys.stderr.write('\n%s!\n' % _('Ouch'))
-        sys.exit(EXIT.USER_INTERRUPT)
+        #sys.stderr.write('\n%s!\n' % _('Ouch'))
+        #sys.exit(EXIT.USER_INTERRUPT)
+        w_err(EXIT.USER_INTERRUPT, '\n%s!\n' % _('Ouch'))
     except VMME.VMMConfigException, e:
-        sys.stderr.write(str(e))
-        sys.exit(ERR.CONF_ERROR)
+        #sys.stderr.write(str(e))
+        #sys.exit(ERR.CONF_ERROR)
+        w_err(ERR.CONF_ERROR, str(e))
     sys.exit(0)
 
 def _getOrder():
     order = ()
-    if sys.argv[1] in ['di', 'domaininfo']:
+    if argv[1] in ['di', 'domaininfo']:
         order = (('domainname', 0), ('gid', 1), ('transport', 0),
                 ('domaindir', 0), ('aliasdomains', 0), ('accounts', 0),
                 ('aliases', 0))
-    elif sys.argv[1] in ['ui', 'userinfo']:
+    elif argv[1] in ['ui', 'userinfo']:
         if argc == 4 or vmm.cfgGetBoolean('maildir', 'diskusage'):
             order = (('address', 0), ('name', 0), ('uid', 1), ('gid', 1),
                     ('transport', 0), ('maildir', 0), ('disk usage', 0),
@@ -102,18 +115,21 @@ def _getOrder():
             order = (('address', 0), ('name', 0), ('uid', 1), ('gid', 1),
                     ('transport', 0), ('maildir', 0), ('smtp', 1), ('pop3', 1),
                     ('imap', 1), ('managesieve', 1))
-    elif sys.argv[1] in ['gu', 'getuser']:
+    elif argv[1] in ['gu', 'getuser']:
         order = (('uid', 1), ('gid', 1), ('address', 0))
     return order
 
 def _printInfo(info, title):
     msg = '%s %s' % (title, _('information'))
-    print '%s\n%s' % (msg, '-'*len(msg))
+    #print '%s\n%s' % (msg, '-'*len(msg))
+    w_std ('%s\n%s' % (msg, '-'*len(msg)))
     for k,u in _getOrder():
         if u:
-            print '\t%s: %s' % (k.upper().ljust(15, '.'), info[k])
+            #print '\t%s: %s' % (k.upper().ljust(15, '.'), info[k])
+            w_std('\t%s: %s' % (k.upper().ljust(15, '.'), info[k]))
         else:
-            print '\t%s: %s' % (k.title().ljust(15, '.'), info[k])
+            #print '\t%s: %s' % (k.title().ljust(15, '.'), info[k])
+            w_std('\t%s: %s' % (k.title().ljust(15, '.'), info[k]))
     print
 
 def _printList(alist, title):
@@ -173,25 +189,25 @@ def domain_add():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing domain name.'))
     elif argc < 4:
-        vmm.domain_add(sys.argv[2].lower())
+        vmm.domain_add(argv[2].lower())
     else:
-        vmm.domain_add(sys.argv[2].lower(), sys.argv[3])
+        vmm.domain_add(argv[2].lower(), argv[3])
 
 def domain_delete():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing domain name.'))
     elif argc < 4:
-        vmm.domain_delete(sys.argv[2].lower())
+        vmm.domain_delete(argv[2].lower())
     else:
-        vmm.domain_delete(sys.argv[2].lower(), sys.argv[3])
+        vmm.domain_delete(argv[2].lower(), argv[3])
 
 def domain_info():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing domain name.'))
     elif argc < 4:
-        _printInfo(vmm.domain_info(sys.argv[2].lower()), _('Domain'))
+        _printInfo(vmm.domain_info(argv[2].lower()), _('Domain'))
     else:
-        infos = vmm.domain_info(sys.argv[2].lower(), sys.argv[3])
+        infos = vmm.domain_info(argv[2].lower(), argv[3])
         _printInfo(infos[0], _('Domain'))
         _printList(infos[1], _('alias domains'))
         _printList(infos[2], _('accounts'))
@@ -203,9 +219,9 @@ def domain_transport():
     if argc < 4:
         usage(EXIT.MISSING_ARGS, _('Missing new transport.'))
     elif argc < 5:
-        vmm.domain_transport(sys.argv[2].lower(), sys.argv[3])
+        vmm.domain_transport(argv[2].lower(), argv[3])
     else:
-        vmm.domain_transport(sys.argv[2].lower(), sys.argv[3], sys.argv[4])
+        vmm.domain_transport(argv[2].lower(), argv[3], argv[4])
 
 def domain_alias_add():
     if argc < 3:
@@ -214,13 +230,13 @@ def domain_alias_add():
     elif argc < 4:
         usage(EXIT.MISSING_ARGS, _('Missing target domain name.'))
     else:
-        vmm.domain_alias_add(sys.argv[2].lower(), sys.argv[3].lower())
+        vmm.domain_alias_add(argv[2].lower(), argv[3].lower())
 
 def domain_alias_delete():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing alias domain name.'))
     else:
-        vmm.domain_alias_delete(sys.argv[2].lower())
+        vmm.domain_alias_delete(argv[2].lower())
 
 def user_add():
     if argc < 3:
@@ -228,22 +244,22 @@ def user_add():
     elif argc < 4:
         password = None
     else:
-        password = sys.argv[3]
-    vmm.user_add(sys.argv[2].lower(), password)
+        password = argv[3]
+    vmm.user_add(argv[2].lower(), password)
 
 def user_delete():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing e-mail address.'))
     else:
-        vmm.user_delete(sys.argv[2].lower())
+        vmm.user_delete(argv[2].lower())
 
 def user_info():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing e-mail address.'))
     elif argc < 4:
-        _printInfo(vmm.user_info(sys.argv[2].lower()), 'Account')
+        _printInfo(vmm.user_info(argv[2].lower()), 'Account')
     else:
-        _printInfo(vmm.user_info(sys.argv[2].lower(), True), 'Account')
+        _printInfo(vmm.user_info(argv[2].lower(), True), 'Account')
 
 def user_name():
     if argc < 3:
@@ -251,7 +267,7 @@ def user_name():
     if argc < 4:
         usage(EXIT.MISSING_ARGS, _('Missing users name.'))
     else:
-        vmm.user_name(sys.argv[2].lower(), sys.argv[3])
+        vmm.user_name(argv[2].lower(), argv[3])
 
 def user_transport():
     if argc < 3:
@@ -259,23 +275,23 @@ def user_transport():
     if argc <4:
         usage(EXIT.MISSING_ARGS, _('Missing transport.'))
     else:
-        vmm.user_transport(sys.argv[2].lower(), sys.argv[3])
+        vmm.user_transport(argv[2].lower(), argv[3])
 
 def user_enable():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing e-mail address.'))
     elif argc < 4:
-        vmm.user_enable(sys.argv[2].lower())
+        vmm.user_enable(argv[2].lower())
     else:
-        vmm.user_enable(sys.argv[2].lower(), sys.argv[3].lower())
+        vmm.user_enable(argv[2].lower(), argv[3].lower())
 
 def user_disable():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing e-mail address.'))
     elif argc < 4:
-        vmm.user_disable(sys.argv[2].lower())
+        vmm.user_disable(argv[2].lower())
     else:
-        vmm.user_disable(sys.argv[2].lower(), sys.argv[3].lower())
+        vmm.user_disable(argv[2].lower(), argv[3].lower())
 
 def user_password():
     if argc < 3:
@@ -283,114 +299,115 @@ def user_password():
     elif argc < 4:
         password = None
     else:
-        password = sys.argv[3]
-    vmm.user_password(sys.argv[2].lower(), password)
+        password = argv[3]
+    vmm.user_password(argv[2].lower(), password)
 
 def alias_add():
     if argc < 4:
         usage(EXIT.MISSING_ARGS, _('Missing alias address and destination.'))
     else:
-        vmm.alias_add(sys.argv[2].lower(), sys.argv[3])
+        vmm.alias_add(argv[2].lower(), argv[3])
 
 def alias_info():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing alias address'))
     else:
-        _printAliases(sys.argv[2], vmm.alias_info(sys.argv[2].lower()))
+        _printAliases(argv[2], vmm.alias_info(argv[2].lower()))
 
 def alias_delete():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing alias address'))
     elif argc < 4:
-        vmm.alias_delete(sys.argv[2].lower())
+        vmm.alias_delete(argv[2].lower())
     else:
-        vmm.alias_delete(sys.argv[2].lower(), sys.argv[3].lower())
+        vmm.alias_delete(argv[2].lower(), argv[3].lower())
 
 def user_byID():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _('Missing userid'))
     else:
-        _printInfo(vmm.user_byID(sys.argv[2]), 'Account')
+        _printInfo(vmm.user_byID(argv[2]), 'Account')
 
 def domain_list():
     if argc < 3:
         order, doms = vmm.domain_list()
     else:
-        order, doms = vmm.domain_list(sys.argv[2].lower())
+        order, doms = vmm.domain_list(argv[2].lower())
     _printDomList(order, doms)
 
 def showWarnings():
     if vmm.hasWarnings():
-        print _('\nWarnings:')
+        print _(u'Warnings:')
         for w in vmm.getWarnings():
             print " * ",w
 
 #def main():
 if __name__ == '__main__':
     argc = len(sys.argv)
+    argv = [unicode(arg, ENCODING) for arg in sys.argv]
     if argc < 2:
         usage(EXIT.MISSING_ARGS)
     vmm = getVMM()
     try:
-        if sys.argv[1] in ['cf',  'configure'] or not vmm.setupIsDone():
+        if argv[1] in ['cf',  'configure'] or not vmm.setupIsDone():
             configure()
     except VMME.VMMConfigException, e:
-        sys.stderr.write(str(e))
-        sys.exit(ERR.CONF_ERROR)
+        #sys.stderr.write(str(e))
+        #sys.exit(ERR.CONF_ERROR)
+        w_err(ERR.CONF_ERROR, str(e))
     except VMME.VMMException, e:
-        sys.stderr.write("%s: %s\n" % (_('Error'), e[0][0]))
-        sys.exit(e[0][1])
+        #sys.stderr.write("%s: %s\n" % (_('Error'), e[0][0]))
+        #sys.exit(e[0][1])
+        w_err(e[0][1], "%s: %s\n" % (_('Error'), e[0][0]))
     try:
-        if sys.argv[1] in ['da', 'domainadd']:
+        if argv[1] in ['da', 'domainadd']:
             domain_add()
-        elif sys.argv[1] in ['di', 'domaininfo']:
+        elif argv[1] in ['di', 'domaininfo']:
             domain_info()
-        elif sys.argv[1] in ['dt', 'domaintransport']:
+        elif argv[1] in ['dt', 'domaintransport']:
             domain_transport()
-        elif sys.argv[1] in ['dd', 'domaindelete']:
+        elif argv[1] in ['dd', 'domaindelete']:
             domain_delete()
-        elif sys.argv[1] in ['daa', 'domainaliasadd']:
+        elif argv[1] in ['daa', 'domainaliasadd']:
             domain_alias_add()
-        elif sys.argv[1] in ['dad', 'domainaliasdelete']:
+        elif argv[1] in ['dad', 'domainaliasdelete']:
             domain_alias_delete()
-        elif sys.argv[1] in ['ua', 'useradd']:
+        elif argv[1] in ['ua', 'useradd']:
             user_add()
-        elif sys.argv[1] in ['ui', 'userinfo']:
+        elif argv[1] in ['ui', 'userinfo']:
             user_info()
-        elif sys.argv[1] in ['un', 'username']:
+        elif argv[1] in ['un', 'username']:
             user_name()
-        elif sys.argv[1] in ['up', 'userpassword']:
+        elif argv[1] in ['up', 'userpassword']:
             user_password()
-        elif sys.argv[1] in ['ut', 'usertransport']:
+        elif argv[1] in ['ut', 'usertransport']:
             user_transport()
-        elif sys.argv[1] in ['u0', 'userdisable']:
+        elif argv[1] in ['u0', 'userdisable']:
             user_disable()
-        elif sys.argv[1] in ['u1', 'userenable']:
+        elif argv[1] in ['u1', 'userenable']:
             user_enable()
-        elif sys.argv[1] in ['ud', 'userdelete']:
+        elif argv[1] in ['ud', 'userdelete']:
             user_delete()
-        elif sys.argv[1] in ['aa', 'aliasadd']:
+        elif argv[1] in ['aa', 'aliasadd']:
             alias_add()
-        elif sys.argv[1] in ['ai', 'aliasinfo']:
+        elif argv[1] in ['ai', 'aliasinfo']:
             alias_info()
-        elif sys.argv[1] in ['ad', 'aliasdelete']:
+        elif argv[1] in ['ad', 'aliasdelete']:
             alias_delete()
-        elif sys.argv[1] in ['gu', 'getuser']:
+        elif argv[1] in ['gu', 'getuser']:
             user_byID()
-        elif sys.argv[1] in ['ld', 'listdomains']:
+        elif argv[1] in ['ld', 'listdomains']:
             domain_list()
-        elif sys.argv[1] in ['h', 'help']:
+        elif argv[1] in ['h', 'help']:
             usage()
-        elif sys.argv[1] in ['v', 'version']:
+        elif argv[1] in ['v', 'version']:
             print "%s, version %s (%s from %s)\n" % (__prog__, __version__,
                     __revision__, __date__)
         else:
             usage(EXIT.UNKNOWN_COMMAND,
-                    "%s: '%s'" % (_('Unknown subcommand'), sys.argv[1]))
+                    "%s: '%s'" % (_(u'Unknown subcommand'), argv[1]))
         showWarnings()
     except (EOFError, KeyboardInterrupt):
-        sys.stderr.write('\n%s!\n' % _('Ouch'))
-        sys.exit(EXIT.USER_INTERRUPT)
+        w_err(EXIT.USER_INTERRUPT, '\n%s!\n' % _('Ouch'))
     except VMME.VMMException, e:
-        sys.stderr.write("%s: %s\n" % (_('Error'), e[0][0]))
-        sys.exit(e[0][1])
+        w_err(e[0][1], "%s: %s" % (_('Error'), e[0][0]))

@@ -13,7 +13,6 @@ __version__ = VERSION
 __revision__ = 'rev '+'$Rev$'.split()[1]
 __date__ = '$Date$'.split()[1]
 
-import gettext
 from random import choice
 
 from Exceptions import VMMDomainException
@@ -21,10 +20,6 @@ import constants.ERROR as ERR
 from Transport import Transport
 
 MAILDIR_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz'
-
-gettext.bindtextdomain('vmm', '/usr/local/share/locale')
-gettext.textdomain('vmm')
-_ = gettext.gettext
 
 class Domain:
     """Class to manage e-mail domains."""
