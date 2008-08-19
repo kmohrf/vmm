@@ -145,7 +145,6 @@ class VirtualMailManager:
         for label in domainname.split('.'):
             if len(label) == 0:
                 continue
-            #tmp.append(ToASCII(unicode(label, ENCODING_IN)))
             tmp.append(ToASCII(label))
         return '.'.join(tmp)
     idn2ascii = staticmethod(idn2ascii)
@@ -229,7 +228,6 @@ class VirtualMailManager:
         return Alias(self.__dbh, address, destination)
 
     def __getDomain(self, domainname, transport=None):
-        domainname = VirtualMailManager.chkDomainname(domainname)
         if transport is None:
             transport = self.__Cfg.get('misc', 'transport')
         self.__dbConnect()
@@ -427,7 +425,7 @@ class VirtualMailManager:
         except ValueError, e:
             raise VMMConfigException(_(u"""Configurtion error: "%s"
 (in section "connfig", option "done") see also: vmm.cfg(5)\n""") % str(e),
-    ERR.CONF_ERROR)
+                  ERR.CONF_ERROR)
 
     def configure(self, section=None):
         """Starts interactive configuration.
@@ -506,8 +504,6 @@ class VirtualMailManager:
         domainname -- name of the target domain (str)
         """
         dom = self.__getDomain(domainname)
-        # XXX chk by DomainAlias!!!
-        aliasname = VirtualMailManager.chkDomainname(aliasname)
         dom.saveAlias(aliasname)
 
     def domain_alias_delete(self, aliasname):
@@ -517,8 +513,6 @@ class VirtualMailManager:
         aliasname -- the alias name of the domain (str)
         """
         from Domain import deleteAlias
-        aliasname = VirtualMailManager.chkDomainname(aliasname)
-        # XXX chk by DomainAlias!!!
         self.__dbConnect()
         deleteAlias(self.__dbh, aliasname)
 
@@ -537,11 +531,8 @@ class VirtualMailManager:
                 re.compile(RE_DOMAIN_SRCH)
                 if not re.match(RE_DOMAIN_SRCH, domain):
                     raise VMMException(
-                    _(u"The pattern '%s' contains invalid characters.") %
+                    _(u"The pattern »%s« contains invalid characters.") %
                     pattern, ERR.DOMAIN_INVALID)
-            else:
-                pattern = VirtualMailManager.chkDomainname(pattern)
-                # XXX chk by domain if not like
         self.__dbConnect()
         return search(self.__dbh, pattern=pattern, like=like)
 
