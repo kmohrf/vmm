@@ -19,7 +19,7 @@ __date__ = '$Date$'.split()[1]
 import locale
 import sys
 from shutil import copy2
-from ConfigParser import ConfigParser
+from ConfigParser import ConfigParser, MissingSectionHeaderError, ParsingError
 from cStringIO import StringIO
 
 from Exceptions import VMMConfigException
@@ -87,9 +87,10 @@ class VMMConfig(ConfigParser):
         """Loads the configuration, r/o"""
         try:
             self.__cfgFile = file(self.__cfgFileName, 'r')
-        except:
-            raise
-        self.readfp(self.__cfgFile)
+            self.readfp(self.__cfgFile)
+        except (MissingSectionHeaderError, ParsingError), e:
+            self.__cfgFile.close()
+            raise VMMConfigException(str(e), ERR.CONF_ERROR)
         self.__cfgFile.close()
 
     def check(self):
@@ -102,7 +103,7 @@ class VMMConfig(ConfigParser):
                     errmsg.write(_(u"missing options in section %s:\n") % k)
                     for o in v:
                         errmsg.write(" * %s\n" % o)
-            raise VMMConfigException((errmsg.getvalue(), ERR.CONF_ERROR))
+            raise VMMConfigException(errmsg.getvalue(), ERR.CONF_ERROR)
 
     def getsections(self):
         """Return a list with all configurable sections."""
@@ -125,9 +126,7 @@ class VMMConfig(ConfigParser):
             self.set('config', 'done', 'False')
             self.__changes = True
         for s in sections:
-            if s == 'config':
-                pass
-            else:
+            if s != 'config':
                 print _(u'* Config section: »%s«') % s
             for opt, val in self.items(s):
                 newval = raw_input(

@@ -70,11 +70,11 @@ class Domain:
         if result is None:
             return False
         elif result[1]:
-            raise VMMDomainException((_('Domain already exists.'),
-                ERR.DOMAIN_EXISTS))
+            raise VMMDomainException(_('Domain already exists.'),
+                ERR.DOMAIN_EXISTS)
         else:
-            raise VMMDomainException((_('Domain alias already exists.'),
-                ERR.DOMAIN_ALIAS_EXISTS))
+            raise VMMDomainException(_('Domain alias already exists.'),
+                ERR.DOMAIN_ALIAS_EXISTS)
 
     def _setID(self):
         """Sets the ID of the domain."""
@@ -127,14 +127,14 @@ class Domain:
         else:
             hasAlias = False
         if hasUser and hasAlias:
-            raise VMMDomainException((_('There are accounts and aliases.'),
-                ERR.ACCOUNT_AND_ALIAS_PRESENT))
+            raise VMMDomainException(_('There are accounts and aliases.'),
+                ERR.ACCOUNT_AND_ALIAS_PRESENT)
         elif hasUser:
-            raise VMMDomainException((_('There are accounts.'),
-                ERR.ACCOUNT_PRESENT))
+            raise VMMDomainException(_('There are accounts.'),
+                ERR.ACCOUNT_PRESENT)
         elif hasAlias:
-            raise VMMDomainException((_('There are aliases.'),
-                ERR.ALIAS_PRESENT))
+            raise VMMDomainException(_('There are aliases.'),
+                ERR.ALIAS_PRESENT)
 
     def save(self):
         """Stores the new domain in the database."""
@@ -148,8 +148,8 @@ class Domain:
             self._dbh.commit()
             dbc.close()
         else:
-            raise VMMDomainException((_('Domain already exists.'),
-                ERR.DOMAIN_EXISTS))
+            raise VMMDomainException(_('Domain already exists.'),
+                ERR.DOMAIN_EXISTS)
 
     def delete(self, delUser=False, delAlias=False):
         """Deletes the domain.
@@ -166,8 +166,8 @@ class Domain:
             self._dbh.commit()
             dbc.close()
         else:
-            raise VMMDomainException((_("Domain doesn't exist yet."),
-                ERR.NO_SUCH_DOMAIN))
+            raise VMMDomainException(_("Domain doesn't exist yet."),
+                ERR.NO_SUCH_DOMAIN)
 
     def updateTransport(self, transport, force = False):
         """Sets a new transport for the domain.
@@ -190,8 +190,8 @@ class Domain:
                     self._dbh.commit()
             dbc.close()
         else:
-            raise VMMDomainException((_("Domain doesn't exist yet."),
-                ERR.NO_SUCH_DOMAIN))
+            raise VMMDomainException(_("Domain doesn't exist yet."),
+                ERR.NO_SUCH_DOMAIN)
 
     def saveAlias(self, aliasname):
         """Stores the alias name for the domain in the database.
@@ -207,8 +207,8 @@ class Domain:
                 self._dbh.commit()
             dbc.close()
         else:
-            raise VMMDomainException((_("Domain doesn't exist yet."),
-                ERR.NO_SUCH_DOMAIN))
+            raise VMMDomainException(_("Domain doesn't exist yet."),
+                ERR.NO_SUCH_DOMAIN)
 
     def getID(self):
         """Returns the ID of the domain."""
@@ -237,8 +237,8 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts, aliases
         info = dbc.fetchone()
         dbc.close()
         if info is None:
-            raise VMMDomainException((_("Domain doesn't exist yet."),
-                ERR.NO_SUCH_DOMAIN))
+            raise VMMDomainException(_("Domain doesn't exist yet."),
+                ERR.NO_SUCH_DOMAIN)
         else:
             keys = ['gid', 'domainname', 'transport', 'domaindir',
                     'aliasdomains', 'accounts', 'aliases']

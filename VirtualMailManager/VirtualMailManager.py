@@ -51,8 +51,8 @@ class VirtualMailManager:
         self.__dbh = None
 
         if os.geteuid():
-            raise VMMNotRootException((_(u"You are not root.\n\tGood bye!\n"),
-                ERR.CONF_NOPERM))
+            raise VMMNotRootException(_(u"You are not root.\n\tGood bye!\n"),
+                ERR.CONF_NOPERM)
         if self.__chkCfgFile():
             self.__Cfg = Cfg(self.__cfgFileName)
             self.__Cfg.load()
@@ -65,16 +65,13 @@ class VirtualMailManager:
     def __chkCfgFile(self):
         """Checks the configuration file, returns bool"""
         if not os.path.isfile(self.__cfgFileName):
-            raise VMMException((_(u"The file »%s« does not exists.") %
-                self.__cfgFileName, ERR.CONF_NOFILE))
+            raise VMMException(_(u"The file »%s« does not exists.") %
+                self.__cfgFileName, ERR.CONF_NOFILE)
         fstat = os.stat(self.__cfgFileName)
-        try:
-            fmode = self.__getFileMode()
-        except:
-            raise
+        fmode = int(oct(fstat.st_mode & 0777))
         if fmode % 100 and fstat.st_uid != fstat.st_gid \
         or fmode % 10 and fstat.st_uid == fstat.st_gid:
-            raise VMMPermException((self.__permWarnMsg, ERR.CONF_ERROR))
+            raise VMMPermException(self.__permWarnMsg, ERR.CONF_ERROR)
         else:
             return True
 
@@ -87,25 +84,18 @@ class VirtualMailManager:
                     self.__Cfg.getint('misc', 'gid_mail'))
             os.umask(old_umask)
         elif not os.path.isdir(self.__Cfg.get('domdir', 'base')):
-            raise VMMException((_(u'»%s« is not a directory.\n\
+            raise VMMException(_(u'»%s« is not a directory.\n\
 (vmm.cfg: section "domdir", option "base")') %
-                self.__Cfg.get('domdir', 'base'), ERR.NO_SUCH_DIRECTORY))
+                self.__Cfg.get('domdir', 'base'), ERR.NO_SUCH_DIRECTORY)
         for opt, val in self.__Cfg.items('bin'):
             if not os.path.exists(val):
-                raise VMMException((_(u'»%s« doesn\'t exists.\n\
-(vmm.cfg: section "bin", option "%s")') % (val, opt), ERR.NO_SUCH_BINARY))
+                raise VMMException(_(u'»%s« doesn\'t exists.\n\
+(vmm.cfg: section "bin", option "%s")') %
+                    (val, opt), ERR.NO_SUCH_BINARY)
             elif not os.access(val, os.X_OK):
-                raise VMMException((_(u'»%s« is not executable.\n\
-(vmm.cfg: section "bin", option "%s")') % (val, opt), ERR.NOT_EXECUTABLE))
-
-    def __getFileMode(self):
-        """Determines the file access mode from file __cfgFileName,
-        returns int.
-        """
-        try:
-            return int(oct(os.stat(self.__cfgFileName).st_mode & 0777))
-        except:
-            raise
+                raise VMMException(_(u'»%s« is not executable.\n\
+(vmm.cfg: section "bin", option "%s")') %
+                    (val, opt), ERR.NOT_EXECUTABLE)
 
     def __dbConnect(self):
         """Creates a pyPgSQL.PgSQL.connection instance."""
@@ -120,7 +110,7 @@ class VirtualMailManager:
             dbc.execute("SET NAMES 'UTF8'")
             dbc.close()
         except PgSQL.libpq.DatabaseError, e:
-            raise VMMException((str(e), ERR.DATABASE_ERROR))
+            raise VMMException(str(e), ERR.DATABASE_ERROR)
 
     def chkLocalpart(localpart):
         """Validates the local part of an e-mail address.
@@ -129,19 +119,19 @@ class VirtualMailManager:
         localpart -- the e-mail address that should be validated (str)
         """
         if len(localpart) < 1:
-            raise VMMException((_(u'No localpart specified.'),
-                ERR.LOCALPART_INVALID))
+            raise VMMException(_(u'No localpart specified.'),
+                ERR.LOCALPART_INVALID)
         if len(localpart) > 64:
-            raise VMMException((_(u'The local part »%s« is too long') %
-                localpart, ERR.LOCALPART_TOO_LONG))
+            raise VMMException(_(u'The local part »%s« is too long') %
+                localpart, ERR.LOCALPART_TOO_LONG)
         ic = re.compile(RE_LOCALPART).findall(localpart)
         if len(ic):
             ichrs = ''
             for c in set(ic):
                 ichrs += u"»%s« " % c
-            raise VMMException((
+            raise VMMException(
                 _(u"The local part »%s« contains invalid characters: %s") %
-                (localpart, ichrs), ERR.LOCALPART_INVALID))
+                (localpart, ichrs), ERR.LOCALPART_INVALID)
         return localpart
     chkLocalpart = staticmethod(chkLocalpart)
 
@@ -184,12 +174,12 @@ class VirtualMailManager:
         if not re.match(RE_ASCII_CHARS, domainname):
             domainname = VirtualMailManager.idn2ascii(domainname)
         if len(domainname) > 255:
-            raise VMMException((_(u'The domain name is too long.'),
-                ERR.DOMAIN_TOO_LONG))
+            raise VMMException(_(u'The domain name is too long.'),
+                ERR.DOMAIN_TOO_LONG)
         re.compile(RE_DOMAIN)
         if not re.match(RE_DOMAIN, domainname):
-            raise VMMException((_(u'The domain name is invalid.'),
-                ERR.DOMAIN_INVALID))
+            raise VMMException(_(u'The domain name is invalid.'),
+                ERR.DOMAIN_INVALID)
         return domainname
     chkDomainname = staticmethod(chkDomainname)
 
@@ -197,11 +187,11 @@ class VirtualMailManager:
         try:
             localpart, domain = address.split('@')
         except ValueError:
-            raise VMMException((_(u"Missing '@' sign in e-mail address »%s«.") %
-                address, ERR.INVALID_ADDRESS))
+            raise VMMException(_(u"Missing '@' sign in e-mail address »%s«.") %
+                address, ERR.INVALID_ADDRESS)
         except AttributeError:
-            raise VMMException((_(u"»%s« looks not like an e-mail address.") %
-                address, ERR.INVALID_ADDRESS))
+            raise VMMException(_(u"»%s« looks not like an e-mail address.") %
+                address, ERR.INVALID_ADDRESS)
         domain = VirtualMailManager.chkDomainname(domain)
         localpart = VirtualMailManager.chkLocalpart(localpart)
         return '%s@%s' % (localpart, domain)
@@ -319,20 +309,20 @@ class VirtualMailManager:
         if uid > 0 and gid > 0:
             maildir = '%s' % uid
             if maildir.count('..') or domdir.count('..'):
-                raise VMMException((_(u'Found ".." in maildir path.'),
-                    ERR.FOUND_DOTS_IN_PATH))
+                raise VMMException(_(u'Found ".." in maildir path.'),
+                    ERR.FOUND_DOTS_IN_PATH)
             if os.path.isdir(domdir):
                 os.chdir(domdir)
                 if os.path.isdir(maildir):
                     mdstat = os.stat(maildir)
                     if (mdstat.st_uid, mdstat.st_gid) != (uid, gid):
-                        raise VMMException((
+                        raise VMMException(
                           _(u'Owner/group mismatch in maildir detected.'),
-                          ERR.MAILDIR_PERM_MISMATCH))
+                          ERR.MAILDIR_PERM_MISMATCH)
                     rmtree(maildir, ignore_errors=True)
                 else:
-                    raise VMMException((_(u"No such directory: %s/%s") %
-                        (domdir, uid), ERR.NO_SUCH_DIRECTORY))
+                    raise VMMException(_(u"No such directory: %s/%s") %
+                        (domdir, uid), ERR.NO_SUCH_DIRECTORY)
 
     def __domdirdelete(self, domdir, gid):
         if gid > 0:
@@ -342,14 +332,14 @@ class VirtualMailManager:
             domdirdirs = domdir.replace(basedir+'/', '').split('/')
             if basedir.count('..') or domdir.count('..'):
                 raise VMMException(
-                        (_(u'FATAL: ".." in domain directory path detected.'),
-                            ERR.FOUND_DOTS_IN_PATH))
+                        _(u'FATAL: ".." in domain directory path detected.'),
+                            ERR.FOUND_DOTS_IN_PATH)
             if os.path.isdir('%s/%s' % (basedir, domdirdirs[0])):
                 os.chdir('%s/%s' % (basedir, domdirdirs[0]))
                 if os.lstat(domdirdirs[1]).st_gid != gid:
                     raise VMMException(
-                    (_(u'FATAL: group mismatch in domain directory detected'),
-                        ERR.DOMAINDIR_GROUP_MISMATCH))
+                    _(u'FATAL: group mismatch in domain directory detected'),
+                        ERR.DOMAINDIR_GROUP_MISMATCH)
                 rmtree(domdirdirs[1], ignore_errors=True)
 
     def __getSalt(self):
@@ -436,8 +426,8 @@ class VirtualMailManager:
             return self.__Cfg.getboolean('config', 'done')
         except ValueError, e:
             raise VMMConfigException(_(u"""Configurtion error: "%s"
-(in section "connfig", option "done") see also: vmm.cfg(5)\n""") % 
-                str(e))
+(in section "connfig", option "done") see also: vmm.cfg(5)\n""") % str(e),
+    ERR.CONF_ERROR)
 
     def configure(self, section=None):
         """Starts interactive configuration.
@@ -450,16 +440,13 @@ class VirtualMailManager:
         section -- the section to configure (default None):
             'database', 'maildir', 'bin' or 'misc'
         """
-        try:
-            if not section:
-                self.__Cfg.configure(self.__cfgSections)
-            elif section not in self.__cfgSections:
-                raise VMMException((_(u"Invalid section: '%s'") % section,
-                    ERR.INVALID_SECTION))
-            else:
-                self.__Cfg.configure([section])
-        except:
-            raise
+        if section is None:
+            self.__Cfg.configure(self.__cfgSections)
+        elif section in self.__cfgSections:
+            self.__Cfg.configure([section])
+        else:
+            raise VMMException(_(u"Invalid section: '%s'") % section,
+                ERR.INVALID_SECTION)
 
     def domain_add(self, domainname, transport=None):
         dom = self.__getDomain(domainname, transport)
@@ -468,8 +455,8 @@ class VirtualMailManager:
 
     def domain_transport(self, domainname, transport, force=None):
         if force is not None and force != 'force':
-            raise VMMDomainException((_(u"Invalid argument: '%s'") % force,
-                ERR.INVALID_OPTION))
+            raise VMMDomainException(_(u"Invalid argument: '%s'") % force,
+                ERR.INVALID_OPTION)
         dom = self.__getDomain(domainname, None)
         if force is None:
             dom.updateTransport(transport)
@@ -478,8 +465,8 @@ class VirtualMailManager:
 
     def domain_delete(self, domainname, force=None):
         if not force is None and force not in ['deluser','delalias','delall']:
-            raise VMMDomainException((_(u"Invalid argument: »%s«") % force,
-                ERR.INVALID_OPTION))
+            raise VMMDomainException(_(u"Invalid argument: »%s«") % force,
+                ERR.INVALID_OPTION)
         dom = self.__getDomain(domainname)
         gid = dom.getID()
         domdir = dom.getDir()
@@ -508,8 +495,8 @@ class VirtualMailManager:
             return (dominfo, dom.getAliaseNames(), dom.getAccounts(),
                     dom.getAliases())
         else:
-            raise VMMDomainException((_(u'Invalid argument: »%s«') % detailed,
-                ERR.INVALID_OPTION))
+            raise VMMDomainException(_(u'Invalid argument: »%s«') % detailed,
+                ERR.INVALID_OPTION)
 
     def domain_alias_add(self, aliasname, domainname):
         """Adds an alias name to the domain.
@@ -549,9 +536,9 @@ class VirtualMailManager:
                     domain = pattern[:-1]
                 re.compile(RE_DOMAIN_SRCH)
                 if not re.match(RE_DOMAIN_SRCH, domain):
-                    raise VMMException((
+                    raise VMMException(
                     _(u"The pattern '%s' contains invalid characters.") %
-                    pattern, ERR.DOMAIN_INVALID))
+                    pattern, ERR.DOMAIN_INVALID)
             else:
                 pattern = VirtualMailManager.chkDomainname(pattern)
                 # XXX chk by domain if not like
@@ -582,14 +569,14 @@ class VirtualMailManager:
         if self.__Cfg.getboolean('maildir', 'delete'):
             try:
                 self.__maildirdelete(acc.getDir('domain'), uid, gid)
-            except (VMMException), e:
-                if e[0][1] in [ERR.FOUND_DOTS_IN_PATH,
+            except VMMException, e:
+                if e.code() in [ERR.FOUND_DOTS_IN_PATH,
                         ERR.MAILDIR_PERM_MISMATCH, ERR.NO_SUCH_DIRECTORY]:
                     warning = _(u"""\
 The account has been successfully deleted from the database.
     But an error occurred while deleting the following directory:
     »%s«
-    Reason: %s""") % (acc.getDir('home'), e[0][0])
+    Reason: %s""") % (acc.getDir('home'), e.msg())
                     self.__warnings.append(warning)
                 else:
                     raise e
@@ -617,8 +604,8 @@ The account has been successfully deleted from the database.
     def user_password(self, emailaddress, password):
         acc = self.__getAccount(emailaddress)
         if acc.getUID() == 0:
-           raise VMMException((_(u"Account doesn't exists"),
-               ERR.NO_SUCH_ACCOUNT))
+           raise VMMException(_(u"Account doesn't exists"),
+               ERR.NO_SUCH_ACCOUNT)
         if password is None:
             password = self._readpass()
         acc.modify('password', self.__pwhash(password))

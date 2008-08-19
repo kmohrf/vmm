@@ -15,50 +15,60 @@ __date__ = '$Date$'.split()[1]
 
 class VMMException(Exception):
     """Exception class for VirtualMailManager exceptions"""
-    def __init__(self, msg):
+    def __init__(self, msg, code):
         Exception.__init__(self, msg)
+        self._code = int(code)
 
-class VMMConfigException(Exception):
+    def msg(self):
+        """Returns the exception message."""
+        return self.message
+
+    def code(self):
+        """Returns the numeric exception error code."""
+        return self._code
+
+class VMMConfigException(VMMException):
     """Exception class for Configurtion exceptions"""
-    def __init__(self, msg):
-        Exception.__init__(self, msg)
+    def __init__(self, msg, code):
+        VMMException.__init__(self, msg, code)
 
-class VMMPermException(Exception):
+class VMMPermException(VMMException):
     """Exception class for permissions exceptions"""
-    pass
+    def __init__(self, msg, code):
+        VMMException.__init__(self, msg, code)
 
-class VMMNotRootException(Exception):
+class VMMNotRootException(VMMException):
     """Exception class for non-root exceptions"""
-    def __init__(self, msg):
-        Exception.__init__(self, msg)
+    def __init__(self, msg, code):
+        VMMException.__init__(self, msg, code)
 
 class VMMDomainException(VMMException):
     """Exception class for Domain exceptions"""
-    def __init__(self, msg):
-        VMMException.__init__(self, msg)
+    def __init__(self, msg, code):
+        VMMException.__init__(self, msg, code)
 
 class VMMDomainAliasException(VMMException):
     """Exception class for DomainAlias exceptions"""
-    def __init__(self, msg):
-        VMMException.__init__(self, msg)
+    def __init__(self, msg, code):
+        VMMException.__init__(self, msg, code)
 
 class VMMAccountException(VMMException):
     """Exception class for Account exceptions"""
-    def __init__(self, msg):
-        VMMException.__init__(self, msg)
+    def __init__(self, msg, code):
+        VMMException.__init__(self, msg, code)
 
 class VMMAliasException(VMMException):
     """Exception class for Alias exceptions"""
-    def __init__(self, msg):
-        VMMException.__init__(self, msg)
+    def __init__(self, msg, code):
+        VMMException.__init__(self, msg, code)
 
 class VMMMailLocationException(VMMException):
     """Exception class for MailLocation exceptions"""
-    def __init__(self, msg):
-        VMMException.__init__(self, msg)
+    def __init__(self, msg, code):
+        VMMException.__init__(self, msg, code)
 
 class VMMTransportException(VMMException):
     """Exception class for Transport exceptions"""
-    def __init__(self, msg):
-        VMMException.__init__(self, msg)
+    def __init__(self, msg, code):
+        VMMException.__init__(self, msg, code)
 

@@ -31,15 +31,15 @@ class Transport:
         """
         self._dbh = dbh
         if tid is None and transport is None:
-            raise VMMTransportException((
+            raise VMMTransportException(
                 _('Either tid or transport must be specified.'),
-                ERR.TRANSPORT_INIT))
+                ERR.TRANSPORT_INIT)
         elif tid is not None:
             try:
                 self.__id = long(tid)
             except ValueError:
-                raise VMMTransportException((_('tid must be an int/long.'),
-                    ERR.TRANSPORT_INIT))
+                raise VMMTransportException(_('tid must be an int/long.'),
+                    ERR.TRANSPORT_INIT)
             self._loadByID()
         else:
             self.__transport = transport
@@ -53,8 +53,8 @@ class Transport:
         if result is not None:
             self.__transport = result[0]
         else:
-            raise VMMTransportException((_('Unknown tid specified.'),
-                ERR.UNKNOWN_TRANSPORT_ID))
+            raise VMMTransportException(_('Unknown tid specified.'),
+                ERR.UNKNOWN_TRANSPORT_ID)
 
     def _loadByName(self):
         dbc = self._dbh.cursor()
