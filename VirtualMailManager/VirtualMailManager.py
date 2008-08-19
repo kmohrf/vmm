@@ -25,7 +25,7 @@ from pyPgSQL import PgSQL # python-pgsql - http://pypgsql.sourceforge.net
 
 from Exceptions import *
 import constants.ERROR as ERR
-from Config import VMMConfig as Cfg
+from Config import Config as Cfg
 from Account import Account
 from Alias import Alias
 from Domain import Domain

@@ -20,7 +20,6 @@ import gettext
 from time import strftime, strptime
 
 from VirtualMailManager.VirtualMailManager import VirtualMailManager
-from VirtualMailManager.Config import VMMConfig
 import VirtualMailManager.Exceptions as VMME
 import VirtualMailManager.constants.EXIT as EXIT
 import VirtualMailManager.constants.ERROR as ERR

@@ -28,7 +28,7 @@ import constants.ERROR as ERR
 locale.setlocale(locale.LC_ALL, '')
 ENCODING = locale.nl_langinfo(locale.CODESET)
 
-class VMMConfig(ConfigParser):
+class Config(ConfigParser):
     """This class is for configure the Virtual Mail Manager.
 
     You can specify settings for the database connection
@@ -37,7 +37,7 @@ class VMMConfig(ConfigParser):
     """
 
     def __init__(self, filename):
-        """Creates a new VMMConfig instance
+        """Creates a new Config instance
 
         Keyword arguments:
         filename -- name of the configuration file
