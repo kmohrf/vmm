@@ -130,8 +130,8 @@ class Config(ConfigParser):
                 print _(u'* Config section: »%s«') % s
             for opt, val in self.items(s):
                 newval = raw_input(
-                _('Enter new value for option %s [%s]: ').encode(
-                    ENCODING, 'replace') % (opt, val))
+                _('Enter new value for option %(opt)s [%(val)s]: ').encode(
+                    ENCODING, 'replace') % {'opt': opt, 'val': val})
                 if newval and newval != val:
                     self.set(s, opt, newval)
                     self.__changes = True

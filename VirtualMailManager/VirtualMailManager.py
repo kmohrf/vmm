@@ -44,8 +44,9 @@ class VirtualMailManager:
         Throws a VMMNotRootException if your uid is greater 0.
         """
         self.__cfgFileName = '/usr/local/etc/vmm.cfg'
-        self.__permWarnMsg = _(u"fix permissions for »%s«\n`chmod 0600 %s`\
- would be great.") % (self.__cfgFileName, self.__cfgFileName)
+        self.__permWarnMsg = _(u"fix permissions for »%(cfgFileName)s«\n\
+`chmod 0600 %(cfgFileName)s` would be great.") % {'cfgFileName':
+            self.__cfgFileName}
         self.__warnings = []
         self.__Cfg = None
         self.__dbh = None
@@ -89,13 +90,13 @@ class VirtualMailManager:
                 self.__Cfg.get('domdir', 'base'), ERR.NO_SUCH_DIRECTORY)
         for opt, val in self.__Cfg.items('bin'):
             if not os.path.exists(val):
-                raise VMMException(_(u'»%s« doesn\'t exists.\n\
-(vmm.cfg: section "bin", option "%s")') %
-                    (val, opt), ERR.NO_SUCH_BINARY)
+                raise VMMException(_(u'»%(binary)s« doesn\'t exists.\n\
+(vmm.cfg: section "bin", option "%(option)s")') %{'binary': val,'option': opt},
+                    ERR.NO_SUCH_BINARY)
             elif not os.access(val, os.X_OK):
-                raise VMMException(_(u'»%s« is not executable.\n\
-(vmm.cfg: section "bin", option "%s")') %
-                    (val, opt), ERR.NOT_EXECUTABLE)
+                raise VMMException(_(u'»%(binary)s« is not executable.\n\
+(vmm.cfg: section "bin", option "%(option)s")') %{'binary': val,'option': opt},
+                    ERR.NOT_EXECUTABLE)
 
     def __dbConnect(self):
         """Creates a pyPgSQL.PgSQL.connection instance."""
@@ -129,9 +130,9 @@ class VirtualMailManager:
             ichrs = ''
             for c in set(ic):
                 ichrs += u"»%s« " % c
-            raise VMMException(
-                _(u"The local part »%s« contains invalid characters: %s") %
-                (localpart, ichrs), ERR.LOCALPART_INVALID)
+            raise VMMException(_(u"The local part »%(lpart)s« contains invalid\
+ characters: %(ichrs)s") % {'lpart': localpart, 'ichrs': ichrs},
+                ERR.LOCALPART_INVALID)
         return localpart
     chkLocalpart = staticmethod(chkLocalpart)
 
@@ -303,24 +304,24 @@ class VirtualMailManager:
                 self.__makedir(folder+'/'+subdir, mode, uid, gid)
         os.chdir(oldpwd)
 
-    def __maildirdelete(self, domdir, uid, gid):
+    def __userdirdelete(self, domdir, uid, gid):
         if uid > 0 and gid > 0:
-            maildir = '%s' % uid
-            if maildir.count('..') or domdir.count('..'):
-                raise VMMException(_(u'Found ".." in maildir path.'),
+            userdir = '%s' % uid
+            if userdir.count('..') or domdir.count('..'):
+                raise VMMException(_(u'Found ".." in home directory path.'),
                     ERR.FOUND_DOTS_IN_PATH)
             if os.path.isdir(domdir):
                 os.chdir(domdir)
-                if os.path.isdir(maildir):
-                    mdstat = os.stat(maildir)
+                if os.path.isdir(userdir):
+                    mdstat = os.stat(userdir)
                     if (mdstat.st_uid, mdstat.st_gid) != (uid, gid):
                         raise VMMException(
-                          _(u'Owner/group mismatch in maildir detected.'),
-                          ERR.MAILDIR_PERM_MISMATCH)
-                    rmtree(maildir, ignore_errors=True)
+                         _(u'Owner/group mismatch in home directory detected.'),
+                         ERR.MAILDIR_PERM_MISMATCH)
+                    rmtree(userdir, ignore_errors=True)
                 else:
-                    raise VMMException(_(u"No such directory: %s/%s") %
-                        (domdir, uid), ERR.NO_SUCH_DIRECTORY)
+                    raise VMMException(_(u"No such directory: %s") %
+                        domdir+'/'+userdir, ERR.NO_SUCH_DIRECTORY)
 
     def __domdirdelete(self, domdir, gid):
         if gid > 0:
@@ -559,15 +560,15 @@ class VirtualMailManager:
         acc.delete()
         if self.__Cfg.getboolean('maildir', 'delete'):
             try:
-                self.__maildirdelete(acc.getDir('domain'), uid, gid)
+                self.__userdirdelete(acc.getDir('domain'), uid, gid)
             except VMMException, e:
                 if e.code() in [ERR.FOUND_DOTS_IN_PATH,
                         ERR.MAILDIR_PERM_MISMATCH, ERR.NO_SUCH_DIRECTORY]:
                     warning = _(u"""\
 The account has been successfully deleted from the database.
     But an error occurred while deleting the following directory:
-    »%s«
-    Reason: %s""") % (acc.getDir('home'), e.msg())
+    »%(directory)s«
+    Reason: %(raeson)s""") % {'directory': acc.getDir('home'),'raeson': e.msg()}
                     self.__warnings.append(warning)
                 else:
                     raise e
