@@ -192,7 +192,11 @@ class VirtualMailManager:
         except AttributeError:
             raise VMMException(_(u"»%s« looks not like an e-mail address.") %
                 address, ERR.INVALID_ADDRESS)
-        domain = VirtualMailManager.chkDomainname(domain)
+        if len(domain) > 0:
+            domain = VirtualMailManager.chkDomainname(domain)
+        else:
+            raise VMMException(_(u"Missing domain name after »%s@«.") %
+                    localpart, ERR.DOMAIN_NO_NAME)
         localpart = VirtualMailManager.chkLocalpart(localpart)
         return '%s@%s' % (localpart, domain)
     chkEmailAddress = staticmethod(chkEmailAddress)
@@ -219,12 +223,6 @@ class VirtualMailManager:
         return clear0
 
     def __getAlias(self, address, destination=None):
-        address = VirtualMailManager.chkEmailAddress(address)
-        if not destination is None:
-            if destination.count('@'):
-                destination = VirtualMailManager.chkEmailAddress(destination)
-            else:
-                destination = VirtualMailManager.chkLocalpart(destination)
         self.__dbConnect()
         return Alias(self.__dbh, address, destination)
 
