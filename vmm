@@ -177,25 +177,25 @@ def domain_add():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing domain name.'))
     elif argc < 4:
-        vmm.domain_add(argv[2].lower())
+        vmm.domainAdd(argv[2].lower())
     else:
-        vmm.domain_add(argv[2].lower(), argv[3])
+        vmm.domainAdd(argv[2].lower(), argv[3])
 
 def domain_delete():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing domain name.'))
     elif argc < 4:
-        vmm.domain_delete(argv[2].lower())
+        vmm.domainDelete(argv[2].lower())
     else:
-        vmm.domain_delete(argv[2].lower(), argv[3])
+        vmm.domainDelete(argv[2].lower(), argv[3])
 
 def domain_info():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing domain name.'))
     elif argc < 4:
-        _printInfo(vmm.domain_info(argv[2].lower()), _('Domain'))
+        _printInfo(vmm.domainInfo(argv[2].lower()), _('Domain'))
     else:
-        infos = vmm.domain_info(argv[2].lower(), argv[3])
+        infos = vmm.domainInfo(argv[2].lower(), argv[3])
         _printInfo(infos[0], _('Domain'))
         _printList(infos[1], _('alias domains'))
         _printList(infos[2], _('accounts'))
@@ -207,9 +207,9 @@ def domain_transport():
     if argc < 4:
         usage(EXIT.MISSING_ARGS, _(u'Missing new transport.'))
     elif argc < 5:
-        vmm.domain_transport(argv[2].lower(), argv[3])
+        vmm.domainTransport(argv[2].lower(), argv[3])
     else:
-        vmm.domain_transport(argv[2].lower(), argv[3], argv[4])
+        vmm.domainTransport(argv[2].lower(), argv[3], argv[4])
 
 def domain_alias_add():
     if argc < 3:
@@ -218,20 +218,20 @@ def domain_alias_add():
     elif argc < 4:
         usage(EXIT.MISSING_ARGS, _(u'Missing target domain name.'))
     else:
-        vmm.domain_alias_add(argv[2].lower(), argv[3].lower())
+        vmm.domainAliasAdd(argv[2].lower(), argv[3].lower())
 
 def domain_alias_info():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing alias domain name.'))
     else:
-        info = vmm.domain_alias_info(argv[2].lower())
+        info = vmm.domainAliasInfo(argv[2].lower())
         w_std(info+'\n')
 
 def domain_alias_delete():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing alias domain name.'))
     else:
-        vmm.domain_alias_delete(argv[2].lower())
+        vmm.domainAliasDelete(argv[2].lower())
 
 def user_add():
     if argc < 3:
@@ -240,21 +240,21 @@ def user_add():
         password = None
     else:
         password = argv[3]
-    vmm.user_add(argv[2].lower(), password)
+    vmm.userAdd(argv[2].lower(), password)
 
 def user_delete():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing e-mail address.'))
     else:
-        vmm.user_delete(argv[2].lower())
+        vmm.userDelete(argv[2].lower())
 
 def user_info():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing e-mail address.'))
     elif argc < 4:
-        _printInfo(vmm.user_info(argv[2].lower()), 'Account')
+        _printInfo(vmm.userInfo(argv[2].lower()), 'Account')
     else:
-        _printInfo(vmm.user_info(argv[2].lower(), True), 'Account')
+        _printInfo(vmm.userInfo(argv[2].lower(), True), 'Account')
 
 def user_name():
     if argc < 3:
@@ -262,7 +262,7 @@ def user_name():
     if argc < 4:
         usage(EXIT.MISSING_ARGS, _('Missing users name.'))
     else:
-        vmm.user_name(argv[2].lower(), argv[3])
+        vmm.userName(argv[2].lower(), argv[3])
 
 def user_transport():
     if argc < 3:
@@ -270,23 +270,23 @@ def user_transport():
     if argc <4:
         usage(EXIT.MISSING_ARGS, _(u'Missing transport.'))
     else:
-        vmm.user_transport(argv[2].lower(), argv[3])
+        vmm.userTransport(argv[2].lower(), argv[3])
 
 def user_enable():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing e-mail address.'))
     elif argc < 4:
-        vmm.user_enable(argv[2].lower())
+        vmm.userEnable(argv[2].lower())
     else:
-        vmm.user_enable(argv[2].lower(), argv[3].lower())
+        vmm.userEnable(argv[2].lower(), argv[3].lower())
 
 def user_disable():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing e-mail address.'))
     elif argc < 4:
-        vmm.user_disable(argv[2].lower())
+        vmm.userDisable(argv[2].lower())
     else:
-        vmm.user_disable(argv[2].lower(), argv[3].lower())
+        vmm.userDisable(argv[2].lower(), argv[3].lower())
 
 def user_password():
     if argc < 3:
@@ -295,39 +295,39 @@ def user_password():
         password = None
     else:
         password = argv[3]
-    vmm.user_password(argv[2].lower(), password)
+    vmm.userPassword(argv[2].lower(), password)
 
 def alias_add():
     if argc < 4:
         usage(EXIT.MISSING_ARGS, _(u'Missing alias address and destination.'))
     else:
-        vmm.alias_add(argv[2].lower(), argv[3])
+        vmm.aliasAdd(argv[2].lower(), argv[3])
 
 def alias_info():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing alias address'))
     else:
-        _printAliases(argv[2], vmm.alias_info(argv[2].lower()))
+        _printAliases(argv[2], vmm.aliasInfo(argv[2].lower()))
 
 def alias_delete():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing alias address'))
     elif argc < 4:
-        vmm.alias_delete(argv[2].lower())
+        vmm.aliasDelete(argv[2].lower())
     else:
-        vmm.alias_delete(argv[2].lower(), argv[3].lower())
+        vmm.aliasDelete(argv[2].lower(), argv[3].lower())
 
 def user_byID():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing userid'))
     else:
-        _printInfo(vmm.user_byID(argv[2]), u'Account')
+        _printInfo(vmm.userByID(argv[2]), u'Account')
 
 def domain_list():
     if argc < 3:
-        order, doms = vmm.domain_list()
+        order, doms = vmm.domainList()
     else:
-        order, doms = vmm.domain_list(argv[2].lower())
+        order, doms = vmm.domainList(argv[2].lower())
     _printDomList(order, doms)
 
 def show_warnings():

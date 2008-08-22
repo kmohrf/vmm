@@ -262,7 +262,7 @@ class VirtualMailManager:
         os.makedirs(directory, mode)
         os.chown(directory, uid, gid)
 
-    def __domdirmake(self, domdir, gid):
+    def __domDirMake(self, domdir, gid):
         os.umask(0006)
         oldpwd = os.getcwd()
         basedir = self.__Cfg.get('domdir', 'base')
@@ -278,7 +278,7 @@ class VirtualMailManager:
                 gid)
         os.chdir(oldpwd)
 
-    def __maildirmake(self, domdir, uid, gid):
+    def __mailDirMake(self, domdir, uid, gid):
         """Creates maildirs and maildir subfolders.
 
         Keyword arguments:
@@ -303,7 +303,7 @@ class VirtualMailManager:
                 self.__makedir(folder+'/'+subdir, mode, uid, gid)
         os.chdir(oldpwd)
 
-    def __userdirdelete(self, domdir, uid, gid):
+    def __userDirDelete(self, domdir, uid, gid):
         if uid > 0 and gid > 0:
             userdir = '%s' % uid
             if userdir.count('..') or domdir.count('..'):
@@ -322,7 +322,7 @@ class VirtualMailManager:
                     raise VMMException(_(u"No such directory: %s") %
                         domdir+'/'+userdir, ERR.NO_SUCH_DIRECTORY)
 
-    def __domdirdelete(self, domdir, gid):
+    def __domDirDelete(self, domdir, gid):
         if gid > 0:
             if not self.__isdir(domdir):
                 return
@@ -446,12 +446,12 @@ class VirtualMailManager:
             raise VMMException(_(u"Invalid section: '%s'") % section,
                 ERR.INVALID_SECTION)
 
-    def domain_add(self, domainname, transport=None):
+    def domainAdd(self, domainname, transport=None):
         dom = self.__getDomain(domainname, transport)
         dom.save()
-        self.__domdirmake(dom.getDir(), dom.getID())
+        self.__domDirMake(dom.getDir(), dom.getID())
 
-    def domain_transport(self, domainname, transport, force=None):
+    def domainTransport(self, domainname, transport, force=None):
         if force is not None and force != 'force':
             raise VMMDomainException(_(u"Invalid argument: '%s'") % force,
                 ERR.INVALID_OPTION)
@@ -461,7 +461,7 @@ class VirtualMailManager:
         else:
             dom.updateTransport(transport, force=True)
 
-    def domain_delete(self, domainname, force=None):
+    def domainDelete(self, domainname, force=None):
         if not force is None and force not in ['deluser','delalias','delall']:
             raise VMMDomainException(_(u"Invalid argument: »%s«") % force,
                 ERR.INVALID_OPTION)
@@ -477,9 +477,9 @@ class VirtualMailManager:
         else:
             dom.delete()
         if self.__Cfg.getboolean('domdir', 'delete'):
-            self.__domdirdelete(domdir, gid)
+            self.__domDirDelete(domdir, gid)
 
-    def domain_info(self, domainname, detailed=None):
+    def domainInfo(self, domainname, detailed=None):
         dom = self.__getDomain(domainname)
         dominfo = dom.getInfo()
         if dominfo['domainname'].startswith('xn--'):
@@ -496,7 +496,7 @@ class VirtualMailManager:
             raise VMMDomainException(_(u'Invalid argument: »%s«') % detailed,
                 ERR.INVALID_OPTION)
 
-    def domain_alias_add(self, aliasname, domainname):
+    def domainAliasAdd(self, aliasname, domainname):
         """Adds an alias name to the domain.
 
         Keyword arguments:
@@ -507,12 +507,12 @@ class VirtualMailManager:
         domAlias = DomainAlias(self.__dbh, aliasname, dom)
         domAlias.save()
 
-    def domain_alias_info(self, aliasname):
+    def domainAliasInfo(self, aliasname):
         self.__dbConnect()
         domAlias = DomainAlias(self.__dbh, aliasname, None)
         return domAlias.info()
 
-    def domain_alias_delete(self, aliasname):
+    def domainAliasDelete(self, aliasname):
         """Deletes the specified alias name.
 
         Keyword arguments:
@@ -522,7 +522,7 @@ class VirtualMailManager:
         domAlias = DomainAlias(self.__dbh, aliasname, None)
         domAlias.delete()
 
-    def domain_list(self, pattern=None):
+    def domainList(self, pattern=None):
         from Domain import search
         like = False
         if pattern is not None:
@@ -542,7 +542,7 @@ class VirtualMailManager:
         self.__dbConnect()
         return search(self.__dbh, pattern=pattern, like=like)
 
-    def user_add(self, emailaddress, password):
+    def userAdd(self, emailaddress, password):
         acc = self.__getAccount(emailaddress, password)
         if password is None:
             password = self._readpass()
@@ -552,20 +552,20 @@ class VirtualMailManager:
                 self.__Cfg.getboolean('services', 'pop3'),
                 self.__Cfg.getboolean('services', 'imap'),
                 self.__Cfg.getboolean('services', 'managesieve'))
-        self.__maildirmake(acc.getDir('domain'), acc.getUID(), acc.getGID())
+        self.__mailDirMake(acc.getDir('domain'), acc.getUID(), acc.getGID())
 
-    def alias_add(self, aliasaddress, targetaddress):
+    def aliasAdd(self, aliasaddress, targetaddress):
         alias = self.__getAlias(aliasaddress, targetaddress)
         alias.save()
 
-    def user_delete(self, emailaddress):
+    def userDelete(self, emailaddress):
         acc = self.__getAccount(emailaddress)
         uid = acc.getUID()
         gid = acc.getGID()
         acc.delete()
         if self.__Cfg.getboolean('maildir', 'delete'):
             try:
-                self.__userdirdelete(acc.getDir('domain'), uid, gid)
+                self.__userDirDelete(acc.getDir('domain'), uid, gid)
             except VMMException, e:
                 if e.code() in [ERR.FOUND_DOTS_IN_PATH,
                         ERR.MAILDIR_PERM_MISMATCH, ERR.NO_SUCH_DIRECTORY]:
@@ -578,27 +578,27 @@ The account has been successfully deleted from the database.
                 else:
                     raise e
 
-    def alias_info(self, aliasaddress):
+    def aliasInfo(self, aliasaddress):
         alias = self.__getAlias(aliasaddress)
         return alias.getInfo()
 
-    def alias_delete(self, aliasaddress, targetaddress=None):
+    def aliasDelete(self, aliasaddress, targetaddress=None):
         alias = self.__getAlias(aliasaddress, targetaddress)
         alias.delete()
 
-    def user_info(self, emailaddress, diskusage=False):
+    def userInfo(self, emailaddress, diskusage=False):
         acc = self.__getAccount(emailaddress)
         info = acc.getInfo()
         if self.__Cfg.getboolean('maildir', 'diskusage') or diskusage:
             info['disk usage'] = self.__getDiskUsage('%(maildir)s' % info)
         return info
 
-    def user_byID(self, uid):
+    def userByID(self, uid):
         from Account import getAccountByID
         self.__dbConnect()
         return getAccountByID(uid, self.__dbh)
 
-    def user_password(self, emailaddress, password):
+    def userPassword(self, emailaddress, password):
         acc = self.__getAccount(emailaddress)
         if acc.getUID() == 0:
            raise VMMException(_(u"Account doesn't exists"),
@@ -607,19 +607,19 @@ The account has been successfully deleted from the database.
             password = self._readpass()
         acc.modify('password', self.__pwhash(password))
 
-    def user_name(self, emailaddress, name):
+    def userName(self, emailaddress, name):
         acc = self.__getAccount(emailaddress)
         acc.modify('name', name)
 
-    def user_transport(self, emailaddress, transport):
+    def userTransport(self, emailaddress, transport):
         acc = self.__getAccount(emailaddress)
         acc.modify('transport', transport)
 
-    def user_disable(self, emailaddress, service=None):
+    def userDisable(self, emailaddress, service=None):
         acc = self.__getAccount(emailaddress)
         acc.disable(service)
 
-    def user_enable(self, emailaddress, service=None):
+    def userEnable(self, emailaddress, service=None):
         acc = self.__getAccount(emailaddress)
         acc.enable(service)
 
