@@ -116,7 +116,7 @@ class Config(ConfigParser):
         sections -- list of strings
         """
         if not isinstance(sections, list):
-            raise TypeError(_(u"Argument 'sections' is not a list."))
+            raise TypeError("Argument 'sections' is not a list.")
         # if [config] done = false (default at 1st run),
         # then set changes true
         try:

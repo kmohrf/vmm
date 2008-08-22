@@ -116,30 +116,30 @@ def _printInfo(info, title):
 
 def _printList(alist, title):
     msg = '%s %s' % (_('Available'), title)
-    print '%s\n%s' % (msg, '-'*len(msg))
+    w_std('%s\n%s' % (msg, '-'*len(msg)))
     if len(alist) > 0:
         if title != _('alias domains'):
             for val in alist:
-                print '\t%s' % val
+                w_std('\t%s' % val)
         else:
             for dom in alist:
                 if not dom.startswith('xn--'):
-                    print '\t%s' % dom
+                    w_std('\t%s' % dom)
                 else:
-                    print '\t%s (%s)' % (dom, vmm.ace2idna(dom))
+                    w_std('\t%s (%s)' % (dom, vmm.ace2idna(dom)))
     else:
-        print _('\tNone')
+        w_std(_('\tNone'))
     print
 
 def _printAliases(alias, targets):
     msg = _('Alias information')
-    print '%s\n%s' % (msg, '-'*len(msg))
-    print _('\tMail for %s goes to:') % alias
+    w_std('%s\n%s' % (msg, '-'*len(msg)))
+    w_std(_('\tMail for %s goes to:') % alias)
     if len(targets) > 0:
         for target in targets:
-            print '\t     -> %s' % target
+            w_std('\t     -> %s' % target)
     else:
-        print _('\tNone')
+        w_std(_('\tNone'))
     print
 
 def _formatDom(domain, main=True):
@@ -155,16 +155,16 @@ def _printDomList(dids, domains):
         msg = _('Available domains')
     else:
         msg = _('Matching domains')
-    print '%s\n%s' % (msg, '-'*len(msg))
+    w_std('%s\n%s' % (msg, '-'*len(msg)))
     if not len(domains):
-        print _('\tNone')
+        w_std(_('\tNone'))
     else:
         for id in dids:
             if domains[id][0] is not None:
-                print _formatDom(domains[id][0])
+                w_std(_formatDom(domains[id][0]))
             if len(domains[id]) > 1:
                 for alias in domains[id][1:]:
-                    print _formatDom(alias, main=False)
+                    w_std(_formatDom(alias, main=False))
     print
 
 def configure():
@@ -221,11 +221,11 @@ def domain_alias_add():
         vmm.domain_alias_add(argv[2].lower(), argv[3].lower())
 
 def domain_alias_info():
-    raise NotImplementedError('Sorry not implemented yet. ;-)')
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing alias domain name.'))
     else:
-        vmm.domain_alias_delete(argv[2].lower())
+        info = vmm.domain_alias_info(argv[2].lower())
+        w_std(info+'\n')
 
 def domain_alias_delete():
     if argc < 3:
@@ -332,9 +332,9 @@ def domain_list():
 
 def show_warnings():
     if vmm.hasWarnings():
-        print _(u'Warnings:')
-        for w in vmm.getWarnings():
-            print " * ",w
+        w_std(_(u'Warnings:'))
+        for warning in vmm.getWarnings():
+            w_std( " * %s" % warning)
 
 def show_version():
     w_std("%s, %s %s (%s %s %s)\n" % (__prog__, _('version'), __version__,

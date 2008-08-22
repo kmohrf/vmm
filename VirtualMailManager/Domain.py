@@ -62,22 +62,6 @@ class Domain:
         else:
             return False
 
-    def _aliasExists(self, aliasname):
-        aliasname = VMM.VirtualMailManager.chkDomainname(aliasname)
-        dbc = self._dbh.cursor()
-        dbc.execute("SELECT gid, is_primary FROM domain_name\
- WHERE domainname = %s", aliasname)
-        result = dbc.fetchone()
-        dbc.close()
-        if result is None:
-            return False
-        elif result[1]:
-            raise VMMDE(_(u'The domain »%s« already exists.') % self._name,
-                ERR.DOMAIN_EXISTS)
-        else:
-            raise VMMDE(_(u'The domain alias »%s« already exists.') % aliasname,
-                ERR.DOMAIN_ALIAS_EXISTS)
-
     def _setID(self):
         """Sets the ID of the domain."""
         dbc = self._dbh.cursor()
@@ -195,24 +179,6 @@ class Domain:
             raise VMMDE(_(u"The domain »%s« doesn't exist yet.") % self._name,
                 ERR.NO_SUCH_DOMAIN)
 
-    def saveAlias(self, aliasname):
-        """Stores the alias name for the domain in the database.
-
-        Keyword arguments:
-        aliasname -- the alias name of the domain (str)
-        """
-        aliasname = VMM.VirtualMailManager.chkDomainname(aliasname)
-        if self._id > 0 and not self._aliasExists(aliasname):
-            dbc = self._dbh.cursor()
-            dbc.execute('INSERT INTO domain_name VALUES (%s, %s, %s)',
-                    aliasname, self._id, False)
-            if dbc.rowcount == 1:
-                self._dbh.commit()
-            dbc.close()
-        else:
-            raise VMMDE(_(u"The domain »%s« doesn't exist yet.") % self._name,
-                ERR.NO_SUCH_DOMAIN)
-
     def getID(self):
         """Returns the ID of the domain."""
         return self._id
@@ -318,12 +284,4 @@ def search(dbh, pattern=None, like=False):
                 domdict[gid] = [None, dom]
     del doms
     return order, domdict
-
-def deleteAlias(dbh, aliasname):
-    aliasname = VMM.VirtualMailManager.chkDomainname(aliasname)
-    dbc = dbh.cursor()
-    dbc.execute('DELETE FROM domain_name WHERE domainname = %s', aliasname)
-    if dbc.rowcount > 0:
-        dbh.commit()
-    dbc.close()
 

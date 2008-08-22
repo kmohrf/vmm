@@ -29,6 +29,7 @@ from Config import Config as Cfg
 from Account import Account
 from Alias import Alias
 from Domain import Domain
+from DomainAlias import DomainAlias
 
 SALTCHARS = './0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 RE_ASCII_CHARS = """^[\x20-\x7E]*$"""
@@ -497,23 +498,29 @@ class VirtualMailManager:
 
     def domain_alias_add(self, aliasname, domainname):
         """Adds an alias name to the domain.
-        
+
         Keyword arguments:
         aliasname -- the alias name of the domain (str)
         domainname -- name of the target domain (str)
         """
         dom = self.__getDomain(domainname)
-        dom.saveAlias(aliasname)
+        domAlias = DomainAlias(self.__dbh, aliasname, dom)
+        domAlias.save()
+
+    def domain_alias_info(self, aliasname):
+        self.__dbConnect()
+        domAlias = DomainAlias(self.__dbh, aliasname, None)
+        return domAlias.info()
 
     def domain_alias_delete(self, aliasname):
         """Deletes the specified alias name.
-        
+
         Keyword arguments:
         aliasname -- the alias name of the domain (str)
         """
-        from Domain import deleteAlias
         self.__dbConnect()
-        deleteAlias(self.__dbh, aliasname)
+        domAlias = DomainAlias(self.__dbh, aliasname, None)
+        domAlias.delete()
 
     def domain_list(self, pattern=None):
         from Domain import search
