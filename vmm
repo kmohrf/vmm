@@ -48,9 +48,9 @@ Usage: %s SUBCOMMAND OBJECT ARGS*
   di    domaininfo         domain.tld        detailed*
   dt    domaintransport    domain.tld        transport force*
   dd    domaindelete       domain.tld        delalias*|deluser*|delall*
-  daa   domainaliasadd     aliasdomain.tld   domain.tld
-  dai   domainaliasinfo    aliasdomain.tld
-  dad   domainaliasdelete  aliasdomain.tld
+  ada   aliasdomainadd     aliasdomain.tld   domain.tld
+  adi   aliasdomaininfo    aliasdomain.tld
+  add   aliasdomaindelete  aliasdomain.tld
   ua    useradd            user@domain.tld   password*
   ui    userinfo           user@domain.tld   du*
   un    username           user@domain.tld   'Users Name'
@@ -134,10 +134,10 @@ def _printList(alist, title):
 def _printAliases(alias, targets):
     msg = _('Alias information')
     w_std('%s\n%s' % (msg, '-'*len(msg)))
-    w_std(_('\tMail for %s goes to:') % alias)
+    w_std(_('\tMail for %s will be redirected to:') % alias)
     if len(targets) > 0:
         for target in targets:
-            w_std('\t     -> %s' % target)
+            w_std('\t     * %s' % target)
     else:
         w_std(_('\tNone'))
     print
@@ -166,6 +166,17 @@ def _printDomList(dids, domains):
                 for alias in domains[id][1:]:
                     w_std(_formatDom(alias, main=False))
     print
+
+def _printAliasDomInfo(info):
+    msg = _('Alias domain information')
+    for k in ['alias', 'domain']:
+        if info[k].startswith('xn--'):
+            info[k] = "%s (%s)" % (info[k], vmm.ace2idna(info[k]))
+    w_std('%s\n%s' % (msg, '-'*len(msg)))
+    w_std(
+        _('\tThe alias domain %(alias)s belongs to:\n\t    * %(domain)s')%info)
+    print
+    
 
 def configure():
     if need_setup or len(argv) < 3:
@@ -211,27 +222,26 @@ def domain_transport():
     else:
         vmm.domainTransport(argv[2].lower(), argv[3], argv[4])
 
-def domain_alias_add():
+def alias_domain_add():
     if argc < 3:
         usage(EXIT.MISSING_ARGS,
                 _(u'Missing alias domain name and target domain name.'))
     elif argc < 4:
         usage(EXIT.MISSING_ARGS, _(u'Missing target domain name.'))
     else:
-        vmm.domainAliasAdd(argv[2].lower(), argv[3].lower())
+        vmm.aliasDomainAdd(argv[2].lower(), argv[3].lower())
 
-def domain_alias_info():
+def alias_domain_info():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing alias domain name.'))
     else:
-        info = vmm.domainAliasInfo(argv[2].lower())
-        w_std(info+'\n')
+        _printAliasDomInfo(vmm.aliasDomainInfo(argv[2].lower()))
 
-def domain_alias_delete():
+def alias_domain_delete():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing alias domain name.'))
     else:
-        vmm.domainAliasDelete(argv[2].lower())
+        vmm.aliasDomainDelete(argv[2].lower())
 
 def user_add():
     if argc < 3:
@@ -366,12 +376,12 @@ if __name__ == '__main__':
             domain_transport()
         elif argv[1] in ['dd', 'domaindelete']:
             domain_delete()
-        elif argv[1] in ['daa', 'domainaliasadd']:
-            domain_alias_add()
-        elif argv[1] in ['dai', 'domainaliasinfo']:
-            domain_alias_info()
-        elif argv[1] in ['dad', 'domainaliasdelete']:
-            domain_alias_delete()
+        elif argv[1] in ['ada', 'aliasdomainadd']:
+            alias_domain_add()
+        elif argv[1] in ['adi', 'aliasdomaininfo']:
+            alias_domain_info()
+        elif argv[1] in ['add', 'aliasdomaindelete']:
+            alias_domain_delete()
         elif argv[1] in ['ua', 'useradd']:
             user_add()
         elif argv[1] in ['ui', 'userinfo']:

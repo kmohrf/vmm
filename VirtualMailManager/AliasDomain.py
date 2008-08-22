@@ -4,7 +4,7 @@
 # See COPYING for distribution information.
 # $Id$
 
-"""Virtual Mail Manager's DomainAlias class to manage alias domains."""
+"""Virtual Mail Manager's AliasDomain class to manage alias domains."""
 
 from constants.VERSION import VERSION
 
@@ -13,11 +13,11 @@ __version__ = VERSION
 __revision__ = 'rev '+'$Rev$'.split()[1]
 __date__ = '$Date$'.split()[1]
 
-from Exceptions import VMMDomainAliasException as VDAE
+from Exceptions import VMMAliasDomainException as VADE
 import constants.ERROR as ERR
 import VirtualMailManager as VMM
 
-class DomainAlias:
+class AliasDomain:
     """Class to manage e-mail alias domains."""
     def __init__(self, dbh, domainname, targetDomain=None):
         self._dbh = dbh
@@ -35,18 +35,18 @@ class DomainAlias:
         if alias is not None:
             self.__gid, primary = alias
             if primary:
-                raise VDAE(_(u"The domain »%s« is a primary domain.") %
+                raise VADE(_(u"The domain »%s« is a primary domain.") %
                         self.__name, ERR.DOMAIN_ALIAS_ISDOMAIN)
 
     def save(self):
         if self.__gid > 0:
-            raise VDAE(_(u'The domain alias »%s« already exists.') %self.__name,
+            raise VADE(_(u'The alias domain »%s« already exists.') %self.__name,
                 ERR.DOMAIN_ALIAS_EXISTS)
         if self._domain is None:
-            raise VDAE(_(u'No destination domain for alias domain denoted.'),
+            raise VADE(_(u'No destination domain for alias domain denoted.'),
                     ERR.DOMAIN_ALIAS_NO_DOMDEST)
         if self._domain._id < 1:
-            raise VDAE (_(u"The target domain »%s« doesn't exist yet.") %
+            raise VADE (_(u"The target domain »%s« doesn't exist yet.") %
                     self._domain._name, ERR.NO_SUCH_DOMAIN)
         dbc = self._dbh.cursor()
         dbc.execute('INSERT INTO domain_name (domainname, gid, is_primary)\
@@ -63,15 +63,14 @@ class DomainAlias:
             domain = dbc.fetchone()
             dbc.close()
             if domain is not None:
-                return _(u"The domain alias »%(alias)s« belongs to »%(dom)s«.")\
-                        % {'alias': self.__name, 'dom': domain[0]}
+                return {'alias': self.__name, 'domain': domain[0]}
             else:# an almost unlikely case, isn't it?
-                raise VDAE(
-                    _(u'There is no primary domain for the domain alias »%s«.')\
+                raise VADE(
+                    _(u'There is no primary domain for the alias domain »%s«.')\
                             % self.__name, ERR.NO_SUCH_DOMAIN)
         else:
-            raise VDAE(
-                  _(u"The domain alias »%s« doesn't exist yet.") % self.__name,
+            raise VADE(
+                  _(u"The alias domain »%s« doesn't exist yet.") % self.__name,
                   ERR.NO_SUCH_DOMAIN_ALIAS)
     
     def delete(self):
@@ -82,7 +81,7 @@ class DomainAlias:
             if dbc.rowcount > 0:
                 self._dbh.commit()
         else:
-            raise VDAE(
-                  _(u"The domain alias »%s« doesn't exist yet.") % self.__name,
+            raise VADE(
+                  _(u"The alias domain »%s« doesn't exist yet.") % self.__name,
                   ERR.NO_SUCH_DOMAIN_ALIAS)
 

@@ -47,8 +47,8 @@ class VMMDomainException(VMMException):
     def __init__(self, msg, code):
         VMMException.__init__(self, msg, code)
 
-class VMMDomainAliasException(VMMException):
-    """Exception class for DomainAlias exceptions"""
+class VMMAliasDomainException(VMMException):
+    """Exception class for AliasDomain exceptions"""
     def __init__(self, msg, code):
         VMMException.__init__(self, msg, code)
 

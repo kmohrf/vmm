@@ -29,7 +29,7 @@ from Config import Config as Cfg
 from Account import Account
 from Alias import Alias
 from Domain import Domain
-from DomainAlias import DomainAlias
+from AliasDomain import AliasDomain
 
 SALTCHARS = './0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 RE_ASCII_CHARS = """^[\x20-\x7E]*$"""
@@ -496,31 +496,31 @@ class VirtualMailManager:
             raise VMMDomainException(_(u'Invalid argument: »%s«') % detailed,
                 ERR.INVALID_OPTION)
 
-    def domainAliasAdd(self, aliasname, domainname):
-        """Adds an alias name to the domain.
+    def aliasDomainAdd(self, aliasname, domainname):
+        """Adds an alias domain to the domain.
 
         Keyword arguments:
-        aliasname -- the alias name of the domain (str)
+        aliasname -- the name of the alias domain (str)
         domainname -- name of the target domain (str)
         """
         dom = self.__getDomain(domainname)
-        domAlias = DomainAlias(self.__dbh, aliasname, dom)
-        domAlias.save()
+        aliasDom = AliasDomain(self.__dbh, aliasname, dom)
+        aliasDom.save()
 
-    def domainAliasInfo(self, aliasname):
+    def aliasDomainInfo(self, aliasname):
         self.__dbConnect()
-        domAlias = DomainAlias(self.__dbh, aliasname, None)
-        return domAlias.info()
+        aliasDom = AliasDomain(self.__dbh, aliasname, None)
+        return aliasDom.info()
 
-    def domainAliasDelete(self, aliasname):
-        """Deletes the specified alias name.
+    def aliasDomainDelete(self, aliasname):
+        """Deletes the specified alias domain.
 
         Keyword arguments:
-        aliasname -- the alias name of the domain (str)
+        aliasname -- the name of the alias domain (str)
         """
         self.__dbConnect()
-        domAlias = DomainAlias(self.__dbh, aliasname, None)
-        domAlias.delete()
+        aliasDom = AliasDomain(self.__dbh, aliasname, None)
+        aliasDom.delete()
 
     def domainList(self, pattern=None):
         from Domain import search
