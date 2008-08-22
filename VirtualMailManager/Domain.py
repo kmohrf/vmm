@@ -41,7 +41,9 @@ class Domain:
             self._transport = transport
         self._id = 0
         self._domaindir = None
-        self._exists()
+        if not self._exists() and self._isAlias():
+            raise VMMDE(_(u"The domain »%s« is an alias domain.") %self._name,
+                    ERR.DOMAIN_ALIAS_EXISTS)
 
     def _exists(self):
         """Checks if the domain already exists.
@@ -52,12 +54,24 @@ class Domain:
         dbc = self._dbh.cursor()
         dbc.execute("SELECT gid, tid, domaindir FROM domain_data WHERE gid =\
  (SELECT gid FROM domain_name WHERE domainname = %s AND is_primary)",
-            self._name)
+                self._name)
         result = dbc.fetchone()
         dbc.close()
         if result is not None:
             self._id, self._domaindir = result[0], result[2]
             self._transport = Transport(self._dbh, tid=result[1])
+            return True
+        else:
+            return False
+
+    def _isAlias(self):
+        """Checks if self._name is known for an alias domain."""
+        dbc = self._dbh.cursor()
+        dbc.execute('SELECT is_primary FROM domain_name WHERE domainname = %s',
+                self._name)
+        result = dbc.fetchone()
+        dbc.close()
+        if result is not None and not result[0]:
             return True
         else:
             return False
@@ -243,7 +257,7 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts, aliases
         """Returns a list with all alias names from the domain."""
         dbc = self._dbh.cursor()
         dbc.execute("SELECT domainname FROM domain_name WHERE gid = %s\
- AND NOT is_primary", self._id)
+ AND NOT is_primary ORDER BY domainname", self._id)
         anames = dbc.fetchall()
         dbc.close()
         aliasdomains = []

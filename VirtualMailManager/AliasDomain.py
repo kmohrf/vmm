@@ -36,15 +36,15 @@ class AliasDomain:
             self.__gid, primary = alias
             if primary:
                 raise VADE(_(u"The domain »%s« is a primary domain.") %
-                        self.__name, ERR.DOMAIN_ALIAS_ISDOMAIN)
+                        self.__name, ERR.ALIASDOMAIN_ISDOMAIN)
 
     def save(self):
         if self.__gid > 0:
             raise VADE(_(u'The alias domain »%s« already exists.') %self.__name,
-                ERR.DOMAIN_ALIAS_EXISTS)
+                ERR.ALIASDOMAIN_EXISTS)
         if self._domain is None:
             raise VADE(_(u'No destination domain for alias domain denoted.'),
-                    ERR.DOMAIN_ALIAS_NO_DOMDEST)
+                    ERR.ALIASDOMAIN_NO_DOMDEST)
         if self._domain._id < 1:
             raise VADE (_(u"The target domain »%s« doesn't exist yet.") %
                     self._domain._name, ERR.NO_SUCH_DOMAIN)
@@ -71,7 +71,7 @@ class AliasDomain:
         else:
             raise VADE(
                   _(u"The alias domain »%s« doesn't exist yet.") % self.__name,
-                  ERR.NO_SUCH_DOMAIN_ALIAS)
+                  ERR.NO_SUCH_ALIASDOMAIN)
     
     def delete(self):
         if self.__gid > 0:
@@ -83,5 +83,5 @@ class AliasDomain:
         else:
             raise VADE(
                   _(u"The alias domain »%s« doesn't exist yet.") % self.__name,
-                  ERR.NO_SUCH_DOMAIN_ALIAS)
+                  ERR.NO_SUCH_ALIASDOMAIN)
 

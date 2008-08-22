@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vmm 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-22 21:37+0200\n"
-"PO-Revision-Date: 2008-08-22 21:57+0200\n"
+"POT-Creation-Date: 2008-08-22 23:51+0200\n"
+"PO-Revision-Date: 2008-08-22 23:52+0200\n"
 "Last-Translator: Pascal Volk <p.volk@veb-it.de>\n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
@@ -21,8 +21,8 @@ msgid "There is already an alias with the address »%s«."
 msgstr "Es existiert bereits ein Alias mit der Adresse »%s«."
 
 #: VirtualMailManager/Account.py:71 VirtualMailManager/Alias.py:72
-#: VirtualMailManager/Domain.py:155 VirtualMailManager/Domain.py:179
-#: VirtualMailManager/Domain.py:209
+#: VirtualMailManager/Domain.py:169 VirtualMailManager/Domain.py:193
+#: VirtualMailManager/Domain.py:223
 #, python-format
 msgid "The domain »%s« doesn't exist yet."
 msgstr "Die Domain »%s« existiert noch nicht."
@@ -136,19 +136,24 @@ msgstr "* Konfigurations Abschnitt: »%s«"
 msgid "Enter new value for option %(opt)s [%(val)s]: "
 msgstr "Neuer Wert für Option %(opt)s [%(val)s]: "
 
-#: VirtualMailManager/Domain.py:116
+#: VirtualMailManager/Domain.py:45
+#, python-format
+msgid "The domain »%s« is an alias domain."
+msgstr "Die Domain »%s« ist eine Alias-Domain."
+
+#: VirtualMailManager/Domain.py:130
 msgid "There are accounts and aliases."
 msgstr "Es sind noch Accounts und Aliase vorhanden."
 
-#: VirtualMailManager/Domain.py:119
+#: VirtualMailManager/Domain.py:133
 msgid "There are accounts."
 msgstr "Es sind noch Accounts vorhanden."
 
-#: VirtualMailManager/Domain.py:122
+#: VirtualMailManager/Domain.py:136
 msgid "There are aliases."
 msgstr "Es sind noch Aliase vorhanden."
 
-#: VirtualMailManager/Domain.py:137
+#: VirtualMailManager/Domain.py:151
 #, python-format
 msgid "The domain »%s« already exists."
 msgstr "Die Domain »%s« existiert bereits."

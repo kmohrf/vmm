@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vmm 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-22 21:37+0200\n"
+"POT-Creation-Date: 2008-08-23 00:12+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,8 +22,8 @@ msgid "There is already an alias with the address »%s«."
 msgstr ""
 
 #: VirtualMailManager/Account.py:71 VirtualMailManager/Alias.py:72
-#: VirtualMailManager/Domain.py:155 VirtualMailManager/Domain.py:179
-#: VirtualMailManager/Domain.py:209
+#: VirtualMailManager/Domain.py:169 VirtualMailManager/Domain.py:193
+#: VirtualMailManager/Domain.py:223
 #, python-format
 msgid "The domain »%s« doesn't exist yet."
 msgstr ""
@@ -137,19 +137,24 @@ msgstr ""
 msgid "Enter new value for option %(opt)s [%(val)s]: "
 msgstr ""
 
-#: VirtualMailManager/Domain.py:116
+#: VirtualMailManager/Domain.py:45
+#, python-format
+msgid "The domain »%s« is an alias domain."
+msgstr ""
+
+#: VirtualMailManager/Domain.py:130
 msgid "There are accounts and aliases."
 msgstr ""
 
-#: VirtualMailManager/Domain.py:119
+#: VirtualMailManager/Domain.py:133
 msgid "There are accounts."
 msgstr ""
 
-#: VirtualMailManager/Domain.py:122
+#: VirtualMailManager/Domain.py:136
 msgid "There are aliases."
 msgstr ""
 
-#: VirtualMailManager/Domain.py:137
+#: VirtualMailManager/Domain.py:151
 #, python-format
 msgid "The domain »%s« already exists."
 msgstr ""
