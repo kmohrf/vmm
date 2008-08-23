@@ -30,6 +30,7 @@ setup(name='VirtualMailManager',
       license='BSD License',
       url='http://vmm.sf.net/',
       download_url='http://sf.net/project/showfiles.php?group_id=213727',
+      platforms=['linux2', 'openbsd4'],
       classifiers=[
           'Development Status :: 4 - Beta',
           'Development Status :: 5 - Production/Stable',
@@ -37,13 +38,15 @@ setup(name='VirtualMailManager',
           'Intended Audience :: System Administrators',
           'License :: OSI Approved :: BSD License',
           'Natural Language :: English',
+          'Natural Language :: German',
           'Operating System :: POSIX',
           'Operating System :: POSIX :: BSD',
           'Operating System :: POSIX :: Linux',
           'Operating System :: POSIX :: Other',
           'Programming Language :: Python',
           'Topic :: Communications :: Email',
-          'Topic :: System :: Systems Administration'
+          'Topic :: System :: Systems Administration',
+          'Topic :: Utilities'
       ],
       requires=['pyPgSQL']
       )
