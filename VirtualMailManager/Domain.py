@@ -243,8 +243,8 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts, aliases
     def getAliases(self):
         """Returns a list with all aliases from the domain."""
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT address from alias where gid = %s ORDER BY address",
-                self._id)
+        dbc.execute("SELECT DISTINCT address FROM alias WHERE gid = %s\
+ ORDER BY address",  self._id)
         addresses = dbc.fetchall()
         dbc.close()
         aliases = []
