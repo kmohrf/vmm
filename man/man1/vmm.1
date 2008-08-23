@@ -1,5 +1,5 @@
 .\" $Id$
-.TH "VMM" "1" "11. Jun 2008" "Pascal Volk"
+.TH "VMM" "1" "23. Aug 2008" "Pascal Volk"
 .SH NAME
 vmm \- command line tool to manage email domains/accounts/aliases
 .SH SYNOPSIS
@@ -53,11 +53,11 @@ misc
         Example:
 
         \fBvmm configure services\fP
-        * Config section: services
-        Enter new value for pop3 [True]: 
-        Enter new value for smtp [True]: 
-        Enter new value for imap [True]: 
-        Enter new value for managesieve [True]: false
+        * Config section: »services«
+        Enter new value for option pop3 [True]: 
+        Enter new value for option smtp [True]: 
+        Enter new value for option imap [True]: 
+        Enter new value for option managesieve [True]: false
 .fi
 .PP
 .TP
@@ -78,8 +78,9 @@ If only the userid is available, for example from process list, the subcommand
 .\"
 .TP
 \fBlistdomains\fP (\fBld\fP) [ \fIpattern\fP ]
-This subcommand lists all available domains. The output can be limited with an
-optional \fIpattern\fP.
+This subcommand lists all available domains. All domain names will be prefixed
+either with '[+]', if the domain is a primary domain, or with '[-]', if it is
+an alias domain name. The output can be limited with an optional \fIpattern\fP.
 .br
 To perform a wild card search, the % character can be used at the start and/or
 the end of the \fIpattern\fP.
@@ -87,17 +88,19 @@ the end of the \fIpattern\fP.
 .nf
         Example:
 
-        \fBvmm listdomains example%\fP
+        \fBvmm listdomains %example%\fP
         Matching domains
         ----------------
-                example.com
-                example.net
-                example.org
+                [+] example.com
+                [-]     e.g.example.com
+                [-]     exempli-gratia.example.com
+                [+] example.net
+                [+] example.org
 .fi
 .\"
 .TP
 \fBhelp\fP (\fBh\fP)
-Prints all available commands to stderr. After this \fBvmm\fP exits.
+Prints all available commands to stdout. After this \fBvmm\fP exits.
 .TP
 \fBversion\fP (\fBv\fP)
 Prints the version information from \fBvmm\fP.
@@ -122,7 +125,7 @@ will be the default transport for all new accounts in this domain.
 This subcommand shows some information about the given domain.
 .br
 If the keyword '\fBdetailed\fP' is specified as optional argument, all
-available accounts and aliases will be listed.
+available alias domains, accounts and aliases will be listed.
 .PP
 .nf
         Example:
@@ -134,6 +137,7 @@ available accounts and aliases will be listed.
                 GID............: 70002
                 Transport......: dovecot:
                 Domaindir......: /home/mail/5/70002
+                Aliasdomains...: 0
                 Accounts.......: 0
                 Aliases........: 0
 
@@ -163,6 +167,41 @@ you are doing, you can specify one of the following keywords: '\fBdelalias\fP', 
 
 If you really always know what you are doing, edit your \fBvmm.cfg\fP and set
 the option \fIforcedel\fP, in section \fImisc\fP, to true.
+.\"
+.SS ALIAS DOMAIN SUBCOMMANDS
+.TP
+\fBaliasdomainaddd\fP (\fBada\fP) \fIaliasdomain\fP \fItargetdomain\fP
+This subcommand adds the new \fIaliasdomain\fP to the \fItargetdomain\fP that
+should be aliased.
+.PP
+.nf
+        Example:
+
+        \fBvmm aliasdomainadd exempli-gratia.example.com example.com\fP
+.fi
+.TP
+\fBaliasdomaininfo (\fBadi\fP) \fIaliasdomain\fP
+This subcommand shows to which domain the \fIaliasdomain\fP is assigned.
+.PP
+.nf
+        Example:
+
+        \fBvmm aliasdomaininfo exempli-gratia.example.com\fP
+        Alias domain information
+        ------------------------
+                The alias domain exempli-gratia.example.com belongs to:
+                    * example.com
+.fi
+.TP
+\fBaliasdomaindelete\fP (\fBadd\fP) \fIaliasdomain\fP
+If the \fIaliasdomain\fP named alias domain should be removed use this
+subcommand.
+.PP
+.nf
+        Example:
+
+        \fBvmm aliasdomaindelete e.g.example.com\fP
+.fi
 .\"
 .SS ACCOUNT SUBCOMMANDS
 .TP
@@ -263,9 +302,9 @@ Information about an alias can be displayed with this subcommand.
         \fBvmm aliasinfo support@example.com\fP
         Alias information
         -----------------
-                Mail for support@example.com goes to:
-                     -> d.user@example.com
-                     -> e.user@example.com
+                Mail for support@example.com will be redirected to:
+                     * d.user@example.com
+                     * e.user@example.com
 .fi
 .TP
 \fBaliasdelete\fP (\fBad\fP) \fIalias\fP [ \fItarget\fP ]

@@ -1,5 +1,5 @@
 .\" $Id$
-.TH "VMM" "1" "11. Jun 2008" "Pascal Volk"
+.TH "VMM" "1" "23. Aug 2008" "Pascal Volk"
 .SH NAME
 vmm \- Programm für die Kommandozeile, um E-Mail-Domains, -Konten und -Aliase zu
 verwalten.
@@ -55,11 +55,11 @@ misc
         Beispiel:
 
         \fBvmm configure services\fP
-        * Konfigurations Abschnitt: services
-        Neuer Wert für pop3 [True]: 
-        Neuer Wert für smtp [True]: 
-        Neuer Wert für imap [True]: 
-        Neuer Wert für managesieve [True]: false
+        * Konfigurations Abschnitt: »services«
+        Neuer Wert für Option pop3 [True]: 
+        Neuer Wert für Option smtp [True]: 
+        Neuer Wert für Option imap [True]: 
+        Neuer Wert für Option managesieve [True]: false
 .fi
 .PP
 .TP
@@ -80,8 +80,10 @@ Unterbefehl \fBgetuser\fP die E-Mail-Adresse des Users ermittelt werden.
 .\"
 .TP
 \fBlistdomains\fP (\fBld\fP) [ \fIMuster\fP ]
-Dieser Unterbefehl listet alle verfügbaren Domains auf. Die Ausgabe kann
-reduziert werden, indem ein optionales \fIMuster\fP angegeben wird.
+Dieser Unterbefehl listet alle verfügbaren Domains auf. Allen Domains wird ein
+Präfix vorangestellt. Entweder ein '[+]', falls es sich um eine primäre Domain
+handelt, oder ein '[-]', falls es sich um eine Alias-Domain handelt.  Die
+Ausgabe kann reduziert werden, indem ein optionales \fIMuster\fP angegeben wird.
 .br
 Um eine Wildcard-Suche durchzuführen kann das %-Zeichen am Anfang und/oder Ende
 des \fIMusters\fP verwendet werden.
@@ -89,17 +91,19 @@ des \fIMusters\fP verwendet werden.
 .nf
         Beispiel:
 
-        \fBvmm listdomains example%\fP
+        \fBvmm listdomains %example%\fP
         Übereinstimmende Domains
-        -------------------------
-                example.com
-                example.net
-                example.org
+        ------------------------
+                [+] example.com
+                [-]     e.g.example.com
+                [-]     exempli-gratia.example.com
+                [+] example.net
+                [+] example.org
 .fi
 .\"
 .TP
 \fBhelp\fP (\fBh\fP)
-Dieser Unterbefehl gibt alle verfügbaren Kommandos auf stderr aus. Danach
+Dieser Unterbefehl gibt alle verfügbaren Kommandos auf stdout aus. Danach
 beendet sich \fBvmm\fP.
 .TP
 \fBversion\fP (\fBv\fP)
@@ -127,7 +131,7 @@ Domain eingerichtet werden.
 Dieser Unterbefehl zeigt Information zur angegeben \fIDomain\fP an.
 .br
 Wurde das optionale Schlüsselwort '\fBdetailed\fP' angegeben, werden zusätzlich
-alle eingerichteten Konten und Aliase aufgelistet.
+alle eingerichteten Alias-Domains, Konten und Aliase aufgelistet.
 .PP
 .nf
         Beispiel:
@@ -139,6 +143,7 @@ alle eingerichteten Konten und Aliase aufgelistet.
                 GID............: 70002
                 Transport......: dovecot:
                 Domaindir......: /home/mail/5/70002
+                Aliasdomains...: 0
                 Accounts.......: 0
                 Aliases........: 0
 
@@ -175,13 +180,49 @@ Sollten Sie wirklich immer wissen was Sie tun, so editieren Sie Ihre
 \fImisc\fP, auf true. Dann werden Sie beim Löschen von Domains nicht mehr wegen
 vorhanden Konten/Aliase gewarnt.
 .\"
+.SS ALIAS-DOMAIN UNTERBEFEHLE
+.TP
+\fBaliasdomainaddd\fP (\fBada\fP) \fIAliasdomain\fP \fIZieldomain\fP
+Mit diesem Unterbefehl wird der \fIZieldomain\fP die Alias-Domain
+\fIAliasdomain\fP zugewiesen.
+.PP
+.nf
+        Beispiel:
+
+        \fBvmm aliasdomainadd exempli-gratia.example.com example.com\fP
+.fi
+.TP
+\fBaliasdomaininfo (\fBadi\fP) \fIAliasdomain\fP
+Dieser Unterbefehl informiert darüber, welcher Domain die Alias-Domain
+\fIAliasdomain\fP zugeordnet ist.
+.PP
+.nf
+        Beispiel:
+
+        \fBvmm aliasdomaininfo exempli-gratia.example.com\fP
+        Alias-Domain Informationen
+        --------------------------
+                Die Alias-Domain exempli-gratia.example.com gehört zu:
+                    * example.com
+.fi
+.TP
+\fBaliasdomaindelete\fP (\fBadd\fP) \fIAliasdomain\fP
+Wenn die Alias-Domain mit dem Namen \fIAliasdomain\fP gelöscht werden soll, ist
+dieser Unterbefehl zu verwenden.
+.PP
+.nf
+        Beispiel:
+
+        \fBvmm aliasdomaindelete e.g.example.com\fP
+.fi
+.\"
 .SS KONTO UNTERBEFEHLE
 .TP
 \fBuseradd\fP (\fBua\fP) \fIAdresse\fP [ \fIPasswort\fP ]
 Mit diesem Unterbefehl wird ein neues Konto für die angegebene \fIAdresse\fP
 angelegt.
 .br
-Wurde keine \fIPasswort\fP angegeben wird \fBvmm\fP dieses im interaktiven
+Wurde kein \fIPasswort\fP angegeben wird \fBvmm\fP dieses im interaktiven
 Modus erfragen.
 .PP
 .nf
@@ -213,7 +254,7 @@ mit diesem Unterbefehl gesetzt/aktualisiert werden.
 \fBuserpassword\fP (\fBup\fP) \fIAdresse\fP [ \fIPasswort\fP ]
 Das \fIPasswort\fP eines Kontos kann mit diesem Unterbefehl aktualisiert werden.
 .br
-Wurde keine \fIPasswort\fP angegeben wird \fBvmm\fP dieses im interaktiven
+Wurde kein \fIPasswort\fP angegeben wird \fBvmm\fP dieses im interaktiven
 Modus erfragen.
 .PP
 .nf
@@ -285,9 +326,9 @@ Informationen zu einem Alias können mit diesem Unterbefehl ausgegeben werden.
         \fBvmm aliasinfo support@example.com\fP
         Alias Informationen
         -------------------
-                E-Mails für support@example.com gehen an:
-                     -> d.user@example.com
-                     -> e.user@example.com
+                E-Mails für support@example.com werden weitergeleitet an:
+                     * d.user@example.com
+                     * e.user@example.com
 .fi
 .TP
 \fBaliasdelete\fP (\fBad\fP) \fIAlias\fP [ \fIZiel\fP ]

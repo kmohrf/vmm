@@ -176,7 +176,6 @@ def _printAliasDomInfo(info):
     w_std(
         _('\tThe alias domain %(alias)s belongs to:\n\t    * %(domain)s')%info)
     print
-    
 
 def configure():
     if need_setup or len(argv) < 3:
