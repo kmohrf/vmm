@@ -18,6 +18,9 @@ class VMMException(Exception):
     def __init__(self, msg, code):
         Exception.__init__(self, msg)
         self._code = int(code)
+        ### for older python versions, like py 2.4.4 on OpenBSD 4.2
+        if not hasattr(self, 'message'):
+            self.message = msg
 
     def msg(self):
         """Returns the exception message."""
