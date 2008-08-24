@@ -127,26 +127,26 @@ Domain eingerichtet werden.
         vmm domainadd sales.example.com\fP
 .fi
 .TP
-\fBdomaininfo\fP (\fBdi\fP) \fIDomain\fP [ \fIaccounts\fP | \fIaliasdomains\fP\
- | \fIaliases\fP | \fIfull\fP ]
+\fBdomaininfo\fP (\fBdi\fP) \fIDomain\fP [ \fIdetails\fP ]
 Dieser Unterbefehl zeigt Information zur angegeben \fIDomain\fP an.
 .br
-Um detaillierte Informationen über die \fIDomain\fP zu erhalten, kann eines der
-folgenden Schlüsselwörter angegeben werden:
+Um detaillierte Informationen über die \fIDomain\fP zu erhalten, kann das
+optionale Argument \fIdetails\fP angegeben werden. Ein möglicher Wert für
+\fIdetails\fP kann eines der folgenden vier Schlüsselwörter sein:
 .RS
 .PD 0
 .TP
 .B accounts
-um zusätzlich alle existierenden Konten aufzulisten.
+um alle existierenden Konten aufzulisten.
 .TP
 .B aliasdomains
-um zusätzlich alle zugeordneten Alias-Domains aufzulisten.
+um alle zugeordneten Alias-Domains aufzulisten.
 .TP
 .B aliases
-um zusätzlich alle verfügbaren Alias-Adressen aufzulisten.
+um alle verfügbaren Alias-Adressen aufzulisten.
 .TP
 .B full
-um alle oben genannten Informationen zusätzlich aufzulisten.
+um alle oben genannten Informationen aufzulisten.
 .PD
 .RE
 .LP
@@ -291,15 +291,15 @@ der angegebenen \fIAdresse\fP festgelegt werden.
         \fBvmm ut d.user@example.com smtp:pc105.it.example.com\fP
 .fi
 .TP
-\fBuserdisable\fP (\fBu0\fP) \fIAdresse\fP [ \fIsmtp\fP | \fIpop3\fP | \fIimap\fP | \fImanagesieve\fP | \fIall\fP ]
+\fBuserdisable\fP (\fBu0\fP) \fIAdresse\fP [ \fIService\fP ]
 Soll ein Anwender keinen Zugriff auf einen oder alle Service haben, kann der
 Zugriff mit diesem Unterbefehl beschränkt werden.
 .br
-Wurde weder der Name eines Services noch das Schlüsselwort '\fIall\fP'
-angegeben, werden alle Service ('smtp', 'pop3', 'imap', und 'managesieve') für
-das Konto mit der angegebenen  \fIAdresse\fP deaktiviert.
+Wurde weder ein \fIService\fP noch das Schlüsselwort '\fIall\fP' angegeben,
+werden alle Services (\fIsmtp\fP, \fIpop3\fP, \fIimap\fP, und \fImanagesieve\fP)
+für das Konto mit der angegebenen \fIAdresse\fP deaktiviert.
 .br
-Andernfalls wird nur der Zugriff auf den angegeben Service gesperrt.
+Andernfalls wird nur der Zugriff auf den angegeben \fIService\fP gesperrt.
 .PP
 .nf
         Beispiele:
@@ -308,15 +308,15 @@ Andernfalls wird nur der Zugriff auf den angegeben Service gesperrt.
         \fBvmm userdisable c.user@example.com\fP
 .fi
 .TP
-\fBuserenable\fP (\fBu1\fP) \fIAdresse\fP [ \fIsmtp\fP | \fIpop3\fP | \fIimap\fP | \fImanagesieve\fP | \fIall\fP ]
+\fBuserenable\fP (\fBu1\fP) \fIAdresse\fP [ \fIService\fP ]
 Um den Zugriff auf bestimmte oder alle gesperrten Service zu gewähren, wird
 dieser Unterbefehl verwendet.
 .br
-Wurde weder der Name eines Services noch das Schlüsselwort '\fIall\fP'
-angegeben, werden alle Service ('smtp', 'pop3', 'imap', und 'managesieve') für
-das Konto mit der angegebenen  \fIAdresse\fP aktiviert.
+Wurde weder ein \fIService\fP noch das Schlüsselwort '\fIall\fP' angegeben,
+werden alle Services (\fIsmtp\fP, \fIpop3\fP, \fIimap\fP, und \fImanagesieve\fP)
+für das Konto mit der angegebenen  \fIAdresse\fP aktiviert.
 .br
-Andernfalls wird nur der Zugriff auf den angegeben Service gestattet.
+Andernfalls wird nur der Zugriff auf den angegeben \fIService\fP gestattet.
 .TP
 \fBuserdelete\fP (\fBud\fP) \fIAdresse\fP
 Verwenden Sie diesen Unterbefehl um, das Konto mit der angegebenen \fIAdresse\fP

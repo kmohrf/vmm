@@ -45,8 +45,7 @@ Usage: %s SUBCOMMAND OBJECT ARGS*
 
     u_body = """\
   da    domainadd          domain.tld        transport*
-  di    domaininfo         domain.tld        accounts*|aliasdomains*|aliases*
-                                             |full*
+  di    domaininfo         domain.tld        details*
   dt    domaintransport    domain.tld        transport force*
   dd    domaindelete       domain.tld        delalias*|deluser*|delall*
   ada   aliasdomainadd     aliasdomain.tld   domain.tld
@@ -57,8 +56,8 @@ Usage: %s SUBCOMMAND OBJECT ARGS*
   un    username           user@domain.tld   'Users Name'
   up    userpassword       user@domain.tld   password*
   ut    usertransport      user@domain.tld   transport
-  u0    userdisable        user@domain.tld   smtp*|pop3*|imap*|managesieve*|all*
-  u1    userenable         user@domain.tld   smtp*|pop3*|imap*|managesieve*|all*
+  u0    userdisable        user@domain.tld   service*
+  u1    userenable         user@domain.tld   service*
   ud    userdelete         user@domain.tld
   aa    aliasadd           alias@domain.tld  user@domain.tld
   ai    aliasinfo          alias@domain.tld

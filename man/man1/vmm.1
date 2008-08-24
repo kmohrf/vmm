@@ -121,26 +121,26 @@ will be the default transport for all new accounts in this domain.
         vmm domainadd sales.example.com\fP
 .fi
 .TP
-\fBdomaininfo\fP (\fBdi\fP) \fIdomain\fP [ \fIaccounts\fP | \fIaliasdomains\fP\
- | \fIaliases\fP | \fIfull\fP ]
+\fBdomaininfo\fP (\fBdi\fP) \fIdomain\fP [ \fIdetails\fP ]
 This subcommand shows some information about the given \fIdomain\fP.
 .br
-For a more detailed information about the \fIdomain\fP one of the following
-keywords can be specified:
+For a more detailed information about the \fIdomain\fP the optional argument
+\fIdetails\fP can be specified. A possible \fIdetails\fP value may be one of
+the following four keywords:
 .RS
 .PD 0
 .TP
 .B accounts
-in order to list additionally all existing accounts.
+to list all existing accounts
 .TP
 .B aliasdomains
-in order to list additionally all assigned alias domains.
+to list all assigned alias domains
 .TP
 .B aliases
-in order to list additionally all available aliases addresses.
+to list all available aliases addresses
 .TP
 .B full
-in order to list additionally all information mentioned above.
+to list all information mentioned above
 .PD
 .RE
 .LP
@@ -273,12 +273,14 @@ A different transport for an account can be specified with this subcommand.
         \fBvmm ut d.user@example.com smtp:pc105.it.example.com\fP
 .fi
 .TP
-\fBuserdisable\fP (\fBu0\fP) \fIaddress\fP [ \fIsmtp\fP | \fIpop3\fP | \fIimap\fP | \fImanagesieve\fP | \fIall\fP ]
+\fBuserdisable\fP (\fBu0\fP) \fIaddress\fP [ \fIservice\fP ]
 If a user shouldn't have access to one or all services you can restrict the 
 access with this subcommand.
 .br
-If neither a service nor the keyword '\fIall\fP' is given all services ('smtp', 'pop3', 'imap', and 'managesieve') will be disabled for the account with the specified
-\fIaddress\fP. Otherwise only the specified service will be restricted.
+If neither a \fIservice\fP nor the keyword '\fIall\fP' is given all services
+(\fIsmtp\fP, \fIpop3\fP, \fIimap\fP, and \fImanagesieve\fP) will be disabled
+for the account with the specified \fIaddress\fP. Otherwise only the specified
+\fIservice\fP will be restricted.
 .PP
 .nf
         Examples:
@@ -287,11 +289,13 @@ If neither a service nor the keyword '\fIall\fP' is given all services ('smtp', 
         \fBvmm userdisable c.user@example.com\fP
 .fi
 .TP
-\fBuserenable\fP (\fBu1\fP) \fIaddress\fP [ \fIsmtp\fP | \fIpop3\fP | \fIimap\fP | \fImanagesieve\fP | \fIall\fP ]
+\fBuserenable\fP (\fBu1\fP) \fIaddress\fP [ \fIservicel\fP ]
 To allow access to one or all restricted services use this subcommand.
 .br
-If neither a service nor the keyword '\fIall\fP' is given all services ('smtp', 'pop3', 'imap', and 'managesieve') will be enabled for the account with the specified
-\fIaddress\fP. Otherwise only the specified service will be enabled.
+If neither a \fIservice\fP nor the keyword '\fIall\fP' is given all services
+(\fIsmtp\fP, \fIpop3\fP, \fIimap\fP, and \fImanagesieve\fP) will be enabled for
+the account with the specified \fIaddress\fP. Otherwise only the specified 
+\fIservice\fP will be enabled.
 .TP
 \fBuserdelete\fP (\fBud\fP) \fIaddress\fP
 Use this subcommand to delete the account with the given \fIaddress\fP.
