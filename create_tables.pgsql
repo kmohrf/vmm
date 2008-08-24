@@ -192,5 +192,8 @@ END;
 $$ LANGUAGE plpgsql STABLE;
 
 
-CREATE TRIGGER primary_count BEFORE INSERT OR UPDATE ON domain_name
+CREATE TRIGGER primary_count_ins BEFORE INSERT ON domain_name
+    FOR EACH ROW EXECUTE PROCEDURE domain_primary_trigger();
+
+CREATE TRIGGER primary_count_upd AFTER UPDATE ON domain_name
     FOR EACH ROW EXECUTE PROCEDURE domain_primary_trigger();

@@ -506,7 +506,7 @@ msgstr "vom"
 
 #: vmm:361
 msgid "on"
-msgstr ""
+msgstr "auf"
 
 #: vmm:426
 msgid "Unknown subcommand"
