@@ -45,7 +45,8 @@ Usage: %s SUBCOMMAND OBJECT ARGS*
 
     u_body = """\
   da    domainadd          domain.tld        transport*
-  di    domaininfo         domain.tld        detailed*
+  di    domaininfo         domain.tld        accounts*|aliasdomains*|aliases*
+                                             |full*
   dt    domaintransport    domain.tld        transport force*
   dd    domaindelete       domain.tld        delalias*|deluser*|delall*
   ada   aliasdomainadd     aliasdomain.tld   domain.tld
@@ -205,11 +206,19 @@ def domain_info():
     elif argc < 4:
         _printInfo(vmm.domainInfo(argv[2].lower()), _('Domain'))
     else:
-        infos = vmm.domainInfo(argv[2].lower(), argv[3])
+        details = argv[3].lower()
+        infos = vmm.domainInfo(argv[2].lower(), details)
         _printInfo(infos[0], _('Domain'))
-        _printList(infos[1], _('alias domains'))
-        _printList(infos[2], _('accounts'))
-        _printList(infos[3], _('aliases'))
+        if details == 'accounts':
+            _printList(infos[1], _('accounts'))
+        elif details == 'aliasdomains':
+            _printList(infos[1], _('alias domains'))
+        elif details == 'aliases':
+            _printList(infos[1], _('aliases'))
+        else:
+            _printList(infos[1], _('alias domains'))
+            _printList(infos[2], _('accounts'))
+            _printList(infos[3], _('aliases'))
 
 def domain_transport():
     if argc < 3:

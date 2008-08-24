@@ -1,5 +1,5 @@
 .\" $Id$
-.TH "VMM" "1" "23. Aug 2008" "Pascal Volk"
+.TH "VMM" "1" "24. Aug 2008" "Pascal Volk"
 .SH NAME
 vmm \- command line tool to manage email domains/accounts/aliases
 .SH SYNOPSIS
@@ -121,12 +121,29 @@ will be the default transport for all new accounts in this domain.
         vmm domainadd sales.example.com\fP
 .fi
 .TP
-\fBdomaininfo\fP (\fBdi\fP) \fIdomain\fP [ \fIdetailed\fP ]
-This subcommand shows some information about the given domain.
+\fBdomaininfo\fP (\fBdi\fP) \fIdomain\fP [ \fIaccounts\fP | \fIaliasdomains\fP\
+ | \fIaliases\fP | \fIfull\fP ]
+This subcommand shows some information about the given \fIdomain\fP.
 .br
-If the keyword '\fBdetailed\fP' is specified as optional argument, all
-available alias domains, accounts and aliases will be listed.
-.PP
+For a more detailed information about the \fIdomain\fP one of the following
+keywords can be specified:
+.RS
+.PD 0
+.TP
+.B accounts
+in order to list additionally all existing accounts.
+.TP
+.B aliasdomains
+in order to list additionally all assigned alias domains.
+.TP
+.B aliases
+in order to list additionally all available aliases addresses.
+.TP
+.B full
+in order to list additionally all information mentioned above.
+.PD
+.RE
+.LP
 .nf
         Example:
 
@@ -161,7 +178,7 @@ Otherwise this setting will affect only new created accounts.
 This subcommand deletes the specified \fIdomain\fP.
 .br
 If there are accounts and/or aliases assigned to the given domain, \fBvmm\fP
-will abort the requested operation and show a error message. If you know, what
+will abort the requested operation and show an error message. If you know, what
 you are doing, you can specify one of the following keywords: '\fBdelalias\fP', '\fBdeluser\fP' or '\fBdelall\fP'.
 .br
 

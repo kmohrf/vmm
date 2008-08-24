@@ -479,7 +479,17 @@ class VirtualMailManager:
         if self.__Cfg.getboolean('domdir', 'delete'):
             self.__domDirDelete(domdir, gid)
 
-    def domainInfo(self, domainname, detailed=None):
+    def domainInfo(self, domainname, details=None):
+        if details not in [None, 'accounts', 'aliasdomains', 'aliases', 'full',
+                'detailed']:
+            raise VMMDomainException(_(u'Invalid argument: »%s«') % details,
+                ERR.INVALID_OPTION)
+        if details == 'detailed':
+            details = 'full'
+            warning = _(u"""\
+The keyword »detailed« is deprecated and will be removed in a future release.
+    Please use the keyword »full« to get full details.""")
+            self.__warnings.append(warning)
         dom = self.__getDomain(domainname)
         dominfo = dom.getInfo()
         if dominfo['domainname'].startswith('xn--'):
@@ -487,14 +497,17 @@ class VirtualMailManager:
                 % VirtualMailManager.ace2idna(dominfo['domainname'])
         if dominfo['aliases'] is None:
             dominfo['aliases'] = 0
-        if detailed is None:
+        if details is None:
             return dominfo
-        elif detailed == 'detailed':
+        elif details == 'accounts':
+            return (dominfo, dom.getAccounts())
+        elif details == 'aliasdomains':
+            return (dominfo, dom.getAliaseNames())
+        elif details == 'aliases':
+            return (dominfo, dom.getAliases())
+        else:
             return (dominfo, dom.getAliaseNames(), dom.getAccounts(),
                     dom.getAliases())
-        else:
-            raise VMMDomainException(_(u'Invalid argument: »%s«') % detailed,
-                ERR.INVALID_OPTION)
 
     def aliasDomainAdd(self, aliasname, domainname):
         """Adds an alias domain to the domain.

@@ -1,5 +1,5 @@
 .\" $Id$
-.TH "VMM" "1" "23. Aug 2008" "Pascal Volk"
+.TH "VMM" "1" "24. Aug 2008" "Pascal Volk"
 .SH NAME
 vmm \- Programm für die Kommandozeile, um E-Mail-Domains, -Konten und -Aliase zu
 verwalten.
@@ -127,11 +127,29 @@ Domain eingerichtet werden.
         vmm domainadd sales.example.com\fP
 .fi
 .TP
-\fBdomaininfo\fP (\fBdi\fP) \fIDomain\fP [ \fIdetailed\fP ]
+\fBdomaininfo\fP (\fBdi\fP) \fIDomain\fP [ \fIaccounts\fP | \fIaliasdomains\fP\
+ | \fIaliases\fP | \fIfull\fP ]
 Dieser Unterbefehl zeigt Information zur angegeben \fIDomain\fP an.
 .br
-Wurde das optionale Schlüsselwort '\fBdetailed\fP' angegeben, werden zusätzlich
-alle eingerichteten Alias-Domains, Konten und Aliase aufgelistet.
+Um detaillierte Informationen über die \fIDomain\fP zu erhalten, kann eines der
+folgenden Schlüsselwörter angegeben werden:
+.RS
+.PD 0
+.TP
+.B accounts
+um zusätzlich alle existierenden Konten aufzulisten.
+.TP
+.B aliasdomains
+um zusätzlich alle zugeordneten Alias-Domains aufzulisten.
+.TP
+.B aliases
+um zusätzlich alle verfügbaren Alias-Adressen aufzulisten.
+.TP
+.B full
+um alle oben genannten Informationen zusätzlich aufzulisten.
+.PD
+.RE
+.LP
 .PP
 .nf
         Beispiel:

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vmm 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-22 23:51+0200\n"
-"PO-Revision-Date: 2008-08-23 04:38+0200\n"
+"POT-Creation-Date: 2008-08-24 04:32+0200\n"
+"PO-Revision-Date: 2008-08-24 04:42+0200\n"
 "Last-Translator: Pascal Volk <p.volk@veb-it.de>\n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
@@ -326,17 +326,27 @@ msgid "Invalid argument: '%s'"
 msgstr "Ungültiges Argument: '%s'"
 
 #: VirtualMailManager/VirtualMailManager.py:466
-#: VirtualMailManager/VirtualMailManager.py:496
+#: VirtualMailManager/VirtualMailManager.py:485
 #, python-format
 msgid "Invalid argument: »%s«"
 msgstr "Ungültiges Argument: »%s«"
 
-#: VirtualMailManager/VirtualMailManager.py:540
+#: VirtualMailManager/VirtualMailManager.py:489
+msgid ""
+"The keyword »detailed« is deprecated and will be removed in a future "
+"release.\n"
+"    Please use the keyword »full« to get full details."
+msgstr ""
+"Das Schlüsselwort »detailed« ist veraltet und wird in einer zukünftigen\n"
+"    Version entfernt werden.\n"
+"    Verwenden Sie bitte das Schlüsselwort »full«, um alle Details zu erhalten."
+
+#: VirtualMailManager/VirtualMailManager.py:553
 #, python-format
 msgid "The pattern »%s« contains invalid characters."
 msgstr "Das Muster »%s« enthält ungültige Zeichen."
 
-#: VirtualMailManager/VirtualMailManager.py:572
+#: VirtualMailManager/VirtualMailManager.py:585
 #, python-format
 msgid ""
 "The account has been successfully deleted from the database.\n"
@@ -349,7 +359,7 @@ msgstr ""
 "    »%(directory)s«\n"
 "    Grund: %(raeson)s"
 
-#: VirtualMailManager/VirtualMailManager.py:604
+#: VirtualMailManager/VirtualMailManager.py:617
 msgid "Account doesn't exists"
 msgstr "Der Account existiert nicht"
 
@@ -364,48 +374,48 @@ msgstr ""
 "  kurz  lang\n"
 "  Unterbefehl              Objekt            args (* = optional)\n"
 
-#: vmm:75 vmm:86 vmm:422
+#: vmm:76 vmm:87 vmm:431
 msgid "Error"
 msgstr "Fehler"
 
-#: vmm:108
+#: vmm:109
 msgid "information"
 msgstr "Informationen"
 
-#: vmm:118
+#: vmm:119
 msgid "Available"
 msgstr "Verfügbare"
 
-#: vmm:121 vmm:211
+#: vmm:122 vmm:215 vmm:219
 msgid "alias domains"
 msgstr "Alias-Domains"
 
-#: vmm:131 vmm:142 vmm:160
+#: vmm:132 vmm:143 vmm:161
 msgid "\tNone"
 msgstr "\tKeine"
 
-#: vmm:135
+#: vmm:136
 msgid "Alias information"
 msgstr "Alias Informationen"
 
-#: vmm:137
+#: vmm:138
 #, python-format
 msgid "\tMail for %s will be redirected to:"
 msgstr "\tE-Mails für %s werden weitergeleitet an:"
 
-#: vmm:155
+#: vmm:156
 msgid "Available domains"
 msgstr "Verfügbare Domains"
 
-#: vmm:157
+#: vmm:158
 msgid "Matching domains"
 msgstr "Übereinstimmende Domains"
 
-#: vmm:171
+#: vmm:172
 msgid "Alias domain information"
 msgstr "Alias-Domain Informationen"
 
-#: vmm:177
+#: vmm:178
 #, python-format
 msgid ""
 "\tThe alias domain %(alias)s belongs to:\n"
@@ -418,86 +428,90 @@ msgstr ""
 msgid "Missing domain name."
 msgstr "Kein Domain-Name angegeben."
 
-#: vmm:207 vmm:210
+#: vmm:207 vmm:211
 msgid "Domain"
 msgstr "Domain"
 
-#: vmm:212
+#: vmm:213 vmm:220
 msgid "accounts"
 msgstr "Accounts"
 
-#: vmm:213
+#: vmm:217 vmm:221
 msgid "aliases"
 msgstr "Aliase"
 
-#: vmm:217
+#: vmm:225
 msgid "Missing domain name and new transport."
 msgstr "Domain-Name und neuer Transport fehlen."
 
-#: vmm:219
+#: vmm:227
 msgid "Missing new transport."
 msgstr "Neuer Transport fehlt."
 
-#: vmm:228
+#: vmm:236
 msgid "Missing alias domain name and target domain name."
 msgstr "Domain-Namen für Alias- und Ziel-Domain fehlen."
 
-#: vmm:230
+#: vmm:238
 msgid "Missing target domain name."
 msgstr "Keine Ziel-Domain angegeben."
 
-#: vmm:236 vmm:242
+#: vmm:244 vmm:250
 msgid "Missing alias domain name."
 msgstr "Keine Alias-Domain angegeben."
 
-#: vmm:248 vmm:257 vmm:263 vmm:287 vmm:295 vmm:303
+#: vmm:256 vmm:265 vmm:271 vmm:295 vmm:303 vmm:311
 msgid "Missing e-mail address."
 msgstr "E-Mail-Adresse fehlt."
 
-#: vmm:271
+#: vmm:279
 msgid "Missing e-mail address and users name."
 msgstr "E-Mail-Adresse und der Name des Benutzers fehlen."
 
-#: vmm:273
+#: vmm:281
 msgid "Missing users name."
 msgstr "Name des Benutzers fehlt."
 
-#: vmm:279
+#: vmm:287
 msgid "Missing e-mail address and transport."
 msgstr "E-Mail-Adresse und Transport fehlen."
 
-#: vmm:281
+#: vmm:289
 msgid "Missing transport."
 msgstr "Transport fehlt."
 
-#: vmm:312
+#: vmm:320
 msgid "Missing alias address and destination."
 msgstr "Alias- und Ziel-Adresse fehlen."
 
-#: vmm:318 vmm:324
+#: vmm:326 vmm:332
 msgid "Missing alias address"
 msgstr "Alias-Adresse fehlt."
 
-#: vmm:332
+#: vmm:340
 msgid "Missing userid"
 msgstr "Keine UID angegeben."
 
-#: vmm:345
+#: vmm:353
 msgid "Warnings:"
 msgstr "Warnungen:"
 
-#: vmm:350
+#: vmm:358
 msgid "version"
 msgstr "Version"
 
-#: vmm:351
+#: vmm:359
 msgid "from"
 msgstr "vom"
 
-#: vmm:417
+#: vmm:361
+msgid "on"
+msgstr ""
+
+#: vmm:426
 msgid "Unknown subcommand"
 msgstr "Unbekannter Unterbefehl"
 
-#: vmm:420
+#: vmm:429
 msgid "Ouch"
 msgstr "Autsch"
