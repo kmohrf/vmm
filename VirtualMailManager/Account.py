@@ -198,7 +198,11 @@ WHERE gid=%s AND local_part=%s",
             dbc = self._dbh.cursor()
             dbc.execute("DELETE FROM users WHERE gid=%s AND local_part=%s",
                     self._gid, self._localpart)
-            if dbc.rowcount > 0:
+            u_rc = dbc.rowcount
+            # delete also all aliases where the destination address is the same
+            # as for this account.
+            dbc.execute("DELETE FROM alias WHERE destination = %s", self._addr)
+            if u_rc > 0 or dbc.rowcount > 0:
                 self._dbh.commit()
             dbc.close()
         else:
