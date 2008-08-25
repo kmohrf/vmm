@@ -1,5 +1,5 @@
 .\" $Id$
-.TH "VMM" "1" "24. Aug 2008" "Pascal Volk"
+.TH "VMM" "1" "25. Aug 2008" "Pascal Volk"
 .SH NAME
 vmm \- Programm für die Kommandozeile, um E-Mail-Domains, -Konten und -Aliase zu
 verwalten.
@@ -307,6 +307,7 @@ Andernfalls wird nur der Zugriff auf den angegeben \fIService\fP gesperrt.
         \fBvmm u0 b.user@example.com imap\fP
         \fBvmm userdisable c.user@example.com\fP
 .fi
+.PP
 .TP
 \fBuserenable\fP (\fBu1\fP) \fIAdresse\fP [ \fIService\fP ]
 Um den Zugriff auf bestimmte oder alle gesperrten Service zu gewähren, wird
@@ -317,10 +318,16 @@ werden alle Services (\fIsmtp\fP, \fIpop3\fP, \fIimap\fP, und \fImanagesieve\fP)
 für das Konto mit der angegebenen  \fIAdresse\fP aktiviert.
 .br
 Andernfalls wird nur der Zugriff auf den angegeben \fIService\fP gestattet.
+.PP
 .TP
-\fBuserdelete\fP (\fBud\fP) \fIAdresse\fP
+\fBuserdelete\fP (\fBud\fP) \fIAdresse\fP [ \fIdelalias\fP ]
 Verwenden Sie diesen Unterbefehl um, das Konto mit der angegebenen \fIAdresse\fP
 zu löschen.
+.br
+Sollte es einen oder mehrere Aliase geben, deren Zieladresse mit der des Kontos
+identisch ist, wird \fBvmm\fP die Ausführung des Befehls mit einer
+entsprechenden Fehlermeldung beenden. Um dieses zu umgehen, kann das optionale
+Schlüsselwort '\fIdelalias\fP' angegebenen werden.
 .\"
 .SS ALIAS UNTERBEFEHLE
 .TP
@@ -352,8 +359,8 @@ Informationen zu einem Alias können mit diesem Unterbefehl ausgegeben werden.
 \fBaliasdelete\fP (\fBad\fP) \fIAlias\fP [ \fIZiel\fP ]
 Verwenden Sie diesen Unterbefehl um den angegebenen \fIAlias\fP zu löschen.
 .br
-Wurde die optionale Ziel-Adresse \fIZiel\fP angegeben, so wird nur diese
-Ziel-Adresse vom angegebenen \fIAlias\fP entfernt.
+Wurde die optionale Zieladresse \fIZiel\fP angegeben, so wird nur diese
+Zieladresse vom angegebenen \fIAlias\fP entfernt.
 .PP
 .nf
         Beispiel:

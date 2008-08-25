@@ -58,7 +58,7 @@ Usage: %s SUBCOMMAND OBJECT ARGS*
   ut    usertransport      user@domain.tld   transport
   u0    userdisable        user@domain.tld   service*
   u1    userenable         user@domain.tld   service*
-  ud    userdelete         user@domain.tld
+  ud    userdelete         user@domain.tld   delalias*
   aa    aliasadd           alias@domain.tld  user@domain.tld
   ai    aliasinfo          alias@domain.tld
   ad    aliasdelete        alias@domain.tld  user@domain.tld*
@@ -262,8 +262,10 @@ def user_add():
 def user_delete():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing e-mail address.'))
-    else:
+    elif argc < 4:
         vmm.userDelete(argv[2].lower())
+    else:
+        vmm.userDelete(argv[2].lower(), argv[3].lower())
 
 def user_info():
     if argc < 3:

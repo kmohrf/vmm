@@ -109,6 +109,15 @@ WHERE gid=%s AND local_part=%s",
             self._dbh.commit()
         dbc.close()
 
+    def __aliaseCount(self):
+        dbc = self._dbh.cursor()
+        q = "SELECT COUNT(destination) FROM alias WHERE destination = '%s'"\
+            %self._addr
+        dbc.execute(q)
+        a_count = dbc.fetchone()[0]
+        dbc.close()
+        return a_count
+
     def setPassword(self, password):
         self._passwd = password
 
@@ -193,9 +202,12 @@ WHERE gid=%s AND local_part=%s",
                     tid=info['transport']).getTransport()
             return info
 
-    def delete(self):
-        if self._uid > 0:
-            dbc = self._dbh.cursor()
+    def delete(self, delalias):
+        if self._uid < 1:
+            raise AccE(_(u"The account »%s« doesn't exists.") % self._addr,
+                    ERR.NO_SUCH_ACCOUNT)
+        dbc = self._dbh.cursor()
+        if delalias == 'delalias':
             dbc.execute("DELETE FROM users WHERE gid=%s AND local_part=%s",
                     self._gid, self._localpart)
             u_rc = dbc.rowcount
@@ -204,11 +216,19 @@ WHERE gid=%s AND local_part=%s",
             dbc.execute("DELETE FROM alias WHERE destination = %s", self._addr)
             if u_rc > 0 or dbc.rowcount > 0:
                 self._dbh.commit()
-            dbc.close()
-        else:
-            raise AccE(_(u"The account »%s« doesn't exists.") % self._addr,
-                    ERR.NO_SUCH_ACCOUNT)
-
+        else: # check first for aliases
+            a_count = self.__aliaseCount()
+            if a_count == 0:
+                dbc.execute("DELETE FROM users WHERE gid=%s AND local_part=%s",
+                        self._gid, self._localpart)
+                if dbc.rowcount > 0:
+                    self._dbh.commit()
+            else:
+                dbc.close()
+                raise AccE(
+                  _(u"There are %(count)d aliases with the destination address\
+ »%(address)s«.") %{'count': a_count, 'address': self._addr}, ERR.ALIAS_PRESENT)
+        dbc.close()
 
 def getAccountByID(uid, dbh):
     try:

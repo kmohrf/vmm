@@ -571,11 +571,14 @@ The keyword »detailed« is deprecated and will be removed in a future release.
         alias = self.__getAlias(aliasaddress, targetaddress)
         alias.save()
 
-    def userDelete(self, emailaddress):
+    def userDelete(self, emailaddress, force=None):
+        if force not in [None, 'delalias']:
+            raise VMMException(_(u"Invalid argument: »%s«") % force,
+                    ERR.INVALID_AGUMENT)
         acc = self.__getAccount(emailaddress)
         uid = acc.getUID()
         gid = acc.getGID()
-        acc.delete()
+        acc.delete(force)
         if self.__Cfg.getboolean('maildir', 'delete'):
             try:
                 self.__userDirDelete(acc.getDir('domain'), uid, gid)

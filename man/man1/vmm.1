@@ -1,5 +1,5 @@
 .\" $Id$
-.TH "VMM" "1" "24. Aug 2008" "Pascal Volk"
+.TH "VMM" "1" "25. Aug 2008" "Pascal Volk"
 .SH NAME
 vmm \- command line tool to manage email domains/accounts/aliases
 .SH SYNOPSIS
@@ -289,16 +289,21 @@ for the account with the specified \fIaddress\fP. Otherwise only the specified
         \fBvmm userdisable c.user@example.com\fP
 .fi
 .TP
-\fBuserenable\fP (\fBu1\fP) \fIaddress\fP [ \fIservicel\fP ]
+\fBuserenable\fP (\fBu1\fP) \fIaddress\fP [ \fIservice\fP ]
 To allow access to one or all restricted services use this subcommand.
 .br
 If neither a \fIservice\fP nor the keyword '\fIall\fP' is given all services
 (\fIsmtp\fP, \fIpop3\fP, \fIimap\fP, and \fImanagesieve\fP) will be enabled for
 the account with the specified \fIaddress\fP. Otherwise only the specified 
 \fIservice\fP will be enabled.
+.PP
 .TP
-\fBuserdelete\fP (\fBud\fP) \fIaddress\fP
+\fBuserdelete\fP (\fBud\fP) \fIaddress\fP [ \fIdelalias\fP ]
 Use this subcommand to delete the account with the given \fIaddress\fP.
+.br
+If there are one or more aliases with an identical destination address,
+\fBvmm\fP will abort the requested operation and show an error message. To
+prevent this, specify the optional keyword '\fIdelalias\fP'.
 .\"
 .SS ALIAS SUBCOMMANDS
 .TP
