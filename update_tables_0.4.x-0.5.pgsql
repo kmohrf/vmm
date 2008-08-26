@@ -38,6 +38,7 @@ ALTER TABLE users ADD CONSTRAINT fkey_users_gid_domain_data FOREIGN KEY (gid)
     REFERENCES domain_data (gid);
 
 ALTER TABLE alias DROP CONSTRAINT fkey_alias_gid_domains;
+ALTER TABLE alias DROP CONSTRAINT pkey_alias;
 ALTER TABLE alias ADD CONSTRAINT fkey_alias_gid_domain_data FOREIGN KEY (gid)
     REFERENCES domain_data (gid);
 
@@ -84,6 +85,14 @@ CREATE OR REPLACE VIEW postfix_relocated AS
       FROM relocated
            LEFT JOIN domain_name USING (gid);
 
+DROP VIEW postfix_alias;
+DROP VIEW vmm_domain_info;
+DROP VIEW vmm_alias_count;
+
+ALTER TABLE alias ALTER address TYPE varchar(64);
+ALTER TABLE alias ADD CONSTRAINT pkey_alias 
+    PRIMARY KEY (gid, address, destination);
+
 CREATE OR REPLACE VIEW postfix_alias AS
     SELECT address || '@' || domain_name.domainname AS address, destination, gid
       FROM alias
@@ -96,7 +105,11 @@ CREATE OR REPLACE VIEW postfix_transport AS
            LEFT JOIN transport USING (tid)
            LEFT JOIN domain_name USING (gid);
 
-DROP VIEW vmm_domain_info;
+CREATE OR REPLACE VIEW vmm_alias_count AS
+    SELECT count(DISTINCT address) AS aliases, gid
+      FROM alias 
+  GROUP BY gid;
+
 CREATE OR REPLACE VIEW vmm_domain_info AS
     SELECT gid, domainname, transport, domaindir,
            count(uid) AS accounts,

@@ -11,6 +11,8 @@ If you have installed vmm 0.4/0.4-r41 you have to proceed this steps:
     
     * start psql and connect to the appropriate database (ex. psql mailsys)
     * update the database: \i update_tables_0.4.x-0.5.pgsql
+    * GRANT SELECT ON postfix_alias TO postfix;
+                                       ^^^^^^^^ <- your Postfix db user
 
     * execute upgrade.sh
 

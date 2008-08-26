@@ -83,7 +83,7 @@ CREATE TABLE users (
 
 CREATE TABLE alias (
     gid         bigint NOT NULL,
-    address     varchar(256) NOT NULL,
+    address     varchar(64) NOT NULL,-- only localpart w/o '@'
     destination varchar(320) NOT NULL,
     CONSTRAINT  pkey_alias PRIMARY KEY (gid, address, destination),
     CONSTRAINT  fkey_alias_gid_domain_data FOREIGN KEY (gid)
