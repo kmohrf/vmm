@@ -110,6 +110,10 @@ class Config(ConfigParser):
         """Return a list with all configurable sections."""
         return self.__VMMsections[:-1]
 
+    def get(self, section, option, raw=False, vars=None):
+        return unicode(ConfigParser.get(self, section, option, raw, vars),
+                ENCODING, 'replace')
+
     def configure(self, sections):
         """Interactive method for configuring all options in the given section
 

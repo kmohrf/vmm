@@ -36,7 +36,6 @@ RE_ASCII_CHARS = """^[\x20-\x7E]*$"""
 RE_DOMAIN = """^(?:[a-z0-9-]{1,63}\.){1,}[a-z]{2,6}$"""
 RE_DOMAIN_SRCH = """^[a-z0-9-\.]+$"""
 RE_LOCALPART = """[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]"""
-RE_MAILLOCATION = """^[\w]{1,20}$"""
 RE_MBOX_NAMES = """^[\x20-\x25\x27-\x7E]*$"""
 
 class VirtualMailManager:

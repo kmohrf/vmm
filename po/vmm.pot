@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vmm 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-25 20:03+0200\n"
+"POT-Creation-Date: 2008-08-27 21:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,39 +33,39 @@ msgstr ""
 msgid "Unknown service »%s«."
 msgstr ""
 
-#: VirtualMailManager/Account.py:93 VirtualMailManager/Account.py:157
-#: VirtualMailManager/Account.py:184 VirtualMailManager/Account.py:205
+#: VirtualMailManager/Account.py:93 VirtualMailManager/Account.py:159
+#: VirtualMailManager/Account.py:186 VirtualMailManager/Account.py:207
 #, python-format
 msgid "The account »%s« doesn't exists."
 msgstr ""
 
-#: VirtualMailManager/Account.py:152
+#: VirtualMailManager/Account.py:154
 #, python-format
 msgid "The account »%s« already exists."
 msgstr ""
 
-#: VirtualMailManager/Account.py:192
+#: VirtualMailManager/Account.py:194
 msgid "enabled"
 msgstr ""
 
-#: VirtualMailManager/Account.py:194
+#: VirtualMailManager/Account.py:196
 msgid "disabled"
 msgstr ""
 
-#: VirtualMailManager/Account.py:228
+#: VirtualMailManager/Account.py:229
 #, python-format
 msgid "There are %(count)d aliases with the destination address »%(address)s«."
 msgstr ""
 
-#: VirtualMailManager/Account.py:236
+#: VirtualMailManager/Account.py:237
 msgid "uid must be an int/long."
 msgstr ""
 
-#: VirtualMailManager/Account.py:238
+#: VirtualMailManager/Account.py:239
 msgid "uid must be greater than 0."
 msgstr ""
 
-#: VirtualMailManager/Account.py:246
+#: VirtualMailManager/Account.py:247
 #, python-format
 msgid "There is no account with the UID »%d«."
 msgstr ""
@@ -122,22 +122,22 @@ msgstr ""
 msgid "The alias domain »%s« doesn't exist yet."
 msgstr ""
 
-#: VirtualMailManager/Config.py:101
+#: VirtualMailManager/Config.py:102
 #, python-format
 msgid "missing section: %s\n"
 msgstr ""
 
-#: VirtualMailManager/Config.py:103
+#: VirtualMailManager/Config.py:104
 #, python-format
 msgid "missing options in section %s:\n"
 msgstr ""
 
-#: VirtualMailManager/Config.py:130
+#: VirtualMailManager/Config.py:135
 #, python-format
 msgid "* Config section: »%s«"
 msgstr ""
 
-#: VirtualMailManager/Config.py:133
+#: VirtualMailManager/Config.py:138
 #, python-format
 msgid "Enter new value for option %(opt)s [%(val)s]: "
 msgstr ""
@@ -164,15 +164,22 @@ msgstr ""
 msgid "The domain »%s« already exists."
 msgstr ""
 
-#: VirtualMailManager/MailLocation.py:34
+#: VirtualMailManager/MailLocation.py:38
 msgid "Either mid or maillocation must be specified."
 msgstr ""
 
-#: VirtualMailManager/MailLocation.py:40
+#: VirtualMailManager/MailLocation.py:44
 msgid "mid must be an int/long."
 msgstr ""
 
-#: VirtualMailManager/MailLocation.py:55
+#: VirtualMailManager/MailLocation.py:53
+#, python-format
+msgid ""
+"Invalid folder name »%s«, it may consist only of\n"
+"1 - 20 single byte characters (A-Z, a-z, 0-9 and _)."
+msgstr ""
+
+#: VirtualMailManager/MailLocation.py:66
 msgid "Unknown mid specified."
 msgstr ""
 
@@ -281,64 +288,64 @@ msgid "Sorry, passwords do not match"
 msgstr ""
 
 #: VirtualMailManager/VirtualMailManager.py:252
-#: VirtualMailManager/VirtualMailManager.py:322
+#: VirtualMailManager/VirtualMailManager.py:340
 #, python-format
 msgid "No such directory: %s"
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:310
+#: VirtualMailManager/VirtualMailManager.py:328
 msgid "Found \"..\" in home directory path."
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:318
+#: VirtualMailManager/VirtualMailManager.py:336
 msgid "Owner/group mismatch in home directory detected."
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:333
+#: VirtualMailManager/VirtualMailManager.py:351
 msgid "FATAL: \"..\" in domain directory path detected."
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:339
+#: VirtualMailManager/VirtualMailManager.py:357
 msgid "FATAL: group mismatch in domain directory detected"
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:426
+#: VirtualMailManager/VirtualMailManager.py:444
 #, python-format
 msgid ""
 "Configurtion error: \"%s\"\n"
 "(in section \"connfig\", option \"done\") see also: vmm.cfg(5)\n"
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:446
+#: VirtualMailManager/VirtualMailManager.py:464
 #, python-format
 msgid "Invalid section: '%s'"
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:456
+#: VirtualMailManager/VirtualMailManager.py:474
 #, python-format
 msgid "Invalid argument: '%s'"
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:466
-#: VirtualMailManager/VirtualMailManager.py:485
-#: VirtualMailManager/VirtualMailManager.py:576
+#: VirtualMailManager/VirtualMailManager.py:484
+#: VirtualMailManager/VirtualMailManager.py:503
+#: VirtualMailManager/VirtualMailManager.py:594
 #, python-format
 msgid "Invalid argument: »%s«"
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:489
+#: VirtualMailManager/VirtualMailManager.py:507
 msgid ""
 "The keyword »detailed« is deprecated and will be removed in a future "
 "release.\n"
 "    Please use the keyword »full« to get full details."
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:553
+#: VirtualMailManager/VirtualMailManager.py:571
 #, python-format
 msgid "The pattern »%s« contains invalid characters."
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:588
+#: VirtualMailManager/VirtualMailManager.py:606
 #, python-format
 msgid ""
 "The account has been successfully deleted from the database.\n"
@@ -347,7 +354,7 @@ msgid ""
 "    Reason: %(raeson)s"
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:620
+#: VirtualMailManager/VirtualMailManager.py:638
 msgid "Account doesn't exists"
 msgstr ""
 

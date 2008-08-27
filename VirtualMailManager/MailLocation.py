@@ -14,8 +14,12 @@ __version__ = VERSION
 __revision__ = 'rev '+'$Rev$'.split()[1]
 __date__ = '$Date$'.split()[1]
 
+import re
+
 from Exceptions import VMMMailLocationException as MLE
 import constants.ERROR as ERR
+
+RE_MAILLOCATION = """^[\w]{1,20}$"""
 
 class MailLocation:
     """A wrapper class thats provide access to the maillocation table"""
@@ -40,8 +44,15 @@ class MailLocation:
                 raise MLE(_('mid must be an int/long.'), ERR.MAILLOCATION_INIT)
             self._loadByID()
         else:
-            self.__maillocation = maillocation
-            self._loadByName()
+            re.compile(RE_MAILLOCATION)
+            if re.match(RE_MAILLOCATION, maillocation):
+                self.__maillocation = maillocation
+                self._loadByName()
+            else:
+                raise MLE(
+                    _(u'Invalid folder name »%s«, it may consist only of\n\
+1 - 20 single byte characters (A-Z, a-z, 0-9 and _).') % maillocation,
+                        ERR.MAILLOCATION_INIT)
 
     def _loadByID(self):
         dbc = self._dbh.cursor()
