@@ -37,6 +37,7 @@ RE_DOMAIN = """^(?:[a-z0-9-]{1,63}\.){1,}[a-z]{2,6}$"""
 RE_DOMAIN_SRCH = """^[a-z0-9-\.]+$"""
 RE_LOCALPART = """[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]"""
 RE_MAILLOCATION = """^[\w]{1,20}$"""
+RE_MBOX_NAMES = """^[\x20-\x25\x27-\x7E]*$"""
 
 class VirtualMailManager:
     """The main class for vmm"""
@@ -278,10 +279,21 @@ class VirtualMailManager:
                 gid)
         os.chdir(oldpwd)
 
+    def __subscribeFL(self, folderlist, uid, gid):
+        fname = self.__Cfg.get('maildir', 'name') + '/subscriptions'
+        sf = file(fname, 'w')
+        for f in folderlist:
+            sf.write(f+'\n')
+        sf.flush()
+        sf.close()
+        os.chown(fname, uid, gid)
+        os.chmod(fname, 384)
+
     def __mailDirMake(self, domdir, uid, gid):
         """Creates maildirs and maildir subfolders.
 
         Keyword arguments:
+        domdir -- the path to the domain directory
         uid -- user id from the account
         gid -- group id from the account
         """
@@ -289,9 +301,14 @@ class VirtualMailManager:
         oldpwd = os.getcwd()
         os.chdir(domdir)
 
-        maildir = '%s' % self.__Cfg.get('maildir', 'folder')
-        folders = [maildir , maildir+'/.Drafts', maildir+'/.Sent',
-                maildir+'/.Templates', maildir+'/.Trash']
+        re.compile(RE_MBOX_NAMES)
+        maildir = self.__Cfg.get('maildir', 'name')
+        folders = [maildir]
+        for folder in self.__Cfg.get('maildir', 'folders').split(':'):
+            folder = folder.strip()
+            if len(folder) and not folder.count('..')\
+            and re.match(RE_MBOX_NAMES, folder):
+                folders.append('%s/.%s' % (maildir, folder))
         subdirs = ['cur', 'new', 'tmp']
         mode = self.__Cfg.getint('maildir', 'mode')
 
@@ -301,6 +318,8 @@ class VirtualMailManager:
             self.__makedir(folder, mode, uid, gid)
             for subdir in subdirs:
                 self.__makedir(folder+'/'+subdir, mode, uid, gid)
+        self.__subscribeFL([f.replace(maildir+'/.', '') for f in folders[1:]],
+                uid, gid)
         os.chdir(oldpwd)
 
     def __userDirDelete(self, domdir, uid, gid):
@@ -560,7 +579,7 @@ The keyword »detailed« is deprecated and will be removed in a future release.
         if password is None:
             password = self._readpass()
             acc.setPassword(self.__pwhash(password))
-        acc.save(self.__Cfg.get('maildir', 'folder'),
+        acc.save(self.__Cfg.get('maildir', 'name'),
                 self.__Cfg.getboolean('services', 'smtp'),
                 self.__Cfg.getboolean('services', 'pop3'),
                 self.__Cfg.getboolean('services', 'imap'),

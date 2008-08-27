@@ -56,7 +56,8 @@ class Config(ConfigParser):
                 ['name', 'mailsys']
                 ]
         self.__mdopts = [
-                ['folder', 'Maildir'],
+                ['name', 'Maildir'],
+                ['folders', 'Drafts:Sent:Templates:Trash'],
                 ['mode', 448],
                 ['diskusage', 'false'],
                 ['delete', 'false']

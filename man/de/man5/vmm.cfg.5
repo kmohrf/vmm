@@ -1,5 +1,5 @@
 .\" $Id$
-.TH vmm.cfg 5 "17. Jun 2008" "Pascal Volk"
+.TH vmm.cfg 5 "27. Aug 2008" "Pascal Volk"
 .SH NAME
 vmm.cfg \- Konfigurationsdatei für vmm
 .SH SYNOPSIS
@@ -71,9 +71,16 @@ name = mailsys
 Im \fBmaildir\fP-Abschnitt werden die für die Maildirs erforderlichen Optionen
 festgelegt.
 .TP
-\fBfolder\fP (\fIString\fP)
+\fBname\fP (\fIString\fP)
 Standard-Name des Maildir-Verzeichnisses im Verzeichnis des jeweiligen
 Anwenders.
+.TP
+\fBfolders\fP (\fIString\fP)
+Eine durch Doppelpunkten getrennte Liste mit Verzeichnisnamen, die innerhalb des
+Maildirs erstellt werden sollen.
+.br
+Sollen innerhalb des Maildirs keine Verzeichnisse angelegt werden, ist dieser
+Optionen ein einzelner Doppelpunkt (':') als Wert zuzuweisen.
 .TP
 \fBmode\fP (\fIInt\fP)
 Zugriffsbits des Maildirs in Dezimal-Schreibweise (Basis 10).
@@ -92,7 +99,9 @@ wird.
 \fBBeispiel\fP:
 [maildir]
 .br
-folder = Maildir
+name = Maildir
+.br
+folders = Drafts:Sent:Templates:Trash:INBOX.News
 .br
 mode = 448
 .br

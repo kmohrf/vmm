@@ -1,5 +1,5 @@
 .\" $Id$
-.TH vmm.cfg 5 "11. Jun 2008" "Pascal Volk"
+.TH vmm.cfg 5 "27. Aug 2008" "Pascal Volk"
 .SH NAME
 vmm.cfg \- configuration file for vmm
 .SH SYNOPSIS
@@ -64,8 +64,14 @@ name = mailsys
 .SH MAILDIR SECTION
 The \fBmaildir\fP section is used to specify some options for the Maildirs.
 .TP
-\fBfolder\fP (\fIString\fP)
+\fBname\fP (\fIString\fP)
 Default name of the maildir folder in users home directory.
+.TP
+\fBfolders\fP (\fIString\fP)
+A colon separated list of folder names, that should be created.
+.br
+If no folders should be created inside the Maildir, set the value of this option
+to a single colon (':').
 .TP
 \fBmode\fP (\fIInt\fP)
 Access mode for the maildir in decimal (base 10) notation. For example:
@@ -81,7 +87,9 @@ Decides if the maildir should be deleted recursive when the account is deleted.
 \fBExample\fP:
 [maildir]
 .br
-folder = Maildir
+name = Maildir
+.br
+folders = Drafts:Sent:Templates:Trash:INBOX.News
 .br
 mode = 448
 .br

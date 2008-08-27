@@ -80,3 +80,7 @@ done
 [ -d ${DOC_DIR}/examples ] || mkdir -m 0755 -p ${DOC_DIR}/examples
 install -m 0644 ${INSTALL_OPTS} pgsql-*.cf ${DOC_DIR}/examples
 install -m 0644 ${INSTALL_OPTS} vmm.cfg ${DOC_DIR}/examples
+
+# update config file
+./update_config_0.4.x-0.5.py
+
