@@ -391,8 +391,8 @@ class VirtualMailManager:
         elif self.__scheme == 'PLAIN-MD5':
             return _md5.hexdigest()
         elif self.__scheme == 'DIGEST-MD5' and emailaddress is not None:
-            _md5 = md5.new('%s:%s:' % tuple(emailaddress.split('@')))
-            _md5.update(password)
+            # use an empty realm - works better with usenames like user@dom
+            _md5 = md5.new('%s::%s' % (emailaddress, password))
             return _md5.hexdigest()
 
     def __pwMD4(self, password):
@@ -635,11 +635,10 @@ The account has been successfully deleted from the database.
     def userPassword(self, emailaddress, password):
         acc = self.__getAccount(emailaddress)
         if acc.getUID() == 0:
-           raise VMMException(_(u"Account doesn't exists"),
-               ERR.NO_SUCH_ACCOUNT)
+           raise VMMException(_(u"Account doesn't exists"), ERR.NO_SUCH_ACCOUNT)
         if password is None:
             password = self._readpass()
-        acc.modify('password', self.__pwhash(password))
+        acc.modify('password', self.__pwhash(password, user=emailaddress))
 
     def userName(self, emailaddress, name):
         acc = self.__getAccount(emailaddress)
