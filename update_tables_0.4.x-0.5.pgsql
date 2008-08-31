@@ -33,6 +33,8 @@ INSERT INTO domain_name (domainname, gid, is_primary)
       FROM domains;
 
 
+ALTER TABLE users DROP CONSTRAINT pkye_users;
+ALTER TABLE users ADD CONSTRAINT  pkey_users PRIMARY KEY (local_part, gid);
 ALTER TABLE users DROP CONSTRAINT fkey_users_gid_domains;
 ALTER TABLE users ADD CONSTRAINT fkey_users_gid_domain_data FOREIGN KEY (gid)
     REFERENCES domain_data (gid);

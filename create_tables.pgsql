@@ -71,7 +71,7 @@ CREATE TABLE users (
     pop3        boolean NOT NULL DEFAULT TRUE,
     imap        boolean NOT NULL DEFAULT TRUE,
     managesieve boolean NOT NULL DEFAULT TRUE,
-    CONSTRAINT  pkye_users PRIMARY KEY (local_part, gid),
+    CONSTRAINT  pkey_users PRIMARY KEY (local_part, gid),
     CONSTRAINT  ukey_users_uid UNIQUE (uid),
     CONSTRAINT  fkey_users_gid_domain_data FOREIGN KEY (gid)
         REFERENCES domain_data (gid),
