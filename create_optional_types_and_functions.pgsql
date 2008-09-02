@@ -6,11 +6,11 @@
 -- ---
 
 -- ---
--- Data type for function postfix_smtpd_sender_login(varchar, varchar)
+-- Data type for function postfix_smtpd_sender_login_map(varchar, varchar)
 -- ---
 CREATE TYPE sender_login AS (
-    sender varchar(320),
-    login text
+    sender  varchar(320),
+    login   text
 );
 
 -- ---
@@ -25,7 +25,7 @@ CREATE TYPE sender_login AS (
 --
 -- For more details see postconf(5) section smtpd_sender_login_maps
 -- ---
-CREATE OR REPLACE FUNCTION postfix_smtpd_sender_login(
+CREATE OR REPLACE FUNCTION postfix_smtpd_sender_login_map(
     IN localpart varchar, IN the_domain varchar) RETURNS SETOF sender_login
 AS $$
     DECLARE
@@ -104,3 +104,46 @@ $$ LANGUAGE plpgsql STABLE
 RETURNS NULL ON NULL INPUT
 EXTERNAL SECURITY INVOKER;
 
+-- ########################################################################## --
+
+-- ---
+-- Data type for function postfix_virtual_alias_map(varchar, varchar)
+-- ---
+CREATE TYPE recipient_destination AS (
+    recipient   varchar(320),
+    destination text
+);
+
+-- ---
+-- Parameters (from recipients address (MAIL TO) [localpart@the_domain]):
+--      varchar localpart
+--      varchar the_domain
+-- Returns: recipient_destination records
+--
+-- Required access privileges for your postfix database user:
+--      GRANT SELECT ON alias TO postfix;
+--
+-- For more details see postconf(5) section virtual_alias_maps and virtual(5)
+-- ---
+CREATE OR REPLACE FUNCTION postfix_virtual_alias_map(
+    IN localpart varchar, IN the_domain varchar)
+    RETURNS SETOF recipient_destination
+AS $$
+    DECLARE
+        record recipient_destination;
+        recipient varchar(320) := localpart || '@' || the_domain;
+        did bigint := (SELECT gid FROM domain_name WHERE domainname=the_domain);
+    BEGIN
+        FOR record IN
+            SELECT recipient, destination
+              FROM alias
+             WHERE gid = did
+               AND address = localpart
+            LOOP
+                RETURN NEXT record;
+            END LOOP;
+        RETURN;
+    END;
+$$ LANGUAGE plpgsql STABLE
+RETURNS NULL ON NULL INPUT
+EXTERNAL SECURITY INVOKER;

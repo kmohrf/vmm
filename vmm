@@ -6,7 +6,7 @@
 
 """This is the vmm main script."""
 
-from VirtualMailManager.constants.VERSION import VERSION
+from VirtualMailManager.constants.VERSION import VERSION, REVISION, RELDATE
 
 __author__ = 'Pascal Volk <p.volk@veb-it.de>'
 __version__ = VERSION
@@ -357,8 +357,8 @@ def show_warnings():
 
 def show_version():
     w_std("%s, %s %s (%s %s %s)\nPython %s %s %s\n" % (__prog__, _('version'),
-        __version__, __revision__, _('from'), strftime(
-            locale.nl_langinfo(locale.D_FMT), strptime(__date__, '%Y-%m-%d')),
+        __version__, REVISION, _('from'), strftime(
+            locale.nl_langinfo(locale.D_FMT), strptime(RELDATE, '%Y-%m-%d')),
         sys.version.split()[0], _(u'on'), os.uname()[0]))
 
 #def main():
