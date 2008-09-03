@@ -107,7 +107,9 @@ EXTERNAL SECURITY INVOKER;
 -- ########################################################################## --
 
 -- ---
--- Data type for function postfix_virtual_alias_map(varchar, varchar)
+-- Data type for functions: postfix_relocated_map(varchar, varchar)
+--                          postfix_virtual_alias_map(varchar, varchar)
+--                          
 -- ---
 CREATE TYPE recipient_destination AS (
     recipient   varchar(320),
@@ -121,7 +123,7 @@ CREATE TYPE recipient_destination AS (
 -- Returns: recipient_destination records
 --
 -- Required access privileges for your postfix database user:
---      GRANT SELECT ON alias TO postfix;
+--      GRANT SELECT ON alias, domain_name TO postfix;
 --
 -- For more details see postconf(5) section virtual_alias_maps and virtual(5)
 -- ---
@@ -139,6 +141,89 @@ AS $$
               FROM alias
              WHERE gid = did
                AND address = localpart
+            LOOP
+                RETURN NEXT record;
+            END LOOP;
+        RETURN;
+    END;
+$$ LANGUAGE plpgsql STABLE
+RETURNS NULL ON NULL INPUT
+EXTERNAL SECURITY INVOKER;
+
+-- ########################################################################## --
+
+-- ---
+-- Parameters (from recipients address (MAIL TO) [localpart@the_domain]):
+--      varchar localpart
+--      varchar the_domain
+-- Returns: recipient_destination records
+--
+-- Required access privileges for your postfix database user:
+--      GRANT SELECT ON domain_name, relocated TO postfix;
+--
+-- For more details see postconf(5) section relocated_maps and relocated(5)
+-- ---
+CREATE OR REPLACE FUNCTION postfix_relocated_map(
+    IN localpart varchar, IN the_domain varchar)
+    RETURNS SETOF recipient_destination
+AS $$
+    DECLARE
+        record recipient_destination;
+        recipient varchar(320) := localpart || '@' || the_domain;
+        did bigint := (SELECT gid FROM domain_name WHERE domainname=the_domain);
+    BEGIN
+        FOR record IN
+            SELECT recipient, destination
+              FROM relocated
+             WHERE gid = did
+               AND address = localpart
+            LOOP
+                RETURN NEXT record;
+            END LOOP;
+        RETURN;
+    END;
+$$ LANGUAGE plpgsql STABLE
+RETURNS NULL ON NULL INPUT
+EXTERNAL SECURITY INVOKER;
+
+-- ########################################################################## --
+
+-- ---
+-- Data type for function postfix_transport_map(varchar, varchar)
+-- ---
+CREATE TYPE recipient_transport AS (
+    recipient   varchar(320),
+    transport   text
+);
+
+-- ---
+-- Parameters (from recipients address (MAIL TO) [localpart@the_domain]):
+--      varchar localpart
+--      varchar the_domain
+-- Returns: recipient_transport records
+--
+-- Required access privileges for your postfix database user:
+--      GRANT SELECT ON users, transport, domain_name TO postfix;
+--
+-- For more details see postconf(5) section transport_maps and transport(5)
+-- ---
+CREATE OR REPLACE FUNCTION postfix_transport_map(
+    IN localpart varchar, IN the_domain varchar)
+    RETURNS SETOF recipient_transport
+AS $$
+    DECLARE
+        record recipient_transport;
+        recipient varchar(320) := localpart || '@' || the_domain;
+    BEGIN
+        FOR record IN
+            SELECT recipient, transport
+              FROM transport
+             WHERE tid = (SELECT tid
+                            FROM users
+                           WHERE gid = (SELECT gid
+                                          FROM domain_name
+                                         WHERE domainname = the_domain)
+               AND local_part = localpart)
             LOOP
                 RETURN NEXT record;
             END LOOP;
