@@ -38,6 +38,7 @@ AS $$
             SELECT sender, local_part || '@' || domainname
               FROM domain_name, users
              WHERE domain_name.gid = did
+               AND users.gid = did
                AND users.local_part = localpart
             LOOP
                 RETURN NEXT rec;
@@ -223,7 +224,148 @@ AS $$
                            WHERE gid = (SELECT gid
                                           FROM domain_name
                                          WHERE domainname = the_domain)
-               AND local_part = localpart)
+                             AND local_part = localpart)
+            LOOP
+                RETURN NEXT record;
+            END LOOP;
+        RETURN;
+    END;
+$$ LANGUAGE plpgsql STABLE
+RETURNS NULL ON NULL INPUT
+EXTERNAL SECURITY INVOKER;
+
+-- ########################################################################## --
+
+-- ---
+-- Data type for function postfix_virtual_uid_map(varchar, varchar)
+-- ---
+CREATE TYPE recipient_uid AS (
+    recipient   varchar(320),
+    uid         bigint
+);
+
+-- ---
+-- Parameters (from recipients address (MAIL TO) [localpart@the_domain]):
+--      varchar localpart
+--      varchar the_domain
+-- Returns: recipient_uid records
+--
+-- Required access privileges for your postfix database user:
+--      GRANT SELECT ON users, domain_name TO postfix;
+--
+-- For more details see postconf(5) section virtual_uid_maps
+-- ---
+CREATE OR REPLACE FUNCTION postfix_virtual_uid_map(
+    IN localpart varchar, IN the_domain varchar) RETURNS SETOF recipient_uid
+AS $$
+    DECLARE
+        record recipient_uid;
+        recipient varchar(320) := localpart || '@' || the_domain;
+    BEGIN
+        FOR record IN
+            SELECT recipient, uid
+              FROM users
+             WHERE gid = (SELECT gid
+                            FROM domain_name
+                           WHERE domainname = the_domain)
+               AND local_part = localpart
+            LOOP
+                RETURN NEXT record;
+            END LOOP;
+        RETURN;
+    END;
+$$ LANGUAGE plpgsql STABLE
+RETURNS NULL ON NULL INPUT
+EXTERNAL SECURITY INVOKER;
+
+-- ########################################################################## --
+
+-- ---
+-- Data type for function dovecotuser(varchar, varchar)
+-- ---
+CREATE TYPE dovecotuser AS (
+    userid      varchar(320),
+    uid         bigint,
+    gid         bigint,
+    home        text,
+    mail        text
+);
+
+-- ---
+-- Parameters (from login name [localpart@the_domain]):
+--      varchar localpart
+--      varchar the_domain
+-- Returns: dovecotuser records
+--
+-- Required access privileges for your dovecot database user:
+--      GRANT SELECT ON users,domain_data,domain_name,maillocation TO dovecot;
+--
+-- For more details see http://wiki.dovecot.org/UserDatabase
+-- ---
+CREATE OR REPLACE FUNCTION dovecotuser(
+    IN localpart varchar, IN the_domain varchar) RETURNS SETOF dovecotuser
+AS $$
+    DECLARE
+        record dovecotuser;
+        userid varchar(320) := localpart || '@' || the_domain;
+        did bigint := (SELECT gid FROM domain_name WHERE domainname=the_domain);
+    BEGIN
+        FOR record IN
+            SELECT userid, uid, did, domaindir ||'/'|| uid AS home,
+                   '~/'|| maillocation AS mail
+              FROM users, domain_data, maillocation
+             WHERE users.gid = did
+               AND users.local_part = localpart
+               AND maillocation.mid = users.mid
+               AND domain_data.gid = did
+            LOOP
+                RETURN NEXT record;
+            END LOOP;
+        RETURN;
+    END;
+$$ LANGUAGE plpgsql STABLE
+RETURNS NULL ON NULL INPUT
+EXTERNAL SECURITY INVOKER;
+
+-- ########################################################################## --
+
+-- ---
+-- Data type for function dovecotpassword(varchar, varchar)
+-- ---
+CREATE TYPE dovecotpassword AS (
+    userid      varchar(320),
+    password    varchar(74),
+    smtp        boolean,
+    pop3        boolean,
+    imap        boolean,
+    managesieve boolean
+);
+
+-- ---
+-- Parameters (from login name [localpart@the_domain]):
+--      varchar localpart
+--      varchar the_domain
+-- Returns: dovecotpassword records
+--
+-- Required access privileges for your dovecot database user:
+--      GRANT SELECT ON users, domain_name TO dovecot;
+--
+-- For more details see http://wiki.dovecot.org/AuthDatabase/SQL
+-- ---
+CREATE OR REPLACE FUNCTION dovecotpassword(
+    IN localpart varchar, IN the_domain varchar) RETURNS SETOF dovecotpassword
+AS $$
+    DECLARE
+        record dovecotpassword;
+        userid varchar(320) := localpart || '@' || the_domain;
+    BEGIN
+        FOR record IN
+            SELECT userid, passwd, smtp, pop3, imap, managesieve
+              FROM users
+             WHERE gid = (SELECT gid
+                            FROM domain_name
+                           WHERE domainname = the_domain)
+               AND local_part = localpart
             LOOP
                 RETURN NEXT record;
             END LOOP;
