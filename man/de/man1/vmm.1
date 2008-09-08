@@ -1,5 +1,5 @@
 .\" $Id$
-.TH "VMM" "1" "25. Aug 2008" "Pascal Volk"
+.TH "VMM" "1" "09. Sep 2008" "Pascal Volk"
 .SH NAME
 vmm \- Programm für die Kommandozeile, um E-Mail-Domains, -Konten und -Aliase zu
 verwalten.
@@ -96,7 +96,7 @@ des \fIMusters\fP verwendet werden.
         ------------------------
                 [+] example.com
                 [-]     e.g.example.com
-                [-]     exempli-gratia.example.com
+                [-]     example.name
                 [+] example.net
                 [+] example.org
 .fi
@@ -207,7 +207,7 @@ Mit diesem Unterbefehl wird der \fIZieldomain\fP die Alias-Domain
 .nf
         Beispiel:
 
-        \fBvmm aliasdomainadd exempli-gratia.example.com example.com\fP
+        \fBvmm aliasdomainadd example.name example.com\fP
 .fi
 .TP
 \fBaliasdomaininfo (\fBadi\fP) \fIAliasdomain\fP
@@ -217,11 +217,21 @@ Dieser Unterbefehl informiert darüber, welcher Domain die Alias-Domain
 .nf
         Beispiel:
 
-        \fBvmm aliasdomaininfo exempli-gratia.example.com\fP
+        \fBvmm aliasdomaininfo example.name\fP
         Alias-Domain Informationen
         --------------------------
-                Die Alias-Domain exempli-gratia.example.com gehört zu:
+                Die Alias-Domain example.name gehört zu:
                     * example.com
+.fi
+.TP
+\fBaliasdomainswitch\fP (\fBads\fP) \fIAliasdomain\fP \fIZieldomain\fP
+Wenn das Ziel der vorhandenen \fIAliasdomain\fP auf eine andere \fIZieldomain\fP
+geändert werden soll, ist dieser Unterbefehl zu verwenden.
+.PP
+.nf
+        Beispiel:
+
+        \fBvmm aliasdomainswitch example.name example.org\fP
 .fi
 .TP
 \fBaliasdomaindelete\fP (\fBadd\fP) \fIAliasdomain\fP

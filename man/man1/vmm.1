@@ -1,5 +1,5 @@
 .\" $Id$
-.TH "VMM" "1" "25. Aug 2008" "Pascal Volk"
+.TH "VMM" "1" "09. Sep 2008" "Pascal Volk"
 .SH NAME
 vmm \- command line tool to manage email domains/accounts/aliases
 .SH SYNOPSIS
@@ -93,7 +93,7 @@ the end of the \fIpattern\fP.
         ----------------
                 [+] example.com
                 [-]     e.g.example.com
-                [-]     exempli-gratia.example.com
+                [-]     example.name
                 [+] example.net
                 [+] example.org
 .fi
@@ -194,7 +194,7 @@ should be aliased.
 .nf
         Example:
 
-        \fBvmm aliasdomainadd exempli-gratia.example.com example.com\fP
+        \fBvmm aliasdomainadd example.name example.com\fP
 .fi
 .TP
 \fBaliasdomaininfo (\fBadi\fP) \fIaliasdomain\fP
@@ -203,11 +203,21 @@ This subcommand shows to which domain the \fIaliasdomain\fP is assigned to.
 .nf
         Example:
 
-        \fBvmm aliasdomaininfo exempli-gratia.example.com\fP
+        \fBvmm aliasdomaininfo example.name\fP
         Alias domain information
         ------------------------
-                The alias domain exempli-gratia.example.com belongs to:
+                The alias domain example.name belongs to:
                     * example.com
+.fi
+.TP
+\fBaliasdomainswitch\fP (\fBads\fP) \fIaliasdomain\fP \fItargetdomain\fP
+If the target of the existing \fIaliasdomain\fP should be switched to another
+\fItargetdomain\fP use this subcommand.
+.PP
+.nf
+        Example:
+
+        \fBvmm aliasdomainswitch example.name example.org\fP
 .fi
 .TP
 \fBaliasdomaindelete\fP (\fBadd\fP) \fIaliasdomain\fP
