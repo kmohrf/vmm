@@ -40,7 +40,7 @@ class AliasDomain:
     def save(self):
         if self.__gid > 0:
             raise VADE(_(u'The alias domain »%s« already exists.') %self.__name,
-                ERR.ALIASDOMAIN_EXISTS)
+                    ERR.ALIASDOMAIN_EXISTS)
         if self._domain is None:
             raise VADE(_(u'No destination domain for alias domain denoted.'),
                     ERR.ALIASDOMAIN_NO_DOMDEST)
@@ -52,7 +52,6 @@ class AliasDomain:
  VALUES (%s, %s, FALSE)', self.__name, self._domain._id)
         self._dbh.commit()
         dbc.close()
-
 
     def info(self):
         if self.__gid > 0:
@@ -68,10 +67,31 @@ class AliasDomain:
                     _(u'There is no primary domain for the alias domain »%s«.')\
                             % self.__name, ERR.NO_SUCH_DOMAIN)
         else:
-            raise VADE(
-                  _(u"The alias domain »%s« doesn't exist yet.") % self.__name,
-                  ERR.NO_SUCH_ALIASDOMAIN)
-    
+            raise VADE(_(u"The alias domain »%s« doesn't exist yet.") %
+                    self.__name, ERR.NO_SUCH_ALIASDOMAIN)
+
+    def switch(self):
+        if self._domain is None:
+            raise VADE(_(u'No destination domain for alias domain denoted.'),
+                    ERR.ALIASDOMAIN_NO_DOMDEST)
+        if self._domain._id < 1:
+            raise VADE (_(u"The target domain »%s« doesn't exist yet.") %
+                    self._domain._name, ERR.NO_SUCH_DOMAIN)
+        if self.__gid < 1:
+            raise VADE(_(u"The alias domain »%s« doesn't exist yet.") %
+                    self.__name, ERR.NO_SUCH_ALIASDOMAIN)
+        if self.__gid == self._domain._id:
+            raise VADE(_(u"The alias domain »%(alias)s« is already assigned to\
+ the domain »%(domain)s«.") %
+                    {'alias': self.__name, 'domain': self._domain._name},
+                    ERR.ALIASDOMAIN_EXISTS)
+        dbc = self._dbh.cursor()
+        dbc.execute('UPDATE domain_name SET gid = %s WHERE gid = %s\
+ AND domainname = %s AND NOT is_primary',
+                self._domain._id, self.__gid, self.__name)
+        self._dbh.commit()
+        dbc.close()
+
     def delete(self):
         if self.__gid > 0:
             dbc = self._dbh.cursor()

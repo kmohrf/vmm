@@ -50,6 +50,7 @@ Usage: %s SUBCOMMAND OBJECT ARGS*
   dd    domaindelete       domain.tld        delalias*|deluser*|delall*
   ada   aliasdomainadd     aliasdomain.tld   domain.tld
   adi   aliasdomaininfo    aliasdomain.tld
+  ads   aliasdomainswitch  aliasdomain.tld   domain.tld
   add   aliasdomaindelete  aliasdomain.tld
   ua    useradd            user@domain.tld   password*
   ui    userinfo           user@domain.tld   du*
@@ -244,6 +245,15 @@ def alias_domain_info():
     else:
         _printAliasDomInfo(vmm.aliasDomainInfo(argv[2].lower()))
 
+def alias_domain_switch():
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS,
+                _(u'Missing alias domain name and target domain name.'))
+    elif argc < 4:
+        usage(EXIT.MISSING_ARGS, _(u'Missing target domain name.'))
+    else:
+        vmm.aliasDomainSwitch(argv[2].lower(), argv[3].lower())
+
 def alias_domain_delete():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing alias domain name.'))
@@ -392,6 +402,8 @@ if __name__ == '__main__':
             alias_domain_add()
         elif argv[1] in ['adi', 'aliasdomaininfo']:
             alias_domain_info()
+        elif argv[1] in ['ads', 'aliasdomainswitch']:
+            alias_domain_switch()
         elif argv[1] in ['add', 'aliasdomaindelete']:
             alias_domain_delete()
         elif argv[1] in ['ua', 'useradd']:

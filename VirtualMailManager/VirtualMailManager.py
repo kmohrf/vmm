@@ -539,6 +539,17 @@ The keyword »detailed« is deprecated and will be removed in a future release.
         aliasDom = AliasDomain(self.__dbh, aliasname, None)
         return aliasDom.info()
 
+    def aliasDomainSwitch(self, aliasname, domainname):
+        """Modifies the target domain of an existing alias domain.
+
+        Keyword arguments:
+        aliasname -- the name of the alias domain (str)
+        domainname -- name of the new target domain (str)
+        """
+        dom = self.__getDomain(domainname)
+        aliasDom = AliasDomain(self.__dbh, aliasname, dom)
+        aliasDom.switch()
+
     def aliasDomainDelete(self, aliasname):
         """Deletes the specified alias domain.
 

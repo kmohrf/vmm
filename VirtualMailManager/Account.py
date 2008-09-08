@@ -41,7 +41,7 @@ class Account:
                     self._addr, ERR.ALIAS_EXISTS)
         if VMM.VirtualMailManager.relocatedExists(self._dbh, self._addr):
             raise AccE(
-              _(u"There is already an relocated user with the address »%s«.") %\
+              _(u"There is already a relocated user with the address »%s«.") %\
                     self._addr, ERR.RELOCATED_EXISTS)
 
     def _exists(self):
