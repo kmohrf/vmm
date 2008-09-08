@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # Copyright 2007-2008 VEB IT
 # See COPYING for distribution information.
@@ -65,8 +64,18 @@ class VMMAliasException(VMMException):
     def __init__(self, msg, code):
         VMMException.__init__(self, msg, code)
 
+class VMMEmailAddressException(VMMException):
+    """Exception class for EmailAddress exceptions"""
+    def __init__(self, msg, code):
+        VMMException.__init__(self, msg, code)
+
 class VMMMailLocationException(VMMException):
     """Exception class for MailLocation exceptions"""
+    def __init__(self, msg, code):
+        VMMException.__init__(self, msg, code)
+
+class VMMRelocatedException(VMMException):
+    """Exception class for Relocated exceptions"""
     def __init__(self, msg, code):
         VMMException.__init__(self, msg, code)
 
@@ -74,4 +83,3 @@ class VMMTransportException(VMMException):
     """Exception class for Transport exceptions"""
     def __init__(self, msg, code):
         VMMException.__init__(self, msg, code)
-

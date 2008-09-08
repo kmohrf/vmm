@@ -9,4 +9,4 @@ password = some_password
 dbname = mailsys
 
 # Postfix 2.2 and later The SQL query template. See pgsql_table(5).
-query = SELECT gid FROM postfix_gid WHERE domainname = '%d'
+query = SELECT gid FROM postfix_gid WHERE domainname = '%s'

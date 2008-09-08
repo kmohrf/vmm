@@ -317,8 +317,10 @@ def user_password():
     vmm.userPassword(argv[2].lower(), password)
 
 def alias_add():
-    if argc < 4:
+    if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing alias address and destination.'))
+    elif argc < 4:
+        usage(EXIT.MISSING_ARGS, _(u'Missing destination address.'))
     else:
         vmm.aliasAdd(argv[2].lower(), argv[3])
 

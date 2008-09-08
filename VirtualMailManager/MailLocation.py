@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # Copyright 2008 VEB IT
 # See COPYING for distribution information.

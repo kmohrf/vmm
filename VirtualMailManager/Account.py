@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # Copyright 2007-2008 VEB IT
 # See COPYING for distribution information.
@@ -17,6 +16,7 @@ from Exceptions import VMMAccountException as AccE
 from Domain import Domain
 from Transport import Transport
 from MailLocation import MailLocation
+from EmailAddress import EmailAddress
 import VirtualMailManager as VMM
 import constants.ERROR as ERR
 
@@ -25,9 +25,10 @@ class Account:
     def __init__(self, dbh, address, password=None):
         self._dbh = dbh
         self._base = None
-        self._addr = VMM.VirtualMailManager.chkEmailAddress(address)
-        self._localpart = None
-        self._name = None
+        if isinstance(address, EmailAddress):
+            self._addr = address
+        else:
+            raise TypeError("Argument 'address' is not an EmailAddress")
         self._uid = 0
         self._gid = 0
         self._mid = 0
@@ -35,15 +36,19 @@ class Account:
         self._passwd = password
         self._setAddr()
         self._exists()
-        if self._isAlias():
+        if VMM.VirtualMailManager.aliasExists(self._dbh, self._addr):
             raise AccE(_(u"There is already an alias with the address »%s«.") %\
-                    address, ERR.ALIAS_EXISTS)
+                    self._addr, ERR.ALIAS_EXISTS)
+        if VMM.VirtualMailManager.relocatedExists(self._dbh, self._addr):
+            raise AccE(
+              _(u"There is already an relocated user with the address »%s«.") %\
+                    self._addr, ERR.RELOCATED_EXISTS)
 
     def _exists(self):
         dbc = self._dbh.cursor()
         dbc.execute("SELECT uid, mid, tid FROM users \
 WHERE gid=%s AND local_part=%s",
-                self._gid, self._localpart)
+                self._gid, self._addr._localpart)
         result = dbc.fetchone()
         dbc.close()
         if result is not None:
@@ -52,24 +57,12 @@ WHERE gid=%s AND local_part=%s",
         else:
             return False
 
-    def _isAlias(self):
-        dbc = self._dbh.cursor()
-        dbc.execute("SELECT gid FROM alias WHERE gid=%s AND address=%s",
-                self._gid, self._localpart)
-        gid = dbc.fetchone()
-        dbc.close()
-        if gid is not None:
-            return True
-        else:
-            return False
-
     def _setAddr(self):
-        self._localpart, d = self._addr.split('@')
-        dom = Domain(self._dbh, d)
+        dom = Domain(self._dbh, self._addr._domainname)
         self._gid = dom.getID()
         if self._gid == 0:
-            raise AccE(_(u"The domain »%s« doesn't exist yet.") % d,
-                ERR.NO_SUCH_DOMAIN)
+            raise AccE(_(u"The domain »%s« doesn't exist yet.") %\
+                    self._addr._domainname, ERR.NO_SUCH_DOMAIN)
         self._base = dom.getDir()
         self._tid = dom.getTransportID()
 
@@ -96,15 +89,15 @@ WHERE gid=%s AND local_part=%s",
         if service in ['smtp', 'pop3', 'imap', 'managesieve']:
             dbc.execute(
                     "UPDATE users SET %s=%s WHERE local_part='%s' AND gid=%s"
-                    % (service, state, self._localpart, self._gid))
+                    % (service, state, self._addr._localpart, self._gid))
         elif state:
             dbc.execute("UPDATE users SET smtp = TRUE, pop3 = TRUE,\
  imap = TRUE, managesieve = TRUE WHERE local_part = %s AND gid = %s",
-                self._localpart, self._gid)
+                self._addr._localpart, self._gid)
         else:
             dbc.execute("UPDATE users SET smtp = FALSE, pop3 = FALSE,\
  imap = FALSE, managesieve = FALSE WHERE local_part = %s AND gid = %s",
-                self._localpart, self._gid)
+                self._addr._localpart, self._gid)
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
@@ -146,8 +139,8 @@ WHERE gid=%s AND local_part=%s",
             dbc.execute("""INSERT INTO users (local_part, passwd, uid, gid,\
  mid, tid, smtp, pop3, imap, managesieve)\
  VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-                self._localpart, self._passwd, self._uid, self._gid, self._mid,
-                self._tid, smtp, pop3, imap, managesieve)
+                self._addr._localpart, self._passwd, self._uid, self._gid,
+                self._mid, self._tid, smtp, pop3, imap, managesieve)
             self._dbh.commit()
             dbc.close()
         else:
@@ -163,14 +156,14 @@ WHERE gid=%s AND local_part=%s",
         dbc = self._dbh.cursor()
         if what == 'password':
             dbc.execute("UPDATE users SET passwd=%s WHERE local_part=%s AND\
- gid=%s", value, self._localpart, self._gid)
+ gid=%s", value, self._addr._localpart, self._gid)
         elif what == 'transport':
             self._tid = Transport(self._dbh, transport=value).getID()
             dbc.execute("UPDATE users SET tid=%s WHERE local_part=%s AND\
- gid=%s", self._tid, self._localpart, self._gid)
+ gid=%s", self._tid, self._addr._localpart, self._gid)
         else:
             dbc.execute("UPDATE users SET name=%s WHERE local_part=%s AND\
- gid=%s", value, self._localpart, self._gid)
+ gid=%s", value, self._addr._localpart, self._gid)
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
@@ -179,7 +172,7 @@ WHERE gid=%s AND local_part=%s",
         dbc = self._dbh.cursor()
         dbc.execute("SELECT name, uid, gid, mid, tid, smtp, pop3, imap, \
  managesieve FROM users WHERE local_part=%s AND gid=%s",
-            self._localpart, self._gid)
+            self._addr._localpart, self._gid)
         info = dbc.fetchone()
         dbc.close()
         if info is None:
@@ -209,7 +202,7 @@ WHERE gid=%s AND local_part=%s",
         dbc = self._dbh.cursor()
         if delalias == 'delalias':
             dbc.execute("DELETE FROM users WHERE gid=%s AND local_part=%s",
-                    self._gid, self._localpart)
+                    self._gid, self._addr._localpart)
             u_rc = dbc.rowcount
             # delete also all aliases where the destination address is the same
             # as for this account.
@@ -220,7 +213,7 @@ WHERE gid=%s AND local_part=%s",
             a_count = self.__aliaseCount()
             if a_count == 0:
                 dbc.execute("DELETE FROM users WHERE gid=%s AND local_part=%s",
-                        self._gid, self._localpart)
+                        self._gid, self._addr._localpart)
                 if dbc.rowcount > 0:
                     self._dbh.commit()
             else:
