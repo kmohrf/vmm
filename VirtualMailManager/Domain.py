@@ -211,7 +211,8 @@ class Domain:
     def getInfo(self):
         """Returns a dictionary with information about the domain."""
         sql = """\
-SELECT gid, domainname, transport, domaindir, aliasdomains, accounts, aliases
+SELECT gid, domainname, transport, domaindir, aliasdomains, accounts,
+       aliases, relocated
   FROM vmm_domain_info
  WHERE gid = %i""" % self._id
         dbc = self._dbh.cursor()
@@ -223,7 +224,7 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts, aliases
                     ERR.NO_SUCH_DOMAIN)
         else:
             keys = ['gid', 'domainname', 'transport', 'domaindir',
-                    'aliasdomains', 'accounts', 'aliases']
+                    'aliasdomains', 'accounts', 'aliases', 'relocated']
             return dict(zip(keys, info))
 
     def getAccounts(self):
@@ -251,6 +252,19 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts, aliases
             for alias in addresses:
                 aliases.append('%s@%s' % (alias[0], self._name))
         return aliases
+
+    def getRelocated(self):
+        """Returns a list with all addresses from relocated users."""
+        dbc = self._dbh.cursor()
+        dbc.execute("SELECT address FROM relocated WHERE gid = %s\
+ ORDER BY address", self._id)
+        addresses = dbc.fetchall()
+        dbc.close()
+        relocated = []
+        if len(addresses) > 0:
+            for address in addresses:
+                relocated.append('%s@%s' % (address[0], self._name))
+        return relocated
 
     def getAliaseNames(self):
         """Returns a list with all alias names from the domain."""

@@ -107,15 +107,15 @@ CREATE OR REPLACE VIEW postfix_transport AS
            LEFT JOIN transport USING (tid)
            LEFT JOIN domain_name USING (gid);
 
-CREATE OR REPLACE VIEW vmm_alias_count AS
-    SELECT count(DISTINCT address) AS aliases, gid
-      FROM alias 
-  GROUP BY gid;
-
 CREATE OR REPLACE VIEW vmm_domain_info AS
     SELECT gid, domainname, transport, domaindir,
            count(uid) AS accounts,
-           aliases,
+           (SELECT count(DISTINCT address)
+              FROM alias
+             WHERE alias.gid = domain_data.gid) AS aliases,
+           (SELECT count(gid)
+              FROM relocated
+             WHERE relocated.gid = domain_data.gid) AS relocated,
            (SELECT count(gid)
               FROM domain_name
              WHERE domain_name.gid = domain_data.gid
@@ -124,9 +124,8 @@ CREATE OR REPLACE VIEW vmm_domain_info AS
            LEFT JOIN domain_name USING (gid)
            LEFT JOIN transport USING (tid)
            LEFT JOIN users USING (gid)
-           LEFT JOIN vmm_alias_count USING (gid)
      WHERE domain_name.is_primary
-  GROUP BY gid, domainname, transport, domaindir, aliases;
+  GROUP BY gid, domainname, transport, domaindir;
 
 
 DROP TABLE domains;
@@ -151,5 +150,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql STABLE;
 
-CREATE TRIGGER primary_count BEFORE INSERT OR UPDATE ON domain_name
+CREATE TRIGGER primary_count_ins BEFORE INSERT ON domain_name
+    FOR EACH ROW EXECUTE PROCEDURE domain_primary_trigger();
+
+CREATE TRIGGER primary_count_upd AFTER UPDATE ON domain_name
     FOR EACH ROW EXECUTE PROCEDURE domain_primary_trigger();

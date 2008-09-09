@@ -194,13 +194,6 @@ class VirtualMailManager:
         return VirtualMailManager._exists(dbh, sql)
     relocatedExists = staticmethod(relocatedExists)
 
-    def __getAccount(self, address, password=None):
-        self.__dbConnect()
-        address = EmailAddress(address)
-        if not password is None:
-            password = self.__pwhash(password)
-        return Account(self.__dbh, address, password)
-
     def _readpass(self):
         mismatched = True
         while mismatched:
@@ -216,12 +209,26 @@ class VirtualMailManager:
             mismatched = False
         return clear0
 
+    def __getAccount(self, address, password=None):
+        self.__dbConnect()
+        address = EmailAddress(address)
+        if not password is None:
+            password = self.__pwhash(password)
+        return Account(self.__dbh, address, password)
+
     def __getAlias(self, address, destination=None):
         self.__dbConnect()
         address = EmailAddress(address)
         if destination is not None:
             destination = EmailAddress(destination)
         return Alias(self.__dbh, address, destination)
+
+    def __getRelocated(self,address, destination=None):
+        self.__dbConnect()
+        address = EmailAddress(address)
+        if destination is not None:
+            destination = EmailAddress(destination)
+        return Relocated(self.__dbh, address, destination)
 
     def __getDomain(self, domainname, transport=None):
         if transport is None:
@@ -495,7 +502,7 @@ class VirtualMailManager:
 
     def domainInfo(self, domainname, details=None):
         if details not in [None, 'accounts', 'aliasdomains', 'aliases', 'full',
-                'detailed']:
+                'relocated', 'detailed']:
             raise VMMDomainException(_(u'Invalid argument: »%s«') % details,
                 ERR.INVALID_OPTION)
         if details == 'detailed':
@@ -519,9 +526,11 @@ The keyword »detailed« is deprecated and will be removed in a future release.
             return (dominfo, dom.getAliaseNames())
         elif details == 'aliases':
             return (dominfo, dom.getAliases())
+        elif details == 'relocated':
+            return(dominfo, dom.getRelocated())
         else:
             return (dominfo, dom.getAliaseNames(), dom.getAccounts(),
-                    dom.getAliases())
+                    dom.getAliases(), dom.getRelocated())
 
     def aliasDomainAdd(self, aliasname, domainname):
         """Adds an alias domain to the domain.
@@ -662,6 +671,18 @@ The account has been successfully deleted from the database.
     def userEnable(self, emailaddress, service=None):
         acc = self.__getAccount(emailaddress)
         acc.enable(service)
+
+    def relocatedAdd(self, emailaddress, targetaddress):
+        relocated = self.__getRelocated(emailaddress, targetaddress)
+        relocated.save()
+
+    def relocatedInfo(self, emailaddress):
+        relocated = self.__getRelocated(emailaddress)
+        return relocated.getInfo()
+
+    def relocatedDelete(self, emailaddress):
+        relocated = self.__getRelocated(emailaddress)
+        relocated.delete()
 
     def __del__(self):
         if not self.__dbh is None and self.__dbh._isOpen:

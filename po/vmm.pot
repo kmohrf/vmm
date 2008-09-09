@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vmm 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-08 20:36+0200\n"
+"POT-Creation-Date: 2008-09-09 06:05+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,7 +28,7 @@ msgstr ""
 
 #: VirtualMailManager/Account.py:64 VirtualMailManager/Alias.py:64
 #: VirtualMailManager/Domain.py:168 VirtualMailManager/Domain.py:192
-#: VirtualMailManager/Domain.py:222 VirtualMailManager/Relocated.py:63
+#: VirtualMailManager/Domain.py:223 VirtualMailManager/Relocated.py:63
 #, python-format
 msgid "The domain »%s« doesn't exist yet."
 msgstr ""
@@ -298,81 +298,81 @@ msgstr ""
 msgid "The domain name »%s« is invalid."
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:207
+#: VirtualMailManager/VirtualMailManager.py:200
 msgid "Enter new password: "
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:208
+#: VirtualMailManager/VirtualMailManager.py:201
 msgid "Retype new password: "
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:210
+#: VirtualMailManager/VirtualMailManager.py:203
 msgid "Sorry, passwords do not match"
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:214
+#: VirtualMailManager/VirtualMailManager.py:207
 msgid "Sorry, empty passwords are not permitted"
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:248
-#: VirtualMailManager/VirtualMailManager.py:336
+#: VirtualMailManager/VirtualMailManager.py:255
+#: VirtualMailManager/VirtualMailManager.py:343
 #, python-format
 msgid "No such directory: %s"
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:324
+#: VirtualMailManager/VirtualMailManager.py:331
 msgid "Found \"..\" in home directory path."
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:332
+#: VirtualMailManager/VirtualMailManager.py:339
 msgid "Owner/group mismatch in home directory detected."
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:347
+#: VirtualMailManager/VirtualMailManager.py:354
 msgid "FATAL: \"..\" in domain directory path detected."
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:353
+#: VirtualMailManager/VirtualMailManager.py:360
 msgid "FATAL: group mismatch in domain directory detected"
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:440
+#: VirtualMailManager/VirtualMailManager.py:447
 #, python-format
 msgid ""
 "Configurtion error: \"%s\"\n"
 "(in section \"connfig\", option \"done\") see also: vmm.cfg(5)\n"
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:460
+#: VirtualMailManager/VirtualMailManager.py:467
 #, python-format
 msgid "Invalid section: '%s'"
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:470
+#: VirtualMailManager/VirtualMailManager.py:477
 #, python-format
 msgid "Invalid argument: '%s'"
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:480
-#: VirtualMailManager/VirtualMailManager.py:499
-#: VirtualMailManager/VirtualMailManager.py:601
+#: VirtualMailManager/VirtualMailManager.py:487
+#: VirtualMailManager/VirtualMailManager.py:506
+#: VirtualMailManager/VirtualMailManager.py:610
 #, python-format
 msgid "Invalid argument: »%s«"
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:503
+#: VirtualMailManager/VirtualMailManager.py:510
 msgid ""
 "The keyword »detailed« is deprecated and will be removed in a future "
 "release.\n"
 "    Please use the keyword »full« to get full details."
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:578
+#: VirtualMailManager/VirtualMailManager.py:587
 #, python-format
 msgid "The pattern »%s« contains invalid characters."
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:613
+#: VirtualMailManager/VirtualMailManager.py:622
 #, python-format
 msgid ""
 "The account has been successfully deleted from the database.\n"
@@ -381,7 +381,7 @@ msgid ""
 "    Reason: %(raeson)s"
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:645
+#: VirtualMailManager/VirtualMailManager.py:654
 msgid "Account doesn't exists"
 msgstr ""
 
@@ -390,149 +390,170 @@ msgstr ""
 msgid ""
 "Usage: %s SUBCOMMAND OBJECT ARGS*\n"
 "  short long\n"
-"  subcommand               object            args (* = optional)\n"
+"  subcommand               object             args (* = optional)\n"
 msgstr ""
 
-#: vmm:76 vmm:87 vmm:446
+#: vmm:79 vmm:90 vmm:487
 msgid "Error"
 msgstr ""
 
-#: vmm:109
+#: vmm:112
 msgid "information"
 msgstr ""
 
-#: vmm:119
+#: vmm:122
 msgid "Available"
 msgstr ""
 
-#: vmm:122 vmm:215 vmm:219
+#: vmm:125 vmm:224 vmm:230
 msgid "alias domains"
 msgstr ""
 
-#: vmm:132 vmm:143 vmm:161
+#: vmm:135 vmm:146 vmm:170
 msgid "\tNone"
 msgstr ""
 
-#: vmm:136
+#: vmm:139
 msgid "Alias information"
 msgstr ""
 
-#: vmm:138
+#: vmm:141
 #, python-format
 msgid "\tMail for %s will be redirected to:"
 msgstr ""
 
-#: vmm:156
+#: vmm:150
+msgid "Relocated information"
+msgstr ""
+
+#: vmm:152
+#, python-format
+msgid "\tUser »%(addr)s« has moved to »%(dest)s«"
+msgstr ""
+
+#: vmm:165
 msgid "Available domains"
 msgstr ""
 
-#: vmm:158
+#: vmm:167
 msgid "Matching domains"
 msgstr ""
 
-#: vmm:172
+#: vmm:181
 msgid "Alias domain information"
 msgstr ""
 
-#: vmm:178
+#: vmm:187
 #, python-format
 msgid ""
 "\tThe alias domain %(alias)s belongs to:\n"
 "\t    * %(domain)s"
 msgstr ""
 
-#: vmm:189 vmm:197 vmm:205
+#: vmm:198 vmm:206 vmm:214
 msgid "Missing domain name."
 msgstr ""
 
-#: vmm:207 vmm:211
+#: vmm:216 vmm:220
 msgid "Domain"
 msgstr ""
 
-#: vmm:213 vmm:220
+#: vmm:222 vmm:231
 msgid "accounts"
 msgstr ""
 
-#: vmm:217 vmm:221
+#: vmm:226 vmm:232
 msgid "aliases"
 msgstr ""
 
-#: vmm:225
+#: vmm:228 vmm:233
+msgid "relocated users"
+msgstr ""
+
+#: vmm:237
 msgid "Missing domain name and new transport."
 msgstr ""
 
-#: vmm:227
+#: vmm:239
 msgid "Missing new transport."
 msgstr ""
 
-#: vmm:236 vmm:251
+#: vmm:248 vmm:263
 msgid "Missing alias domain name and target domain name."
 msgstr ""
 
-#: vmm:238 vmm:253
+#: vmm:250 vmm:265
 msgid "Missing target domain name."
 msgstr ""
 
-#: vmm:244 vmm:259
+#: vmm:256 vmm:271
 msgid "Missing alias domain name."
 msgstr ""
 
-#: vmm:265 vmm:274 vmm:282 vmm:306 vmm:314 vmm:322
+#: vmm:277 vmm:286 vmm:294 vmm:318 vmm:326 vmm:334
 msgid "Missing e-mail address."
 msgstr ""
 
-#: vmm:290
+#: vmm:302
 msgid "Missing e-mail address and users name."
 msgstr ""
 
-#: vmm:292
+#: vmm:304
 msgid "Missing users name."
 msgstr ""
 
-#: vmm:298
+#: vmm:310
 msgid "Missing e-mail address and transport."
 msgstr ""
 
-#: vmm:300
+#: vmm:312
 msgid "Missing transport."
 msgstr ""
 
-#: vmm:331
+#: vmm:343
 msgid "Missing alias address and destination."
 msgstr ""
 
-#: vmm:333
+#: vmm:345 vmm:368
 msgid "Missing destination address."
 msgstr ""
 
-#: vmm:339 vmm:345
+#: vmm:351 vmm:357
 msgid "Missing alias address"
 msgstr ""
 
-#: vmm:353
+#: vmm:366
+msgid "Missing relocated address and destination."
+msgstr ""
+
+#: vmm:374 vmm:382
+msgid "Missing relocated address"
+msgstr ""
+
+#: vmm:388
 msgid "Missing userid"
 msgstr ""
 
-#: vmm:366
+#: vmm:401
 msgid "Warnings:"
 msgstr ""
 
-#: vmm:371
+#: vmm:406
 msgid "version"
 msgstr ""
 
-#: vmm:372
+#: vmm:407
 msgid "from"
 msgstr ""
 
-#: vmm:374
+#: vmm:409
 msgid "on"
 msgstr ""
 
-#: vmm:441
+#: vmm:482
 msgid "Unknown subcommand"
 msgstr ""
 
-#: vmm:444
+#: vmm:485
 msgid "Ouch"
 msgstr ""

@@ -40,32 +40,35 @@ def usage(excode=0, errMsg=None):
     u_head = _("""\
 Usage: %s SUBCOMMAND OBJECT ARGS*
   short long
-  subcommand               object            args (* = optional)\n""")\
+  subcommand               object             args (* = optional)\n""")\
           % __prog__
 
     u_body = """\
-  da    domainadd          domain.tld        transport*
-  di    domaininfo         domain.tld        details*
-  dt    domaintransport    domain.tld        transport force*
-  dd    domaindelete       domain.tld        delalias*|deluser*|delall*
-  ada   aliasdomainadd     aliasdomain.tld   domain.tld
+  da    domainadd          domain.tld         transport*
+  di    domaininfo         domain.tld         details*
+  dt    domaintransport    domain.tld         transport force*
+  dd    domaindelete       domain.tld         delalias*|deluser*|delall*
+  ada   aliasdomainadd     aliasdomain.tld    domain.tld
   adi   aliasdomaininfo    aliasdomain.tld
-  ads   aliasdomainswitch  aliasdomain.tld   domain.tld
+  ads   aliasdomainswitch  aliasdomain.tld    domain.tld
   add   aliasdomaindelete  aliasdomain.tld
-  ua    useradd            user@domain.tld   password*
-  ui    userinfo           user@domain.tld   du*
-  un    username           user@domain.tld   'Users Name'
-  up    userpassword       user@domain.tld   password*
-  ut    usertransport      user@domain.tld   transport
-  u0    userdisable        user@domain.tld   service*
-  u1    userenable         user@domain.tld   service*
-  ud    userdelete         user@domain.tld   delalias*
-  aa    aliasadd           alias@domain.tld  user@domain.tld
+  ua    useradd            user@domain.tld    password*
+  ui    userinfo           user@domain.tld    du*
+  un    username           user@domain.tld    'Users Name'
+  up    userpassword       user@domain.tld    password*
+  ut    usertransport      user@domain.tld    transport
+  u0    userdisable        user@domain.tld    service*
+  u1    userenable         user@domain.tld    service*
+  ud    userdelete         user@domain.tld    delalias*
+  aa    aliasadd           alias@domain.tld   user@domain.tld
   ai    aliasinfo          alias@domain.tld
-  ad    aliasdelete        alias@domain.tld  user@domain.tld*
+  ad    aliasdelete        alias@domain.tld   user@domain.tld*
+  ra    relocatedadd       exaddr@domain.tld  user@domain.tld
+  ri    relocatedinfo      exaddr@domain.tld
+  rf    relocateddelete    exaddr@domain.tld
   gu    getuser            userid
-  ld    listdomains                          pattern*
-  cf    configure                            section*
+  ld    listdomains                           pattern*
+  cf    configure                             section*
   h     help
   v     version
 """
@@ -91,7 +94,7 @@ def _getOrder():
     if argv[1] in ['di', 'domaininfo']:
         order = (('domainname', 0), ('gid', 1), ('transport', 0),
                 ('domaindir', 0), ('aliasdomains', 0), ('accounts', 0),
-                ('aliases', 0))
+                ('aliases', 0), ('relocated', 0))
     elif argv[1] in ['ui', 'userinfo']:
         if argc == 4 or vmm.cfgGetBoolean('maildir', 'diskusage'):
             order = (('address', 0), ('name', 0), ('uid', 1), ('gid', 1),
@@ -141,6 +144,12 @@ def _printAliases(alias, targets):
             w_std('\t     * %s' % target)
     else:
         w_std(_('\tNone'))
+    print
+
+def _printRelocated(addr_dest):
+    msg = _(u'Relocated information')
+    w_std('%s\n%s' % (msg, '-'*len(msg)))
+    w_std(_(u'\tUser »%(addr)s« has moved to »%(dest)s«') % addr_dest)
     print
 
 def _formatDom(domain, main=True):
@@ -215,10 +224,13 @@ def domain_info():
             _printList(infos[1], _('alias domains'))
         elif details == 'aliases':
             _printList(infos[1], _('aliases'))
+        elif details == 'relocated':
+            _printList(infos[1], _('relocated users'))
         else:
             _printList(infos[1], _('alias domains'))
             _printList(infos[2], _('accounts'))
             _printList(infos[3], _('aliases'))
+            _printList(infos[4], _('relocated users'))
 
 def domain_transport():
     if argc < 3:
@@ -338,7 +350,7 @@ def alias_info():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing alias address'))
     else:
-        _printAliases(argv[2], vmm.aliasInfo(argv[2].lower()))
+        _printAliases(argv[2].lower(), vmm.aliasInfo(argv[2].lower()))
 
 def alias_delete():
     if argc < 3:
@@ -347,6 +359,29 @@ def alias_delete():
         vmm.aliasDelete(argv[2].lower())
     else:
         vmm.aliasDelete(argv[2].lower(), argv[3].lower())
+
+def relocated_add():
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS,
+                _(u'Missing relocated address and destination.'))
+    elif argc < 4:
+        usage(EXIT.MISSING_ARGS, _(u'Missing destination address.'))
+    else:
+        vmm.relocatedAdd(argv[2].lower(), argv[3])
+
+def relocated_info():
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS, _(u'Missing relocated address'))
+    else:
+        relocated = argv[2].lower()
+        _printRelocated({'addr': relocated,
+            'dest': vmm.relocatedInfo(relocated)})
+
+def relocated_delete():
+    if argc < 3:
+        usage(EXIT.MISSING_ARGS, _(u'Missing relocated address'))
+    else:
+        vmm.relocatedDelete(argv[2].lower())
 
 def user_byID():
     if argc < 3:
@@ -428,6 +463,12 @@ if __name__ == '__main__':
             alias_info()
         elif argv[1] in ['ad', 'aliasdelete']:
             alias_delete()
+        elif argv[1] in ['ra', 'relocatedadd']:
+            relocated_add()
+        elif argv[1] in ['ri', 'relocatedinfo']:
+            relocated_info()
+        elif argv[1] in ['rd', 'relocateddelete']:
+            relocated_delete()
         elif argv[1] in ['gu', 'getuser']:
             user_byID()
         elif argv[1] in ['ld', 'listdomains']:
