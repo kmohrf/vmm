@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: vmm 0.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-09-09 06:05+0200\n"
-"PO-Revision-Date: 2008-09-09 06:15+0200\n"
+"PO-Revision-Date: 2008-09-10 01:57+0200\n"
 "Last-Translator: Pascal Volk <p.volk@veb-it.de>\n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
@@ -23,7 +23,7 @@ msgstr "Es existiert bereits ein Alias mit der Adresse »%s«."
 #: VirtualMailManager/Account.py:44 VirtualMailManager/Alias.py:48
 #, python-format
 msgid "There is already a relocated user with the address »%s«."
-msgstr "Es gibt bereits ein umgezogenen Benutzer mit der Adresse »%s«."
+msgstr "Es gibt bereits ein relocated User mit der Adresse »%s«."
 
 #: VirtualMailManager/Account.py:64 VirtualMailManager/Alias.py:64
 #: VirtualMailManager/Domain.py:168 VirtualMailManager/Domain.py:192
@@ -228,17 +228,17 @@ msgstr "Unbekannte MID angegeben."
 
 #: VirtualMailManager/Relocated.py:68
 msgid "No destination address for relocated user denoted."
-msgstr "Keine Ziel-Adresse für den umgezogene Benutzer angegeben."
+msgstr "Keine Ziel-Adresse für den relocated User angegeben."
 
 #: VirtualMailManager/Relocated.py:78
 #, python-format
 msgid "The relocated user »%s« already exists."
-msgstr "Der umgezogene Benutzer »%s« existiert bereits."
+msgstr "Der relocated User »%s« existiert bereits."
 
 #: VirtualMailManager/Relocated.py:92 VirtualMailManager/Relocated.py:105
 #, python-format
 msgid "The relocated user »%s« doesn't exists."
-msgstr "Der umgezogene Benutzer »%s« existiert nicht."
+msgstr "Der relocated User »%s« existiert nicht."
 
 #: VirtualMailManager/Transport.py:34
 msgid "Either tid or transport must be specified."
@@ -448,12 +448,12 @@ msgstr "\tE-Mails für %s werden weitergeleitet an:"
 
 #: vmm:150
 msgid "Relocated information"
-msgstr "Information zum umgezogenen Benutzer"
+msgstr "Relocated Informationen"
 
 #: vmm:152
 #, python-format
 msgid "\tUser »%(addr)s« has moved to »%(dest)s«"
-msgstr "\tDer Benutzer »%(addr)s« ist umgezogenen nach »%(dest)s«"
+msgstr "\tDer Benutzer »%(addr)s« ist erreichbar unter »%(dest)s«"
 
 #: vmm:165
 msgid "Available domains"
@@ -494,7 +494,7 @@ msgstr "Aliase"
 
 #: vmm:228 vmm:233
 msgid "relocated users"
-msgstr "umgezogenen Benutzer"
+msgstr "Relocated Users"
 
 #: vmm:237
 msgid "Missing domain name and new transport."
@@ -550,11 +550,11 @@ msgstr "Die Alias-Adresse fehlt."
 
 #: vmm:366
 msgid "Missing relocated address and destination."
-msgstr "Die Adresse des umgezogenen Benutzers und Ziel-Adresse fehlen."
+msgstr "Die Adresse des relocated Users und Ziel-Adresse fehlen."
 
 #: vmm:374 vmm:382
 msgid "Missing relocated address"
-msgstr "Die Adresse des umgezogenen Benutzers fehlt."
+msgstr "Die Adresse des relocated Users fehlt."
 
 #: vmm:388
 msgid "Missing userid"

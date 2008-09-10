@@ -1,5 +1,5 @@
 .\" $Id$
-.TH "VMM" "1" "09. Sep 2008" "Pascal Volk"
+.TH "VMM" "1" "10. Sep 2008" "Pascal Volk"
 .SH NAME
 vmm \- Programm für die Kommandozeile, um E-Mail-Domains, -Konten und -Aliase zu
 verwalten.
@@ -132,21 +132,24 @@ Dieser Unterbefehl zeigt Information zur angegeben \fIDomain\fP an.
 .br
 Um detaillierte Informationen über die \fIDomain\fP zu erhalten, kann das
 optionale Argument \fIdetails\fP angegeben werden. Ein möglicher Wert für
-\fIdetails\fP kann eines der folgenden vier Schlüsselwörter sein:
+\fIdetails\fP kann eines der folgenden fünf Schlüsselwörter sein:
 .RS
 .PD 0
 .TP
 .B accounts
-um alle existierenden Konten aufzulisten.
+um alle existierenden Konten aufzulisten
 .TP
 .B aliasdomains
-um alle zugeordneten Alias-Domains aufzulisten.
+um alle zugeordneten Alias-Domains aufzulisten
 .TP
 .B aliases
-um alle verfügbaren Alias-Adressen aufzulisten.
+um alle verfügbaren Alias-Adressen aufzulisten
+.TP
+.B relocated
+um alle Adressen der relocated Users aufzulisten
 .TP
 .B full
-um alle oben genannten Informationen aufzulisten.
+um alle oben genannten Informationen aufzulisten
 .PD
 .RE
 .LP
@@ -164,6 +167,7 @@ um alle oben genannten Informationen aufzulisten.
                 Aliasdomains...: 0
                 Accounts.......: 0
                 Aliases........: 0
+                Relocated......: 0
 
 .fi
 .TP
@@ -376,6 +380,46 @@ Zieladresse vom angegebenen \fIAlias\fP entfernt.
         Beispiel:
         \fBvmm ad support@example.com d.user@example.com\fP
 .fi
+.\"
+.SS RELOCATED UNTERBEFEHLE
+.TP
+\fBrelocatedadd\fP (\fBra\fP) \fIalte_adresse\fP \fIneue_adresse\fP
+Um einen neuen relocated User anzulegen kann dieser Unterbefehl verwendet
+werden.
+.br
+Dabei ist \fIalte_adresse\fP die ehemalige Adresse des Benutzers, z. B.
+b.user@example.com, und \fIneue_adresse\fP die neue Adresse, unter der Benutzer
+erreichbar ist.
+.PP
+.nf
+        Beispiel:
+
+        \fBvmm relocatedadd b.user@example.com b-user@company.tld\fP
+.fi
+.TP
+\fBrelocatedinfo\fP (\fBri\fP) \fIalte_adresse\fP
+Dieser Unterbefehl zeigt die neue Adresse des relocated Users mit
+\fIalte_adresse\fP.
+.PP
+.nf
+        Beispiel:
+
+        \fBvmm relocatedinfo b.user@example.com\fP
+        Relocated Informationen
+        -----------------------
+        Der Benutzer »b.user@example.com« ist erreichbar unter »b-user@company.tld«
+.fi
+.TP
+\fBrelocateddelete\fP (\fBrd\fP) \fIalte_adresse\fP
+Mit diesem Unterbefehl kann ein der relocated User mit \fIalte_adresse\fP
+gelöscht werden.
+.PP
+.nf
+        Beispiel:
+
+        \fBvmm relocateddelete b.user@example.com\fP
+.fi
+.\"
 .SH DATEIEN
 /usr/local/etc/vmm.cfg
 .SH SIEHE AUCH
