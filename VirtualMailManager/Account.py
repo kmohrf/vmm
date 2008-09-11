@@ -36,10 +36,12 @@ class Account:
         self._passwd = password
         self._setAddr()
         self._exists()
-        if VMM.VirtualMailManager.aliasExists(self._dbh, self._addr):
+        if self._uid < 1 and VMM.VirtualMailManager.aliasExists(self._dbh,
+                self._addr):
             raise AccE(_(u"There is already an alias with the address »%s«.") %\
                     self._addr, ERR.ALIAS_EXISTS)
-        if VMM.VirtualMailManager.relocatedExists(self._dbh, self._addr):
+        if self._uid < 1 and VMM.VirtualMailManager.relocatedExists(self._dbh,
+                self._addr):
             raise AccE(
               _(u"There is already a relocated user with the address »%s«.") %\
                     self._addr, ERR.RELOCATED_EXISTS)

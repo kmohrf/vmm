@@ -48,8 +48,8 @@ AS $$
             FOR rec IN
                 SELECT DISTINCT sender, destination
                   FROM alias
-                       LEFT JOIN domain_name USING (gid)
-                 WHERE alias.address = localpart
+                 WHERE alias.gid = did
+                   AND alias.address = localpart
                 LOOP
                     RETURN NEXT rec;
                 END LOOP;
