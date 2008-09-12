@@ -1,5 +1,12 @@
 # $Id$
 
-- VirtualMailManager/Alias.py
+- Aliases
     - avoid looping aliases
+    - avoid number of alias destinations > virtual_alias_expansion_limit
 
+- Domain
+    - optional limits for number of:
+        + accounts
+        + aliases
+        + destinations/alias
+        + alias domains

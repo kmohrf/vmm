@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vmm 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-12 01:40+0200\n"
-"PO-Revision-Date: 2008-09-12 01:43+0200\n"
+"POT-Creation-Date: 2008-09-12 23:18+0200\n"
+"PO-Revision-Date: 2008-09-12 23:20+0200\n"
 "Last-Translator: Pascal Volk <p.volk@veb-it.de>\n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
@@ -369,7 +369,7 @@ msgstr "Ungültiges Argument: '%s'"
 
 #: VirtualMailManager/VirtualMailManager.py:488
 #: VirtualMailManager/VirtualMailManager.py:507
-#: VirtualMailManager/VirtualMailManager.py:617
+#: VirtualMailManager/VirtualMailManager.py:618
 #, python-format
 msgid "Invalid argument: »%s«"
 msgstr "Ungültiges Argument: »%s«"
@@ -389,12 +389,12 @@ msgstr ""
 msgid "The pattern »%s« contains invalid characters."
 msgstr "Das Muster »%s« enthält ungültige Zeichen."
 
-#: VirtualMailManager/VirtualMailManager.py:612
+#: VirtualMailManager/VirtualMailManager.py:613
 #, python-format
-msgid "The destination account »%s« doesn't exists yet."
-msgstr "Der Ziel-Account »%s« existiert noch nicht."
+msgid "The destination account/alias »%s« doesn't exists yet."
+msgstr "Der Ziel-Account/-Alias »%s« existiert noch nicht."
 
-#: VirtualMailManager/VirtualMailManager.py:629
+#: VirtualMailManager/VirtualMailManager.py:630
 #, python-format
 msgid ""
 "The account has been successfully deleted from the database.\n"
@@ -407,7 +407,7 @@ msgstr ""
 "    »%(directory)s«\n"
 "    Grund: %(raeson)s"
 
-#: VirtualMailManager/VirtualMailManager.py:661
+#: VirtualMailManager/VirtualMailManager.py:662
 msgid "Account doesn't exists"
 msgstr "Der Account existiert nicht"
 
