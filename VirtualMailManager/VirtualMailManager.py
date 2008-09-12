@@ -607,10 +607,11 @@ The keyword »detailed« is deprecated and will be removed in a future release.
         alias.save()
         gid = self.__getDomain(alias._dest._domainname).getID()
         if gid > 0 and not VirtualMailManager.accountExists(self.__dbh,
-                alias._dest):
+        alias._dest) and not VirtualMailManager.aliasExists(self.__dbh, 
+        alias._dest):
             self.__warnings.append(
-                    _(u"The destination account »%s« doesn't exists yet.")%\
-                            alias._dest)
+                _(u"The destination account/alias »%s« doesn't exists yet.")%\
+                        alias._dest)
 
     def userDelete(self, emailaddress, force=None):
         if force not in [None, 'delalias']:
