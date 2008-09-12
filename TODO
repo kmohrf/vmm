@@ -1,6 +1,5 @@
 # $Id$
 
 - VirtualMailManager/Alias.py
-    - check if account exists, when destination is in the same domain
     - avoid looping aliases
 

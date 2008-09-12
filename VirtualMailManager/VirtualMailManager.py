@@ -102,18 +102,19 @@ class VirtualMailManager:
 
     def __dbConnect(self):
         """Creates a pyPgSQL.PgSQL.connection instance."""
-        try:
-            self.__dbh = PgSQL.connect(
-                    database=self.__Cfg.get('database', 'name'),
-                    user=self.__Cfg.get('database', 'user'),
-                    host=self.__Cfg.get('database', 'host'),
-                    password=self.__Cfg.get('database', 'pass'),
-                    client_encoding='utf8', unicode_results=True)
-            dbc = self.__dbh.cursor()
-            dbc.execute("SET NAMES 'UTF8'")
-            dbc.close()
-        except PgSQL.libpq.DatabaseError, e:
-            raise VMMException(str(e), ERR.DATABASE_ERROR)
+        if self.__dbh is None or not self.__dbh._isOpen:
+            try:
+                self.__dbh = PgSQL.connect(
+                        database=self.__Cfg.get('database', 'name'),
+                        user=self.__Cfg.get('database', 'user'),
+                        host=self.__Cfg.get('database', 'host'),
+                        password=self.__Cfg.get('database', 'pass'),
+                        client_encoding='utf8', unicode_results=True)
+                dbc = self.__dbh.cursor()
+                dbc.execute("SET NAMES 'UTF8'")
+                dbc.close()
+            except PgSQL.libpq.DatabaseError, e:
+                raise VMMException(str(e), ERR.DATABASE_ERROR)
 
     def idn2ascii(domainname):
         """Converts an idn domainname in punycode.
@@ -604,6 +605,12 @@ The keyword »detailed« is deprecated and will be removed in a future release.
     def aliasAdd(self, aliasaddress, targetaddress):
         alias = self.__getAlias(aliasaddress, targetaddress)
         alias.save()
+        gid = self.__getDomain(alias._dest._domainname).getID()
+        if gid > 0 and not VirtualMailManager.accountExists(self.__dbh,
+                alias._dest):
+            self.__warnings.append(
+                    _(u"The destination account »%s« doesn't exists yet.")%\
+                            alias._dest)
 
     def userDelete(self, emailaddress, force=None):
         if force not in [None, 'delalias']:
