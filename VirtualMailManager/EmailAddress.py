@@ -75,10 +75,10 @@ class EmailAddress(object):
         if len(localpart) > 64:
             raise VMMEAE(_(u'The local part »%s« is too long') %
                 localpart, ERR.LOCALPART_TOO_LONG)
-        ic = re.compile(RE_LOCALPART).findall(localpart)
+        ic = set(re.findall(RE_LOCALPART, localpart))
         if len(ic):
             ichrs = ''
-            for c in set(ic):
+            for c in ic:
                 ichrs += u"»%s« " % c
             raise VMMEAE(_(u"The local part »%(lpart)s« contains invalid\
  characters: %(ichrs)s") % {'lpart': localpart, 'ichrs': ichrs},

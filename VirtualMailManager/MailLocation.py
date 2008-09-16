@@ -18,7 +18,7 @@ import re
 from Exceptions import VMMMailLocationException as MLE
 import constants.ERROR as ERR
 
-RE_MAILLOCATION = """^[\w]{1,20}$"""
+RE_MAILLOCATION = """^\w{1,20}$"""
 
 class MailLocation:
     """A wrapper class thats provide access to the maillocation table"""
@@ -43,7 +43,6 @@ class MailLocation:
                 raise MLE(_('mid must be an int/long.'), ERR.MAILLOCATION_INIT)
             self._loadByID()
         else:
-            re.compile(RE_MAILLOCATION)
             if re.match(RE_MAILLOCATION, maillocation):
                 self.__maillocation = maillocation
                 self._loadByName()

@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2007-2008 VEB IT
+# Copyright 2008 VEB IT
 # See COPYING for distribution information.
 # $Id$
 
@@ -30,8 +30,7 @@ class Postconf:
         """
         self.__bin = postconf_bin
         self.__val = ''
-        re.compile(RE_PC_PARAMS)
-        re.compile(RE_PC_VARIABLES)
+        self.__varFinder = re.compile(RE_PC_VARIABLES)
 
     def read(self, parameter, expand_vars=True):
         """Returns the parameters value.
@@ -56,7 +55,7 @@ class Postconf:
 
     def __expandVars(self):
         while True:
-            pvars = set(re.findall(RE_PC_VARIABLES, self.__val))
+            pvars = set(self.__varFinder.findall(self.__val))
             pvars_len = len(pvars)
             if pvars_len < 1:
                 break

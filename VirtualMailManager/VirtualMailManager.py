@@ -151,13 +151,11 @@ class VirtualMailManager:
         Keyword arguments:
         domainname -- the domain name that should be validated
         """
-        re.compile(RE_ASCII_CHARS)
         if not re.match(RE_ASCII_CHARS, domainname):
             domainname = VirtualMailManager.idn2ascii(domainname)
         if len(domainname) > 255:
             raise VMMException(_(u'The domain name is too long.'),
                 ERR.DOMAIN_TOO_LONG)
-        re.compile(RE_DOMAIN)
         if not re.match(RE_DOMAIN, domainname):
             raise VMMException(_(u'The domain name »%s« is invalid.') %\
                     domainname, ERR.DOMAIN_INVALID)
@@ -305,7 +303,6 @@ class VirtualMailManager:
         oldpwd = os.getcwd()
         os.chdir(domdir)
 
-        re.compile(RE_MBOX_NAMES)
         maildir = self.__Cfg.get('maildir', 'name')
         folders = [maildir]
         for folder in self.__Cfg.get('maildir', 'folders').split(':'):
@@ -583,7 +580,6 @@ The keyword »detailed« is deprecated and will be removed in a future release.
                     domain = pattern[1:]
                 elif pattern.endswith('%'):
                     domain = pattern[:-1]
-                re.compile(RE_DOMAIN_SRCH)
                 if not re.match(RE_DOMAIN_SRCH, domain):
                     raise VMMException(
                     _(u"The pattern »%s« contains invalid characters.") %
