@@ -1,5 +1,5 @@
 .\" $Id$
-.TH vmm.cfg 5 "27. Aug 2008" "Pascal Volk"
+.TH vmm.cfg 5 "15 Sep 2008" "Pascal Volk"
 .SH NAME
 vmm.cfg \- configuration file for vmm
 .SH SYNOPSIS
@@ -161,12 +161,20 @@ password hash, if the \fIpasswdscheme\fP is one of 'SMD5', 'SSHA', 'CRAM-MD5',
 The absolute path to \fBdu\fR(1). This binary is used to summarize the disk
 usage of a maildir.
 .TP
+\fBpostconf\fP (\fIString\fP)
+The absolute path to Postfix' \fBpostconf\fR(1).
+.br
+This binary is required if \fBvmm\fR(1) has to check for some Postfix settings,
+e.g. virtual_alias_expansion_limit.
+.TP
 \fBExample\fP:
 [bin]
 .br
 dovecotpw = /usr/sbin/dovecotpw
 .br
 du = /usr/bin/du
+.br
+postconf = /usr/sbin/postconf
 .\" -----
 .SH MISC SECTION
 The \fBmisc\fP section is used to define miscellaneous settings.

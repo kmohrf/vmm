@@ -23,6 +23,7 @@ from subprocess import Popen, PIPE
 from pyPgSQL import PgSQL # python-pgsql - http://pypgsql.sourceforge.net
 
 import constants.ERROR as ERR
+from ext.Postconf import Postconf
 from Account import Account
 from Alias import Alias
 from AliasDomain import AliasDomain

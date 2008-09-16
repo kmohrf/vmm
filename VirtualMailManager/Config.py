@@ -32,7 +32,6 @@ class Config(ConfigParser):
 
     You can specify settings for the database connection
     and maildirectories.
-
     """
 
     def __init__(self, filename):
@@ -74,7 +73,8 @@ class Config(ConfigParser):
                 ]
         self.__binopts = [
                 ['dovecotpw', '/usr/sbin/dovecotpw'],
-                ['du', '/usr/bin/du']
+                ['du', '/usr/bin/du'],
+                ['postconf', '/usr/sbin/postconf']
                 ]
         self.__miscopts = [
                 ['passwdscheme', 'PLAIN'],

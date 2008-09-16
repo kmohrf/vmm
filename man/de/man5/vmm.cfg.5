@@ -1,5 +1,5 @@
 .\" $Id$
-.TH vmm.cfg 5 "27. Aug 2008" "Pascal Volk"
+.TH vmm.cfg 5 "15 Sep 2008" "Pascal Volk"
 .SH NAME
 vmm.cfg \- Konfigurationsdatei für vmm
 .SH SYNOPSIS
@@ -173,12 +173,20 @@ Passwort-Schema eines der folgenden verwendet wird: 'SMD5', 'SSHA', 'CRAM-MD5',
 Der absolute Pfad zu \fBdu\fR(1). Dieses Binary wird verwendet, wenn die
 Festplattenbelegung eines Kontos ermittelt wird.
 .TP
+\fBpostconf\fP (\fIString\fP)
+Der absolute Pfad zu Postfix' \fBpostconf\fR(1).
+.br
+Dieses Binary wird verwendet, wenn \fBvmm\fR(1) diverse Postfix-Einstellungen
+prüft, zum Beispiel virtual_alias_expansion_limit.
+.TP
 \fBBeispiel\fP:
 [bin]
 .br
 dovecotpw = /usr/sbin/dovecotpw
 .br
 du = /usr/bin/du
+.br
+postconf = /usr/sbin/postconf
 .\" -----
 .SH MISC ABSCHNITT
 Im \fBmisc\fP-Abschnitt werden verschiedene Einstellungen festgelegt.

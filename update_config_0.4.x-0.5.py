@@ -4,6 +4,7 @@
 # See COPYING for distribution information.
 # $Id$
 
+import sys
 from ConfigParser import ConfigParser
 from shutil import copy2
 
@@ -29,3 +30,21 @@ if not cp.has_option('maildir', 'name') or not cp.has_option('maildir',
         cp.remove_option('maildir', 'folder')
     cp.write(fh)
     fh.close()
+
+if not cp.has_option('bin', 'postconf'):
+    fh = file(cf, 'w')
+    try:
+        postconf = sys.argv[1].strip()
+        if len(postconf):
+            cp.set('bin', 'postconf', postconf)
+        else: # possible?
+            cp.set('bin', 'postconf', '/usr/sbin/postconf')
+    except IndexError:
+        cp.set('bin', 'postconf', '/usr/sbin/postconf')
+    cp.write(fh)
+    fh.close()
+    print
+    print "Please have a look at your %s" %cf
+    print "and verify the value from option 'postconf' in section 'bin'."
+    print
+

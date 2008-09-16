@@ -10,6 +10,7 @@ PREFIX=/usr/local
 
 PF_CONFDIR=$(postconf -h config_directory)
 PF_GID=$(id -g $(postconf -h mail_owner))
+POSTCONF=$(which postconf)
 LOCALE_DIR=${PREFIX}/share/locale
 DOC_DIR=${PREFIX}/share/doc/vmm
 if [ ${PREFIX} == "/usr" ]; then
@@ -82,5 +83,5 @@ install -m 0644 ${INSTALL_OPTS} pgsql-*.cf ${DOC_DIR}/examples
 install -m 0644 ${INSTALL_OPTS} vmm.cfg ${DOC_DIR}/examples
 
 # update config file
-./update_config_0.4.x-0.5.py
+./update_config_0.4.x-0.5.py $POSTCONF
 
