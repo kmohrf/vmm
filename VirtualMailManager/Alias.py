@@ -66,11 +66,26 @@ class Alias:
             raise VMMAE(_(u"The domain »%s« doesn't exist yet.") %\
                     self._addr._domainname, ERR.NO_SUCH_DOMAIN)
 
-    def save(self):
+    def _checkExpansion(self, limit):
+        dbc = self._dbh.cursor()
+        dbc.execute('SELECT count(gid) FROM alias where gid=%s AND address=%s',
+                self._gid, self._addr._localpart)
+        curEx = dbc.fetchone()[0]
+        dbc.close()
+        if curEx == limit:
+            errmsg = _(u"""Can't add new destination to alias »%(address)s«.
+Currently this alias expands into %(count)i recipients.
+One destination more will render this alias unusable.
+Hint: Increase Postfix' virtual_alias_expansion_limit
+""") % {'address': self._addr, 'count': curEx}
+            raise VMMAE(errmsg, ERR.ALIAS_EXCEEDS_EXPANSION_LIMIT)
+
+    def save(self, expansion_limit):
         if self._dest is None:
            raise VMMAE(_(u"No destination address for alias denoted."),
                ERR.ALIAS_MISSING_DEST)
         if self._isNew:
+            self._checkExpansion(expansion_limit)
             dbc = self._dbh.cursor()
             dbc.execute("INSERT INTO alias (gid, address, destination) VALUES\
  (%s, %s, %s)", self._gid, self._addr._localpart, str(self._dest))

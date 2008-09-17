@@ -63,6 +63,7 @@ class VirtualMailManager:
             self.__Cfg.check()
             self.__cfgSections = self.__Cfg.getsections()
             self.__scheme = self.__Cfg.get('misc', 'passwdscheme')
+            self._postconf = Postconf(self.__Cfg.get('bin', 'postconf'))
         if not sys.argv[1] in ['cf', 'configure']:
             self.__chkenv()
 
@@ -601,7 +602,7 @@ The keyword »detailed« is deprecated and will be removed in a future release.
 
     def aliasAdd(self, aliasaddress, targetaddress):
         alias = self.__getAlias(aliasaddress, targetaddress)
-        alias.save()
+        alias.save(long(self._postconf.read('virtual_alias_expansion_limit')))
         gid = self.__getDomain(alias._dest._domainname).getID()
         if gid > 0 and not VirtualMailManager.accountExists(self.__dbh,
         alias._dest) and not VirtualMailManager.aliasExists(self.__dbh, 

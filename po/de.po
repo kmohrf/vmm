@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vmm 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-12 23:18+0200\n"
-"PO-Revision-Date: 2008-09-12 23:20+0200\n"
+"POT-Creation-Date: 2008-09-17 04:20+0200\n"
+"PO-Revision-Date: 2008-09-17 04:32+0200\n"
 "Last-Translator: Pascal Volk <p.volk@veb-it.de>\n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
@@ -83,16 +83,29 @@ msgstr "Alias- und Ziel-Adresse sind identisch."
 msgid "There is already an account with address »%s«."
 msgstr "Es gibt bereits einen Account mit der Adresse »%s«."
 
-#: VirtualMailManager/Alias.py:71
+#: VirtualMailManager/Alias.py:76
+#, python-format
+msgid ""
+"Can't add new destination to alias »%(address)s«.\n"
+"Currently this alias expands into %(count)i recipients.\n"
+"One destination more will render this alias unusable.\n"
+"Hint: Increase Postfix' virtual_alias_expansion_limit\n"
+msgstr ""
+"Dem Alias »%(address)s« kann keine weitere Ziel-Adresse hinzugefügt werden.\n"
+"Derzeit verweist der Alias auf %(count)i Empfänger.\n"
+"Eine weitere Ziel-Adresse würde diesen Alias unbrauchbar machen.\n"
+"Tipp: Erhöhen Sie Postfix' virtual_alias_expansion_limit\n"
+
+#: VirtualMailManager/Alias.py:85
 msgid "No destination address for alias denoted."
 msgstr "Keine Ziel-Adresse für den Alias angegeben."
 
-#: VirtualMailManager/Alias.py:81
+#: VirtualMailManager/Alias.py:96
 #, python-format
 msgid "The alias »%(a)s« with destination »%(d)s« already exists."
 msgstr "Der Alias »%(a)s« mit der Ziel-Adresse »%(d)s« existiert bereits."
 
-#: VirtualMailManager/Alias.py:96
+#: VirtualMailManager/Alias.py:111
 #, python-format
 msgid "The alias »%s« doesn't exists."
 msgstr "Der Alias »%s« existiert nicht."
@@ -213,7 +226,7 @@ msgstr "Entweder mid oder maillocation muss angegeben werden."
 msgid "mid must be an int/long."
 msgstr "Die MID muss eine Ganzzahl sein."
 
-#: VirtualMailManager/MailLocation.py:52
+#: VirtualMailManager/MailLocation.py:51
 #, python-format
 msgid ""
 "Invalid folder name »%s«, it may consist only of\n"
@@ -222,7 +235,7 @@ msgstr ""
 "Unzulässiger Verzeichnisname »%s«, dieser darf nur aus\n"
 "1 - 20 Einzelbytezeichen (A-Z, a-z, 0-9 und _) bestehen."
 
-#: VirtualMailManager/MailLocation.py:65
+#: VirtualMailManager/MailLocation.py:64
 msgid "Unknown mid specified."
 msgstr "Unbekannte MID angegeben."
 
@@ -252,7 +265,7 @@ msgstr "Die tid muss eine Ganzzahl sein."
 msgid "Unknown tid specified."
 msgstr "Unbekannte tid angegeben."
 
-#: VirtualMailManager/VirtualMailManager.py:49
+#: VirtualMailManager/VirtualMailManager.py:50
 #, python-format
 msgid ""
 "fix permissions for »%(cfgFileName)s«\n"
@@ -261,7 +274,7 @@ msgstr ""
 "Bitte Zugriffsrechte für »%(cfgFileName)s« anpassen\n"
 "`chmod 0600 %(cfgFileName)s` wäre großartig."
 
-#: VirtualMailManager/VirtualMailManager.py:57
+#: VirtualMailManager/VirtualMailManager.py:58
 msgid ""
 "You are not root.\n"
 "\tGood bye!\n"
@@ -269,12 +282,12 @@ msgstr ""
 "Sie sind nicht root.\n"
 "\tAuf Wiedersehen.\n"
 
-#: VirtualMailManager/VirtualMailManager.py:71
+#: VirtualMailManager/VirtualMailManager.py:73
 #, python-format
 msgid "The file »%s« does not exists."
 msgstr "Die Datei »%s« existiert nicht."
 
-#: VirtualMailManager/VirtualMailManager.py:90
+#: VirtualMailManager/VirtualMailManager.py:92
 #, python-format
 msgid ""
 "»%s« is not a directory.\n"
@@ -283,7 +296,7 @@ msgstr ""
 "»%s« ist kein Verzeichnis.\n"
 "(vmm.cfg: Abschnitt \"domdir\", Option \"base\")"
 
-#: VirtualMailManager/VirtualMailManager.py:95
+#: VirtualMailManager/VirtualMailManager.py:97
 #, python-format
 msgid ""
 "»%(binary)s« doesn't exists.\n"
@@ -292,7 +305,7 @@ msgstr ""
 "»%(binary)s« existiert nicht.\n"
 "(vmm.cfg: Abschnitt \"bin\", Option \"%(option)s\")"
 
-#: VirtualMailManager/VirtualMailManager.py:99
+#: VirtualMailManager/VirtualMailManager.py:101
 #, python-format
 msgid ""
 "»%(binary)s« is not executable.\n"
@@ -301,7 +314,7 @@ msgstr ""
 "»%(binary)s« ist nicht ausführbar.\n"
 "(vmm.cfg: Abschnitt \"bin\", Option \"%(option)s\")"
 
-#: VirtualMailManager/VirtualMailManager.py:157
+#: VirtualMailManager/VirtualMailManager.py:158
 msgid "The domain name is too long."
 msgstr "Der Domain-Name ist zu lang."
 
@@ -327,28 +340,28 @@ msgid "Sorry, empty passwords are not permitted"
 msgstr "Entschuldigung, leere Passwörter sind nicht zulässig"
 
 #: VirtualMailManager/VirtualMailManager.py:256
-#: VirtualMailManager/VirtualMailManager.py:344
+#: VirtualMailManager/VirtualMailManager.py:343
 #, python-format
 msgid "No such directory: %s"
 msgstr "Verzeichnis nicht gefunden: %s"
 
-#: VirtualMailManager/VirtualMailManager.py:332
+#: VirtualMailManager/VirtualMailManager.py:331
 msgid "Found \"..\" in home directory path."
 msgstr "\"..\" im Pfad zum Benutzerverzeichnis entdeckt."
 
-#: VirtualMailManager/VirtualMailManager.py:340
+#: VirtualMailManager/VirtualMailManager.py:339
 msgid "Owner/group mismatch in home directory detected."
 msgstr "Benutzerverzeichnis gehört dem/der falschen Benutzer/Gruppe."
 
-#: VirtualMailManager/VirtualMailManager.py:355
+#: VirtualMailManager/VirtualMailManager.py:354
 msgid "FATAL: \"..\" in domain directory path detected."
 msgstr "FATAL: \"..\" im Pfad zum Domain-Verzeichnis entdeckt."
 
-#: VirtualMailManager/VirtualMailManager.py:361
+#: VirtualMailManager/VirtualMailManager.py:360
 msgid "FATAL: group mismatch in domain directory detected"
 msgstr "FATAL: Domain-Verzeichnis gehört der falschen Gruppe"
 
-#: VirtualMailManager/VirtualMailManager.py:448
+#: VirtualMailManager/VirtualMailManager.py:447
 #, python-format
 msgid ""
 "Configurtion error: \"%s\"\n"
@@ -357,24 +370,24 @@ msgstr ""
 "Konfigurations Fehler: \"%s\"\n"
 "(im Abschnitt \"connfig\", Option \"done\") Siehe auch: vmm.cfg(5)\n"
 
-#: VirtualMailManager/VirtualMailManager.py:468
+#: VirtualMailManager/VirtualMailManager.py:467
 #, python-format
 msgid "Invalid section: '%s'"
 msgstr "Ungültiger Abschnitt: '%s'"
 
-#: VirtualMailManager/VirtualMailManager.py:478
+#: VirtualMailManager/VirtualMailManager.py:477
 #, python-format
 msgid "Invalid argument: '%s'"
 msgstr "Ungültiges Argument: '%s'"
 
-#: VirtualMailManager/VirtualMailManager.py:488
-#: VirtualMailManager/VirtualMailManager.py:507
-#: VirtualMailManager/VirtualMailManager.py:618
+#: VirtualMailManager/VirtualMailManager.py:487
+#: VirtualMailManager/VirtualMailManager.py:506
+#: VirtualMailManager/VirtualMailManager.py:616
 #, python-format
 msgid "Invalid argument: »%s«"
 msgstr "Ungültiges Argument: »%s«"
 
-#: VirtualMailManager/VirtualMailManager.py:511
+#: VirtualMailManager/VirtualMailManager.py:510
 msgid ""
 "The keyword »detailed« is deprecated and will be removed in a future "
 "release.\n"
@@ -384,17 +397,17 @@ msgstr ""
 "    Version entfernt werden.\n"
 "    Verwenden Sie bitte das Schlüsselwort »full«, um alle Details zu erhalten."
 
-#: VirtualMailManager/VirtualMailManager.py:588
+#: VirtualMailManager/VirtualMailManager.py:586
 #, python-format
 msgid "The pattern »%s« contains invalid characters."
 msgstr "Das Muster »%s« enthält ungültige Zeichen."
 
-#: VirtualMailManager/VirtualMailManager.py:613
+#: VirtualMailManager/VirtualMailManager.py:611
 #, python-format
 msgid "The destination account/alias »%s« doesn't exists yet."
 msgstr "Der Ziel-Account/-Alias »%s« existiert noch nicht."
 
-#: VirtualMailManager/VirtualMailManager.py:630
+#: VirtualMailManager/VirtualMailManager.py:628
 #, python-format
 msgid ""
 "The account has been successfully deleted from the database.\n"
@@ -407,7 +420,7 @@ msgstr ""
 "    »%(directory)s«\n"
 "    Grund: %(raeson)s"
 
-#: VirtualMailManager/VirtualMailManager.py:662
+#: VirtualMailManager/VirtualMailManager.py:660
 msgid "Account doesn't exists"
 msgstr "Der Account existiert nicht"
 
