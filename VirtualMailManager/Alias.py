@@ -75,7 +75,7 @@ class Alias:
         if curEx == limit:
             errmsg = _(u"""Can't add new destination to alias »%(address)s«.
 Currently this alias expands into %(count)i recipients.
-One destination more will render this alias unusable.
+One more destination will render this alias unusable.
 Hint: Increase Postfix' virtual_alias_expansion_limit
 """) % {'address': self._addr, 'count': curEx}
             raise VMMAE(errmsg, ERR.ALIAS_EXCEEDS_EXPANSION_LIMIT)

@@ -47,7 +47,7 @@ class Postconf:
         """
         if not re.match(RE_PC_PARAMS, parameter):
             raise VMMException(_(u'The value »%s« looks not like a valid\
- postfix configuration parameter name.'), ERR.INVALID_AGUMENT)
+ postfix configuration parameter name.') % parameter, ERR.INVALID_AGUMENT)
         self.__val = self.__read(parameter)
         if expand_vars:
             self.__expandVars()
@@ -62,8 +62,8 @@ class Postconf:
             if pvars_len > 1:
                 self.__expandMultiVars(self.__readMulti(pvars))
                 continue
-            for var in pvars:
-                self.__val = self.__val.replace(var, self.__read(var[1:]))
+            pvars = pvars.pop()
+            self.__val = self.__val.replace(pvars, self.__read(pvars[1:]))
 
     def __expandMultiVars(self, old_new):
         for old, new in old_new.items():

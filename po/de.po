@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vmm 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-17 04:20+0200\n"
-"PO-Revision-Date: 2008-09-17 04:32+0200\n"
+"POT-Creation-Date: 2008-09-18 00:43+0200\n"
+"PO-Revision-Date: 2008-09-18 01:12+0200\n"
 "Last-Translator: Pascal Volk <p.volk@veb-it.de>\n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
@@ -88,7 +88,7 @@ msgstr "Es gibt bereits einen Account mit der Adresse »%s«."
 msgid ""
 "Can't add new destination to alias »%(address)s«.\n"
 "Currently this alias expands into %(count)i recipients.\n"
-"One destination more will render this alias unusable.\n"
+"One more destination will render this alias unusable.\n"
 "Hint: Increase Postfix' virtual_alias_expansion_limit\n"
 msgstr ""
 "Dem Alias »%(address)s« kann keine weitere Ziel-Adresse hinzugefügt werden.\n"
@@ -423,6 +423,13 @@ msgstr ""
 #: VirtualMailManager/VirtualMailManager.py:660
 msgid "Account doesn't exists"
 msgstr "Der Account existiert nicht"
+
+#: VirtualMailManager/ext/Postconf.py:49
+#, python-format
+msgid ""
+"The value »%s« looks not like a valid postfix configuration parameter name."
+msgstr ""
+"»%s« sieht nicht wie ein gültiger Postfix Konfigurationsparametername aus."
 
 #: vmm:40
 #, python-format
