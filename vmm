@@ -53,7 +53,7 @@ Usage: %s SUBCOMMAND OBJECT ARGS*
   ads   aliasdomainswitch  aliasdomain.tld    domain.tld
   add   aliasdomaindelete  aliasdomain.tld
   ua    useradd            user@domain.tld    password*
-  ui    userinfo           user@domain.tld    du*
+  ui    userinfo           user@domain.tld    details*
   un    username           user@domain.tld    'Users Name'
   up    userpassword       user@domain.tld    password*
   ut    usertransport      user@domain.tld    transport
@@ -96,7 +96,8 @@ def _getOrder():
                 ('domaindir', 0), ('aliasdomains', 0), ('accounts', 0),
                 ('aliases', 0), ('relocated', 0))
     elif argv[1] in ['ui', 'userinfo']:
-        if argc == 4 or vmm.cfgGetBoolean('maildir', 'diskusage'):
+        if argc == 4 and argv[3] != 'aliases'\
+        or vmm.cfgGetBoolean('maildir', 'diskusage'):
             order = (('address', 0), ('name', 0), ('uid', 1), ('gid', 1),
                     ('transport', 0), ('maildir', 0), ('disk usage', 0),
                     ('smtp', 1), ('pop3', 1), ('imap', 1), ('managesieve', 1))
@@ -295,7 +296,13 @@ def user_info():
     elif argc < 4:
         _printInfo(vmm.userInfo(argv[2].lower()), 'Account')
     else:
-        _printInfo(vmm.userInfo(argv[2].lower(), True), 'Account')
+        arg3 = argv[3].lower()
+        info = vmm.userInfo(argv[2].lower(), arg3)
+        if arg3 in ['aliases', 'full']:
+            _printInfo(info[0], 'Account')
+            _printList(info[1], _(u'alias addresses'))
+        else:
+            _printInfo(info, 'Account')
 
 def user_name():
     if argc < 3:

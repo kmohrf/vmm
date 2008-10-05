@@ -1,5 +1,5 @@
 .\" $Id$
-.TH "VMM" "1" "10. Sep 2008" "Pascal Volk"
+.TH "VMM" "1" "5 Oct 2008" "Pascal Volk"
 .SH NAME
 vmm \- command line tool to manage email domains/accounts/aliases
 .SH SYNOPSIS
@@ -250,12 +250,28 @@ interactively.
         Retype new password:
 .fi
 .TP
-\fBuserinfo\fP (\fBui\fP) \fIaddress\fP [ \fIdu\fP ]
+\fBuserinfo\fP (\fBui\fP) \fIaddress\fP [ \fIdetails\fP ]
 This subcommand displays some information about the account specified by
 \fIaddress\fP.
 .br
-If the optional argument \fIdu\fP is given, the disk usage of users maildir will
-be summarized and displayed too.
+If the optional argument \fIdetails\fP is given some more information will be
+displayed.
+.br
+Possible values for \fIdetails\fP are:
+.RS
+.PD 0
+.TP 
+.B aliases
+to list all alias addresses with the destination \fIaddress\fP
+.TP
+.B du
+to display the disk usage of users maildir
+.TP
+.B full
+to list all information mentioned above
+.PD
+.RE
+.LP
 .TP
 \fBusername\fP (\fBun\fP) \fIaddress\fP \fI'Users Name'\fP
 The user's real name can be set/updated with this subcommand.

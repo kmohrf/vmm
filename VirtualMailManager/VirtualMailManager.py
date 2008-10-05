@@ -503,8 +503,8 @@ class VirtualMailManager:
     def domainInfo(self, domainname, details=None):
         if details not in [None, 'accounts', 'aliasdomains', 'aliases', 'full',
                 'relocated', 'detailed']:
-            raise VMMDomainException(_(u'Invalid argument: »%s«') % details,
-                ERR.INVALID_OPTION)
+            raise VMMException(_(u'Invalid argument: »%s«') % details,
+                    ERR.INVALID_AGUMENT)
         if details == 'detailed':
             details = 'full'
             warning = _(u"""\
@@ -516,8 +516,6 @@ The keyword »detailed« is deprecated and will be removed in a future release.
         if dominfo['domainname'].startswith('xn--'):
             dominfo['domainname'] += ' (%s)'\
                 % VirtualMailManager.ace2idna(dominfo['domainname'])
-        if dominfo['aliases'] is None:
-            dominfo['aliases'] = 0
         if details is None:
             return dominfo
         elif details == 'accounts':
@@ -642,11 +640,19 @@ The account has been successfully deleted from the database.
         alias = self.__getAlias(aliasaddress, targetaddress)
         alias.delete()
 
-    def userInfo(self, emailaddress, diskusage=False):
+    def userInfo(self, emailaddress, details=None):
+        if details not in [None, 'du', 'aliases', 'full']:
+            raise VMMException(_(u'Invalid argument: »%s«') % details,
+                    ERR.INVALID_AGUMENT)
         acc = self.__getAccount(emailaddress)
         info = acc.getInfo()
-        if self.__Cfg.getboolean('maildir', 'diskusage') or diskusage:
+        if self.__Cfg.getboolean('maildir', 'diskusage')\
+        or details in ['du', 'full']:
             info['disk usage'] = self.__getDiskUsage('%(maildir)s' % info)
+            if details in [None, 'du']:
+                return info
+        if details in ['aliases', 'full']:
+            return (info, acc.getAliases())
         return info
 
     def userByID(self, uid):

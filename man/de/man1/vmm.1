@@ -1,5 +1,5 @@
 .\" $Id$
-.TH "VMM" "1" "10. Sep 2008" "Pascal Volk"
+.TH "VMM" "1" "5. Okt 2008" "Pascal Volk"
 .SH NAME
 vmm \- Programm für die Kommandozeile, um E-Mail-Domains, -Konten und -Aliase zu
 verwalten.
@@ -266,12 +266,28 @@ Modus erfragen.
         Neues Passwort wiederholen:
 .fi
 .TP
-\fBuserinfo\fP (\fBui\fP) \fIAdresse\fP [ \fIdu\fP ]
+\fBuserinfo\fP (\fBui\fP) \fIAdresse\fP [ \fIdetails\fP ]
 Dieser Unterbefehl zeigt einige Informationen über das Konto mit der angegebenen
 \fIAdresse\fP an.
 .br
-Wurde das optionale Argument \fIdu\fP angegeben, wird zusätzlich die
-Festplattenbelegung des Kontos ermittelt und ausgegeben.
+Wurde das optionale Argument \fIdetails\fP angegeben, werden weitere
+Informationen ausgegeben.
+.br
+Mögliche Werte für \fIdetails\fP sind:
+.RS
+.PD 0
+.TP 
+.B aliases
+um alle Alias-Adressen, mit dem Ziel \fIAdresse\fP, aufzulisten
+.TP
+.B du
+um zusätzlich die Festplattenbelegung des Kontos anzuzeigen
+.TP
+.B full
+um alle oben genannten Informationen anzuzeigen
+.PD
+.RE
+.LP
 .TP
 \fBusername\fP (\fBun\fP) \fIAdresse\fP \fI'Bürgerlicher Name'\fP
 Der Bürgerliche Name des Konto-Inhabers mit der angegebenen \fIAdresse\fP kann

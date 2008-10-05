@@ -197,6 +197,19 @@ WHERE gid=%s AND local_part=%s",
                     tid=info['transport']).getTransport()
             return info
 
+    def getAliases(self):
+        dbc = self._dbh.cursor()
+        dbc.execute("SELECT address ||'@'|| domainname FROM alias, domain_name\
+ WHERE destination = %s AND domain_name.gid = alias.gid\
+ AND domain_name.is_primary", str(self._addr))
+        addresses = dbc.fetchall()
+        dbc.close()
+        aliases = []
+        if len(addresses) > 0:
+            for alias in addresses:
+                aliases.append(alias[0])
+        return aliases
+
     def delete(self, delalias):
         if self._uid < 1:
             raise AccE(_(u"The account »%s« doesn't exists.") % self._addr,
