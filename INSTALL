@@ -68,7 +68,7 @@ Configuring Dovecot
       postmaster_address = postmaster@YOUR-DOMAIN.TLD
     }
     auth default {
-      mechanisms = plain login cram-md5 
+      mechanisms = cram-md5 login plain
       passdb sql {
         args = /etc/dovecot/dovecot-sql.conf
       }
@@ -137,7 +137,12 @@ Configuring Postfix's main.cf
     smtpd_sasl_type = dovecot
     smtpd_sasl_path = private/auth
     smtpd_sasl_auth_enable = yes
-    smtpd_sasl_local_domain = $myhostname
+    # keep smtpd_sasl_local_domain identical to Dovecot's auth_default_realm
+    # both are empty by default
+    # let it commented out if you want to use more than one domain
+    # its only required if you use the digest-md5 mechanism
+    # read more at: http://wiki.dovecot.org/Authentication/Mechanisms/DigestMD5
+    #smtpd_sasl_local_domain = $mydomain
     smtpd_sasl_security_options = noplaintext, noanonymous
     #smtpd_sasl_security_options = noanonymous
     #broken_sasl_auth_clients = yes
