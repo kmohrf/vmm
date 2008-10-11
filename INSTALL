@@ -137,12 +137,10 @@ Configuring Postfix's main.cf
     smtpd_sasl_type = dovecot
     smtpd_sasl_path = private/auth
     smtpd_sasl_auth_enable = yes
-    # keep smtpd_sasl_local_domain identical to Dovecot's auth_default_realm
-    # both are empty by default
-    # let it commented out if you want to use more than one domain
-    # its only required if you use the digest-md5 mechanism
-    # read more at: http://wiki.dovecot.org/Authentication/Mechanisms/DigestMD5
-    #smtpd_sasl_local_domain = $mydomain
+    # Keep smtpd_sasl_local_domain identical to Dovecot's auth_default_realm:
+    # empty. Both are empty by default. Let it commented out.
+    # Read more at: http://wiki.dovecot.org/Authentication/Mechanisms/DigestMD5
+    #smtpd_sasl_local_domain =
     smtpd_sasl_security_options = noplaintext, noanonymous
     #smtpd_sasl_security_options = noanonymous
     #broken_sasl_auth_clients = yes
