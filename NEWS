@@ -1,0 +1,17 @@
+v0.5  2008-11-26  Pascal Volk <neverseen@users.sf.net>
+
+	+ gettext i18n support (German translation)
+	+ support for alias domains (add/info/switch/delete).
+	+ support for relocated users (add/info/delete).
+	+ base layout of the users Maildir is now configurable. Also a according
+  	  "subscriptions" file will be created.
+	+ subcommand »listdomains«: lists all configured domains or domains that
+	  matches the specified search pattern.
+	+ subcommand »userinfo« can additional display assigned alias addresses.
+	+ subcommand »aliasadd« checks Postfix's "virtual_alias_recursion_limit"
+	  before adding an additional destination address.
+	+ optional SQL functions (see create_optional_types_and_functions.pgsql)
+	- »useradd«/»userpassword«: fixed behavior of interactive password
+	  prompt.
+	- fixed some encoding problems (UnicodeEncodeErrors).
+	- fixed bug in generation of DIGEST-MD5 hashes.

@@ -3,6 +3,6 @@
 # See COPYING for distribution information.
 # $Id$
 
-VERSION = '0.5-dev'
+VERSION = '0.5'
 REVISION = 'rev '+'$Rev$'.split()[1]
 RELDATE = '$Date$'.split()[1]
