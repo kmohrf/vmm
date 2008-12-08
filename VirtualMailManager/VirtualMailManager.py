@@ -46,7 +46,7 @@ class VirtualMailManager:
         """Creates a new VirtualMailManager instance.
         Throws a VMMNotRootException if your uid is greater 0.
         """
-        self.__cfgFileName = '/usr/local/etc/vmm.cfg'
+        self.__cfgFileName = ''
         self.__permWarnMsg = _(u"fix permissions for »%(cfgFileName)s«\n\
 `chmod 0600 %(cfgFileName)s` would be great.") % {'cfgFileName':
             self.__cfgFileName}
@@ -67,11 +67,19 @@ class VirtualMailManager:
         if not sys.argv[1] in ['cf', 'configure']:
             self.__chkenv()
 
+    def __findCfgFile(self):
+        for path in ['/root', '/usr/local/etc', '/etc']:
+            if os.path.isfile(path+'/vmm.cfg'):
+                self.__cfgFileName = path+'/vmm.cfg'
+                break
+        if not len(self.__cfgFileName):
+            raise VMMException(
+                _(u"No »vmm.cfg« found in: /root:/usr/local/etc:/etc"),
+                ERR.CONF_NOFILE)
+
     def __chkCfgFile(self):
         """Checks the configuration file, returns bool"""
-        if not os.path.isfile(self.__cfgFileName):
-            raise VMMException(_(u"The file »%s« does not exists.") %
-                self.__cfgFileName, ERR.CONF_NOFILE)
+        self.__findCfgFile()
         fstat = os.stat(self.__cfgFileName)
         fmode = int(oct(fstat.st_mode & 0777))
         if fmode % 100 and fstat.st_uid != fstat.st_gid \

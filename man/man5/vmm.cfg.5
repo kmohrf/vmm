@@ -1,11 +1,11 @@
 .\" $Id$
-.TH vmm.cfg 5 "15 Sep 2008" "Pascal Volk"
+.TH vmm.cfg 5 "08 Dec 2008" "Pascal Volk"
 .SH NAME
 vmm.cfg \- configuration file for vmm
 .SH SYNOPSIS
-/usr/local/etc/vmm.cfg
+vmm.cfg
 .SH DESCRIPTION
-\fBvmm\fR(1) reads configuration data from \fI/usr/local/etc/vmm.cfg\fP.
+\fBvmm\fR(1) reads configuration data from \fIvmm.cfg\fP.
 .br
 The configuration file is split in multiple sections. A section starts with the
 section  name, enclosed in square brackets '[' and ']' (e.g. \fB[database]\fP),
@@ -33,6 +33,24 @@ example \fB1\fP, \fB50\fP or \fB321\fP are integers.
 .I String
 a sequence of characters and numbers. For example '\fBword\fP', '\fBhello
 world\fP', or '\fB/usr/bin/strings\fP'
+.SS SEARCH ORDER
+By default vmm looks for \fIvmm.cfg\fP in the following directories in the
+order listed:
+.RS
+.PD 0
+.TP
+.I
+/root
+.TP
+.I
+/usr/local/etc
+.TP
+.I
+/etc
+.PD
+.RE
+.PP
+The first match it finds will be used.
 .\" -----
 .SH DATABASE SECTION
 The \fBdatabase\fP section is used to specify some options required to
@@ -220,7 +238,7 @@ configurations mode.
 done = true
 .\" -----
 .SH FILES
-/usr/local/etc/vmm.cfg
+vmm.cfg
 .SH SEE ALSO
 vmm(1), command line tool to manage email domains/accounts/aliases
 .SH AUTHOR

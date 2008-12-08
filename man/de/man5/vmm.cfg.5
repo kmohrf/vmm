@@ -1,12 +1,11 @@
 .\" $Id$
-.TH vmm.cfg 5 "15 Sep 2008" "Pascal Volk"
+.TH vmm.cfg 5 "08 Dez 2008" "Pascal Volk"
 .SH NAME
 vmm.cfg \- Konfigurationsdatei für vmm
 .SH SYNOPSIS
-/usr/local/etc/vmm.cfg
+vmm.cfg
 .SH BESCHREIBUNG
-\fBvmm\fR(1) liest Konfigurationsparameter aus der Datei
-\fI/usr/local/etc/vmm.cfg\fP.
+\fBvmm\fR(1) liest Konfigurationsparameter aus der Datei \fIvmm.cfg\fP.
 .br
 Die Konfigurationsdatei ist in mehrere Abschnitte unterteilt. Jeder Abschnitt
 wird mit dem, in eckigen Klammern '[' und ']' eingefassten, Namen des Abschnitts
@@ -38,7 +37,25 @@ Beispielsweise sind \fB1\fP, \fB50\fP oder \fB321\fP Integer-Zahlen.
 .I String
 eine Folge von Buchstaben und Zahlen.
 .br
-Zum Beispiel: '\fBWort\fP', '\fBHallo Welt\fP', oder '\fB/usr/bin/strings\fP' 
+Zum Beispiel: '\fBWort\fP', '\fBHallo Welt\fP', oder '\fB/usr/bin/strings\fP'
+.SS SUCH REIHENFOLGE
+Standardmäßig sucht vmm die \fIvmm.cfg\fP in folgenden Verzeichnissen, in dieser
+Reihenfolge:
+.RS
+.PD 0
+.TP
+.I
+/root
+.TP
+.I
+/usr/local/etc
+.TP
+.I
+/etc
+.PD
+.RE
+.PP
+Die zuerst gefundene Datei wird verwendet.
 .\" -----
 .SH DATABASE ABSCHNITT
 Der \fBdatabase\fP-Abschnitt wird verwendet, um die für den Datenbankzugriff
@@ -237,7 +254,7 @@ beim nächsten Aufruf im interaktiven Konfigurations-Modus.
 done = true
 .\" -----
 .SH DATEIEN
-/usr/local/etc/vmm.cfg
+vmm.cfg
 .SH SIEHE AUCH
 vmm(1), Programm für die Kommandozeile, um E-Mail-Domains, -Konten und -Aliase
 zu verwalten.

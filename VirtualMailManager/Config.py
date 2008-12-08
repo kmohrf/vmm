@@ -96,6 +96,8 @@ class Config(ConfigParser):
     def check(self):
         if not self.__chkSections():
             errmsg = StringIO()
+            errmsg.write(_("Using configuration file: %s\n") %\
+                    self.__cfgFileName)
             for k,v in self.__missing.items():
                 if v[0] is True:
                     errmsg.write(_(u"missing section: %s\n") % k)
@@ -129,6 +131,7 @@ class Config(ConfigParser):
         except ValueError:
             self.set('config', 'done', 'False')
             self.__changes = True
+        print _(u"Using configuration file: %s\n" % self.__cfgFileName)
         for s in sections:
             if s != 'config':
                 print _(u'* Config section: »%s«') % s
