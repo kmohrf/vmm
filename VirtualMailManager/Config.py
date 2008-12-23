@@ -131,7 +131,7 @@ class Config(ConfigParser):
         except ValueError:
             self.set('config', 'done', 'False')
             self.__changes = True
-        print _(u"Using configuration file: %s\n" % self.__cfgFileName)
+        print _(u"Using configuration file: %s\n") % self.__cfgFileName
         for s in sections:
             if s != 'config':
                 print _(u'* Config section: »%s«') % s

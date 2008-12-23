@@ -10,9 +10,9 @@ from distutils.core import setup
 from VirtualMailManager.constants.VERSION import VERSION
 
 long_description = """
-Virtual Mail Manager is a command line tool for administrators/postmasters to
-manage domains, accounts and aliases. It's designed for Dovecot and Postfix
-with a PostgreSQL backend.
+Virtual Mail Manager is a command line tool for
+administrators/postmasters to manage domains, accounts and aliases.
+It's designed for Dovecot and Postfix with a PostgreSQL backend.
 """
 
 # remove existing MANIFEST
@@ -29,7 +29,7 @@ setup(name='VirtualMailManager',
       author='Pascal Volk',
       author_email='p.volk@veb-it.de',
       license='BSD License',
-      url='http://vmm.sf.net/',
+      url='http://vmm.localdomain.org/',
       download_url='http://sf.net/project/showfiles.php?group_id=213727',
       platforms=['linux2', 'openbsd4'],
       classifiers=[

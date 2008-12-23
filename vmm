@@ -491,4 +491,7 @@ if __name__ == '__main__':
     except (EOFError, KeyboardInterrupt):
         w_err(EXIT.USER_INTERRUPT, '\n%s!\n' % _(u'Ouch'))
     except (VMME.VMMConfigException, VMME.VMMException), e:
-        w_err(e.code(), "%s: %s" % (_(u'Error'), e.msg()))
+        if e.code() != ERR.DATABASE_ERROR:
+            w_err(e.code(), "%s: %s" % (_(u'Error'), e.msg()))
+        else:
+            w_err(e.code(), "%s" % unicode(e.msg(), ENCODING, 'replace'))
