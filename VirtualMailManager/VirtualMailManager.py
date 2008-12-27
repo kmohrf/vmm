@@ -15,6 +15,7 @@ __date__ = '$Date$'.split()[1]
 import os
 import re
 import sys
+import locale
 from encodings.idna import ToASCII, ToUnicode
 from getpass import getpass
 from shutil import rmtree
@@ -39,6 +40,8 @@ RE_DOMAIN = """^(?:[a-z0-9-]{1,63}\.){1,}[a-z]{2,6}$"""
 RE_DOMAIN_SRCH = """^[a-z0-9-\.]+$"""
 RE_LOCALPART = """[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]"""
 RE_MBOX_NAMES = """^[\x20-\x25\x27-\x7E]*$"""
+locale.setlocale(locale.LC_ALL, '')
+ENCODING = locale.nl_langinfo(locale.CODESET)
 
 class VirtualMailManager:
     """The main class for vmm"""
@@ -209,11 +212,12 @@ class VirtualMailManager:
             clear0 = getpass(prompt=_('Enter new password: '))
             clear1 = getpass(prompt=_('Retype new password: '))
             if clear0 != clear1:
-                sys.stderr.write('%s\n' % _('Sorry, passwords do not match'))
+                msg = _('Sorry, passwords do not match')
+                sys.stderr.write('%s\n' % msg.encode(ENCODING, 'replace'))
                 continue
             if len(clear0) < 1 or len(clear1) < 1:
-                sys.stderr.write('%s\n'
-                        % _('Sorry, empty passwords are not permitted'))
+                msg = _('Sorry, empty passwords are not permitted')
+                sys.stderr.write('%s\n' % msg.encode(ENCODING, 'replace'))
                 continue
             mismatched = False
         return clear0
