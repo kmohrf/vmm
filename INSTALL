@@ -118,6 +118,8 @@ Configuring Postfix's master.cf
 
 
 Configuring Postfix's main.cf
+    # relocated users from the database
+    #relocated_maps = pgsql:/etc/postfix/pgsql-relocated_maps.cf
 
     # virtual domains
     virtual_mailbox_domains = pgsql:/etc/postfix/pgsql-virtual_mailbox_domains.cf
