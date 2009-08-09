@@ -1,17 +1,11 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2008 VEB IT
+# Copyright (c) 2008 - 2009, VEB IT
 # See COPYING for distribution information.
-# $Id$
 
 """Virtual Mail Manager's MailLocation class to manage the mail_location
 for accounts."""
 
-from constants.VERSION import VERSION
-
-__author__ = 'Pascal Volk <p.volk@veb-it.de>'
-__version__ = VERSION
-__revision__ = 'rev '+'$Rev$'.split()[1]
-__date__ = '$Date$'.split()[1]
+from constants.VERSION import *
 
 import re
 

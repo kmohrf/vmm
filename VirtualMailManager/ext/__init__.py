@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2008 VEB IT
+# Copyright (c) 2008 - 2009, VEB IT
 # See COPYING for distribution information.
-# $Id$
 # package placeholder
 #
 # EOF

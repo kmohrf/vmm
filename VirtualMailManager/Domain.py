@@ -1,16 +1,10 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2007-2008 VEB IT
+# Copyright (c) 2007 - 2009, VEB IT
 # See COPYING for distribution information.
-# $Id$
 
 """Virtual Mail Manager's Domain class to manage e-mail domains."""
 
-from constants.VERSION import VERSION
-
-__author__ = 'Pascal Volk <p.volk@veb-it.de>'
-__version__ = VERSION
-__revision__ = 'rev '+'$Rev$'.split()[1]
-__date__ = '$Date$'.split()[1]
+from constants.VERSION import *
 
 from random import choice
 

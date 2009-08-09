@@ -1,8 +1,7 @@
 #!/bin/sh
-# $Id$
 #
 # Upgrade script for the Virtual Mail Manager
-# run: ./install.sh
+# run: ./upgrade.sh
 
 LANG=C
 PATH=/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
@@ -12,7 +11,7 @@ PF_CONFDIR=$(postconf -h config_directory)
 PF_GID=$(id -g $(postconf -h mail_owner))
 LOCALE_DIR=${PREFIX}/share/locale
 DOC_DIR=${PREFIX}/share/doc/vmm
-if [ ${PREFIX} == "/usr" ]; then
+if [ ${PREFIX} = "/usr" ]; then
     MANDIR=${PREFIX}/share/man
 else
     MANDIR=${PREFIX}/man

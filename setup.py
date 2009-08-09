@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright 2007-2008 VEB IT
+# Copyright 2007 - 2009, VEB IT
 # See COPYING for distribution information.
-# $Id$
 
 import os
 from distutils.core import setup

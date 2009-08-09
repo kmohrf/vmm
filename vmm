@@ -1,17 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-# Copyright 2007-2008 VEB IT
+# Copyright 2007 - 2009, VEB IT
 # See COPYING for distribution information.
-# $Id$
 
 """This is the vmm main script."""
 
-from VirtualMailManager.constants.VERSION import VERSION, REVISION, RELDATE
-
-__author__ = 'Pascal Volk <p.volk@veb-it.de>'
-__version__ = VERSION
-__revision__ = 'rev '+'$Rev$'.split()[1]
-__date__ = '$Date$'.split()[1]
+from VirtualMailManager.constants.VERSION import *
 
 import locale
 import os
@@ -410,10 +404,11 @@ def show_warnings():
             w_std( " * %s" % warning)
 
 def show_version():
-    w_std("%s, %s %s (%s %s %s)\nPython %s %s %s\n" % (__prog__, _('version'),
-        __version__, REVISION, _('from'), strftime(
-            locale.nl_langinfo(locale.D_FMT), strptime(RELDATE, '%Y-%m-%d')),
-        sys.version.split()[0], _(u'on'), os.uname()[0]))
+    w_std('%s, %s %s (%s %s)\nPython %s %s %s\n\n%s %s' % (__prog__,
+        _('version'), __version__, _('from'), strftime(
+            locale.nl_langinfo(locale.D_FMT), strptime(__date__, '%Y-%m-%d')),
+        sys.version.split()[0], _(u'on'), os.uname()[0], __prog__,
+        'is free software and comes with ABSOLUTELY NO WARRANTY.'))
 
 #def main():
 if __name__ == '__main__':

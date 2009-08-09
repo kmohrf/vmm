@@ -1,16 +1,10 @@
 # -*- coding: UTF-8 -*-
-# Copyright 2008 VEB IT
+# Copyright (c) 2008 - 2009, VEB IT
 # See COPYING for distribution information.
-# $Id$
 
 """A small - r/o - wrapper class for Postfix' postconf."""
 
-from VirtualMailManager.constants.VERSION import VERSION
-
-__author__ = 'Pascal Volk <p.volk@veb-it.de>'
-__version__ = VERSION
-__revision__ = 'rev '+'$Rev$'.split()[1]
-__date__ = '$Date$'.split()[1]
+from VirtualMailManager.constants.VERSION import *
 
 import re
 from subprocess import Popen, PIPE

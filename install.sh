@@ -1,5 +1,4 @@
 #!/bin/sh
-# $Id$
 #
 # Installation script for the Virtual Mail Manager
 # run: ./install.sh
@@ -12,7 +11,7 @@ PF_CONFDIR=$(postconf -h config_directory)
 PF_GID=$(id -g $(postconf -h mail_owner))
 LOCALE_DIR=${PREFIX}/share/locale
 DOC_DIR=${PREFIX}/share/doc/vmm
-if [ ${PREFIX} == "/usr" ]; then
+if [ ${PREFIX} = "/usr" ]; then
     MANDIR=${PREFIX}/share/man
 else
     MANDIR=${PREFIX}/man

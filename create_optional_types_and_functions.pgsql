@@ -1,5 +1,3 @@
--- $Id$
-
 -- --- Information:
 -- This file contains some data types and functions these should speed up some
 -- operations. Read the comment on each data type/functions for more details.
