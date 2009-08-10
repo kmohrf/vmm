@@ -9,6 +9,7 @@ PREFIX=/usr/local
 
 PF_CONFDIR=$(postconf -h config_directory)
 PF_GID=$(id -g $(postconf -h mail_owner))
+POSTCONF=$(which postconf)
 LOCALE_DIR=${PREFIX}/share/locale
 DOC_DIR=${PREFIX}/share/doc/vmm
 if [ ${PREFIX} = "/usr" ]; then
@@ -41,6 +42,14 @@ for po in $(ls -1 *.po); do
 done
 cd - >/dev/null
 
+# remove misplaced manual pages
+if [ -f /usr/local/share/man/man1/vmm.1 ]; then
+    rm -f /usr/local/share/man/man1/vmm.1
+fi
+if [ -f /usr/local/share/man/man5/vmm.cfg.5 ]; then
+    rm -f /usr/local/share/man/man5/vmm.cfg.5
+fi
+
 # install manual pages
 cd man
 [ -d ${MANDIR}/man1 ] || mkdir -m 0755 -p ${MANDIR}/man1
@@ -71,4 +80,7 @@ done
 [ -d ${DOC_DIR}/examples ] || mkdir -m 0755 -p ${DOC_DIR}/examples
 install -m 0644 ${INSTALL_OPTS} pgsql-*.cf ${DOC_DIR}/examples
 install -m 0644 ${INSTALL_OPTS} vmm.cfg ${DOC_DIR}/examples
+
+# update config file
+./update_config_0.4.x-0.5.py $POSTCONF
 
