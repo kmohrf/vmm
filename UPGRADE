@@ -19,5 +19,10 @@ If you have installed vmm 0.4/0.4-r41 you have to proceed this steps:
     * start Dovecot and Postfix
 
 
+If you have installed vmm 0.5:
+
+    * execute upgrade.sh
+
+
 else
      * read INSTALL

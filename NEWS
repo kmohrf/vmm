@@ -1,3 +1,10 @@
+v0.5.1  2009-08-12  Pascal Volk <neverseen@users.sf.net>
+
+	+ Added support for a variable "vmm.cfg" location in
+	  /root, /usr/local/etc or /etc (see vmm.cfg(5))
+	- fixed a few UnicodeDecodeErrors 
+	- fixed a quoting mistake in vmm.cfg
+
 v0.5  2008-11-26  Pascal Volk <neverseen@users.sf.net>
 
 	+ gettext i18n support (German translation)
