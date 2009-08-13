@@ -15,6 +15,7 @@ import constants.ERROR as ERR
 RE_LOCALPART = """[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]"""
 
 class EmailAddress(object):
+    __slots__ = ('_localpart', '_domainname')
     def __init__(self, address):
         self._localpart = None
         self._domainname = None
