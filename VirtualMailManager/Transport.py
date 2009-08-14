@@ -10,8 +10,9 @@ from constants.VERSION import *
 from Exceptions import VMMTransportException
 import constants.ERROR as ERR
 
-class Transport:
-    """A wrapper class thats provide access to the transport table"""
+class Transport(object):
+    """A wrapper class that provides access to the transport table"""
+    __slots__ = ('__id', '__transport', '_dbh')
     def __init__(self, dbh, tid=None, transport=None):
         """Creates a new Transport instance.
 
@@ -37,6 +38,19 @@ class Transport:
         else:
             self.__transport = transport
             self._loadByName()
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__id == other.getID()
+        return NotImplemented
+
+    def __ne__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__id != other.getID()
+        return NotImplemented
+
+    def __str__(self):
+        return self.__transport
 
     def _loadByID(self):
         dbc = self._dbh.cursor()

@@ -170,6 +170,8 @@ class Domain:
         force -- True/False force new transport for all accounts (bool)
         """
         if self._id > 0:
+            if transport == self._transport.getTransport():
+                return
             trsp = Transport(self._dbh, transport=transport)
             dbc = self._dbh.cursor()
             dbc.execute("UPDATE domain_data SET tid = %s WHERE gid = %s",
