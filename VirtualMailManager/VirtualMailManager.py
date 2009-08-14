@@ -181,22 +181,22 @@ class VirtualMailManager:
 
     def accountExists(dbh, address):
         sql = "SELECT gid FROM users WHERE gid = (SELECT gid FROM domain_name\
- WHERE domainname = '%(_domainname)s') AND local_part = '%(_localpart)s'" %\
-            address.__dict__
+ WHERE domainname = '%s') AND local_part = '%s'" % (address._domainname,
+            address._localpart)
         return VirtualMailManager._exists(dbh, sql)
     accountExists = staticmethod(accountExists)
 
     def aliasExists(dbh, address):
         sql = "SELECT DISTINCT gid FROM alias WHERE gid = (SELECT gid FROM\
- domain_name WHERE domainname = '%(_domainname)s') AND address =\
- '%(_localpart)s'" % address.__dict__
+ domain_name WHERE domainname = '%s') AND address = '%s'" %\
+            (address._domainname, address._localpart)
         return VirtualMailManager._exists(dbh, sql)
     aliasExists = staticmethod(aliasExists)
 
     def relocatedExists(dbh, address):
         sql = "SELECT gid FROM relocated WHERE gid = (SELECT gid FROM\
- domain_name WHERE domainname = '%(_domainname)s') AND address =\
- '%(_localpart)s'" % address.__dict__
+ domain_name WHERE domainname = '%s') AND address = '%s'" %\
+            (address._domainname, address._localpart)
         return VirtualMailManager._exists(dbh, sql)
     relocatedExists = staticmethod(relocatedExists)
 
