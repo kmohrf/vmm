@@ -1,34 +1,176 @@
-=== 0.0.0 ===
+=== 0.5.1 ===
+2009-08-12  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* NEWS, UPGRADE, VirtualMailManager/constants/VERSION.py:
+	Released vmm-0.5.1
+	[dc98cc162c66] [vmm-0.5.1]
+	* pgsql-relocated_maps.cf, pgsql-smtpd_sender_login_maps.cf,
+	pgsql-transport.cf, pgsql-virtual_alias_maps.cf,
+	pgsql-virtual_gid_maps.cf, pgsql-virtual_mailbox_domains.cf,
+	pgsql-virtual_mailbox_maps.cf, pgsql-virtual_uid_maps.cf:
+	Set default value of hosts to localhost
+	Updated comments 
+
+2009-08-09  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Config.py:
+	Replaced the last non encoded print statement.
+	* install.sh, upgrade.sh:
+	Do now strict POSIX compliant string comparison in expressions.
+	Fixed a typo in upgrade.sh.
+	* nearly all files:
+	Removed the subversion keywords $Date$, $Id$ and $Rev$ from all files.
+
+2008-12-27  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Config.py:
+	Config.configure(): Eliminated another UnicodeEncodeError.
+	* vmm.cfg: removed single quotes around bin.postconf
+	Thanks to samfisch for reporting both bugs
+
+2008-12-23  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Config.py:
+	fixed parenthesis in Config.configure()
+
+	* setup.py: adjusted long_description
+	updated url to http://vmm.localdomain.org/
+
+	* vmm: 	fixed UnicodeDecodeError, that could occur with German locale
+
+2008-12-08  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/VirtualMailManager.py,VirtualMailManager/Config.py:
+	Added support for variable "vmm.cfg" location in
+	/root:/usr/local/etc:/etc
+
+=== 0.5 ===
+2008-11-26  Pascal Volk  <neverseen@users.sourceforge.net>
+	* NEWS:
+	Added to repository. News (enhancements, bug fixes) for non programmers
+
+	* VirtualMailManager/constants/VERSION.py:
+	Updated version from 0.5-dev to 0.5
+
+2008-09-16  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/ext/Postconf.py:
+	Added to repository to read some Postfix settings
+
+2008-09-09  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Domain.py, vmm,
+	VirtualMailManager/VirtualMailManager.py:
+	Added relocated stuff
+
+2008-09-08  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/EmailAddress.py:
+	Added to repository, to simplify/reduce address validation
+
+2008-09-01  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* create_optional_types_and_functions.pgsql:
+	Added to repository, for faster database lookups
+
+2008-08-29  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/VirtualMailManager.py:
+	Fixed DIGEST-MD5 hash generation.
+
+2008-08-23  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Exceptions.py:
+	Fixed AttributeError in class VMMException on older Python
+	installations. (VMMException instance has no attribute 'message')
+
+2008-08-22  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Domain.py, VirtualMailManager/AliasDomain.py
+	VirtualMailManager/VirtualMailManager.py:
+	did some alias domain modifications/enhancements
+
+	* vmm: Implemented w_std() to write encoded output to stdout
+
+2008-08-19  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Config.py.
+	VirtualMailManager/VirtualMailManager.py, vmm:
+	Renamed class VMMConfig -> Config
+	Adjusted Config import
+
+2008-08-16  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/VirtualMailManager.py,
+	VirtualMailManager/Domain.py:
+	Added alias domain stuff
+
+2008-08-14  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Account.py, VirtualMailManager/Domain.py:
+	adjusted to modified database layout
+
+	* create_tables.pgsql, update_tables_0.4.x-0.5.pgsql:
+	modified database layout
+
+2008-08-07  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Account.py: Account.getInfo() added i18n stuff
+
 2008-08-06  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* vmm (_getOrder):
-		Respect vmm.cfg/maildir/diskusage settings
-	* VirtualMailManager/VirtualMailManager.py:
-		Adds a warning if a directory not exists:
-		  VirtualMailManager.__getDiskUsage()
-		  VirtualMailManager.__maildirdelete()
-		  VirtualMailManager.__domdirdelete()
-		Implemented:
-		  VirtualMailManager.__isdir()
-		  VirtualMailManager.cfgGetBoolean()
-		  VirtualMailManager.cfgGetInt()
-		  VirtualMailManager.cfgGetString()
-	* po/vmm.pot, po/de.po:
-		Updated
+	Respect vmm.cfg/maildir/diskusage settings
 
+	* VirtualMailManager/VirtualMailManager.py:
+	Adds a warning if a directory not exists:
+	  VirtualMailManager.__getDiskUsage()
+	  VirtualMailManager.__maildirdelete()
+	  VirtualMailManager.__domdirdelete()
+	Implemented:
+	  VirtualMailManager.__isdir()
+	  VirtualMailManager.cfgGetBoolean()
+	  VirtualMailManager.cfgGetInt()
+	  VirtualMailManager.cfgGetString()
+	* po/vmm.pot, po/de.po: Updated
+
+2008-06-17  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* install.sh, upgrade.sh: fixed $MANDIR
+	* vmm: removed BEL escape sequences
+
+2008-06-11  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* install.sh:
+	removed verbose stuff
+	fixed (multilingual) man pages installation stuff
+	* man/man1/vmm1, man/man5/vmm.cfg.5:
+	moved to sub folders
+	 
 2008-05-25  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* VirtualMailManager/VirtualMailManager.py (VirtualMailManager):
-		Renamed:
-		  __idn2ascii() -> idn2ascii()
-		  __ace2idna()  -> ace2idna()
-		Implemented domain_list()
-		some small code cleanups
+	Renamed: __idn2ascii() -> idn2ascii()
+		 __ace2idna()  -> ace2idna()
+	Implemented domain_list()
+	some small code cleanups
 	* vmm:
-		Implemented domain_list()
-		some small code cleanups
+	Implemented domain_list()
+	some small code cleanups
 	* VirtualMailManager/Domain.py:
-		Implemented search()
+	Implemented search()
+
+2008-05-18  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Account.py, VirtualMailManager/Alias.py,
+	VirtualMailManager/Config.py, VirtualMailManager/Domain.py,
+	VirtualMailManager/MailLocation.py, VirtualMailManager/Transport.py,
+	VirtualMailManager/VirtualMailManager.py, po/de.po, po/vmm.pot, vmm:
+	completed gettext support
+
+2008-05-15  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* vmm.cfg: now vmm.cfg conforms to example in INSTALL.
 
 2008-05-13  Pascal Volk  <neverseen@users.sourceforge.net>
 
@@ -36,24 +178,43 @@
 	VirtualMailManager/Account.py, VirtualMailManager/Transport.py,
 	VirtualMailManager/VirtualMailManager.py, VirtualMailManager/Config.py,
 	VirtualMailManager/Domain.py, vmm:
-		Added i18n (gettext) support
-	* install.sh:
-		+Install message objects
+	Added i18n (gettext) support
+	* install.sh: Install message objects
+
+2008-05-10  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* install.sh: Should now also work on all *BSDs
 
 2008-05-01  Pascal Volk  <neverseen@users.sourceforge.net>
 
-	* VirtualMailManager/VirtualMailManager.py (VirtualMailManager.__chkenv()):
-		Create the base directory with correct access mode and gid, if it does
-		not exist yet.
+	* VirtualMailManager/VirtualMailManager.py
+	(VirtualMailManager.__chkenv()):
+	Create the base directory with correct access mode and gid, ifit does
+	not exist yet.
+	* update_config_0.3.x-0.4.py, update_tables_0.3.x-0.4.py, UPGRADE,
+	upgrade.sh:
+	removed because vmm 0.4 was released
+
+=== 0.4-r41 ===
+2008-05-01  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* create_tables.pgsql:
+	fixed typo in CREATE TABLE users
+	* install.sh, upgrade.sh:
+	Added again $PF_GID (was removed with r19)
+
+2008-04-30  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* UPGRADE: added hint for virtual_mailbox_domains in UPGRADE
 
 === 0.4 ===
 2008-04-30  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* vmm.1, vmm.cfg.5:
-		Reworded some parts.
+	Reworded some parts.
 	* vmm:
-		Added function _getOrder() for a (hopefully) better structured output
-		from the domaininfo, userinfo and getuser subcommands.
+	Added function _getOrder() for a (hopefully) better structured 	output
+	from the domaininfo, userinfo and getuser subcommands.
 
 2008-04-28  Pascal Volk  <neverseen@users.sourceforge.net>
 
@@ -61,38 +222,35 @@
 	* update_config_0.3.x-0.4.py:
 	* VirtualMailManager/VirtualMailManager.py:
 	* VirtualMailManager/Config.py:
-		Moved option 'base' from section 'maildir' to section 'domdir'
+	Moved option 'base' from section 'maildir' to section 'domdir'
 	* VirtualMailManager/Account.py (Account._setAddr()):
-		Removed parameter 'address'
-	* VirtualMailManager/Domain.py (Domain.getAccounts(), Domain.getAliases()):
-		Added 'ORDER BY' clause in queries.
-	+ setup.py:
-		Adjusted trove classifiers.
+	Removed parameter 'address'
+	* VirtualMailManager/Domain.py (Domain.getAccounts(),
+	Domain.getAliases()): Added 'ORDER BY' clause in queries.
+	+ setup.py: Adjusted trove classifiers.
 
 2008-04-21  Pascal Volk  <neverseen@users.sourceforge.net>
 
 	* create_tables.pgsql (table users):
-		Replaced column 'disabled' with columns smpt, pop3, imap and managesieve
+	Replaced column 'disabled' with columns smpt, pop3, imap and managesieve
 	* create_tables.pgsql (view dovecot_password):
-		updated view, added service columns smpt, pop3, imap and  managesieve
+	updated view, added service columns smpt, pop3, imap and  managesieve
 	* update_tables_0.3.x-0.4.py:
-		Updated to consider the points above mentioned
+	Updated to consider the points above mentioned
 	* vmm.cfg:
-		Added section »services« with options: smtp, pop3, imap and managesieve 
-	* update_config_0.3.x-0.4.py:
-	* VirtualMailManager/Config.py:
-		Updated, to add new section »services«
-	* VirtualMailManager/Account.py (Account._switchState(), Account.enable(),
-	Account.disable(), Account.save(), Account.getInfo()):
-	* VirtualMailManager/VirtualMailManager.py (VirtualMailManager.user_add(),
-	VirtualMailManager.user_disable(), VirtualMailManager.user_enable()):
-	* vmm (usage(), user_disable(), user_enable()):
-		Modified, to fit new database structure
-	* UPGRADE:
-	* INSTALL:
-		Updated information
+	Added section »services« with options: smtp, pop3, imap and managesieve 
+	* update_config_0.3.x-0.4.py, VirtualMailManager/Config.py:
+	Updated, to add new section »services«
+	* VirtualMailManager/Account.py (Account._switchState(),
+	Account.enable(), Account.disable(), Account.save(), Account.getInfo()),
+	VirtualMailManager/VirtualMailManager.py (VirtualMailManager.user_add(),
+	VirtualMailManager.user_disable(), VirtualMailManager.user_enable()),
+	vmm (usage(), user_disable(), user_enable()):
+	Modified, to fit new database structure
+	* UPGRADE, INSTALL:
+	Updated information
 	* update_tables_0.4-dev_r24.py:
-		Added temporary to the repository
+	Added temporary to the repository
 
 2008-04-18  Pascal Volk  <neverseen@users.sourceforge.net>
 
@@ -121,7 +279,6 @@
 	updated VirtualMailManager.__pwhash()
 	* VirtualMailManager/constants/VERSION.py: Set Version to 0.4-dev
 	* INSTALL: Added hint for python-crypto, fixed user_query
-
 
 2008-04-10  Pascal Volk  <neverseen@users.sourceforge.net>
 
