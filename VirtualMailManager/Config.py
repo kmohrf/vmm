@@ -21,6 +21,11 @@ import constants.ERROR as ERR
 locale.setlocale(locale.LC_ALL, '')
 ENCODING = locale.nl_langinfo(locale.CODESET)
 
+def w_std(*args):
+    for arg in args:
+        sys.stdout.write(arg.encode(ENCODING, 'replace'))
+        sys.stdout.write('\n')
+
 class Config(ConfigParser):
     """This class is for configure the Virtual Mail Manager.
 
@@ -125,11 +130,10 @@ class Config(ConfigParser):
         except ValueError:
             self.set('config', 'done', 'False')
             self.__changes = True
-        print _(u"Using configuration file: %s\n").encode(ENCODING,
-                'replace') % self.__cfgFileName
+        w_std(_(u'Using configuration file: %s\n') % self.__cfgFileName)
         for s in sections:
             if s != 'config':
-                print _(u'* Config section: »%s«').encode(ENCODING,'replace')%s
+                w_std(_(u'* Config section: »%s«') % s )
             for opt, val in self.items(s):
                 newval = raw_input(
                 _('Enter new value for option %(opt)s [%(val)s]: ').encode(
