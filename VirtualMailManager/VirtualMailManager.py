@@ -601,7 +601,7 @@ The keyword »detailed« is deprecated and will be removed in a future release.
                 self.__Cfg.getboolean('services', 'smtp'),
                 self.__Cfg.getboolean('services', 'pop3'),
                 self.__Cfg.getboolean('services', 'imap'),
-                self.__Cfg.getboolean('services', 'managesieve'))
+                self.__Cfg.getboolean('services', 'sieve'))
         self.__mailDirMake(acc.getDir('domain'), acc.getUID(), acc.getGID())
 
     def aliasAdd(self, aliasaddress, targetaddress):

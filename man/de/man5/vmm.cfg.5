@@ -1,4 +1,4 @@
-.TH vmm.cfg 5 "08 Dez 2008" "Pascal Volk"
+.TH vmm.cfg 5 "17 Aug 2009" "Pascal Volk"
 .SH NAME
 vmm.cfg \- Konfigurationsdatei für vmm
 .SH SYNOPSIS
@@ -138,7 +138,7 @@ Legt fest, ob sich ein Anwender standardmäßig per POP3 einloggen kann.
 \fBimap\fP (\fIBoolean\fP)
 Legt fest, ob sich ein Anwender standardmäßig per IMAP einloggen kann.
 .TP
-\fBmanagesieve\fP (\fIBoolean\fP)
+\fBsieve\fP (\fIBoolean\fP)
 Legt fest, ob sich ein Anwender standardmäßig per MANAGESIEVE einloggen kann.
 .TP
 \fBBeispiel\fP:
@@ -150,7 +150,7 @@ pop3 = true
 .br
 imap = false
 .br
-managesieve = false
+sieve = false
 .\" -----
 .SH DOMDIR ABSCHNITT
 Im \fBdomdir\fP-Abschnitt werden die Optionen der Domain-Verzeichnisse bestimmt.
@@ -221,6 +221,14 @@ ohne Nachfrage, gelöscht werden sollen.
 \fBtransport\fP (\fIString\fP)
 Der Standard-Transport aller Domains und Konten.
 .TP
+\fBdovecotvers\fP (\fIInt\fP)
+Die verketteten Major- und Minor-Teile der eingesetzten Dovecot-Version
+(siehe: dovecot --version).
+.br
+Diese Option beeinflusst diverse Datenbankzugriffe. Da es zwischen Dovecot
+v1.1.x und v1.2.x einige Änderungen gab. Zum Beispiel \fB11\fP, falls
+\fBdovecot --version\fP den Wert \fB1.1\fP.18 ausgibt.
+.TP
 \fBBeispiel\fP:
 [misc]
 .br
@@ -231,6 +239,8 @@ gid_mail = 8
 forcedel = false
 .br
 transport = dovecot:
+.br
+dovecotvers = 11
 .\" -----
 .SH CONFIG ABSCHNITT
 Beim \fBconfig\fP-Abschnitt handelt es sich um einen internen

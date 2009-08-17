@@ -1,4 +1,4 @@
-.TH "VMM" "1" "5. Okt 2008" "Pascal Volk"
+.TH "VMM" "1" "17 Aug 2009" "Pascal Volk"
 .SH NAME
 vmm \- Programm für die Kommandozeile, um E-Mail-Domains, -Konten und -Aliase zu
 verwalten.
@@ -54,11 +54,13 @@ misc
         Beispiel:
 
         \fBvmm configure services\fP
+        Verwende Konfigurationsdatei: /usr/local/etc/vmm.cfg
+
         * Konfigurations Abschnitt: »services«
         Neuer Wert für Option pop3 [True]: 
         Neuer Wert für Option smtp [True]: 
         Neuer Wert für Option imap [True]: 
-        Neuer Wert für Option managesieve [True]: false
+        Neuer Wert für Option sieve [True]: false
 .fi
 .PP
 .TP
@@ -325,7 +327,7 @@ Soll ein Anwender keinen Zugriff auf einen oder alle Service haben, kann der
 Zugriff mit diesem Unterbefehl beschränkt werden.
 .br
 Wurde weder ein \fIService\fP noch das Schlüsselwort '\fIall\fP' angegeben,
-werden alle Services (\fIsmtp\fP, \fIpop3\fP, \fIimap\fP, und \fImanagesieve\fP)
+werden alle Services (\fIsmtp\fP, \fIpop3\fP, \fIimap\fP, und \fIsieve\fP)
 für das Konto mit der angegebenen \fIAdresse\fP deaktiviert.
 .br
 Andernfalls wird nur der Zugriff auf den angegeben \fIService\fP gesperrt.
@@ -343,7 +345,7 @@ Um den Zugriff auf bestimmte oder alle gesperrten Service zu gewähren, wird
 dieser Unterbefehl verwendet.
 .br
 Wurde weder ein \fIService\fP noch das Schlüsselwort '\fIall\fP' angegeben,
-werden alle Services (\fIsmtp\fP, \fIpop3\fP, \fIimap\fP, und \fImanagesieve\fP)
+werden alle Services (\fIsmtp\fP, \fIpop3\fP, \fIimap\fP, und \fIsieve\fP)
 für das Konto mit der angegebenen  \fIAdresse\fP aktiviert.
 .br
 Andernfalls wird nur der Zugriff auf den angegeben \fIService\fP gestattet.

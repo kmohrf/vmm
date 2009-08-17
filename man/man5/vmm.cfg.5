@@ -1,4 +1,4 @@
-.TH vmm.cfg 5 "08 Dec 2008" "Pascal Volk"
+.TH vmm.cfg 5 "17 Aug 2009" "Pascal Volk"
 .SH NAME
 vmm.cfg \- configuration file for vmm
 .SH SYNOPSIS
@@ -127,7 +127,7 @@ Decides if users can login via pop3 by default.
 \fBimap\fP (\fIBoolean\fP)
 Decides if users can login via imap by default. 
 .TP
-\fBmanagesieve\fP (\fIBoolean\fP)
+\fBsieve\fP (\fIBoolean\fP)
 Decides if users can login via managesieve by default. 
 .TP
 \fBExample\fP:
@@ -139,7 +139,7 @@ pop3 = true
 .br
 imap = false
 .br
-managesieve = false
+sieve = false
 .\" -----
 .SH DOMDIR SECTION
 The \fBdomdir\fP section is used to specify options for the directories of the
@@ -208,6 +208,14 @@ Force deletion of accounts and aliases when a domain is deleted.
 \fBtransport\fP (\fIString\fP)
 Default transport for domains and accounts.
 .TP
+\fBdovecotvers\fP (\fIInt\fP)
+The concatenated major and minor version number of the currently used Dovecot
+version. (see: dovecot --version).
+.br
+This option affects various database operations. There are some differences
+between Dovecot v1.1.x and v1.2.x. For example, when the command \fBdovecot
+--version\fP shows \fB1.1\fP.18, set the value of this option to \fB11\fP.
+.TP
 \fBExample\fP:
 [misc]
 .br
@@ -218,6 +226,8 @@ gid_mail = 8
 forcedel = false
 .br
 transport = dovecot:
+.br
+dovecotvers = 11
 .\" -----
 .SH CONFIG SECTION
 The \fBconfig\fP section is a internal used control section.

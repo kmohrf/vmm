@@ -1,4 +1,4 @@
-.TH "VMM" "1" "5 Oct 2008" "Pascal Volk"
+.TH "VMM" "1" "17 Aug 2009" "Pascal Volk"
 .SH NAME
 vmm \- command line tool to manage email domains/accounts/aliases
 .SH SYNOPSIS
@@ -52,11 +52,13 @@ misc
         Example:
 
         \fBvmm configure services\fP
+        Using configuration file: /usr/local/etc/vmm.cfg
+
         * Config section: »services«
         Enter new value for option pop3 [True]: 
         Enter new value for option smtp [True]: 
         Enter new value for option imap [True]: 
-        Enter new value for option managesieve [True]: false
+        Enter new value for option sieve [True]: false
 .fi
 .PP
 .TP
@@ -307,8 +309,8 @@ If a user shouldn't have access to one or all services you can restrict the
 access with this subcommand.
 .br
 If neither a \fIservice\fP nor the keyword '\fIall\fP' is given all services
-(\fIsmtp\fP, \fIpop3\fP, \fIimap\fP, and \fImanagesieve\fP) will be disabled
-for the account with the specified \fIaddress\fP. Otherwise only the specified
+(\fIsmtp\fP, \fIpop3\fP, \fIimap\fP, and \fIsieve\fP) will be disabled for the
+account with the specified \fIaddress\fP. Otherwise only the specified 
 \fIservice\fP will be restricted.
 .PP
 .nf
@@ -322,8 +324,8 @@ for the account with the specified \fIaddress\fP. Otherwise only the specified
 To allow access to one or all restricted services use this subcommand.
 .br
 If neither a \fIservice\fP nor the keyword '\fIall\fP' is given all services
-(\fIsmtp\fP, \fIpop3\fP, \fIimap\fP, and \fImanagesieve\fP) will be enabled for
-the account with the specified \fIaddress\fP. Otherwise only the specified 
+(\fIsmtp\fP, \fIpop3\fP, \fIimap\fP, and \fIsieve\fP) will be enabled for the
+account with the specified \fIaddress\fP. Otherwise only the specified 
 \fIservice\fP will be enabled.
 .PP
 .TP

@@ -94,11 +94,11 @@ def _getOrder():
         or vmm.cfgGetBoolean('maildir', 'diskusage'):
             order = (('address', 0), ('name', 0), ('uid', 1), ('gid', 1),
                     ('transport', 0), ('maildir', 0), ('disk usage', 0),
-                    ('smtp', 1), ('pop3', 1), ('imap', 1), ('managesieve', 1))
+                    ('smtp', 1), ('pop3', 1), ('imap', 1), ('sieve', 1))
         else:
             order = (('address', 0), ('name', 0), ('uid', 1), ('gid', 1),
                     ('transport', 0), ('maildir', 0), ('smtp', 1), ('pop3', 1),
-                    ('imap', 1), ('managesieve', 1))
+                    ('imap', 1), ('sieve', 1))
     elif argv[1] in ['gu', 'getuser']:
         order = (('uid', 1), ('gid', 1), ('address', 0))
     return order

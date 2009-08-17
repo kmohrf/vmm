@@ -63,7 +63,7 @@ class Config(ConfigParser):
                 ['smtp', 'true'],
                 ['pop3', 'true'],
                 ['imap', 'true'],
-                ['managesieve', 'true']
+                ['sieve', 'true']
                 ]
         self.__domdopts = [
                 ['base', '/srv/mail'],
@@ -79,7 +79,8 @@ class Config(ConfigParser):
                 ['passwdscheme', 'PLAIN'],
                 ['gid_mail', 8],
                 ['forcedel', 'false'],
-                ['transport', 'dovecot:']
+                ['transport', 'dovecot:'],
+                ['dovecotvers', '11']
                 ]
 
     def load(self):
