@@ -72,30 +72,28 @@ WHERE gid=%s AND local_part=%s",
         self._setID()
         self._mid = MailLocation(self._dbh, maillocation=maillocation).getID()
 
-    def _switchState(self, state, service):
+    def _switchState(self, state, dcvers, service):
         if not isinstance(state, bool):
             return False
-        if not service in ['smtp', 'pop3', 'imap', 'sieve', 'all', None]:
+        if not service in (None, 'all', 'imap', 'pop3', 'sieve', 'smtp'):
             raise AccE(_(u"Unknown service »%s«.") % service,
                     ERR.UNKNOWN_SERVICE)
         if self._uid < 1:
             raise AccE(_(u"The account »%s« doesn't exists.") % self._addr,
                     ERR.NO_SUCH_ACCOUNT)
-        dbc = self._dbh.cursor()
-        if service in ['smtp', 'pop3', 'imap', 'sieve']:
-            dbc.execute(
-                    "UPDATE users SET %s=%s WHERE local_part='%s' AND gid=%s"
-                    % (service, state, self._addr._localpart, self._gid))
-        elif state:
-            # TODO
-            # add dovecotvers check
-            dbc.execute("UPDATE users SET smtp = TRUE, pop3 = TRUE,\
- imap = TRUE, managesieve = TRUE WHERE local_part = %s AND gid = %s",
-                self._addr._localpart, self._gid)
+        sieve_col = 'sieve' if dcvers > 11 else 'managesieve'
+        if service in ('smtp', 'pop3', 'imap'):
+            sql = 'UPDATE users SET %s = %s WHERE uid = %d' % (service, state,
+                    self._uid)
+        elif service == 'sieve':
+            sql = 'UPDATE users SET %s = %s WHERE uid = %d' % (sieve_col,
+                    state, self._uid)
         else:
-            dbc.execute("UPDATE users SET smtp = FALSE, pop3 = FALSE,\
- imap = FALSE, managesieve = FALSE WHERE local_part = %s AND gid = %s",
-                self._addr._localpart, self._gid)
+            sql = 'UPDATE users SET smtp = %(s)s, pop3 = %(s)s, imap = %(s)s,\
+ %(col)s = %(s)s WHERE uid = %(uid)d' % {
+                's': state, 'col': sieve_col, 'uid': self._uid}
+        dbc = self._dbh.cursor()
+        dbc.execute(sql)
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
@@ -124,23 +122,22 @@ WHERE gid=%s AND local_part=%s",
         elif directory == 'home':
             return '%s/%i' % (self._base, self._uid)
 
-    def enable(self, service=None):
-        self._switchState(True, service)
+    def enable(self, dcvers, service=None):
+        self._switchState(True, dcvers, service)
 
-    def disable(self, service=None):
-        self._switchState(False, service)
+    def disable(self, dcvers, service=None):
+        self._switchState(False, dcvers, service)
 
-    def save(self, maillocation, smtp, pop3, imap, sieve):
+    def save(self, maillocation, dcvers, smtp, pop3, imap, sieve):
         if self._uid < 1:
+            sieve_col = 'sieve' if dcvers > 11 else 'managesieve'
             self._prepare(maillocation)
+            sql = "INSERT INTO users (local_part, passwd, uid, gid, mid, tid,\
+ smtp, pop3, imap, %s) VALUES ('%s', '%s', %d, %d, %d, %d, %s, %s, %s, %s)" % (
+                sieve_col, self._addr._localpart, self._passwd, self._uid,
+                self._gid, self._mid, self._tid, smtp, pop3, imap, sieve)
             dbc = self._dbh.cursor()
-            # TODO
-            # add dovecotvers check
-            dbc.execute("""INSERT INTO users (local_part, passwd, uid, gid,\
- mid, tid, smtp, pop3, imap, managesieve)\
- VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-                self._addr._localpart, self._passwd, self._uid, self._gid,
-                self._mid, self._tid, smtp, pop3, imap, sieve)
+            dbc.execute(sql)
             self._dbh.commit()
             dbc.close()
         else:
@@ -168,13 +165,12 @@ WHERE gid=%s AND local_part=%s",
             self._dbh.commit()
         dbc.close()
 
-    def getInfo(self):
+    def getInfo(self, dcvers):
+        sieve_col = 'sieve' if dcvers > 11 else 'managesieve'
+        sql = 'SELECT name, uid, gid, mid, tid, smtp, pop3, imap, %s\
+ FROM users WHERE uid = %d' % (sieve_col, self._uid)
         dbc = self._dbh.cursor()
-        # TODO
-        # add dovecotvers check
-        dbc.execute("SELECT name, uid, gid, mid, tid, smtp, pop3, imap, \
- managesieve FROM users WHERE local_part=%s AND gid=%s",
-            self._addr._localpart, self._gid)
+        dbc.execute(sql)
         info = dbc.fetchone()
         dbc.close()
         if info is None:
@@ -182,9 +178,9 @@ WHERE gid=%s AND local_part=%s",
                     ERR.NO_SUCH_ACCOUNT)
         else:
             keys = ['name', 'uid', 'gid', 'maildir', 'transport', 'smtp',
-                    'pop3', 'imap', 'sieve']
+                    'pop3', 'imap', sieve_col]
             info = dict(zip(keys, info))
-            for service in ['smtp', 'pop3', 'imap', 'sieve']:
+            for service in ('smtp', 'pop3', 'imap', sieve_col):
                 if bool(info[service]):
                     info[service] = _('enabled')
                 else:

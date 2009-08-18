@@ -598,6 +598,7 @@ The keyword »detailed« is deprecated and will be removed in a future release.
             password = self._readpass()
             acc.setPassword(self.__pwhash(password))
         acc.save(self.__Cfg.get('maildir', 'name'),
+                self.__Cfg.getint('misc', 'dovecotvers'),
                 self.__Cfg.getboolean('services', 'smtp'),
                 self.__Cfg.getboolean('services', 'pop3'),
                 self.__Cfg.getboolean('services', 'imap'),
@@ -651,7 +652,7 @@ The account has been successfully deleted from the database.
             raise VMMException(_(u'Invalid argument: »%s«') % details,
                     ERR.INVALID_AGUMENT)
         acc = self.__getAccount(emailaddress)
-        info = acc.getInfo()
+        info = acc.getInfo(self.__Cfg.getint('misc', 'dovecotvers'))
         if self.__Cfg.getboolean('maildir', 'diskusage')\
         or details in ['du', 'full']:
             info['disk usage'] = self.__getDiskUsage('%(maildir)s' % info)
@@ -684,11 +685,11 @@ The account has been successfully deleted from the database.
 
     def userDisable(self, emailaddress, service=None):
         acc = self.__getAccount(emailaddress)
-        acc.disable(service)
+        acc.disable(self.__Cfg.getint('misc', 'dovecotvers'), service)
 
     def userEnable(self, emailaddress, service=None):
         acc = self.__getAccount(emailaddress)
-        acc.enable(service)
+        acc.enable(self.__Cfg.getint('misc', 'dovecotvers'), service)
 
     def relocatedAdd(self, emailaddress, targetaddress):
         relocated = self.__getRelocated(emailaddress, targetaddress)
