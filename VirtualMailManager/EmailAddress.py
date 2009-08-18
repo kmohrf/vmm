@@ -20,20 +20,18 @@ class EmailAddress(object):
         self._localpart = None
         self._domainname = None
         self.__chkAddress(address)
-    
+
     def __eq__(self, other):
-        if hasattr(other, '_localpart') and hasattr(other, '_domainname'):
+        if isinstance(other, self.__class__):
             return self._localpart == other._localpart\
                     and self._domainname == other._domainname
-        else:
-            return NotImplemented
+        return NotImplemented
 
     def __ne__(self, other):
-        if hasattr(other, '_localpart') and hasattr(other, '_domainname'):
-            return not self._localpart == other._localpart\
-                    and self._domainname == other._domainname
-        else:
-            return NotImplemented
+        if isinstance(other, self.__class__):
+            return self._localpart != other._localpart\
+                    or self._domainname != other._domainname
+        return NotImplemented
 
     def __repr__(self):
         return "EmailAddress('%s@%s')" % (self._localpart, self._domainname)
@@ -60,7 +58,7 @@ class EmailAddress(object):
 
     def __chkLocalpart(self, localpart):
         """Validates the local part of an e-mail address.
-        
+
         Keyword arguments:
         localpart -- of the e-mail address that should be validated (str)
         """
