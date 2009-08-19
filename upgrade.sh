@@ -10,6 +10,7 @@ PREFIX=/usr/local
 PF_CONFDIR=$(postconf -h config_directory)
 PF_GID=$(id -g $(postconf -h mail_owner))
 POSTCONF=$(which postconf)
+DOVECOT_VERS=$(dovecot --version | awk -F . '{print $1 $2}')
 LOCALE_DIR=${PREFIX}/share/locale
 DOC_DIR=${PREFIX}/share/doc/vmm
 if [ ${PREFIX} = "/usr" ]; then
@@ -24,6 +25,21 @@ INSTALL_OPTS_CF="-b -m 0640 -g ${PF_GID} -o 0 -p"
 
 if [ $(id -u) -ne 0 ]; then
     echo "Run this script as root."
+    exit 1
+fi
+
+# update config file before installing the new files.
+./update_config_0.4.x-0.5.py ${POSTCONF} ${DOVECOT_VERS:-10}
+rv=$?
+if [ $rv -eq 2 ]; then
+	echo "please run the install.sh script"
+	exit 1
+elif [ $rv -eq 3 ]; then
+    echo "please read the upgrade instructions at http://vmm.localdomain.org/"
+    exit 1
+elif [ $rv -ne 0 ]; then
+    echo "Sorry, something went wrong. Please file a bug:"
+    echo "https://sourceforge.net/tracker/?group_id=213727"
     exit 1
 fi
 
@@ -80,7 +96,4 @@ done
 [ -d ${DOC_DIR}/examples ] || mkdir -m 0755 -p ${DOC_DIR}/examples
 install -m 0644 ${INSTALL_OPTS} pgsql-*.cf ${DOC_DIR}/examples
 install -m 0644 ${INSTALL_OPTS} vmm.cfg ${DOC_DIR}/examples
-
-# update config file
-./update_config_0.4.x-0.5.py $POSTCONF
 

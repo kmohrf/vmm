@@ -3,47 +3,107 @@
 # Copyright (c) 2008 - 2009, VEB IT
 # See COPYING for distribution information.
 
-import sys
+import os
+os.sys.path.remove(os.sys.path[0])
+from time import time
 from ConfigParser import ConfigParser
 from shutil import copy2
+from VirtualMailManager.constants.VERSION import VERSION
 
-cf = '/usr/local/etc/vmm.cfg'
-fh = file(cf, 'r')
-cp = ConfigParser()
-cp.readfp(fh)
-fh.close()
 
-if not cp.has_option('maildir', 'name') or not cp.has_option('maildir',
+def get_config_file():
+    f = None
+    for d in ('/root', '/usr/local/etc', '/etc'):
+        if os.path.isfile(d+'/vmm.cfg'):
+            f = d+'/vmm.cfg'
+            break
+    if f:
+        return f
+    else:
+        os.sys.stderr.write('error: vmm.cfg not found\n')
+        os.sys.exit(2)
+
+def update(cp):
+    if VERSION == '0.4':
+        upd_040(cp)
+    elif VERSION == '0.5':
+        upd_050(cp)
+    elif VERSION == '0.5.1':
+        upd_051(cp)
+    else:
+        os.sys.stderr.write(
+            'error: the version %s is not supported by this script\n' % VERSION)
+        os.sys.exit(3)
+
+def get_cfg_parser(cf):
+    fh = file(cf, 'r')
+    cp = ConfigParser()
+    cp.readfp(fh)
+    fh.close()
+    return cp
+
+def update_cfg_file(cp, cf):
+    copy2(cf, cf+'.bak.'+str(time()))
+    fh = file(cf, 'w')
+    cp.write(fh)
+    fh.close()
+
+def upd_040(cp):
+    if not cp.has_option('maildir', 'name') or not cp.has_option('maildir',
         'folders') or cp.has_option('maildir', 'folder'):
-    copy2(cf, cf+'.bak_upd_0.4.x-0.5')
-    fh = file(cf, 'w')
-    if not cp.has_option('maildir', 'name'):
+        if not cp.has_option('maildir', 'name'):
+            if cp.has_option('maildir', 'folder'):
+                cp.set('maildir', 'name', cp.get('maildir', 'folder'))
+                cp.remove_option('maildir', 'folder')
+                sect_opt.append(('maildir', 'name'))
+            else:
+                cp.set('maildir', 'name', 'Maildir')
+                sect_opt.append(('maildir', 'name'))
+        if not cp.has_option('maildir', 'folders'):
+            cp.set('maildir', 'folders', 'Drafts:Sent:Templates:Trash')
+            sect_opt.append(('maildir', 'folders'))
         if cp.has_option('maildir', 'folder'):
-            cp.set('maildir', 'name', cp.get('maildir', 'folder'))
             cp.remove_option('maildir', 'folder')
-        else:
-            cp.set('maildir', 'name', 'Maildir')
-    if not cp.has_option('maildir', 'folders'):
-        cp.set('maildir', 'folders', 'Drafts:Sent:Templates:Trash')
-    if cp.has_option('maildir', 'folder'):
-        cp.remove_option('maildir', 'folder')
-    cp.write(fh)
-    fh.close()
+    upd_050(cp)
 
-if not cp.has_option('bin', 'postconf'):
-    fh = file(cf, 'w')
-    try:
-        postconf = sys.argv[1].strip()
-        if len(postconf):
-            cp.set('bin', 'postconf', postconf)
-        else: # possible?
+def upd_050(cp):
+    if not cp.has_option('bin', 'postconf'):
+        try:
+            postconf = os.sys.argv[1].strip()
+            if len(postconf):
+                cp.set('bin', 'postconf', postconf)
+                sect_opt.append(('bin', 'postconf'))
+            else: # possible?
+                cp.set('bin', 'postconf', '/usr/sbin/postconf')
+                sect_opt.append(('bin', 'postconf'))
+        except IndexError:
             cp.set('bin', 'postconf', '/usr/sbin/postconf')
-    except IndexError:
-        cp.set('bin', 'postconf', '/usr/sbin/postconf')
-    cp.write(fh)
-    fh.close()
-    print
-    print "Please have a look at your %s" %cf
-    print "and verify the value from option 'postconf' in section 'bin'."
-    print
+            sect_opt.append(('bin', 'postconf'))
+    upd_051(cp)
+
+def upd_051(cp):
+    if not cp.has_option('misc', 'dovecotvers') or cp.has_option('services',
+            'managesieve'):
+        if not cp.has_option('misc', 'dovecotvers'):
+            cp.set('misc', 'dovecotvers', os.sys.argv[2].strip())
+            sect_opt.append(('misc', 'dovecotvers'))
+        if cp.has_option('services', 'managesieve'):
+            cp.set('services','sieve',cp.getboolean('services', 'managesieve'))
+            cp.remove_option('services', 'managesieve')
+            sect_opt.append(('services', 'sieve'))
+
+# def main():
+if __name__ == '__main__':
+    sect_opt = []
+    cf = get_config_file()
+    cp = get_cfg_parser(cf)
+    update(cp)
+    if len(sect_opt): 
+        update_cfg_file(cp, cf)
+        print 'Please have a look at your configuration: %s' %cf
+        print 'and verify the value from:'
+        for s_o in sect_opt:
+            print '  [%s] %s' % s_o
+        print
+
 
