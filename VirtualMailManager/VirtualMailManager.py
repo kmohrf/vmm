@@ -66,8 +66,9 @@ class VirtualMailManager:
 
     def __findCfgFile(self):
         for path in ['/root', '/usr/local/etc', '/etc']:
-            if os.path.isfile(path+'/vmm.cfg'):
-                self.__cfgFileName = path+'/vmm.cfg'
+            tmp = os.path.join(path, 'vmm.cfg')
+            if os.path.isfile(tmp):
+                self.__cfgFileName = tmp
                 break
         if not len(self.__cfgFileName):
             raise VMMException(
@@ -289,7 +290,7 @@ class VirtualMailManager:
         os.chdir(oldpwd)
 
     def __subscribeFL(self, folderlist, uid, gid):
-        fname = self.__Cfg.get('maildir', 'name') + '/subscriptions'
+        fname = os.path.join(self.__Cfg.get('maildir','name'), 'subscriptions')
         sf = file(fname, 'w')
         for f in folderlist:
             sf.write(f+'\n')
@@ -325,7 +326,7 @@ class VirtualMailManager:
         for folder in folders:
             self.__makedir(folder, mode, uid, gid)
             for subdir in subdirs:
-                self.__makedir(folder+'/'+subdir, mode, uid, gid)
+                self.__makedir(os.path.join(folder, subdir), mode, uid, gid)
         self.__subscribeFL([f.replace(maildir+'/.', '') for f in folders[1:]],
                 uid, gid)
         os.chdir(oldpwd)
@@ -347,20 +348,21 @@ class VirtualMailManager:
                     rmtree(userdir, ignore_errors=True)
                 else:
                     raise VMMException(_(u"No such directory: %s") %
-                        domdir+'/'+userdir, ERR.NO_SUCH_DIRECTORY)
+                        os.path.join(domdir, userdir), ERR.NO_SUCH_DIRECTORY)
 
     def __domDirDelete(self, domdir, gid):
         if gid > 0:
             if not self.__isdir(domdir):
                 return
-            basedir = '%s' % self.__Cfg.get('domdir', 'base')
+            basedir = self.__Cfg.get('domdir', 'base')
             domdirdirs = domdir.replace(basedir+'/', '').split('/')
+            domdirparent = os.path.join(basedir, domdirdirs[0])
             if basedir.count('..') or domdir.count('..'):
                 raise VMMException(
                         _(u'FATAL: ".." in domain directory path detected.'),
                             ERR.FOUND_DOTS_IN_PATH)
-            if os.path.isdir('%s/%s' % (basedir, domdirdirs[0])):
-                os.chdir('%s/%s' % (basedir, domdirdirs[0]))
+            if os.path.isdir(domdirparent):
+                os.chdir(domdirparent)
                 if os.lstat(domdirdirs[1]).st_gid != gid:
                     raise VMMException(
                     _(u'FATAL: group mismatch in domain directory detected'),

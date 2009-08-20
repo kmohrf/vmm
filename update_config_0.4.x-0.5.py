@@ -14,8 +14,9 @@ from VirtualMailManager.constants.VERSION import VERSION
 def get_config_file():
     f = None
     for d in ('/root', '/usr/local/etc', '/etc'):
-        if os.path.isfile(d+'/vmm.cfg'):
-            f = d+'/vmm.cfg'
+        tmp = os.path.join(d, 'vmm.cfg')
+        if os.path.isfile(tmp):
+            f = tmp
             break
     if f:
         return f
