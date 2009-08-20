@@ -14,13 +14,14 @@ import constants.ERROR as ERR
 
 RE_MAILLOCATION = """^\w{1,20}$"""
 
-class MailLocation:
+class MailLocation(object):
     """A wrapper class thats provide access to the maillocation table"""
+    __slots__ = ('__id', '__maillocation', '_dbh')
     def __init__(self, dbh, mid=None, maillocation=None):
         """Creates a new MailLocation instance.
 
         Either mid or maillocation must be specified.
-        
+
         Keyword arguments:
         dbh -- a pyPgSQL.PgSQL.connection
         mid -- the id of a maillocation (long)

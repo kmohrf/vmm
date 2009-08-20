@@ -12,8 +12,9 @@ from EmailAddress import EmailAddress
 import constants.ERROR as ERR
 import VirtualMailManager as VMM
 
-class Relocated:
+class Relocated(object):
     """Class to manage e-mail addresses of relocated users."""
+    __slots__ = ('_addr', '_dest', '_gid', '_isNew', '_dbh')
     def __init__(self, dbh, address, destination=None):
         if isinstance(address, EmailAddress):
             self._addr = address

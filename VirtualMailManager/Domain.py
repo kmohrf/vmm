@@ -15,11 +15,12 @@ from Transport import Transport
 
 MAILDIR_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz'
 
-class Domain:
+class Domain(object):
     """Class to manage e-mail domains."""
+    __slots__ = ('_basedir','_domaindir','_id','_name','_transport','_dbh')
     def __init__(self, dbh, domainname, basedir=None, transport=None):
         """Creates a new Domain instance.
-        
+
         Keyword arguments:
         dbh -- a pyPgSQL.PgSQL.connection
         domainname -- name of the domain (str)
@@ -106,7 +107,7 @@ class Domain:
 
     def _chkDelete(self, delUser, delAlias):
         """Checks dependencies for deletion.
-        
+
         Keyword arguments:
         delUser -- ignore available accounts (bool)
         delAlias -- ignore available aliases (bool)
@@ -276,7 +277,7 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts,
         return aliasdomains
 
 def search(dbh, pattern=None, like=False):
-    if pattern is not None and like is False: 
+    if pattern is not None and like is False:
         pattern = VMM.VirtualMailManager.chkDomainname(pattern)
     sql = 'SELECT gid, domainname, is_primary FROM domain_name'
     if pattern is None:

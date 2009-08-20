@@ -10,8 +10,9 @@ from Exceptions import VMMAliasDomainException as VADE
 import constants.ERROR as ERR
 import VirtualMailManager as VMM
 
-class AliasDomain:
+class AliasDomain(object):
     """Class to manage e-mail alias domains."""
+    __slots__ = ('__gid', '__name', '_domain', '_dbh')
     def __init__(self, dbh, domainname, targetDomain=None):
         self._dbh = dbh
         self.__name = VMM.VirtualMailManager.chkDomainname(domainname)
