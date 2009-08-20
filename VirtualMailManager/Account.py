@@ -14,8 +14,9 @@ from EmailAddress import EmailAddress
 import VirtualMailManager as VMM
 import constants.ERROR as ERR
 
-class Account:
+class Account(object):
     """Class to manage e-mail accounts."""
+    __slots__ = ('_addr','_base','_gid','_mid','_passwd','_tid','_uid','_dbh')
     def __init__(self, dbh, address, password=None):
         self._dbh = dbh
         self._base = None
@@ -152,15 +153,15 @@ WHERE gid=%s AND local_part=%s",
             return False
         dbc = self._dbh.cursor()
         if what == 'password':
-            dbc.execute("UPDATE users SET passwd=%s WHERE local_part=%s AND\
- gid=%s", value, self._addr._localpart, self._gid)
+            dbc.execute('UPDATE users SET passwd = %s WHERE uid = %s',
+                    value, self._uid)
         elif what == 'transport':
             self._tid = Transport(self._dbh, transport=value).getID()
-            dbc.execute("UPDATE users SET tid=%s WHERE local_part=%s AND\
- gid=%s", self._tid, self._addr._localpart, self._gid)
+            dbc.execute('UPDATE users SET tid = %s WHERE uid = %s',
+                    self._tid, self._uid)
         else:
-            dbc.execute("UPDATE users SET name=%s WHERE local_part=%s AND\
- gid=%s", value, self._addr._localpart, self._gid)
+            dbc.execute('UPDATE users SET name = %s WHERE uid = %s',
+                    value, self._uid)
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
@@ -212,8 +213,7 @@ WHERE gid=%s AND local_part=%s",
                     ERR.NO_SUCH_ACCOUNT)
         dbc = self._dbh.cursor()
         if delalias == 'delalias':
-            dbc.execute("DELETE FROM users WHERE gid=%s AND local_part=%s",
-                    self._gid, self._addr._localpart)
+            dbc.execute('DELETE FROM users WHERE uid= %s', self._uid)
             u_rc = dbc.rowcount
             # delete also all aliases where the destination address is the same
             # as for this account.
@@ -224,8 +224,7 @@ WHERE gid=%s AND local_part=%s",
         else: # check first for aliases
             a_count = self.__aliaseCount()
             if a_count == 0:
-                dbc.execute("DELETE FROM users WHERE gid=%s AND local_part=%s",
-                        self._gid, self._addr._localpart)
+                dbc.execute('DELETE FROM users WHERE uid = %s', self._uid)
                 if dbc.rowcount > 0:
                     self._dbh.commit()
             else:
