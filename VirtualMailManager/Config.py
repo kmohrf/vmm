@@ -2,7 +2,7 @@
 # Copyright (c) 2007 - 2009, VEB IT
 # See COPYING for distribution information.
 
-"""Configurtion class for read, modify and write the
+"""Configuration class for read, modify and write the
 configuration from Virtual Mail Manager.
 
 """
@@ -27,17 +27,13 @@ def w_std(*args):
         sys.stdout.write('\n')
 
 class Config(ConfigParser):
-    """This class is for configure the Virtual Mail Manager.
-
-    You can specify settings for the database connection
-    and maildirectories.
-    """
+    """This class is for reading and modifying vmm's configuration file."""
 
     def __init__(self, filename):
         """Creates a new Config instance
 
-        Keyword arguments:
-        filename -- name of the configuration file
+        Arguments:
+        filename -- path to the configuration file
         """
         ConfigParser.__init__(self)
         self.__cfgFileName = filename
@@ -84,7 +80,10 @@ class Config(ConfigParser):
                 ]
 
     def load(self):
-        """Loads the configuration, r/o"""
+        """Loads the configuration, read only.
+
+        Raises a VMMConfigException if the configuration syntax is invalid.
+        """
         try:
             self.__cfgFile = file(self.__cfgFileName, 'r')
             self.readfp(self.__cfgFile)
@@ -94,6 +93,10 @@ class Config(ConfigParser):
         self.__cfgFile.close()
 
     def check(self):
+        """Performs a configuration check.
+        
+        Raises a VMMConfigException if the check fails.
+        """
         if not self.__chkSections():
             errmsg = StringIO()
             errmsg.write(_("Using configuration file: %s\n") %\
@@ -116,10 +119,10 @@ class Config(ConfigParser):
                 ENCODING, 'replace')
 
     def configure(self, sections):
-        """Interactive method for configuring all options in the given section
+        """Interactive method for configuring all options in the given sections
 
-        Keyword arguments:
-        sections -- list of strings
+        Arguments:
+        sections -- list of strings with section names
         """
         if not isinstance(sections, list):
             raise TypeError("Argument 'sections' is not a list.")
@@ -167,7 +170,7 @@ class Config(ConfigParser):
     def __chkOptions(self, section):
         """Checks if all configuration options in section are existing.
 
-        Keyword arguments:
+        Arguments:
         section -- the section to be checked
         """
         retval = True
