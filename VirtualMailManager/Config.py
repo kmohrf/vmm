@@ -94,7 +94,7 @@ class Config(ConfigParser):
 
     def check(self):
         """Performs a configuration check.
-        
+
         Raises a VMMConfigException if the check fails.
         """
         if not self.__chkSections():

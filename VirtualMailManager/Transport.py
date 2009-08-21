@@ -17,7 +17,7 @@ class Transport(object):
         """Creates a new Transport instance.
 
         Either tid or transport must be specified.
-        
+
         Keyword arguments:
         dbh -- a pyPgSQL.PgSQL.connection
         tid -- the id of a transport (long)

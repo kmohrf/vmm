@@ -26,7 +26,7 @@ Configuring PostgreSQL
 * Create Database and db users for Postfix and Dovecot
     connecting to PostgreSQL:
     psql template1
-    
+
     # create database
     CREATE DATABASE mailsys ENCODING 'UTF8';
     # connect to the new database

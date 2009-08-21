@@ -144,7 +144,7 @@ WHERE gid=%s AND local_part=%s",
         else:
             raise AccE(_(u'The account »%s« already exists.') % self._addr,
                     ERR.ACCOUNT_EXISTS)
-       
+
     def modify(self, what, value):
         if self._uid == 0:
             raise AccE(_(u"The account »%s« doesn't exists.") % self._addr,
@@ -248,7 +248,7 @@ def getAccountByID(uid, dbh):
     info = dbc.fetchone()
     dbc.close()
     if info is None:
-        raise AccE(_(u"There is no account with the UID »%d«.") % uid, 
+        raise AccE(_(u"There is no account with the UID »%d«.") % uid,
                 ERR.NO_SUCH_ACCOUNT)
     keys = ['address', 'uid', 'gid']
     info = dict(zip(keys, info))

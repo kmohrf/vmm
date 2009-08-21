@@ -15,12 +15,13 @@ from VirtualMailManager.Exceptions import VMMException
 RE_PC_PARAMS = """^\w+$"""
 RE_PC_VARIABLES = r"""\$\b\w+\b"""
 
-class Postconf:
+class Postconf(object):
+    __slots__ = ('__bin', '__val', '__varFinder')
     def __init__(self, postconf_bin):
         """Creates a new Postconf instance.
-        
+
         Keyword arguments:
-        postconf_bin -- absolute path to Postfix' postconf binary (str)
+        postconf_bin -- absolute path to the Postfix postconf binary (str)
         """
         self.__bin = postconf_bin
         self.__val = ''
@@ -29,7 +30,7 @@ class Postconf:
     def read(self, parameter, expand_vars=True):
         """Returns the parameters value.
 
-        If expand_vars is True (default), all variables in the value will be 
+        If expand_vars is True (default), all variables in the value will be
         expanded:
         e.g. mydestination -> mail.example.com, localhost.example.com, localhost
         Otherwise the value may contain one or more variables.
@@ -41,7 +42,7 @@ class Postconf:
         """
         if not re.match(RE_PC_PARAMS, parameter):
             raise VMMException(_(u'The value »%s« looks not like a valid\
- postfix configuration parameter name.') % parameter, ERR.INVALID_AGUMENT)
+ postfix configuration parameter name.') % parameter, ERR.VMM_ERROR)
         self.__val = self.__read(parameter)
         if expand_vars:
             self.__expandVars()
@@ -67,7 +68,7 @@ class Postconf:
         out, err = Popen([self.__bin, '-h', parameter], stdout=PIPE,
                 stderr=PIPE).communicate()
         if len(err):
-            raise Exception, err.strip()
+            raise VMMException(err.strip(), ERR.VMM_ERROR)
         return out.strip()
 
     def __readMulti(self, parameters):
@@ -76,7 +77,7 @@ class Postconf:
             cmd.append(parameter[1:])
         out, err = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()
         if len(err):
-            raise Exception, err.strip()
+            raise VMMException(err.strip(), ERR.VMM_ERROR)
         par_val = {}
         for line in out.splitlines():
             par, val = line.split(' = ')

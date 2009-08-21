@@ -37,16 +37,15 @@ RE_MBOX_NAMES = """^[\x20-\x25\x27-\x7E]*$"""
 locale.setlocale(locale.LC_ALL, '')
 ENCODING = locale.nl_langinfo(locale.CODESET)
 
-class VirtualMailManager:
+class VirtualMailManager(object):
     """The main class for vmm"""
+    __slots__ = ('__Cfg', '__cfgFileName', '__cfgSections', '__dbh', '__scheme',
+            '__warnings', '_postconf')
     def __init__(self):
         """Creates a new VirtualMailManager instance.
         Throws a VMMNotRootException if your uid is greater 0.
         """
         self.__cfgFileName = ''
-        self.__permWarnMsg = _(u"fix permissions for »%(cfgFileName)s«\n\
-`chmod 0600 %(cfgFileName)s` would be great.") % {'cfgFileName':
-            self.__cfgFileName}
         self.__warnings = []
         self.__Cfg = None
         self.__dbh = None
@@ -82,7 +81,10 @@ class VirtualMailManager:
         fmode = int(oct(fstat.st_mode & 0777))
         if fmode % 100 and fstat.st_uid != fstat.st_gid \
         or fmode % 10 and fstat.st_uid == fstat.st_gid:
-            raise VMMPermException(self.__permWarnMsg, ERR.CONF_ERROR)
+            raise VMMPermException(_(
+                u'fix permissions (%(perms)s) for »%(file)s«\n\
+`chmod 0600 %(file)s` would be great.') % {'file':
+                self.__cfgFileName, 'perms': fmode}, ERR.CONF_WRONGPERM)
         else:
             return True
 
@@ -126,7 +128,7 @@ class VirtualMailManager:
 
     def idn2ascii(domainname):
         """Converts an idn domainname in punycode.
-        
+
         Keyword arguments:
         domainname -- the domainname to convert (str)
         """
@@ -140,7 +142,7 @@ class VirtualMailManager:
 
     def ace2idna(domainname):
         """Convertis a domainname from ACE according to IDNA
-        
+
         Keyword arguments:
         domainname -- the domainname to convert (str)
         """
@@ -154,7 +156,7 @@ class VirtualMailManager:
 
     def chkDomainname(domainname):
         """Validates the domain name of an e-mail address.
-        
+
         Keyword arguments:
         domainname -- the domain name that should be validated
         """
@@ -247,7 +249,7 @@ class VirtualMailManager:
 
     def __getDiskUsage(self, directory):
         """Estimate file space usage for the given directory.
-        
+
         Keyword arguments:
         directory -- the directory to summarize recursively disk usage for
         """
@@ -612,7 +614,7 @@ The keyword »detailed« is deprecated and will be removed in a future release.
         alias.save(long(self._postconf.read('virtual_alias_expansion_limit')))
         gid = self.__getDomain(alias._dest._domainname).getID()
         if gid > 0 and not VirtualMailManager.accountExists(self.__dbh,
-        alias._dest) and not VirtualMailManager.aliasExists(self.__dbh, 
+        alias._dest) and not VirtualMailManager.aliasExists(self.__dbh,
         alias._dest):
             self.__warnings.append(
                 _(u"The destination account/alias »%s« doesn't exists yet.")%\
