@@ -120,9 +120,9 @@ Hint: Increase Postfix' virtual_alias_expansion_limit
             self._dbh.commit()
         else:
             if self._dest is None:
-                msg = u"The alias »%s« doesn't exists." % self._addr
+                msg = _(u"The alias »%s« doesn't exists.") % self._addr
             else:
-                msg = u"The alias »%(a)s« with destination »%(d)s« doesn't\
- exists." % {'a': self._addr, 'd': self._dest}
-            raise VMMAE(_(msg), ERR.NO_SUCH_ALIAS)
+                msg = _(u"The alias »%(a)s« with destination »%(d)s« doesn't\
+ exists.") % {'a': self._addr, 'd': self._dest}
+            raise VMMAE(msg, ERR.NO_SUCH_ALIAS)
 
