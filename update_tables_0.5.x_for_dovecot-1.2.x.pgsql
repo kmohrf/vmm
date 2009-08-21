@@ -8,8 +8,7 @@ CREATE OR REPLACE VIEW dovecot_password AS
     SELECT local_part || '@' || domain_name.domainname AS "user",
            passwd AS "password", smtp, pop3, imap, sieve
       FROM users
-           LEFT JOIN domain_name USING (gid)
-     WHERE domain_name.is_primary;
+           LEFT JOIN domain_name USING (gid);
 
 -- ---
 -- Change the user name to the name of your dovecot database user.
