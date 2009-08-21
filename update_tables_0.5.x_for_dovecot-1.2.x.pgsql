@@ -10,9 +10,3 @@ CREATE OR REPLACE VIEW dovecot_password AS
       FROM users
            LEFT JOIN domain_name USING (gid);
 
--- ---
--- Change the user name to the name of your dovecot database user.
--- ---
-GRANT SELECT ON dovecot_password TO dovecot;
---                               ---^
-
