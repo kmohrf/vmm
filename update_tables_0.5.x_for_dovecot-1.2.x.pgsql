@@ -1,0 +1,19 @@
+-- ---
+-- with Dovecot v1.2.x the service managesieve was renamed to sieve
+-- ---
+ALTER TABLE users RENAME managesieve TO sieve;
+
+DROP VIEW dovecot_password;
+CREATE OR REPLACE VIEW dovecot_password AS
+    SELECT local_part || '@' || domain_name.domainname AS "user",
+           passwd AS "password", smtp, pop3, imap, sieve
+      FROM users
+           LEFT JOIN domain_name USING (gid)
+     WHERE domain_name.is_primary;
+
+-- ---
+-- Change the user name to the name of your dovecot database user.
+-- ---
+GRANT SELECT ON dovecot_password TO dovecot;
+--                               ---^
+
