@@ -31,8 +31,10 @@ Configuring PostgreSQL
     CREATE DATABASE mailsys ENCODING 'UTF8';
     # connect to the new database
     \c mailsys
-    # import db structure
+    # either import the database structure for Dovecot v1.0.x/v1.1.x
     \i /path/to/create_tables.pgsql
+    # or import the database structure for Dovecot v1.2.x
+    \i /path/to/create_tables-dovecot-1.2.x.pgsql
 
     # create users and group
     CREATE USER postfix ENCRYPTED password 'DB PASSWORD for Postfix';
@@ -103,7 +105,9 @@ Provide a root SETUID copy of Dovecot's deliver agent for Postfix
     chmod 700 /usr/local/lib/dovecot
     chown nobody /usr/local/lib/dovecot
     cp /usr/lib/dovecot/deliver /usr/local/lib/dovecot/
-    chmod u+s /usr/local/lib/dovecot/deliver
+    chgrp nogroup /usr/local/lib/dovecot/deliver
+    chmod u+s,o-rwx /usr/local/lib/dovecot/deliver
+
 
 
 Start or restart Dovecot

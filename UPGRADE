@@ -9,19 +9,40 @@ If you have installed vmm 0.4/0.4-r41 you have to proceed this steps:
     * backup/dump your database.
     * backup/dump your database!
     
-    * start psql and connect to the appropriate database (ex. psql mailsys)
+    * start psql and connect to the appropriate database
+      (ex. psql mailsys mailsys vmm -W -h localhost)
     * update the database: \i update_tables_0.4.x-0.5.pgsql
     * GRANT SELECT ON postfix_alias TO postfix;
                                        ^^^^^^^^ <- your Postfix db user
+
+
+  Dovecot v1.2.x
+    -> Are you already using Dovecot v1.2.x?
+       * update the database for Dovecot v1.2.x:
+         \i update_tables_0.5.x_for_dovecot-1.2.x.pgsql
+       * GRANT SELECT ON dovecot_password TO dovecot;
+                                             ^^^^^^^^ <- your Dovecot db user
+
+       * When you are using the SQL function »dovecotpassword()« in your
+         dovecot-sql.conf, update it also:
+         \i update_types_and_functions_0.5.x_for_dovecot-1.2.x.pgsql
+
+       * You have also to adjust the permissions of the set-uid deliver copy:
+         chgrp nogroup /usr/local/lib/dovecot/deliver
+	 chmod u+s,o-rwx /usr/local/lib/dovecot/deliver
 
     * execute upgrade.sh
 
     * start Dovecot and Postfix
 
 
-If you have installed vmm 0.5:
+
+If you have installed vmm 0.5.x:
 
     * execute upgrade.sh
+
+    -> Are you already using Dovecot v1.2.x?
+       See a few lines above.
 
 
 else
