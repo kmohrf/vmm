@@ -31,6 +31,9 @@ def update(cp):
         upd_050(cp)
     elif VERSION == '0.5.1':
         upd_051(cp)
+    elif VERSION == '0.5.2':
+        os.sys.stdout.write('info: nothing to do for version %s\n' % VERSION)
+        os.sys.exit(0)
     else:
         os.sys.stderr.write(
             'error: the version %s is not supported by this script\n' % VERSION)
