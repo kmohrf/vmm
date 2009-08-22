@@ -117,7 +117,7 @@ Configuring Postfix's master.cf
 
     # Add Dovecot's deliver agent
     dovecot   unix  -       n       n       -       -       pipe
-      flags=DRhu user=nobody:mail argv=/usr/local/lib/dovecot/deliver -f ${sender} -d ${user}@${nexthop} -n -m ${extension}
+      flags=DRhu user=nobody argv=/usr/local/lib/dovecot/deliver -f ${sender} -d ${user}@${nexthop} -n -m ${extension}
 
 
 
