@@ -1,6 +1,6 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) 2009 VEB IT
-# This file is distributed under the same license as the vmm package.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vmm 0.5.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-08-21 20:17+0200\n"
+"POT-Creation-Date: 2009-08-23 17:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -373,8 +373,8 @@ msgstr ""
 
 #: VirtualMailManager/VirtualMailManager.py:497
 #: VirtualMailManager/VirtualMailManager.py:516
-#: VirtualMailManager/VirtualMailManager.py:625
-#: VirtualMailManager/VirtualMailManager.py:656
+#: VirtualMailManager/VirtualMailManager.py:624
+#: VirtualMailManager/VirtualMailManager.py:655
 #, python-format
 msgid "Invalid argument: »%s«"
 msgstr ""
@@ -383,20 +383,20 @@ msgstr ""
 msgid ""
 "The keyword »detailed« is deprecated and will be removed in a future "
 "release.\n"
-"    Please use the keyword »full« to get full details."
+"   Please use the keyword »full« to get full details."
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:594
+#: VirtualMailManager/VirtualMailManager.py:593
 #, python-format
 msgid "The pattern »%s« contains invalid characters."
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:620
+#: VirtualMailManager/VirtualMailManager.py:619
 #, python-format
 msgid "The destination account/alias »%s« doesn't exists yet."
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:637
+#: VirtualMailManager/VirtualMailManager.py:636
 #, python-format
 msgid ""
 "The account has been successfully deleted from the database.\n"
@@ -405,8 +405,16 @@ msgid ""
 "    Reason: %(raeson)s"
 msgstr ""
 
-#: VirtualMailManager/VirtualMailManager.py:677
+#: VirtualMailManager/VirtualMailManager.py:676
 msgid "Account doesn't exists"
+msgstr ""
+
+#: VirtualMailManager/VirtualMailManager.py:692
+#: VirtualMailManager/VirtualMailManager.py:702
+msgid ""
+"The service name »managesieve« is deprecated and will be removed\n"
+"   in a future release.\n"
+"   Please use the service name »sieve« instead."
 msgstr ""
 
 #: VirtualMailManager/ext/Postconf.py:44

@@ -1,13 +1,13 @@
 # German translations for vmm package.
-# Copyright (C) 2008 VEB IT
-# Pascal Volk <p.volk@veb-it.de>, 2008.
+# Copyright (C) 2009 VEB IT
+# Pascal Volk <p.volk@veb-it.de>, 2009.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: vmm 0.5.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-08-21 20:17+0200\n"
-"PO-Revision-Date: 2009-08-21 20:31+0200\n"
+"POT-Creation-Date: 2009-08-23 17:45+0200\n"
+"PO-Revision-Date: 2009-08-21 18:01+0200\n"
 "Last-Translator: Pascal Volk <p.volk@veb-it.de>\n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
@@ -391,8 +391,8 @@ msgstr "Ungültiges Argument: '%s'"
 
 #: VirtualMailManager/VirtualMailManager.py:497
 #: VirtualMailManager/VirtualMailManager.py:516
-#: VirtualMailManager/VirtualMailManager.py:625
-#: VirtualMailManager/VirtualMailManager.py:656
+#: VirtualMailManager/VirtualMailManager.py:624
+#: VirtualMailManager/VirtualMailManager.py:655
 #, python-format
 msgid "Invalid argument: »%s«"
 msgstr "Ungültiges Argument: »%s«"
@@ -401,23 +401,23 @@ msgstr "Ungültiges Argument: »%s«"
 msgid ""
 "The keyword »detailed« is deprecated and will be removed in a future "
 "release.\n"
-"    Please use the keyword »full« to get full details."
+"   Please use the keyword »full« to get full details."
 msgstr ""
 "Das Schlüsselwort »detailed« ist veraltet und wird in einer zukünftigen\n"
-"    Version entfernt werden.\n"
-"    Verwenden Sie bitte das Schlüsselwort »full«, um alle Details zu erhalten."
+"   Version entfernt werden.\n"
+"   Verwenden Sie bitte das Schlüsselwort »full«, um alle Details zu erhalten."
 
-#: VirtualMailManager/VirtualMailManager.py:594
+#: VirtualMailManager/VirtualMailManager.py:593
 #, python-format
 msgid "The pattern »%s« contains invalid characters."
 msgstr "Das Muster »%s« enthält ungültige Zeichen."
 
-#: VirtualMailManager/VirtualMailManager.py:620
+#: VirtualMailManager/VirtualMailManager.py:619
 #, python-format
 msgid "The destination account/alias »%s« doesn't exists yet."
 msgstr "Der Ziel-Account/-Alias »%s« existiert noch nicht."
 
-#: VirtualMailManager/VirtualMailManager.py:637
+#: VirtualMailManager/VirtualMailManager.py:636
 #, python-format
 msgid ""
 "The account has been successfully deleted from the database.\n"
@@ -430,9 +430,20 @@ msgstr ""
 "    »%(directory)s«\n"
 "    Grund: %(raeson)s"
 
-#: VirtualMailManager/VirtualMailManager.py:677
+#: VirtualMailManager/VirtualMailManager.py:676
 msgid "Account doesn't exists"
 msgstr "Der Account existiert nicht"
+
+#: VirtualMailManager/VirtualMailManager.py:692
+#: VirtualMailManager/VirtualMailManager.py:702
+msgid ""
+"The service name »managesieve« is deprecated and will be removed\n"
+"   in a future release.\n"
+"   Please use the service name »sieve« instead."
+msgstr ""
+"Der Servicename »managesieve« ist veraltet und wird in einer zukünftigen\n"
+"   Version entfernt werden.\n"
+"   Verwenden Sie stattdessen bitte den Servicename »sieve«."
 
 #: VirtualMailManager/ext/Postconf.py:44
 #, python-format

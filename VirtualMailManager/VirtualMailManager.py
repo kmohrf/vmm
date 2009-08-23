@@ -517,10 +517,9 @@ class VirtualMailManager(object):
                     ERR.INVALID_AGUMENT)
         if details == 'detailed':
             details = 'full'
-            warning = _(u"""\
-The keyword »detailed« is deprecated and will be removed in a future release.
-    Please use the keyword »full« to get full details.""")
-            self.__warnings.append(warning)
+            self.__warnings.append(_(u'\
+The keyword »detailed« is deprecated and will be removed in a future release.\n\
+   Please use the keyword »full« to get full details.'))
         dom = self.__getDomain(domainname)
         dominfo = dom.getInfo()
         if dominfo['domainname'].startswith('xn--'):
@@ -688,10 +687,22 @@ The account has been successfully deleted from the database.
         acc.modify('transport', transport)
 
     def userDisable(self, emailaddress, service=None):
+        if service == 'managesieve':
+            service = 'sieve'
+            self.__warnings.append(_(u'\
+The service name »managesieve« is deprecated and will be removed\n\
+   in a future release.\n\
+   Please use the service name »sieve« instead.'))
         acc = self.__getAccount(emailaddress)
         acc.disable(self.__Cfg.getint('misc', 'dovecotvers'), service)
 
     def userEnable(self, emailaddress, service=None):
+        if service == 'managesieve':
+            service = 'sieve'
+            self.__warnings.append(_(u'\
+The service name »managesieve« is deprecated and will be removed\n\
+   in a future release.\n\
+   Please use the service name »sieve« instead.'))
         acc = self.__getAccount(emailaddress)
         acc.enable(self.__Cfg.getint('misc', 'dovecotvers'), service)
 
