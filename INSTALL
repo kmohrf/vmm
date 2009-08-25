@@ -105,6 +105,9 @@ Provide a root SETUID copy of Dovecot's deliver agent for Postfix
     chmod 700 /usr/local/lib/dovecot
     chown nobody /usr/local/lib/dovecot
     cp /usr/lib/dovecot/deliver /usr/local/lib/dovecot/
+    # on BSD:
+    chgrp nobody /usr/local/lib/dovecot/deliver
+    # on Linux:
     chgrp nogroup /usr/local/lib/dovecot/deliver
     chmod u+s,o-rwx /usr/local/lib/dovecot/deliver
 
