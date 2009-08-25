@@ -36,7 +36,7 @@ class Domain(object):
         self._id = 0
         self._domaindir = None
         if not self._exists() and self._isAlias():
-            raise VMMDE(_(u"The domain »%s« is an alias domain.") %self._name,
+            raise VMMDE(_(u"The domain “%s” is an alias domain.") %self._name,
                     ERR.DOMAIN_ALIAS_EXISTS)
 
     def _exists(self):
@@ -142,7 +142,7 @@ class Domain(object):
             self._dbh.commit()
             dbc.close()
         else:
-            raise VMMDE(_(u'The domain »%s« already exists.') % self._name,
+            raise VMMDE(_(u'The domain “%s” already exists.') % self._name,
                 ERR.DOMAIN_EXISTS)
 
     def delete(self, delUser=False, delAlias=False):
@@ -160,7 +160,7 @@ class Domain(object):
             self._dbh.commit()
             dbc.close()
         else:
-            raise VMMDE(_(u"The domain »%s« doesn't exist yet.") % self._name,
+            raise VMMDE(_(u"The domain “%s” doesn't exist yet.") % self._name,
                 ERR.NO_SUCH_DOMAIN)
 
     def updateTransport(self, transport, force=False):
@@ -186,7 +186,7 @@ class Domain(object):
                     self._dbh.commit()
             dbc.close()
         else:
-            raise VMMDE(_(u"The domain »%s« doesn't exist yet.") % self._name,
+            raise VMMDE(_(u"The domain “%s” doesn't exist yet.") % self._name,
                 ERR.NO_SUCH_DOMAIN)
 
     def getID(self):
@@ -217,7 +217,7 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts,
         info = dbc.fetchone()
         dbc.close()
         if info is None:
-            raise VMMDE(_(u"The domain »%s« doesn't exist yet.") % self._name,
+            raise VMMDE(_(u"The domain “%s” doesn't exist yet.") % self._name,
                     ERR.NO_SUCH_DOMAIN)
         else:
             keys = ['gid', 'domainname', 'transport', 'domaindir',

@@ -33,12 +33,12 @@ class Account(object):
         self._exists()
         if self._uid < 1 and VMM.VirtualMailManager.aliasExists(self._dbh,
                 self._addr):
-            raise AccE(_(u"There is already an alias with the address »%s«.") %\
+            raise AccE(_(u"There is already an alias with the address “%s”.") %\
                     self._addr, ERR.ALIAS_EXISTS)
         if self._uid < 1 and VMM.VirtualMailManager.relocatedExists(self._dbh,
                 self._addr):
             raise AccE(
-              _(u"There is already a relocated user with the address »%s«.") %\
+              _(u"There is already a relocated user with the address “%s”.") %\
                     self._addr, ERR.RELOCATED_EXISTS)
 
     def _exists(self):
@@ -58,7 +58,7 @@ WHERE gid=%s AND local_part=%s",
         dom = Domain(self._dbh, self._addr._domainname)
         self._gid = dom.getID()
         if self._gid == 0:
-            raise AccE(_(u"The domain »%s« doesn't exist yet.") %\
+            raise AccE(_(u"The domain “%s” doesn't exist yet.") %\
                     self._addr._domainname, ERR.NO_SUCH_DOMAIN)
         self._base = dom.getDir()
         self._tid = dom.getTransportID()
@@ -77,10 +77,10 @@ WHERE gid=%s AND local_part=%s",
         if not isinstance(state, bool):
             return False
         if not service in (None, 'all', 'imap', 'pop3', 'sieve', 'smtp'):
-            raise AccE(_(u"Unknown service »%s«.") % service,
+            raise AccE(_(u"Unknown service “%s”.") % service,
                     ERR.UNKNOWN_SERVICE)
         if self._uid < 1:
-            raise AccE(_(u"The account »%s« doesn't exists.") % self._addr,
+            raise AccE(_(u"The account “%s” doesn't exists.") % self._addr,
                     ERR.NO_SUCH_ACCOUNT)
         sieve_col = 'sieve' if dcvers > 11 else 'managesieve'
         if service in ('smtp', 'pop3', 'imap'):
@@ -142,12 +142,12 @@ WHERE gid=%s AND local_part=%s",
             self._dbh.commit()
             dbc.close()
         else:
-            raise AccE(_(u'The account »%s« already exists.') % self._addr,
+            raise AccE(_(u'The account “%s” already exists.') % self._addr,
                     ERR.ACCOUNT_EXISTS)
 
     def modify(self, what, value):
         if self._uid == 0:
-            raise AccE(_(u"The account »%s« doesn't exists.") % self._addr,
+            raise AccE(_(u"The account “%s” doesn't exists.") % self._addr,
                     ERR.NO_SUCH_ACCOUNT)
         if what not in ['name', 'password', 'transport']:
             return False
@@ -175,7 +175,7 @@ WHERE gid=%s AND local_part=%s",
         info = dbc.fetchone()
         dbc.close()
         if info is None:
-            raise AccE(_(u"The account »%s« doesn't exists.") % self._addr,
+            raise AccE(_(u"The account “%s” doesn't exists.") % self._addr,
                     ERR.NO_SUCH_ACCOUNT)
         else:
             keys = ['name', 'uid', 'gid', 'maildir', 'transport', 'smtp',
@@ -209,7 +209,7 @@ WHERE gid=%s AND local_part=%s",
 
     def delete(self, delalias):
         if self._uid < 1:
-            raise AccE(_(u"The account »%s« doesn't exists.") % self._addr,
+            raise AccE(_(u"The account “%s” doesn't exists.") % self._addr,
                     ERR.NO_SUCH_ACCOUNT)
         dbc = self._dbh.cursor()
         if delalias == 'delalias':
@@ -231,7 +231,7 @@ WHERE gid=%s AND local_part=%s",
                 dbc.close()
                 raise AccE(
                   _(u"There are %(count)d aliases with the destination address\
- »%(address)s«.") %{'count': a_count, 'address': self._addr}, ERR.ALIAS_PRESENT)
+ “%(address)s”.") %{'count': a_count, 'address': self._addr}, ERR.ALIAS_PRESENT)
         dbc.close()
 
 def getAccountByID(uid, dbh):
@@ -248,7 +248,7 @@ def getAccountByID(uid, dbh):
     info = dbc.fetchone()
     dbc.close()
     if info is None:
-        raise AccE(_(u"There is no account with the UID »%d«.") % uid,
+        raise AccE(_(u"There is no account with the UID “%d”.") % uid,
                 ERR.NO_SUCH_ACCOUNT)
     keys = ['address', 'uid', 'gid']
     info = dict(zip(keys, info))

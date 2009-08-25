@@ -43,7 +43,7 @@ class MailLocation(object):
                 self._loadByName()
             else:
                 raise MLE(
-                    _(u'Invalid folder name »%s«, it may consist only of\n\
+                    _(u'Invalid folder name “%s”, it may consist only of\n\
 1 - 20 single byte characters (A-Z, a-z, 0-9 and _).') % maillocation,
                         ERR.MAILLOCATION_INIT)
 

@@ -36,12 +36,12 @@ class Relocated(object):
         self._exists()
         if self._isNew and VMM.VirtualMailManager.accountExists(self._dbh,
                 self._addr):
-            raise VMMRE(_(u"There is already an account with address »%s«.") %\
+            raise VMMRE(_(u"There is already an account with address “%s”.") %\
                     self._addr, ERR.ACCOUNT_EXISTS)
         if self._isNew and VMM.VirtualMailManager.aliasExists(self._dbh,
                 self._addr):
             raise VMMRE(
-                    _(u"There is already an alias with the address »%s«.") %\
+                    _(u"There is already an alias with the address “%s”.") %\
                     self._addr, ERR.ALIAS_EXISTS)
 
     def _exists(self):
@@ -57,7 +57,7 @@ class Relocated(object):
         dom = Domain(self._dbh, self._addr._domainname)
         self._gid = dom.getID()
         if self._gid == 0:
-            raise VMMRE(_(u"The domain »%s« doesn't exist yet.") %\
+            raise VMMRE(_(u"The domain “%s” doesn't exist yet.") %\
                     self._addr._domainname, ERR.NO_SUCH_DOMAIN)
 
     def save(self):
@@ -72,7 +72,7 @@ class Relocated(object):
             dbc.close()
         else:
             raise VMMRE(
-                    _(u"The relocated user »%s« already exists.") % self._addr,
+                    _(u"The relocated user “%s” already exists.") % self._addr,
                     ERR.RELOCATED_EXISTS)
 
     def getInfo(self):
@@ -86,7 +86,7 @@ class Relocated(object):
             return destination[0]
         else:
             raise VMMRE(
-                    _(u"The relocated user »%s« doesn't exists.") % self._addr,
+                    _(u"The relocated user “%s” doesn't exists.") % self._addr,
                     ERR.NO_SUCH_RELOCATED)
 
     def delete(self):
@@ -99,6 +99,6 @@ class Relocated(object):
             self._dbh.commit()
         else:
             raise VMMRE(
-                    _(u"The relocated user »%s« doesn't exists.") % self._addr,
+                    _(u"The relocated user “%s” doesn't exists.") % self._addr,
                     ERR.NO_SUCH_RELOCATED)
 

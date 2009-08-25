@@ -41,7 +41,7 @@ class Postconf(object):
         expand_vars -- default True (bool)
         """
         if not re.match(RE_PC_PARAMS, parameter):
-            raise VMMException(_(u'The value »%s« looks not like a valid\
+            raise VMMException(_(u'The value “%s” looks not like a valid\
  postfix configuration parameter name.') % parameter, ERR.VMM_ERROR)
         self.__val = self.__read(parameter)
         if expand_vars:

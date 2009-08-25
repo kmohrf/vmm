@@ -43,15 +43,15 @@ class EmailAddress(object):
         try:
             localpart, domain = address.split('@')
         except ValueError:
-            raise VMMEAE(_(u"Missing '@' sign in e-mail address »%s«.") %
+            raise VMMEAE(_(u"Missing '@' sign in e-mail address “%s”.") %
                 address, ERR.INVALID_ADDRESS)
         except AttributeError:
-            raise VMMEAE(_(u"»%s« looks not like an e-mail address.") %
+            raise VMMEAE(_(u"“%s” looks not like an e-mail address.") %
                 address, ERR.INVALID_ADDRESS)
         if len(domain) > 0:
             domain = VMM.VirtualMailManager.chkDomainname(domain)
         else:
-            raise VMMEAE(_(u"Missing domain name after »%s@«.") %
+            raise VMMEAE(_(u"Missing domain name after “%s@”.") %
                     localpart, ERR.DOMAIN_NO_NAME)
         localpart = self.__chkLocalpart(localpart)
         self._localpart, self._domainname = localpart, domain
@@ -66,14 +66,14 @@ class EmailAddress(object):
             raise VMMEAE(_(u'No localpart specified.'),
                 ERR.LOCALPART_INVALID)
         if len(localpart) > 64:
-            raise VMMEAE(_(u'The local part »%s« is too long') %
+            raise VMMEAE(_(u'The local part “%s” is too long') %
                 localpart, ERR.LOCALPART_TOO_LONG)
         ic = set(re.findall(RE_LOCALPART, localpart))
         if len(ic):
             ichrs = ''
             for c in ic:
-                ichrs += u"»%s« " % c
-            raise VMMEAE(_(u"The local part »%(lpart)s« contains invalid\
+                ichrs += u"“%s” " % c
+            raise VMMEAE(_(u"The local part “%(lpart)s” contains invalid\
  characters: %(ichrs)s") % {'lpart': localpart, 'ichrs': ichrs},
                 ERR.LOCALPART_INVALID)
         return localpart

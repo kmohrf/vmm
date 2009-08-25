@@ -37,12 +37,12 @@ class Alias(object):
             self._exists()
         if self._isNew and VMM.VirtualMailManager.accountExists(self._dbh,
                 self._addr):
-            raise VMMAE(_(u"There is already an account with address »%s«.") %\
+            raise VMMAE(_(u"There is already an account with address “%s”.") %\
                     self._addr, ERR.ACCOUNT_EXISTS)
         if self._isNew and VMM.VirtualMailManager.relocatedExists(self._dbh,
                 self._addr):
             raise VMMAE(
-              _(u"There is already a relocated user with the address »%s«.") %\
+              _(u"There is already a relocated user with the address “%s”.") %\
                     self._addr, ERR.RELOCATED_EXISTS)
 
     def _exists(self):
@@ -58,7 +58,7 @@ class Alias(object):
         dom = Domain(self._dbh, self._addr._domainname)
         self._gid = dom.getID()
         if self._gid == 0:
-            raise VMMAE(_(u"The domain »%s« doesn't exist yet.") %\
+            raise VMMAE(_(u"The domain “%s” doesn't exist yet.") %\
                     self._addr._domainname, ERR.NO_SUCH_DOMAIN)
 
     def _checkExpansion(self, limit):
@@ -68,7 +68,7 @@ class Alias(object):
         curEx = dbc.fetchone()[0]
         dbc.close()
         if curEx == limit:
-            errmsg = _(u"""Can't add new destination to alias »%(address)s«.
+            errmsg = _(u"""Can't add new destination to alias “%(address)s”.
 Currently this alias expands into %(count)i recipients.
 One more destination will render this alias unusable.
 Hint: Increase Postfix' virtual_alias_expansion_limit
@@ -88,7 +88,7 @@ Hint: Increase Postfix' virtual_alias_expansion_limit
             dbc.close()
         else:
             raise VMMAE(
-               _(u"The alias »%(a)s« with destination »%(d)s« already exists.")\
+               _(u"The alias “%(a)s” with destination “%(d)s” already exists.")\
                        % {'a': self._addr, 'd': self._dest}, ERR.ALIAS_EXISTS)
 
     def getInfo(self):
@@ -103,7 +103,7 @@ Hint: Increase Postfix' virtual_alias_expansion_limit
                 targets.append(destination[0])
             return targets
         else:
-            raise VMMAE(_(u"The alias »%s« doesn't exists.") % self._addr,
+            raise VMMAE(_(u"The alias “%s” doesn't exists.") % self._addr,
                     ERR.NO_SUCH_ALIAS)
 
     def delete(self):
@@ -120,9 +120,9 @@ Hint: Increase Postfix' virtual_alias_expansion_limit
             self._dbh.commit()
         else:
             if self._dest is None:
-                msg = _(u"The alias »%s« doesn't exists.") % self._addr
+                msg = _(u"The alias “%s” doesn't exists.") % self._addr
             else:
-                msg = _(u"The alias »%(a)s« with destination »%(d)s« doesn't\
+                msg = _(u"The alias “%(a)s” with destination “%(d)s” doesn't\
  exists.") % {'a': self._addr, 'd': self._dest}
             raise VMMAE(msg, ERR.NO_SUCH_ALIAS)
 

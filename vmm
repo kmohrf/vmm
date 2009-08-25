@@ -148,7 +148,7 @@ def _printAliases(alias, targets):
 def _printRelocated(addr_dest):
     msg = _(u'Relocated information')
     w_std('%s\n%s' % (msg, '-'*len(msg)))
-    w_std(_(u'\tUser »%(addr)s« has moved to »%(dest)s«') % addr_dest)
+    w_std(_(u'\tUser “%(addr)s” has moved to “%(dest)s”') % addr_dest)
     print
 
 def _formatDom(domain, main=True):
@@ -485,7 +485,7 @@ if __name__ == '__main__':
             show_version()
         else:
             usage(EXIT.UNKNOWN_COMMAND,
-                    u"%s: »%s«" % (_('Unknown subcommand'), argv[1]))
+                    u"%s: “%s”" % (_('Unknown subcommand'), argv[1]))
         show_warnings()
     except (EOFError, KeyboardInterrupt):
         w_err(EXIT.USER_INTERRUPT, '\n%s!\n' % _(u'Ouch'))

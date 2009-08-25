@@ -137,7 +137,7 @@ class Config(ConfigParser):
         w_std(_(u'Using configuration file: %s\n') % self.__cfgFileName)
         for s in sections:
             if s != 'config':
-                w_std(_(u'* Config section: »%s«') % s )
+                w_std(_(u'* Config section: “%s”') % s )
             for opt, val in self.items(s):
                 newval = raw_input(
                 _('Enter new value for option %(opt)s [%(val)s]: ').encode(

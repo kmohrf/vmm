@@ -71,7 +71,7 @@ class VirtualMailManager(object):
                 break
         if not len(self.__cfgFileName):
             raise VMMException(
-                _(u"No »vmm.cfg« found in: /root:/usr/local/etc:/etc"),
+                _(u"No “vmm.cfg” found in: /root:/usr/local/etc:/etc"),
                 ERR.CONF_NOFILE)
 
     def __chkCfgFile(self):
@@ -82,7 +82,7 @@ class VirtualMailManager(object):
         if fmode % 100 and fstat.st_uid != fstat.st_gid \
         or fmode % 10 and fstat.st_uid == fstat.st_gid:
             raise VMMPermException(_(
-                u'fix permissions (%(perms)s) for »%(file)s«\n\
+                u'fix permissions (%(perms)s) for “%(file)s”\n\
 `chmod 0600 %(file)s` would be great.') % {'file':
                 self.__cfgFileName, 'perms': fmode}, ERR.CONF_WRONGPERM)
         else:
@@ -97,16 +97,16 @@ class VirtualMailManager(object):
                     self.__Cfg.getint('misc', 'gid_mail'))
             os.umask(old_umask)
         elif not os.path.isdir(self.__Cfg.get('domdir', 'base')):
-            raise VMMException(_(u'»%s« is not a directory.\n\
+            raise VMMException(_(u'“%s” is not a directory.\n\
 (vmm.cfg: section "domdir", option "base")') %
                 self.__Cfg.get('domdir', 'base'), ERR.NO_SUCH_DIRECTORY)
         for opt, val in self.__Cfg.items('bin'):
             if not os.path.exists(val):
-                raise VMMException(_(u'»%(binary)s« doesn\'t exists.\n\
+                raise VMMException(_(u'“%(binary)s” doesn\'t exists.\n\
 (vmm.cfg: section "bin", option "%(option)s")') %{'binary': val,'option': opt},
                     ERR.NO_SUCH_BINARY)
             elif not os.access(val, os.X_OK):
-                raise VMMException(_(u'»%(binary)s« is not executable.\n\
+                raise VMMException(_(u'“%(binary)s” is not executable.\n\
 (vmm.cfg: section "bin", option "%(option)s")') %{'binary': val,'option': opt},
                     ERR.NOT_EXECUTABLE)
 
@@ -166,7 +166,7 @@ class VirtualMailManager(object):
             raise VMMException(_(u'The domain name is too long.'),
                 ERR.DOMAIN_TOO_LONG)
         if not re.match(RE_DOMAIN, domainname):
-            raise VMMException(_(u'The domain name »%s« is invalid.') %\
+            raise VMMException(_(u'The domain name “%s” is invalid.') %\
                     domainname, ERR.DOMAIN_INVALID)
         return domainname
     chkDomainname = staticmethod(chkDomainname)
@@ -474,7 +474,7 @@ class VirtualMailManager(object):
         elif section in self.__cfgSections:
             self.__Cfg.configure([section])
         else:
-            raise VMMException(_(u"Invalid section: '%s'") % section,
+            raise VMMException(_(u"Invalid section: “%s”") % section,
                 ERR.INVALID_SECTION)
 
     def domainAdd(self, domainname, transport=None):
@@ -484,7 +484,7 @@ class VirtualMailManager(object):
 
     def domainTransport(self, domainname, transport, force=None):
         if force is not None and force != 'force':
-            raise VMMDomainException(_(u"Invalid argument: '%s'") % force,
+            raise VMMDomainException(_(u"Invalid argument: “%s”") % force,
                 ERR.INVALID_OPTION)
         dom = self.__getDomain(domainname, None)
         if force is None:
@@ -494,7 +494,7 @@ class VirtualMailManager(object):
 
     def domainDelete(self, domainname, force=None):
         if not force is None and force not in ['deluser','delalias','delall']:
-            raise VMMDomainException(_(u"Invalid argument: »%s«") % force,
+            raise VMMDomainException(_(u"Invalid argument: “%s”") % force,
                 ERR.INVALID_OPTION)
         dom = self.__getDomain(domainname)
         gid = dom.getID()
@@ -513,13 +513,13 @@ class VirtualMailManager(object):
     def domainInfo(self, domainname, details=None):
         if details not in [None, 'accounts', 'aliasdomains', 'aliases', 'full',
                 'relocated', 'detailed']:
-            raise VMMException(_(u'Invalid argument: »%s«') % details,
+            raise VMMException(_(u'Invalid argument: “%s”') % details,
                     ERR.INVALID_AGUMENT)
         if details == 'detailed':
             details = 'full'
             self.__warnings.append(_(u'\
-The keyword »detailed« is deprecated and will be removed in a future release.\n\
-   Please use the keyword »full« to get full details.'))
+The keyword “detailed” is deprecated and will be removed in a future release.\n\
+   Please use the keyword “full” to get full details.'))
         dom = self.__getDomain(domainname)
         dominfo = dom.getInfo()
         if dominfo['domainname'].startswith('xn--'):
@@ -590,7 +590,7 @@ The keyword »detailed« is deprecated and will be removed in a future release.\
                     domain = pattern[:-1]
                 if not re.match(RE_DOMAIN_SRCH, domain):
                     raise VMMException(
-                    _(u"The pattern »%s« contains invalid characters.") %
+                    _(u"The pattern “%s” contains invalid characters.") %
                     pattern, ERR.DOMAIN_INVALID)
         self.__dbConnect()
         return search(self.__dbh, pattern=pattern, like=like)
@@ -616,12 +616,12 @@ The keyword »detailed« is deprecated and will be removed in a future release.\
         alias._dest) and not VirtualMailManager.aliasExists(self.__dbh,
         alias._dest):
             self.__warnings.append(
-                _(u"The destination account/alias »%s« doesn't exists yet.")%\
+                _(u"The destination account/alias “%s” doesn't exists yet.")%\
                         alias._dest)
 
     def userDelete(self, emailaddress, force=None):
         if force not in [None, 'delalias']:
-            raise VMMException(_(u"Invalid argument: »%s«") % force,
+            raise VMMException(_(u"Invalid argument: “%s”") % force,
                     ERR.INVALID_AGUMENT)
         acc = self.__getAccount(emailaddress)
         uid = acc.getUID()
@@ -636,7 +636,7 @@ The keyword »detailed« is deprecated and will be removed in a future release.\
                     warning = _(u"""\
 The account has been successfully deleted from the database.
     But an error occurred while deleting the following directory:
-    »%(directory)s«
+    “%(directory)s”
     Reason: %(raeson)s""") % {'directory': acc.getDir('home'),'raeson': e.msg()}
                     self.__warnings.append(warning)
                 else:
@@ -652,7 +652,7 @@ The account has been successfully deleted from the database.
 
     def userInfo(self, emailaddress, details=None):
         if details not in [None, 'du', 'aliases', 'full']:
-            raise VMMException(_(u'Invalid argument: »%s«') % details,
+            raise VMMException(_(u'Invalid argument: “%s”') % details,
                     ERR.INVALID_AGUMENT)
         acc = self.__getAccount(emailaddress)
         info = acc.getInfo(self.__Cfg.getint('misc', 'dovecotvers'))
@@ -690,9 +690,9 @@ The account has been successfully deleted from the database.
         if service == 'managesieve':
             service = 'sieve'
             self.__warnings.append(_(u'\
-The service name »managesieve« is deprecated and will be removed\n\
+The service name “managesieve” is deprecated and will be removed\n\
    in a future release.\n\
-   Please use the service name »sieve« instead.'))
+   Please use the service name “sieve” instead.'))
         acc = self.__getAccount(emailaddress)
         acc.disable(self.__Cfg.getint('misc', 'dovecotvers'), service)
 
@@ -700,9 +700,9 @@ The service name »managesieve« is deprecated and will be removed\n\
         if service == 'managesieve':
             service = 'sieve'
             self.__warnings.append(_(u'\
-The service name »managesieve« is deprecated and will be removed\n\
+The service name “managesieve” is deprecated and will be removed\n\
    in a future release.\n\
-   Please use the service name »sieve« instead.'))
+   Please use the service name “sieve” instead.'))
         acc = self.__getAccount(emailaddress)
         acc.enable(self.__Cfg.getint('misc', 'dovecotvers'), service)
 
