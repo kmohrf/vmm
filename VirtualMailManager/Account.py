@@ -82,7 +82,10 @@ WHERE gid=%s AND local_part=%s",
         if self._uid < 1:
             raise AccE(_(u"The account “%s” doesn't exists.") % self._addr,
                     ERR.NO_SUCH_ACCOUNT)
-        sieve_col = 'sieve' if dcvers > 11 else 'managesieve'
+        if dcvers > 11:
+            sieve_col = 'sieve'
+        else:
+            sieve_col = 'managesieve'
         if service in ('smtp', 'pop3', 'imap'):
             sql = 'UPDATE users SET %s = %s WHERE uid = %d' % (service, state,
                     self._uid)
@@ -131,7 +134,10 @@ WHERE gid=%s AND local_part=%s",
 
     def save(self, maillocation, dcvers, smtp, pop3, imap, sieve):
         if self._uid < 1:
-            sieve_col = 'sieve' if dcvers > 11 else 'managesieve'
+            if dcvers > 11:
+                sieve_col = 'sieve'
+            else:
+                sieve_col = 'managesieve'
             self._prepare(maillocation)
             sql = "INSERT INTO users (local_part, passwd, uid, gid, mid, tid,\
  smtp, pop3, imap, %s) VALUES ('%s', '%s', %d, %d, %d, %d, %s, %s, %s, %s)" % (
@@ -167,7 +173,10 @@ WHERE gid=%s AND local_part=%s",
         dbc.close()
 
     def getInfo(self, dcvers):
-        sieve_col = 'sieve' if dcvers > 11 else 'managesieve'
+        if dcvers > 11:
+            sieve_col = 'sieve'
+        else:
+            sieve_col = 'managesieve'
         sql = 'SELECT name, uid, gid, mid, tid, smtp, pop3, imap, %s\
  FROM users WHERE uid = %d' % (sieve_col, self._uid)
         dbc = self._dbh.cursor()
