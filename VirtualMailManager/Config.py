@@ -9,22 +9,13 @@ configuration from Virtual Mail Manager.
 
 from constants.VERSION import *
 
-import locale
-import sys
 from shutil import copy2
 from ConfigParser import ConfigParser, MissingSectionHeaderError, ParsingError
 from cStringIO import StringIO
 
+from __main__ import ENCODING, w_std
 from Exceptions import VMMConfigException
 import constants.ERROR as ERR
-
-locale.setlocale(locale.LC_ALL, '')
-ENCODING = locale.nl_langinfo(locale.CODESET)
-
-def w_std(*args):
-    for arg in args:
-        sys.stdout.write(arg.encode(ENCODING, 'replace'))
-        sys.stdout.write('\n')
 
 class Config(ConfigParser):
     """This class is for reading and modifying vmm's configuration file."""

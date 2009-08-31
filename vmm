@@ -8,8 +8,16 @@
 from VirtualMailManager.constants.VERSION import *
 
 import locale
+# do it early - for import in in the other files
+locale.setlocale(locale.LC_ALL, '')
+ENCODING = locale.nl_langinfo(locale.CODESET)
+
+def w_std(*args):
+    for arg in args:
+        os.sys.stdout.write(arg.encode(ENCODING, 'replace'))
+        os.sys.stdout.write('\n')
+
 import os
-import sys
 import gettext
 from time import strftime, strptime
 
@@ -21,14 +29,9 @@ import VirtualMailManager.constants.ERROR as ERR
 
 def w_err(code, *args):
     for arg in args:
-        sys.stderr.write(arg.encode(ENCODING, 'replace'))
-        sys.stderr.write('\n')
-    sys.exit(code)
-
-def w_std(*args):
-    for arg in args:
-        sys.stdout.write(arg.encode(ENCODING, 'replace'))
-        sys.stdout.write('\n')
+        os.sys.stderr.write(arg.encode(ENCODING, 'replace'))
+        os.sys.stderr.write('\n')
+    os.sys.exit(code)
 
 def usage(excode=0, errMsg=None):
     u_head = _("""\
@@ -73,7 +76,7 @@ Usage: %s SUBCOMMAND OBJECT ARGS*
             w_err(excode, u_head, u_body, '%s: %s\n' % (_('Error'), errMsg))
     else:
         w_std(u_head, u_body)
-        sys.exit(excode)
+        os.sys.exit(excode)
 
 def get_vmm():
     try:
@@ -411,17 +414,15 @@ def show_version():
     w_std('%s, %s %s (%s %s)\nPython %s %s %s\n\n%s %s' % (__prog__,
         _('version'), __version__, _('from'), strftime(
             locale.nl_langinfo(locale.D_FMT), strptime(__date__, '%Y-%m-%d')),
-        sys.version.split()[0], _(u'on'), os.uname()[0], __prog__,
+        os.sys.version.split()[0], _(u'on'), os.uname()[0], __prog__,
         'is free software and comes with ABSOLUTELY NO WARRANTY.'))
 
 #def main():
 if __name__ == '__main__':
-    __prog__ = os.path.basename(sys.argv[0])
-    locale.setlocale(locale.LC_ALL, '')
-    ENCODING = locale.nl_langinfo(locale.CODESET)
+    __prog__ = os.path.basename(os.sys.argv[0])
     gettext.install(__prog__, '/usr/local/share/locale', unicode=1)
-    argv = [unicode(arg, ENCODING) for arg in sys.argv]
-    argc = len(sys.argv)
+    argv = [unicode(arg, ENCODING) for arg in os.sys.argv]
+    argc = len(os.sys.argv)
 
     if argc < 2:
         usage(EXIT.MISSING_ARGS)

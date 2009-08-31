@@ -8,8 +8,6 @@ from constants.VERSION import *
 
 import os
 import re
-import sys
-import locale
 from encodings.idna import ToASCII, ToUnicode
 from getpass import getpass
 from shutil import rmtree
@@ -18,6 +16,7 @@ from subprocess import Popen, PIPE
 from pyPgSQL import PgSQL # python-pgsql - http://pypgsql.sourceforge.net
 
 import constants.ERROR as ERR
+from __main__ import ENCODING, w_std
 from ext.Postconf import Postconf
 from Account import Account
 from Alias import Alias
@@ -34,8 +33,6 @@ RE_DOMAIN = """^(?:[a-z0-9-]{1,63}\.){1,}[a-z]{2,6}$"""
 RE_DOMAIN_SRCH = """^[a-z0-9-\.]+$"""
 RE_LOCALPART = """[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]"""
 RE_MBOX_NAMES = """^[\x20-\x25\x27-\x7E]*$"""
-locale.setlocale(locale.LC_ALL, '')
-ENCODING = locale.nl_langinfo(locale.CODESET)
 
 class VirtualMailManager(object):
     """The main class for vmm"""
@@ -60,7 +57,7 @@ class VirtualMailManager(object):
             self.__cfgSections = self.__Cfg.getsections()
             self.__scheme = self.__Cfg.get('misc', 'passwdscheme')
             self._postconf = Postconf(self.__Cfg.get('bin', 'postconf'))
-        if not sys.argv[1] in ['cf', 'configure']:
+        if not os.sys.argv[1] in ['cf', 'configure']:
             self.__chkenv()
 
     def __findCfgFile(self):
@@ -204,17 +201,17 @@ class VirtualMailManager(object):
     relocatedExists = staticmethod(relocatedExists)
 
     def _readpass(self):
+        readp_msg0 = _(u'Enter new password: ').encode(ENCODING, 'replace')
+        readp_msg1 = _(u'Retype new password: ').encode(ENCODING, 'replace')
         mismatched = True
         while mismatched:
-            clear0 = getpass(prompt=_('Enter new password: '))
-            clear1 = getpass(prompt=_('Retype new password: '))
+            clear0 = getpass(prompt=readp_msg0)
+            clear1 = getpass(prompt=readp_msg1)
             if clear0 != clear1:
-                msg = _('Sorry, passwords do not match')
-                sys.stderr.write('%s\n' % msg.encode(ENCODING, 'replace'))
+                w_std(_(u'Sorry, passwords do not match'))
                 continue
             if len(clear0) < 1 or len(clear1) < 1:
-                msg = _('Sorry, empty passwords are not permitted')
-                sys.stderr.write('%s\n' % msg.encode(ENCODING, 'replace'))
+                w_std(_(u'Sorry, empty passwords are not permitted'))
                 continue
             mismatched = False
         return clear0
