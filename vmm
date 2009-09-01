@@ -8,7 +8,7 @@
 from VirtualMailManager.constants.VERSION import *
 
 import locale
-# do it early - for import in in the other files
+# do it early - for importing in the other files
 locale.setlocale(locale.LC_ALL, '')
 ENCODING = locale.nl_langinfo(locale.CODESET)
 
@@ -34,13 +34,13 @@ def w_err(code, *args):
     os.sys.exit(code)
 
 def usage(excode=0, errMsg=None):
-    u_head = _("""\
+    u_head = _(u"""\
 Usage: %s SUBCOMMAND OBJECT ARGS*
   short long
   subcommand               object             args (* = optional)\n""")\
           % __prog__
 
-    u_body = """\
+    u_body = u"""\
   da    domainadd          domain.tld         transport*
   di    domaininfo         domain.tld         details*
   dt    domaintransport    domain.tld         transport force*
@@ -73,7 +73,7 @@ Usage: %s SUBCOMMAND OBJECT ARGS*
         if errMsg is None:
             w_err(excode, u_head, u_body)
         else:
-            w_err(excode, u_head, u_body, '%s: %s\n' % (_('Error'), errMsg))
+            w_err(excode, u_head, u_body, '%s: %s\n' % (_(u'Error'), errMsg))
     else:
         w_std(u_head, u_body)
         os.sys.exit(excode)
@@ -84,7 +84,7 @@ def get_vmm():
         return vmm
     except (VMME.VMMException, VMME.VMMNotRootException, VMME.VMMPermException,
             VMME.VMMConfigException), e:
-        w_err(e.code(), "%s: %s\n" % (_('Error'), e.msg()))
+        w_err(e.code(), "%s: %s\n" % (_(u'Error'), e.msg()))
 
 def _getOrder():
     order = ()
@@ -412,8 +412,9 @@ def show_warnings():
 
 def show_version():
     w_std('%s, %s %s (%s %s)\nPython %s %s %s\n\n%s %s' % (__prog__,
-        _('version'), __version__, _('from'), strftime(
-            locale.nl_langinfo(locale.D_FMT), strptime(__date__, '%Y-%m-%d')),
+        _(u'version'), __version__, _(u'from'),
+        strftime(locale.nl_langinfo(locale.D_FMT),
+            strptime(__date__, '%Y-%m-%d')).decode(ENCODING, 'replace'),
         os.sys.version.split()[0], _(u'on'), os.uname()[0], __prog__,
         'is free software and comes with ABSOLUTELY NO WARRANTY.'))
 
@@ -486,7 +487,7 @@ if __name__ == '__main__':
             show_version()
         else:
             usage(EXIT.UNKNOWN_COMMAND,
-                    u"%s: “%s”" % (_('Unknown subcommand'), argv[1]))
+                    u"%s: “%s”" % (_(u'Unknown subcommand'), argv[1]))
         show_warnings()
     except (EOFError, KeyboardInterrupt):
         w_err(EXIT.USER_INTERRUPT, '\n%s!\n' % _(u'Ouch'))
