@@ -7,15 +7,12 @@ configuration from Virtual Mail Manager.
 
 """
 
-from constants.VERSION import *
-
 from shutil import copy2
 from ConfigParser import ConfigParser, MissingSectionHeaderError, ParsingError
 from cStringIO import StringIO
 
-from __main__ import ENCODING, w_std
+from __main__ import ENCODING, ERR, w_std
 from Exceptions import VMMConfigException
-import constants.ERROR as ERR
 
 class Config(ConfigParser):
     """This class is for reading and modifying vmm's configuration file."""

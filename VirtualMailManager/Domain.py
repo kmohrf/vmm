@@ -4,12 +4,10 @@
 
 """Virtual Mail Manager's Domain class to manage e-mail domains."""
 
-from constants.VERSION import *
-
 from random import choice
 
+from __main__ import ERR
 from Exceptions import VMMDomainException as VMMDE
-import constants.ERROR as ERR
 import VirtualMailManager as VMM
 from Transport import Transport
 

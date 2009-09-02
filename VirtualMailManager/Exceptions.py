@@ -4,8 +4,6 @@
 
 """Exception classes for Virtual Mail Manager"""
 
-from constants.VERSION import *
-
 class VMMException(Exception):
     """Exception class for VirtualMailManager exceptions"""
     def __init__(self, msg, code):

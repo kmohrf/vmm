@@ -4,10 +4,8 @@
 
 """Virtual Mail Manager's AliasDomain class to manage alias domains."""
 
-from constants.VERSION import *
-
+from __main__ import ERR
 from Exceptions import VMMAliasDomainException as VADE
-import constants.ERROR as ERR
 import VirtualMailManager as VMM
 
 class AliasDomain(object):

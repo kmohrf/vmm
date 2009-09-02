@@ -5,33 +5,14 @@
 
 """This is the vmm main script."""
 
-from VirtualMailManager.constants.VERSION import *
-
-import locale
-# do it early - for importing in the other files
-locale.setlocale(locale.LC_ALL, '')
-ENCODING = locale.nl_langinfo(locale.CODESET)
-
-def w_std(*args):
-    for arg in args:
-        os.sys.stdout.write(arg.encode(ENCODING, 'replace'))
-        os.sys.stdout.write('\n')
-
-import os
 import gettext
 from time import strftime, strptime
 
+from VirtualMailManager import *
 from VirtualMailManager.VirtualMailManager import VirtualMailManager
 import VirtualMailManager.Exceptions as VMME
 import VirtualMailManager.constants.EXIT as EXIT
-import VirtualMailManager.constants.ERROR as ERR
 
-
-def w_err(code, *args):
-    for arg in args:
-        os.sys.stderr.write(arg.encode(ENCODING, 'replace'))
-        os.sys.stderr.write('\n')
-    os.sys.exit(code)
 
 def usage(excode=0, errMsg=None):
     u_head = _(u"""\

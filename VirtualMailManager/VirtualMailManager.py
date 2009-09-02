@@ -4,10 +4,7 @@
 
 """The main class for vmm."""
 
-from constants.VERSION import *
 
-import os
-import re
 from encodings.idna import ToASCII, ToUnicode
 from getpass import getpass
 from shutil import rmtree
@@ -15,8 +12,7 @@ from subprocess import Popen, PIPE
 
 from pyPgSQL import PgSQL # python-pgsql - http://pypgsql.sourceforge.net
 
-import constants.ERROR as ERR
-from __main__ import ENCODING, w_std
+from __main__ import os, re, ENCODING, ERR, w_std
 from ext.Postconf import Postconf
 from Account import Account
 from Alias import Alias

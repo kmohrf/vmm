@@ -4,13 +4,9 @@
 
 """Virtual Mail Manager's EmailAddress class to handle e-mail addresses."""
 
-from constants.VERSION import *
-
-import re
-
+from __main__ import re, ERR
 from Exceptions import VMMEmailAddressException as VMMEAE
 import VirtualMailManager as VMM
-import constants.ERROR as ERR
 
 RE_LOCALPART = """[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]"""
 

@@ -4,12 +4,9 @@
 
 """A small - r/o - wrapper class for Postfix' postconf."""
 
-from VirtualMailManager.constants.VERSION import *
-
-import re
 from subprocess import Popen, PIPE
 
-import VirtualMailManager.constants.ERROR as ERR
+from __main__ import re, ERR
 from VirtualMailManager.Exceptions import VMMException
 
 RE_PC_PARAMS = """^\w+$"""
