@@ -370,10 +370,7 @@ class VirtualMailManager(object):
         if self.__scheme == 'CRYPT':
             salt = '%s%s' % (choice(SALTCHARS), choice(SALTCHARS))
         elif self.__scheme in ['MD5', 'MD5-CRYPT']:
-            salt = '$1$'
-            for i in range(8):
-                salt += choice(SALTCHARS)
-            salt += '$'
+            salt = '$1$%s$' % ''.join([choice(SALTCHARS) for x in xrange(8)])
         return salt
 
     def __pwCrypt(self, password):
