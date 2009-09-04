@@ -231,8 +231,9 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts,
         dbc.close()
         accounts = []
         if len(users) > 0:
-            for account in users:
-                accounts.append('%s@%s' % (account[0], self._name))
+            addr = u'@'.join
+            _dom = self._name
+            accounts = [addr((account[0], _dom)) for account in users]
         return accounts
 
     def getAliases(self):
@@ -244,8 +245,9 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts,
         dbc.close()
         aliases = []
         if len(addresses) > 0:
-            for alias in addresses:
-                aliases.append('%s@%s' % (alias[0], self._name))
+            addr = u'@'.join
+            _dom = self._name
+            aliases = [addr((alias[0], _dom)) for alias in addresses]
         return aliases
 
     def getRelocated(self):
@@ -257,8 +259,9 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts,
         dbc.close()
         relocated = []
         if len(addresses) > 0:
-            for address in addresses:
-                relocated.append('%s@%s' % (address[0], self._name))
+            addr = u'@'.join
+            _dom = self._name
+            relocated = [addr((address[0], _dom)) for address in addresses]
         return relocated
 
     def getAliaseNames(self):
@@ -270,8 +273,7 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts,
         dbc.close()
         aliasdomains = []
         if len(anames) > 0:
-            for aname in anames:
-                aliasdomains.append(aname[0])
+            aliasdomains = [aname[0] for aname in anames]
         return aliasdomains
 
 def search(dbh, pattern=None, like=False):

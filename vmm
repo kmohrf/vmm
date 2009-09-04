@@ -70,78 +70,78 @@ def get_vmm():
 def _getOrder():
     order = ()
     if vmm.cfgGetInt('misc', 'dovecotvers') > 11:
-        sieve_name = 'sieve'
+        sieve_name = u'sieve'
     else:
-        sieve_name = 'managesieve'
+        sieve_name = u'managesieve'
     if argv[1] in ['di', 'domaininfo']:
-        order = (('domainname', 0), ('gid', 1), ('transport', 0),
-                ('domaindir', 0), ('aliasdomains', 0), ('accounts', 0),
-                ('aliases', 0), ('relocated', 0))
+        order = ((u'domainname', 0), (u'gid', 1), (u'transport', 0),
+                (u'domaindir', 0), (u'aliasdomains', 0), (u'accounts', 0),
+                (u'aliases', 0), (u'relocated', 0))
     elif argv[1] in ['ui', 'userinfo']:
         if argc == 4 and argv[3] != 'aliases'\
         or vmm.cfgGetBoolean('maildir', 'diskusage'):
-            order = (('address', 0), ('name', 0), ('uid', 1), ('gid', 1),
-                    ('transport', 0), ('maildir', 0), ('disk usage', 0),
-                    ('smtp', 1), ('pop3', 1), ('imap', 1), (sieve_name, 1))
+            order = ((u'address', 0), (u'name', 0), (u'uid', 1), (u'gid', 1),
+                    (u'transport', 0), (u'maildir', 0), (u'disk usage', 0),
+                    (u'smtp', 1), (u'pop3', 1), (u'imap', 1), (sieve_name, 1))
         else:
-            order = (('address', 0), ('name', 0), ('uid', 1), ('gid', 1),
-                    ('transport', 0), ('maildir', 0), ('smtp', 1), ('pop3', 1),
-                    ('imap', 1), (sieve_name, 1))
+            order = ((u'address', 0), (u'name', 0), (u'uid', 1), (u'gid', 1),
+                    (u'transport', 0), (u'maildir', 0), (u'smtp', 1),
+                    (u'pop3', 1), (u'imap', 1), (sieve_name, 1))
     elif argv[1] in ['gu', 'getuser']:
-        order = (('uid', 1), ('gid', 1), ('address', 0))
+        order = ((u'uid', 1), (u'gid', 1), (u'address', 0))
     return order
 
 def _printInfo(info, title):
-    msg = '%s %s' % (title, _('information'))
-    w_std ('%s\n%s' % (msg, '-'*len(msg)))
+    msg = u'%s %s' % (title, _(u'information'))
+    w_std (u'%s\n%s' % (msg, u'-'*len(msg)))
     for k,u in _getOrder():
         if u:
-            w_std('\t%s: %s' % (k.upper().ljust(15, '.'), info[k]))
+            w_std(u'\t%s: %s' % (k.upper().ljust(15, u'.'), info[k]))
         else:
-            w_std('\t%s: %s' % (k.title().ljust(15, '.'), info[k]))
+            w_std(u'\t%s: %s' % (k.title().ljust(15, u'.'), info[k]))
     print
 
 def _printList(alist, title):
-    msg = '%s %s' % (_('Available'), title)
-    w_std('%s\n%s' % (msg, '-'*len(msg)))
+    msg = u'%s %s' % (_(u'Available'), title)
+    w_std(u'%s\n%s' % (msg, u'-'*len(msg)))
     if len(alist) > 0:
-        if title != _('alias domains'):
+        if title != _(u'alias domains'):
             for val in alist:
-                w_std('\t%s' % val)
+                w_std(u'\t%s' % val)
         else:
             for dom in alist:
                 if not dom.startswith('xn--'):
-                    w_std('\t%s' % dom)
+                    w_std(u'\t%s' % dom)
                 else:
-                    w_std('\t%s (%s)' % (dom, vmm.ace2idna(dom)))
+                    w_std(u'\t%s (%s)' % (dom, vmm.ace2idna(dom)))
     else:
-        w_std(_('\tNone'))
+        w_std(_(u'\tNone'))
     print
 
 def _printAliases(alias, targets):
-    msg = _('Alias information')
-    w_std('%s\n%s' % (msg, '-'*len(msg)))
-    w_std(_('\tMail for %s will be redirected to:') % alias)
+    msg = _(u'Alias information')
+    w_std(u'%s\n%s' % (msg, u'-'*len(msg)))
+    w_std(_(u'\tMail for %s will be redirected to:') % alias)
     if len(targets) > 0:
         for target in targets:
-            w_std('\t     * %s' % target)
+            w_std(u'\t     * %s' % target)
     else:
-        w_std(_('\tNone'))
+        w_std(_(u'\tNone'))
     print
 
 def _printRelocated(addr_dest):
     msg = _(u'Relocated information')
-    w_std('%s\n%s' % (msg, '-'*len(msg)))
+    w_std(u'%s\n%s' % (msg, u'-'*len(msg)))
     w_std(_(u'\tUser “%(addr)s” has moved to “%(dest)s”') % addr_dest)
     print
 
 def _formatDom(domain, main=True):
     if domain.startswith('xn--'):
-        domain = '%s (%s)' % (domain, vmm.ace2idna(domain))
+        domain = u'%s (%s)' % (domain, vmm.ace2idna(domain))
     if main:
-        return '\t[+] %s' %  domain
+        return u'\t[+] %s' %  domain
     else:
-        return '\t[-]     %s' % domain
+        return u'\t[-]     %s' % domain
 
 def _printDomList(dids, domains):
     if argc < 3:
@@ -196,24 +196,24 @@ def domain_info():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing domain name.'))
     elif argc < 4:
-        _printInfo(vmm.domainInfo(argv[2].lower()), _('Domain'))
+        _printInfo(vmm.domainInfo(argv[2].lower()), _(u'Domain'))
     else:
         details = argv[3].lower()
         infos = vmm.domainInfo(argv[2].lower(), details)
-        _printInfo(infos[0], _('Domain'))
+        _printInfo(infos[0], _(u'Domain'))
         if details == 'accounts':
-            _printList(infos[1], _('accounts'))
+            _printList(infos[1], _(u'accounts'))
         elif details == 'aliasdomains':
-            _printList(infos[1], _('alias domains'))
+            _printList(infos[1], _(u'alias domains'))
         elif details == 'aliases':
-            _printList(infos[1], _('aliases'))
+            _printList(infos[1], _(u'aliases'))
         elif details == 'relocated':
-            _printList(infos[1], _('relocated users'))
+            _printList(infos[1], _(u'relocated users'))
         else:
-            _printList(infos[1], _('alias domains'))
-            _printList(infos[2], _('accounts'))
-            _printList(infos[3], _('aliases'))
-            _printList(infos[4], _('relocated users'))
+            _printList(infos[1], _(u'alias domains'))
+            _printList(infos[2], _(u'accounts'))
+            _printList(infos[3], _(u'aliases'))
+            _printList(infos[4], _(u'relocated users'))
 
 def domain_transport():
     if argc < 3:
@@ -276,15 +276,15 @@ def user_info():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing e-mail address.'))
     elif argc < 4:
-        _printInfo(vmm.userInfo(argv[2].lower()), 'Account')
+        _printInfo(vmm.userInfo(argv[2].lower()), u'Account')
     else:
         arg3 = argv[3].lower()
         info = vmm.userInfo(argv[2].lower(), arg3)
         if arg3 in ['aliases', 'full']:
-            _printInfo(info[0], 'Account')
+            _printInfo(info[0], u'Account')
             _printList(info[1], _(u'alias addresses'))
         else:
-            _printInfo(info, 'Account')
+            _printInfo(info, u'Account')
 
 def user_name():
     if argc < 3:
