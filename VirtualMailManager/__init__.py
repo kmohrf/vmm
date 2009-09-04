@@ -19,18 +19,20 @@ ENCODING = locale.nl_langinfo(locale.CODESET)
 def w_std(*args):
     """Writes each arg of args, encoded in the current ENCODING, to stdout and
     appends a newline."""
+    _write = os.sys.stdout.write
     for arg in args:
-        os.sys.stdout.write(arg.encode(ENCODING, 'replace'))
-        os.sys.stdout.write('\n')
+        _write(arg.encode(ENCODING, 'replace'))
+        _write('\n')
 
 def w_err(code, *args):
     """Writes each arg of args, encoded in the current ENCODING, to stderr and
     appends a newline.
     This function additional interrupts the program execution and uses 'code'
     system exit status."""
+    _write = os.sys.stderr.write
     for arg in args:
-        os.sys.stderr.write(arg.encode(ENCODING, 'replace'))
-        os.sys.stderr.write('\n')
+        _write(arg.encode(ENCODING, 'replace'))
+        _write('\n')
     os.sys.exit(code)
 
 __all__ = [
