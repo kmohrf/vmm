@@ -122,29 +122,20 @@ class VirtualMailManager(object):
     def idn2ascii(domainname):
         """Converts an idn domainname in punycode.
 
-        Keyword arguments:
-        domainname -- the domainname to convert (str)
+        Arguments:
+        domainname -- the domainname to convert (unicode)
         """
-        tmp = []
-        for label in domainname.split('.'):
-            if len(label) == 0:
-                continue
-            tmp.append(ToASCII(label))
-        return '.'.join(tmp)
+        return '.'.join([ToASCII(lbl) for lbl in domainname.split('.') if lbl])
     idn2ascii = staticmethod(idn2ascii)
 
     def ace2idna(domainname):
         """Convertis a domainname from ACE according to IDNA
 
-        Keyword arguments:
+        Arguments:
         domainname -- the domainname to convert (str)
         """
-        tmp = []
-        for label in domainname.split('.'):
-            if len(label) == 0:
-                continue
-            tmp.append(ToUnicode(label))
-        return '.'.join(tmp)
+        return u'.'.join([ToUnicode(lbl) for lbl in domainname.split('.')\
+                if lbl])
     ace2idna = staticmethod(ace2idna)
 
     def chkDomainname(domainname):
