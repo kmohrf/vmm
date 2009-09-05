@@ -210,8 +210,7 @@ WHERE gid=%s AND local_part=%s",
         dbc.close()
         aliases = []
         if len(addresses) > 0:
-            for alias in addresses:
-                aliases.append(alias[0])
+            aliases = [alias[0] for alias in addresses]
         return aliases
 
     def delete(self, delalias):

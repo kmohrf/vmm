@@ -96,9 +96,7 @@ Hint: Increase Postfix' virtual_alias_expansion_limit
         destinations = dbc.fetchall()
         dbc.close()
         if len(destinations) > 0:
-            targets = []
-            for destination in destinations:
-                targets.append(destination[0])
+            targets = [destination[0] for destination in destinations]
             return targets
         else:
             raise VMMAE(_(u"The alias “%s” doesn't exists.") % self._addr,
