@@ -205,7 +205,7 @@ WHERE gid=%s AND local_part=%s",
         dbc = self._dbh.cursor()
         dbc.execute("SELECT address ||'@'|| domainname FROM alias, domain_name\
  WHERE destination = %s AND domain_name.gid = alias.gid\
- AND domain_name.is_primary", str(self._addr))
+ AND domain_name.is_primary ORDER BY address", str(self._addr))
         addresses = dbc.fetchall()
         dbc.close()
         aliases = []
