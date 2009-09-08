@@ -73,12 +73,12 @@ def _getOrder():
         sieve_name = u'sieve'
     else:
         sieve_name = u'managesieve'
-    if argv[1] in ['di', 'domaininfo']:
+    if argv[1] in (u'di', u'domaininfo'):
         order = ((u'domainname', 0), (u'gid', 1), (u'transport', 0),
                 (u'domaindir', 0), (u'aliasdomains', 0), (u'accounts', 0),
                 (u'aliases', 0), (u'relocated', 0))
-    elif argv[1] in ['ui', 'userinfo']:
-        if argc == 4 and argv[3] != 'aliases'\
+    elif argv[1] in (u'ui', u'userinfo'):
+        if argc == 4 and argv[3] != u'aliases'\
         or vmm.cfgGetBoolean('maildir', 'diskusage'):
             order = ((u'address', 0), (u'name', 0), (u'uid', 1), (u'gid', 1),
                     (u'transport', 0), (u'maildir', 0), (u'disk usage', 0),
@@ -87,7 +87,7 @@ def _getOrder():
             order = ((u'address', 0), (u'name', 0), (u'uid', 1), (u'gid', 1),
                     (u'transport', 0), (u'maildir', 0), (u'smtp', 1),
                     (u'pop3', 1), (u'imap', 1), (sieve_name, 1))
-    elif argv[1] in ['gu', 'getuser']:
+    elif argv[1] in (u'gu', u'getuser'):
         order = ((u'uid', 1), (u'gid', 1), (u'address', 0))
     return order
 
@@ -201,13 +201,13 @@ def domain_info():
         details = argv[3].lower()
         infos = vmm.domainInfo(argv[2].lower(), details)
         _printInfo(infos[0], _(u'Domain'))
-        if details == 'accounts':
+        if details == u'accounts':
             _printList(infos[1], _(u'accounts'))
-        elif details == 'aliasdomains':
+        elif details == u'aliasdomains':
             _printList(infos[1], _(u'alias domains'))
-        elif details == 'aliases':
+        elif details == u'aliases':
             _printList(infos[1], _(u'aliases'))
-        elif details == 'relocated':
+        elif details == u'relocated':
             _printList(infos[1], _(u'relocated users'))
         else:
             _printList(infos[1], _(u'alias domains'))
@@ -275,16 +275,28 @@ def user_delete():
 def user_info():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing e-mail address.'))
-    elif argc < 4:
-        _printInfo(vmm.userInfo(argv[2].lower()), u'Account')
-    else:
-        arg3 = argv[3].lower()
-        info = vmm.userInfo(argv[2].lower(), arg3)
-        if arg3 in ['aliases', 'full']:
-            _printInfo(info[0], u'Account')
-            _printList(info[1], _(u'alias addresses'))
+    try:
+        if argc < 4:
+            _printInfo(vmm.userInfo(argv[2].lower()), u'Account')
         else:
-            _printInfo(info, u'Account')
+            arg3 = argv[3].lower()
+            info = vmm.userInfo(argv[2].lower(), arg3)
+            if arg3 in ['aliases', 'full']:
+                _printInfo(info[0], u'Account')
+                _printList(info[1], _(u'alias addresses'))
+            else:
+                _printInfo(info, u'Account')
+    except VMME.VMMAccountException, e:
+        if e.code() is ERR.ALIAS_EXISTS:
+            w_std(plan_a_b % {'subcommand': u'aliasinfo',
+                'address': argv[2].lower()})
+            alias_info()
+        elif e.code() is ERR.RELOCATED_EXISTS:
+            w_std(plan_a_b % {'subcommand': u'relocatedinfo',
+                'address': argv[2].lower()})
+            relocated_info()
+        else:
+            raise e
 
 def user_name():
     if argc < 3:
@@ -338,8 +350,20 @@ def alias_add():
 def alias_info():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing alias address'))
-    else:
+    try:
         _printAliases(argv[2].lower(), vmm.aliasInfo(argv[2].lower()))
+    except VMME.VMMAliasException, e:
+        if e.code() is ERR.ACCOUNT_EXISTS:
+            w_std(plan_a_b % {'subcommand': u'userinfo',
+                'address': argv[2].lower()})
+            argv[1] = u'ui' # necessary manipulation to get the order
+            user_info()
+        elif e.code() is ERR.RELOCATED_EXISTS:
+            w_std(plan_a_b % {'subcommand': u'relocatedinfo',
+                'address': argv[2].lower()})
+            relocated_info()
+        else:
+            raise e
 
 def alias_delete():
     if argc < 3:
@@ -361,10 +385,20 @@ def relocated_add():
 def relocated_info():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing relocated address'))
-    else:
-        relocated = argv[2].lower()
+    relocated = argv[2].lower()
+    try:
         _printRelocated({'addr': relocated,
             'dest': vmm.relocatedInfo(relocated)})
+    except VMME.VMMRelocatedException, e:
+        if e.code() is ERR.ACCOUNT_EXISTS:
+            w_std(plan_a_b % {'subcommand': u'userinfo', 'address': relocated})
+            argv[1] = u'ui' # necessary manipulation to get the order
+            user_info()
+        elif e.code() is ERR.ALIAS_EXISTS:
+            w_std(plan_a_b % {'subcommand': u'aliasinfo', 'address': relocated})
+            alias_info()
+        else:
+            raise e
 
 def relocated_delete():
     if argc < 3:
@@ -405,6 +439,7 @@ if __name__ == '__main__':
     gettext.install(__prog__, '/usr/local/share/locale', unicode=1)
     argv = [unicode(arg, ENCODING) for arg in os.sys.argv]
     argc = len(os.sys.argv)
+    plan_a_b =_(u'Plan A failed ... trying Plan B: %(subcommand)s %(address)s')
 
     if argc < 2:
         usage(EXIT.MISSING_ARGS)
@@ -412,59 +447,59 @@ if __name__ == '__main__':
     vmm = get_vmm()
     try:
         need_setup = not vmm.setupIsDone()
-        if   argv[1] in ['cf', 'configure'] or need_setup:
+        if   argv[1] in (u'cf', u'configure') or need_setup:
             configure()
-        elif argv[1] in ['da', 'domainadd']:
+        elif argv[1] in (u'da', u'domainadd'):
             domain_add()
-        elif argv[1] in ['di', 'domaininfo']:
+        elif argv[1] in (u'di', u'domaininfo'):
             domain_info()
-        elif argv[1] in ['dt', 'domaintransport']:
+        elif argv[1] in (u'dt', u'domaintransport'):
             domain_transport()
-        elif argv[1] in ['dd', 'domaindelete']:
+        elif argv[1] in (u'dd', u'domaindelete'):
             domain_delete()
-        elif argv[1] in ['ada', 'aliasdomainadd']:
+        elif argv[1] in (u'ada', u'aliasdomainadd'):
             alias_domain_add()
-        elif argv[1] in ['adi', 'aliasdomaininfo']:
+        elif argv[1] in (u'adi', u'aliasdomaininfo'):
             alias_domain_info()
-        elif argv[1] in ['ads', 'aliasdomainswitch']:
+        elif argv[1] in (u'ads', u'aliasdomainswitch'):
             alias_domain_switch()
-        elif argv[1] in ['add', 'aliasdomaindelete']:
+        elif argv[1] in (u'add', u'aliasdomaindelete'):
             alias_domain_delete()
-        elif argv[1] in ['ua', 'useradd']:
+        elif argv[1] in (u'ua', u'useradd'):
             user_add()
-        elif argv[1] in ['ui', 'userinfo']:
+        elif argv[1] in (u'ui', u'userinfo'):
             user_info()
-        elif argv[1] in ['un', 'username']:
+        elif argv[1] in (u'un', u'username'):
             user_name()
-        elif argv[1] in ['up', 'userpassword']:
+        elif argv[1] in (u'up', u'userpassword'):
             user_password()
-        elif argv[1] in ['ut', 'usertransport']:
+        elif argv[1] in (u'ut', u'usertransport'):
             user_transport()
-        elif argv[1] in ['u0', 'userdisable']:
+        elif argv[1] in (u'u0', u'userdisable'):
             user_disable()
-        elif argv[1] in ['u1', 'userenable']:
+        elif argv[1] in (u'u1', u'userenable'):
             user_enable()
-        elif argv[1] in ['ud', 'userdelete']:
+        elif argv[1] in (u'ud', u'userdelete'):
             user_delete()
-        elif argv[1] in ['aa', 'aliasadd']:
+        elif argv[1] in (u'aa', u'aliasadd'):
             alias_add()
-        elif argv[1] in ['ai', 'aliasinfo']:
+        elif argv[1] in (u'ai', u'aliasinfo'):
             alias_info()
-        elif argv[1] in ['ad', 'aliasdelete']:
+        elif argv[1] in (u'ad', u'aliasdelete'):
             alias_delete()
-        elif argv[1] in ['ra', 'relocatedadd']:
+        elif argv[1] in (u'ra', u'relocatedadd'):
             relocated_add()
-        elif argv[1] in ['ri', 'relocatedinfo']:
+        elif argv[1] in (u'ri', u'relocatedinfo'):
             relocated_info()
-        elif argv[1] in ['rd', 'relocateddelete']:
+        elif argv[1] in (u'rd', u'relocateddelete'):
             relocated_delete()
-        elif argv[1] in ['gu', 'getuser']:
+        elif argv[1] in (u'gu', u'getuser'):
             user_byID()
-        elif argv[1] in ['ld', 'listdomains']:
+        elif argv[1] in (u'ld', u'listdomains'):
             domain_list()
-        elif argv[1] in ['h', 'help']:
+        elif argv[1] in (u'h', u'help'):
             usage()
-        elif argv[1] in ['v', 'version']:
+        elif argv[1] in (u'v', u'version'):
             show_version()
         else:
             usage(EXIT.UNKNOWN_COMMAND,

@@ -33,12 +33,10 @@ class Alias(object):
         self._setAddr()
         if not self._dest is None:
             self._exists()
-        if VMM.VirtualMailManager.accountExists(self._dbh,
-                self._addr):
+        if VMM.VirtualMailManager.accountExists(self._dbh, self._addr):
             raise VMMAE(_(u"There is already an account with address “%s”.") %\
                     self._addr, ERR.ACCOUNT_EXISTS)
-        if VMM.VirtualMailManager.relocatedExists(self._dbh,
-                self._addr):
+        if VMM.VirtualMailManager.relocatedExists(self._dbh, self._addr):
             raise VMMAE(
               _(u"There is already a relocated user with the address “%s”.") %\
                     self._addr, ERR.RELOCATED_EXISTS)
