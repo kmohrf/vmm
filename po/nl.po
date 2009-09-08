@@ -1,0 +1,629 @@
+# Dutch translation of vmm
+# Copyright (C) 2009 Free Software Foundation, Inc.
+# This file is distributed under the same license as the vmm package.
+# Erwin Poeze <erwin.poeze@gmail.com>, 2009
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: vmm 0.5.2\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-08-25 06:07+0200\n"
+"PO-Revision-Date: 2009-09-08 10:19+0100\n"
+"Last-Translator: Erwin Poeze <erwin.poeze@gmail.com>\n"
+"Language-Team: Dutch <vertaling@vrijschrift.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Language: Dutch\n"
+"X-Poedit-Country: NETHERLANDS\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: VirtualMailManager/Account.py:36 VirtualMailManager/Relocated.py:44
+#, python-format
+msgid "There is already an alias with the address “%s”."
+msgstr "Er bestaat reeds een alias met het adres “%s”."
+
+#: VirtualMailManager/Account.py:41 VirtualMailManager/Alias.py:45
+#, python-format
+msgid "There is already a relocated user with the address “%s”."
+msgstr "Er bestaat al een verplaatste gebruiker met het adres “%s”."
+
+#: VirtualMailManager/Account.py:61 VirtualMailManager/Alias.py:61
+#: VirtualMailManager/Domain.py:163 VirtualMailManager/Domain.py:189
+#: VirtualMailManager/Domain.py:220 VirtualMailManager/Relocated.py:60
+#, python-format
+msgid "The domain “%s” doesn't exist yet."
+msgstr "Het domein “%s” bestaat nog niet."
+
+#: VirtualMailManager/Account.py:80
+#, python-format
+msgid "Unknown service “%s”."
+msgstr "Service “%s” is onbekend."
+
+#: VirtualMailManager/Account.py:83 VirtualMailManager/Account.py:150
+#: VirtualMailManager/Account.py:178 VirtualMailManager/Account.py:212
+#, python-format
+msgid "The account “%s” doesn't exists."
+msgstr "Account “%s” bestaat niet."
+
+#: VirtualMailManager/Account.py:145
+#, python-format
+msgid "The account “%s” already exists."
+msgstr "Account “%s” bestaat al."
+
+#: VirtualMailManager/Account.py:186
+msgid "enabled"
+msgstr "ingeschakeld"
+
+#: VirtualMailManager/Account.py:188
+msgid "disabled"
+msgstr "uitgeschakeld"
+
+#: VirtualMailManager/Account.py:233
+#, python-format
+msgid "There are %(count)d aliases with the destination address “%(address)s”."
+msgstr "Er bestaan %(count)d aliassen met het bestemmingsadres “%(address)s”."
+
+#: VirtualMailManager/Account.py:241
+msgid "uid must be an int/long."
+msgstr "uid moet geen geheel getal zijn (int/long)."
+
+#: VirtualMailManager/Account.py:243
+msgid "uid must be greater than 0."
+msgstr "uid moet groter dan 0 zijn."
+
+#: VirtualMailManager/Account.py:251
+#, python-format
+msgid "There is no account with the UID “%d”."
+msgstr "Er bestaat geen account met UID “%d”."
+
+#: VirtualMailManager/Alias.py:30 VirtualMailManager/Relocated.py:30
+msgid "Address and destination are identical."
+msgstr "Adres en bestemming zijn identiek."
+
+#: VirtualMailManager/Alias.py:40 VirtualMailManager/Relocated.py:39
+#, python-format
+msgid "There is already an account with address “%s”."
+msgstr "Het account met adres “%s” bestaat al."
+
+#: VirtualMailManager/Alias.py:71
+#, python-format
+msgid ""
+"Can't add new destination to alias “%(address)s”.\n"
+"Currently this alias expands into %(count)i recipients.\n"
+"One more destination will render this alias unusable.\n"
+"Hint: Increase Postfix' virtual_alias_expansion_limit\n"
+msgstr ""
+"De nieuwe bestemming kan niet aan alias “%(address)s” worden toegevoegd.\n"
+"Deze alias staat nu voor %(count)i ontvangers.\n"
+"Eén bestemming extra maakt deze alias onbruikbaar.\n"
+"Hint: verhoog virtual_alias_expansion_limit van Postfix.\n"
+
+#: VirtualMailManager/Alias.py:80
+msgid "No destination address for alias denoted."
+msgstr "Aangegeven alias bevat geen bestemmingsadres."
+
+#: VirtualMailManager/Alias.py:91
+#, python-format
+msgid "The alias “%(a)s” with destination “%(d)s” already exists."
+msgstr "De alias “%(a)s” met bestemming “%(d)s” bestaat al."
+
+#: VirtualMailManager/Alias.py:106 VirtualMailManager/Alias.py:123
+#, python-format
+msgid "The alias “%s” doesn't exists."
+msgstr "De alias “%s” bestaat niet."
+
+#: VirtualMailManager/Alias.py:125
+#, python-format
+msgid "The alias “%(a)s” with destination “%(d)s” doesn't exists."
+msgstr "De alias “%(a)s” met bestemming “%(d)s” bestaat niet."
+
+#: VirtualMailManager/AliasDomain.py:32
+#, python-format
+msgid "The domain “%s” is a primary domain."
+msgstr "De domein “%s” is een hoofddomein."
+
+#: VirtualMailManager/AliasDomain.py:37
+#, python-format
+msgid "The alias domain “%s” already exists."
+msgstr "De domeinalias “%s” bestaat al."
+
+#: VirtualMailManager/AliasDomain.py:40 VirtualMailManager/AliasDomain.py:70
+msgid "No destination domain for alias domain denoted."
+msgstr "Aangegeven domeinalias bevat geen bestemmingsdomein."
+
+#: VirtualMailManager/AliasDomain.py:43 VirtualMailManager/AliasDomain.py:73
+#, python-format
+msgid "The target domain “%s” doesn't exist yet."
+msgstr "Het bestemmingsdomein “%s” bestaat nog niet."
+
+#: VirtualMailManager/AliasDomain.py:62
+#, python-format
+msgid "There is no primary domain for the alias domain “%s”."
+msgstr "Er bestaat geen hoofddomein voor de domeinalias “%s”."
+
+#: VirtualMailManager/AliasDomain.py:65 VirtualMailManager/AliasDomain.py:76
+#: VirtualMailManager/AliasDomain.py:99
+#, python-format
+msgid "The alias domain “%s” doesn't exist yet."
+msgstr "De domeinalias “%s” bestaat nog niet."
+
+#: VirtualMailManager/AliasDomain.py:79
+#, python-format
+msgid "The alias domain “%(alias)s” is already assigned to the domain “%(domain)s”."
+msgstr "De domeinalias “%(alias)s” is al toegekend aan het domein “%(domain)s”."
+
+#: VirtualMailManager/Config.py:102 VirtualMailManager/Config.py:137
+#, python-format
+msgid "Using configuration file: %s\n"
+msgstr "Gebruikt configuratiebestand: %s\n"
+
+#: VirtualMailManager/Config.py:106
+#, python-format
+msgid "missing section: %s\n"
+msgstr "ontbrekend deel: %s\n"
+
+#: VirtualMailManager/Config.py:108
+#, python-format
+msgid "missing options in section %s:\n"
+msgstr "ontbrekende opties in deel %s:\n"
+
+#: VirtualMailManager/Config.py:140
+#, python-format
+msgid "* Config section: “%s”"
+msgstr "* Configuratiedeel: “%s”"
+
+#: VirtualMailManager/Config.py:143
+#, python-format
+msgid "Enter new value for option %(opt)s [%(val)s]: "
+msgstr "Geef nieuwe waarde voor optie %(opt)s [%(val)s]: "
+
+#: VirtualMailManager/Domain.py:39
+#, python-format
+msgid "The domain “%s” is an alias domain."
+msgstr "De domein “%s” is een domeinalias."
+
+#: VirtualMailManager/Domain.py:124
+msgid "There are accounts and aliases."
+msgstr "Er zijn accounts en aliassen."
+
+#: VirtualMailManager/Domain.py:127
+msgid "There are accounts."
+msgstr "Er zijn accounts."
+
+#: VirtualMailManager/Domain.py:130
+msgid "There are aliases."
+msgstr "Er zijn aliassen."
+
+#: VirtualMailManager/Domain.py:145
+#, python-format
+msgid "The domain “%s” already exists."
+msgstr "De domein “%s” bestaat al."
+
+#: VirtualMailManager/EmailAddress.py:46
+#, python-format
+msgid "Missing '@' sign in e-mail address “%s”."
+msgstr "Ontbrekend '@'-teken in e-mailadres “%s”."
+
+#: VirtualMailManager/EmailAddress.py:49
+#, python-format
+msgid "“%s” looks not like an e-mail address."
+msgstr "“%s” lijkt niet op een e-mailadres."
+
+#: VirtualMailManager/EmailAddress.py:54
+#, python-format
+msgid "Missing domain name after “%s@”."
+msgstr "De domeinnaam ontbreekt na “%s@”."
+
+#: VirtualMailManager/EmailAddress.py:66
+msgid "No localpart specified."
+msgstr "Geen lokaaldeel opgegeven."
+
+#: VirtualMailManager/EmailAddress.py:69
+#, python-format
+msgid "The local part “%s” is too long"
+msgstr "Het lokaaldeel “%s” is te lang."
+
+#: VirtualMailManager/EmailAddress.py:76
+#, python-format
+msgid "The local part “%(lpart)s” contains invalid characters: %(ichrs)s"
+msgstr "Het lokaaldeel “%(lpart)s” bevat ongeldige tekens: %(ichrs)s"
+
+#: VirtualMailManager/MailLocation.py:32
+msgid "Either mid or maillocation must be specified."
+msgstr "Of mid of maillocatie moeten worden opgegeven."
+
+#: VirtualMailManager/MailLocation.py:38
+msgid "mid must be an int/long."
+msgstr "mid moet een geheel getal zijn (int/long)."
+
+#: VirtualMailManager/MailLocation.py:46
+#, python-format
+msgid ""
+"Invalid folder name “%s”, it may consist only of\n"
+"1 - 20 single byte characters (A-Z, a-z, 0-9 and _)."
+msgstr ""
+"Mapnaam “%s” is ongeldig. Het moet bestaan uit\n"
+"maximaal 20 tekens (A-Z, a-z, 0-9 en _)."
+
+#: VirtualMailManager/MailLocation.py:59
+msgid "Unknown mid specified."
+msgstr "Onbekende mid opgegeven."
+
+#: VirtualMailManager/Relocated.py:65
+msgid "No destination address for relocated user denoted."
+msgstr "Verplaatste gebruiker heeft geen bestemmingsadres."
+
+#: VirtualMailManager/Relocated.py:75
+#, python-format
+msgid "The relocated user “%s” already exists."
+msgstr "De verplaatste gebruiker “%s” bestaat al."
+
+#: VirtualMailManager/Relocated.py:89 VirtualMailManager/Relocated.py:102
+#, python-format
+msgid "The relocated user “%s” doesn't exists."
+msgstr "De verplaatste gebruiker “%s” bestaat niet."
+
+#: VirtualMailManager/Transport.py:29
+msgid "Either tid or transport must be specified."
+msgstr "tid of transport moet worden opgegeven."
+
+#: VirtualMailManager/Transport.py:35
+msgid "tid must be an int/long."
+msgstr "tid moet een geheel getal zijn (int/long)."
+
+#: VirtualMailManager/Transport.py:63
+msgid "Unknown tid specified."
+msgstr "Onbekende tid opgegeven."
+
+#: VirtualMailManager/VirtualMailManager.py:54
+msgid ""
+"You are not root.\n"
+"\tGood bye!\n"
+msgstr ""
+"U bent geen root.\n"
+"\tTot ziens!\n"
+
+#: VirtualMailManager/VirtualMailManager.py:74
+msgid "No “vmm.cfg” found in: /root:/usr/local/etc:/etc"
+msgstr "“vmm.cfg” is niet gevonden in: /root:/usr/local/etc:/etc"
+
+#: VirtualMailManager/VirtualMailManager.py:85
+#, python-format
+msgid ""
+"fix permissions (%(perms)s) for “%(file)s”\n"
+"`chmod 0600 %(file)s` would be great."
+msgstr ""
+"herstel rechten (%(perms)s) voor “%(file)s”\n"
+"`chmod 0600 %(file)s` is uitstekend."
+
+#: VirtualMailManager/VirtualMailManager.py:100
+#, python-format
+msgid ""
+"“%s” is not a directory.\n"
+"(vmm.cfg: section \"domdir\", option \"base\")"
+msgstr ""
+"“%s” is geen map.\n"
+"(vmm.cfg: deel \"domdir\", optie \"base\")"
+
+#: VirtualMailManager/VirtualMailManager.py:105
+#, python-format
+msgid ""
+"“%(binary)s” doesn't exists.\n"
+"(vmm.cfg: section \"bin\", option \"%(option)s\")"
+msgstr ""
+"“%(binary)s” bestaat niet.\n"
+"(vmm.cfg: deel \"bin\", optie \"%(option)s\")"
+
+#: VirtualMailManager/VirtualMailManager.py:109
+#, python-format
+msgid ""
+"“%(binary)s” is not executable.\n"
+"(vmm.cfg: section \"bin\", option \"%(option)s\")"
+msgstr ""
+"“%(binary)s” is geen uitvoerbaar bestand.\n"
+"(vmm.cfg: deel \"bin\", optie \"%(option)s\")"
+
+#: VirtualMailManager/VirtualMailManager.py:166
+msgid "The domain name is too long."
+msgstr "De domeinnaam is te lang."
+
+#: VirtualMailManager/VirtualMailManager.py:169
+#, python-format
+msgid "The domain name “%s” is invalid."
+msgstr "De domeinnaam “%s” is ongeldig."
+
+#: VirtualMailManager/VirtualMailManager.py:209
+msgid "Enter new password: "
+msgstr "Nieuw wachtwoord invoeren:"
+
+#: VirtualMailManager/VirtualMailManager.py:210
+msgid "Retype new password: "
+msgstr "Herhaal het wachtwoord:"
+
+#: VirtualMailManager/VirtualMailManager.py:212
+msgid "Sorry, passwords do not match"
+msgstr "Sorry, wachtwoorden komen niet overeen"
+
+#: VirtualMailManager/VirtualMailManager.py:216
+msgid "Sorry, empty passwords are not permitted"
+msgstr "Sorry, lege wachtwoorden zijn niet toegestaan"
+
+#: VirtualMailManager/VirtualMailManager.py:265
+#: VirtualMailManager/VirtualMailManager.py:352
+#, python-format
+msgid "No such directory: %s"
+msgstr "Onbekende map: %s"
+
+#: VirtualMailManager/VirtualMailManager.py:340
+msgid "Found \"..\" in home directory path."
+msgstr "\"..\" aangetroffen in pad naar persoonlijke map."
+
+#: VirtualMailManager/VirtualMailManager.py:348
+msgid "Owner/group mismatch in home directory detected."
+msgstr "Eigenaar/groep-conflict in persoonlijke map aangetroffen."
+
+#: VirtualMailManager/VirtualMailManager.py:364
+msgid "FATAL: \"..\" in domain directory path detected."
+msgstr "FATAAL: \"..\" in pad van domeinmap aangetroffen."
+
+#: VirtualMailManager/VirtualMailManager.py:370
+msgid "FATAL: group mismatch in domain directory detected"
+msgstr "FATAAL: groep hoort niet in domeinmap"
+
+#: VirtualMailManager/VirtualMailManager.py:457
+#, python-format
+msgid ""
+"Configurtion error: \"%s\"\n"
+"(in section \"connfig\", option \"done\") see also: vmm.cfg(5)\n"
+msgstr ""
+"Configuratiefout: \"%s\"\n"
+"(in deel \"config\", optie \"done\") zie ook: vmm.cfg(5)\n"
+
+#: VirtualMailManager/VirtualMailManager.py:477
+#, python-format
+msgid "Invalid section: “%s”"
+msgstr "Ongeldig deel: “%s”"
+
+#: VirtualMailManager/VirtualMailManager.py:487
+#: VirtualMailManager/VirtualMailManager.py:497
+#: VirtualMailManager/VirtualMailManager.py:516
+#: VirtualMailManager/VirtualMailManager.py:624
+#: VirtualMailManager/VirtualMailManager.py:655
+#, python-format
+msgid "Invalid argument: “%s”"
+msgstr "Ongeldig argument: “%s”"
+
+#: VirtualMailManager/VirtualMailManager.py:520
+msgid ""
+"The keyword “detailed” is deprecated and will be removed in a future release.\n"
+"   Please use the keyword “full” to get full details."
+msgstr ""
+"Het sleutelwoord “detailed” wordt niet meer ondersteund en zal in toekomstige versies worden verwijderd.\n"
+"   Gebruik het sleutelwoord “full” om de volledige informatie te krijgen."
+
+#: VirtualMailManager/VirtualMailManager.py:593
+#, python-format
+msgid "The pattern “%s” contains invalid characters."
+msgstr "Het patroon “%s” bevat ongeldige tekens."
+
+#: VirtualMailManager/VirtualMailManager.py:619
+#, python-format
+msgid "The destination account/alias “%s” doesn't exists yet."
+msgstr "De bestemming account/alias “%s” bestaat nog niet."
+
+#: VirtualMailManager/VirtualMailManager.py:636
+#, python-format
+msgid ""
+"The account has been successfully deleted from the database.\n"
+"    But an error occurred while deleting the following directory:\n"
+"    “%(directory)s”\n"
+"    Reason: %(raeson)s"
+msgstr ""
+"Het account is verwijderd uit de database.\n"
+"    Het verwijderen van de volgende map is echter mislukt:\n"
+"     “%(directory)s”\n"
+"    Oorzaak: %(raeson)s"
+
+#: VirtualMailManager/VirtualMailManager.py:676
+msgid "Account doesn't exists"
+msgstr "Account bestaat niet"
+
+#: VirtualMailManager/VirtualMailManager.py:692
+#: VirtualMailManager/VirtualMailManager.py:702
+msgid ""
+"The service name “managesieve” is deprecated and will be removed\n"
+"   in a future release.\n"
+"   Please use the service name “sieve” instead."
+msgstr ""
+"De servicenaam “managesieve” is niet langer ondersteund en zal in een\n"
+"   toekomstige versie worden verwijderd.\n"
+"   Gebruik in plaats hiervan de servicenaam “sieve”."
+
+#: VirtualMailManager/ext/Postconf.py:44
+#, python-format
+msgid "The value “%s” looks not like a valid postfix configuration parameter name."
+msgstr "De waarde “%s” lijkt niet op een geldige Postfix-configuratieparameternaam."
+
+#: vmm:34
+#, python-format
+msgid ""
+"Usage: %s SUBCOMMAND OBJECT ARGS*\n"
+"  short long\n"
+"  subcommand               object             args (* = optional)\n"
+msgstr ""
+"Gebruik: %s SUBOPDRACHT OBJECT ARGS*\n"
+"  kort lang\n"
+"  subopdracht              object             args (* = optioneel)\n"
+
+#: vmm:73 vmm:84 vmm:494
+msgid "Error"
+msgstr "Fout"
+
+#: vmm:111
+msgid "information"
+msgstr "informatie"
+
+#: vmm:121
+msgid "Available"
+msgstr "Beschikbaar"
+
+#: vmm:124 vmm:223 vmm:229
+msgid "alias domains"
+msgstr "aliasdomeinen"
+
+#: vmm:134 vmm:145 vmm:169
+msgid "\tNone"
+msgstr "\tGeen"
+
+#: vmm:138
+msgid "Alias information"
+msgstr "Aliasinformatie"
+
+#: vmm:140
+#, python-format
+msgid "\tMail for %s will be redirected to:"
+msgstr "\tMail voor %s wordt doorgestuurd naar:"
+
+#: vmm:149
+msgid "Relocated information"
+msgstr "Verplaatste informatie"
+
+#: vmm:151
+#, python-format
+msgid "\tUser “%(addr)s” has moved to “%(dest)s”"
+msgstr "\tGebruiker “%(addr)s” is verplaatst naar “%(dest)s”"
+
+#: vmm:164
+msgid "Available domains"
+msgstr "Beschikbare domeinen"
+
+#: vmm:166
+msgid "Matching domains"
+msgstr "Overeenkomstige domeinen"
+
+#: vmm:180
+msgid "Alias domain information"
+msgstr "Aliasdomeininformatie"
+
+#: vmm:186
+#, python-format
+msgid ""
+"\tThe alias domain %(alias)s belongs to:\n"
+"\t    * %(domain)s"
+msgstr ""
+"\tDe aliasdomein %(alias)s behoort tot:\n"
+"\t    * %(domain)s"
+
+#: vmm:197 vmm:205 vmm:213
+msgid "Missing domain name."
+msgstr "Ontbrekende domeinnaam."
+
+#: vmm:215 vmm:219
+msgid "Domain"
+msgstr "Domein"
+
+#: vmm:221 vmm:230
+msgid "accounts"
+msgstr "accounts"
+
+#: vmm:225 vmm:231
+msgid "aliases"
+msgstr "aliassen"
+
+#: vmm:227 vmm:232
+msgid "relocated users"
+msgstr "verplaatste gebruikers"
+
+#: vmm:236
+msgid "Missing domain name and new transport."
+msgstr "Ontbrekende domeinnaam en nieuw transport."
+
+#: vmm:238
+msgid "Missing new transport."
+msgstr "Ontbrekend nieuw transport."
+
+#: vmm:247 vmm:262
+msgid "Missing alias domain name and target domain name."
+msgstr "Ontbrekende aliasdomeinnaam en doeldomeinnaam."
+
+#: vmm:249 vmm:264
+msgid "Missing target domain name."
+msgstr "Ontbrekende doeldomeinnaam."
+
+#: vmm:255 vmm:270
+msgid "Missing alias domain name."
+msgstr "Ontbrekende aliasdomeinnaam."
+
+#: vmm:276 vmm:285 vmm:293 vmm:323 vmm:331 vmm:339
+msgid "Missing e-mail address."
+msgstr "Ontbrekende e-mailadres."
+
+#: vmm:301
+msgid "alias addresses"
+msgstr "aliasadressen"
+
+#: vmm:307
+msgid "Missing e-mail address and users name."
+msgstr "Ontbrekende e-mailadres en gebruikernaam."
+
+#: vmm:309
+msgid "Missing users name."
+msgstr "Ontbrekende gebruikersnaam."
+
+#: vmm:315
+msgid "Missing e-mail address and transport."
+msgstr "Ontbrekend e-mailadres en transport."
+
+#: vmm:317
+msgid "Missing transport."
+msgstr "Ontbrekend transport."
+
+#: vmm:348
+msgid "Missing alias address and destination."
+msgstr "Ontbrekend aliasadres en bestemming."
+
+#: vmm:350 vmm:373
+msgid "Missing destination address."
+msgstr "Ontbrekend bestemmingsadres."
+
+#: vmm:356 vmm:362
+msgid "Missing alias address"
+msgstr "Ontbrekend aliasadres"
+
+#: vmm:371
+msgid "Missing relocated address and destination."
+msgstr "Ontbrekend verplaatst adres en bestemming."
+
+#: vmm:379 vmm:387
+msgid "Missing relocated address"
+msgstr "Ontbrekend verplaatst adres"
+
+#: vmm:393
+msgid "Missing userid"
+msgstr "Ontbrekend userid"
+
+#: vmm:406
+msgid "Warnings:"
+msgstr "Waarschuwingen:"
+
+#: vmm:412
+msgid "from"
+msgstr "van"
+
+#: vmm:412
+msgid "version"
+msgstr "versie"
+
+#: vmm:414
+msgid "on"
+msgstr "op"
+
+#: vmm:488
+msgid "Unknown subcommand"
+msgstr "Onbekende subopdracht"
+
+#: vmm:491
+msgid "Ouch"
+msgstr "Ouch"
