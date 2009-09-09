@@ -6,7 +6,7 @@
 import os
 from distutils.core import setup
 
-VERSION = '0.5.1'
+VERSION = '0.5.2'
 
 long_description = """
 vmm, a virtual mail manager, is a command line tool for

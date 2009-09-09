@@ -3,8 +3,8 @@
 # See COPYING for distribution information.
 
 AUTHOR  = 'Pascal Volk <p.volk@veb-it.de>'
-RELDATE = '2009-08-12'
-VERSION = '0.5.1'
+RELDATE = '2009-09-09'
+VERSION = '0.5.2'
 __author__  = AUTHOR
 __date__    = RELDATE
 __version__ = VERSION

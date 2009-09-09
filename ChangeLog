@@ -1,9 +1,279 @@
+=== 0.5.2 ===
+2009-09-09  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* vmm:
+	Improved error handling in vmm's {alias}domaininfo.
+	[581a5680d0ef] [tip]
+
+2009-09-08  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* po/nl.po, setup.py:
+	Added the Dutch translation to the repository. Many thanks to Erwin
+	Poeze from the Translation Project for the work.
+	[e574f5dedb60]
+
+	* VirtualMailManager/Alias.py, vmm:
+	Improved error handling in vmm's {user,alias,relocated}info. Removed
+	some comparisons of string and Unicode.
+	[e3fd0b67ae50]
+
+2009-09-07  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Alias.py:
+	Alias.__init__(): Check really if the given address is not used.
+	[a08d78344706]
+
+	* VirtualMailManager/Account.py:
+	Sort alias addresses in Account.getAliases() / vmm userinfo.
+	[ead2a7e9f8be]
+
+2009-09-05  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Account.py, VirtualMailManager/Alias.py:
+	Small optimizations in Account.getAliases() and Alias.getInfo().
+	[4c6aa6c29dd7]
+
+	* VirtualMailManager/VirtualMailManager.py:
+	Code cleanup/optimization in VMM's idn2ascii() and ace2idna().
+	[16542519a5a8]
+
+2009-09-04  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Domain.py, vmm:
+	Reduced the mixing/concatenating of str and unicode objects.
+	Optimized list generation in Domain class.
+	[28f26f7f3d8f]
+
+	* VirtualMailManager/__init__.py:
+	Small optimization in w_std()/w_err() 'avoid the dot'.
+	[ecd6a379e523]
+
+2009-09-03  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/VirtualMailManager.py:
+	Code cleanup/optimization in VirtualMailManager's __getSalt().
+	[ffac064bd728]
+
+2009-09-02  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* po/fr.po, setup.py:
+	Added the French translation to the repository. Many thanks to
+	Dimitri Duc from the Translation Project for the work.
+	[7f6911bd11cd]
+
+	* VirtualMailManager/Account.py, VirtualMailManager/Alias.py,
+	VirtualMailManager/AliasDomain.py, VirtualMailManager/Config.py,
+	VirtualMailManager/Domain.py, VirtualMailManager/EmailAddress.py,
+	VirtualMailManager/Exceptions.py,
+	VirtualMailManager/MailLocation.py, VirtualMailManager/Relocated.py,
+	VirtualMailManager/Transport.py,
+	VirtualMailManager/VirtualMailManager.py,
+	VirtualMailManager/__init__.py, VirtualMailManager/ext/Postconf.py,
+	vmm:
+	Reorganized module import. Dropped the import of constants.VERSION,
+	when it wasn't really needed. Centralized the import of os, re and
+	locale in VirtualMailManager/__init__.py. Also moved w_std() and
+	w_err() from vmm to the __init__.py.
+	[617f27715b01]
+
+2009-09-01  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* vmm:
+	Don't crash if the date format not only consists of ASCII signs.
+	Added also the u stringprefix to translatable strings where it was
+	missing.
+	[fc09f657082d]
+
+2009-08-31  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Config.py,
+	VirtualMailManager/VirtualMailManager.py, vmm:
+	Reorganized imports, eliminated a potential UnicodeEncodeError.
+	Removed double definition of function w_std() in Config class.
+	[fb61f64e6351]
+
+2009-08-25  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* INSTALL, UPGRADE:
+	Updated documentation
+	[32ad0c79a6ef]
+
+	* VirtualMailManager/Account.py:
+	Fixed a Python2.4.4 SyntaxError
+	[6ca3d22e5dd0]
+
+	* VirtualMailManager/Account.py, VirtualMailManager/Alias.py,
+	VirtualMailManager/AliasDomain.py, VirtualMailManager/Config.py,
+	VirtualMailManager/Domain.py, VirtualMailManager/EmailAddress.py,
+	VirtualMailManager/MailLocation.py, VirtualMailManager/Relocated.py,
+	VirtualMailManager/VirtualMailManager.py,
+	VirtualMailManager/ext/Postconf.py, man/de/man1/vmm.1,
+	man/man1/vmm.1, po/de.po, po/vmm.pot, vmm:
+	Replaced angle quotes by quotation marks.
+	[2d5c4745efec]
+
+2009-08-23  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/VirtualMailManager.py, po/de.po, po/vmm.pot:
+	Added a deprecated warning for managesieve. Updated translation.
+	[fa22bd13b4d1]
+
+2009-08-22  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* INSTALL, UPGRADE:
+	Updated documentation
+	[2b8154cc7ebe]
+
+	* update_config_0.4.x-0.5.py:
+	avoid error message if used with version 0.5.2
+	[9dca3e898ddb]
+
+2009-08-21  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* .hgignore, VirtualMailManager/Alias.py, po/de.po, po/vmm.pot:
+	Updated translation.
+	[4ffb50de00d5]
+
+	* INSTALL, UPGRADE, VirtualMailManager/Account.py,
+	VirtualMailManager/Config.py, VirtualMailManager/Transport.py,
+	VirtualMailManager/VirtualMailManager.py,
+	VirtualMailManager/constants/ERROR.py,
+	VirtualMailManager/ext/Postconf.py:
+	Converted VirtualMailManager and Postconf to new-style classes. A
+	few small cleanups.
+	[cf8116625866]
+
+	* INSTALL, UPGRADE:
+	Updated documentation
+	[97a9f6dd954b]
+
+	* update_tables_0.5.x_for_dovecot-1.2.x.pgsql:
+	removed GRANT statement. It's mentioned in UPGRADE
+	[3643a0777e77]
+
+	* update_tables_0.5.x_for_dovecot-1.2.x.pgsql:
+	Removed the currently not needed WHERE clause from the VIEW.
+	[988b9a719929]
+
+	* create_optional_types_and_functions-dovecot-1.2.x.pgsql,
+	create_tables-dovecot-1.2.x.pgsql:
+	Added create SQL scripts for Dovecot v1.2.x
+	[68af38212ff5]
+
+	* update_tables_0.5.x_for_dovecot-1.2.x.pgsql,
+	update_types_and_functions_0.5.x_for_dovecot-1.2.x.pgsql:
+	Added update SQL scripts for Dovecot v1.2.x
+	[626c008a4a04]
+
+2009-08-20  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Alias.py, VirtualMailManager/AliasDomain.py,
+	VirtualMailManager/Domain.py, VirtualMailManager/MailLocation.py,
+	VirtualMailManager/Relocated.py:
+	Converted to new-style class, added __slots__.
+	[30abf0abf8f8]
+
+	* VirtualMailManager/Account.py:
+	Converted to new-style class, added __slots__, updated queries. Use
+	the _uid attribute in queries whenever it is possible.
+	[7ccc05774118]
+
+	* VirtualMailManager/Config.py:
+	Comments updated.
+	[928659c8ee9f]
+
+	* VirtualMailManager/VirtualMailManager.py,
+	update_config_0.4.x-0.5.py:
+	Small code cleanups (replaced dir+'/'+file by os.path.join()).
+	[014335f38962]
+
+2009-08-19  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* update_config_0.4.x-0.5.py, upgrade.sh:
+	Rewrote upgrade script and config update script
+	[cf85d78486ce]
+
+	* setup.py:
+	Updated long_description, download_url and platforms. Dropped
+	VirtualMailManager.constants.VERSION import - error-prone.
+	[c96b5768c76d]
+
+2009-08-18  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/EmailAddress.py:
+	Fixed a logical mistake in EmailAddress.__ne__() (not used), small
+	code cleanups.
+	[949c5db6447a]
+
+	* VirtualMailManager/Account.py,
+	VirtualMailManager/VirtualMailManager.py, vmm:
+	Added sieve/managesieve switching stuff, depending on the used
+	Dovecot version.
+	[21f264a88ab2]
+
+	* VirtualMailManager/Account.py:
+	Fixed a libpq.OperationalError in Account.delete() Passing only the
+	object's address string to the 'alias delete' query, not the whole
+	EmailAddress object.
+	[e671210b04b8]
+
+2009-08-17  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Account.py, VirtualMailManager/Config.py,
+	VirtualMailManager/VirtualMailManager.py, man/de/man1/vmm.1,
+	man/de/man5/vmm.cfg.5, man/man1/vmm.1, man/man5/vmm.cfg.5, vmm,
+	vmm.cfg:
+	Config: renamed services.managesieve to services.sieve, added
+	misc.dovecotvers
+	[e35755191ff3]
+
+	* VirtualMailManager/Config.py:
+	Hopefully the final UnicodeDecodeError fix for the Config class
+
+	Added a global w_std() function and replaced all print statements.
+	[d1f345f91e1c]
+
+2009-08-16  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* ChangeLog:
+	Added the essential changes since vmm-0.4. Partly reformatted.
+	[50ff50f5055e]
+
+2009-08-14  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/Domain.py, VirtualMailManager/Transport.py:
+	Transport: converted to new-style class; Domain: query reduction
+
+	VirtualMailManager/Transport.py:
+	    * added: __slots__
+	    * implemented: __eq__(), __ne__() and __str__()
+
+	VirtualMailManager/Domain.py (updateTransport()):
+	    * reduced db lookups/update
+	[cb8b2f6a5fca]
+
+	* VirtualMailManager/VirtualMailManager.py:
+	VMM: Fixed an AttributeError, caused by the last commit. Class
+	EmailAddress has no __dict__ anymore.
+	[766299a8639d]
+
+2009-08-13  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* VirtualMailManager/EmailAddress.py:
+	VMM.EmailAddress: Added __slots__ aka post-sf.net-hg-update-commit
+	[fb88585f17fe]
+
 === 0.5.1 ===
 2009-08-12  Pascal Volk  <neverseen@users.sourceforge.net>
+
+	* .hgtags:
+	Added tag vmm-0.5.1 for changeset dc98cc162c66
+	[e98a0fdf1266]
 
 	* NEWS, UPGRADE, VirtualMailManager/constants/VERSION.py:
 	Released vmm-0.5.1
 	[dc98cc162c66] [vmm-0.5.1]
+
 	* pgsql-relocated_maps.cf, pgsql-smtpd_sender_login_maps.cf,
 	pgsql-transport.cf, pgsql-virtual_alias_maps.cf,
 	pgsql-virtual_gid_maps.cf, pgsql-virtual_mailbox_domains.cf,

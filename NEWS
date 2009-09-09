@@ -1,3 +1,17 @@
+v0.5.2  2009-09-09  Pascal Volk <neverseen@users.sf.net>
+
+	* Now vmm supports Dovecot v1.2.x.
+	* vmm.cfg: renamed services.managesieve to services.sieve, added
+	  misc.dovecotvers.
+	* New translations: Dutch and French.
+	+ Improved error handling for the domaininfo, aliasdomaininfo, userinfo,
+	  aliasinfo and relocatedinfo subcommands.
+	+ Sorted alias listing in userinfo output.
+	+ Reduction of useless database lookups/updates.
+	+ Partly improved database lookups.
+	- Fixed a libpq.OperationalError in Account.delete().
+	- Eliminated hopefully finally all (potential) UnicodeDecodeErrors.
+
 v0.5.1  2009-08-12  Pascal Volk <neverseen@users.sf.net>
 
 	+ Added support for a variable "vmm.cfg" location in
