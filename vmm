@@ -195,25 +195,33 @@ def domain_delete():
 def domain_info():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing domain name.'))
-    elif argc < 4:
-        _printInfo(vmm.domainInfo(argv[2].lower()), _(u'Domain'))
-    else:
-        details = argv[3].lower()
-        infos = vmm.domainInfo(argv[2].lower(), details)
-        _printInfo(infos[0], _(u'Domain'))
-        if details == u'accounts':
-            _printList(infos[1], _(u'accounts'))
-        elif details == u'aliasdomains':
-            _printList(infos[1], _(u'alias domains'))
-        elif details == u'aliases':
-            _printList(infos[1], _(u'aliases'))
-        elif details == u'relocated':
-            _printList(infos[1], _(u'relocated users'))
+    try:
+        if argc < 4:
+            _printInfo(vmm.domainInfo(argv[2].lower()), _(u'Domain'))
         else:
-            _printList(infos[1], _(u'alias domains'))
-            _printList(infos[2], _(u'accounts'))
-            _printList(infos[3], _(u'aliases'))
-            _printList(infos[4], _(u'relocated users'))
+            details = argv[3].lower()
+            infos = vmm.domainInfo(argv[2].lower(), details)
+            _printInfo(infos[0], _(u'Domain'))
+            if details == u'accounts':
+                _printList(infos[1], _(u'accounts'))
+            elif details == u'aliasdomains':
+                _printList(infos[1], _(u'alias domains'))
+            elif details == u'aliases':
+                _printList(infos[1], _(u'aliases'))
+            elif details == u'relocated':
+                _printList(infos[1], _(u'relocated users'))
+            else:
+                _printList(infos[1], _(u'alias domains'))
+                _printList(infos[2], _(u'accounts'))
+                _printList(infos[3], _(u'aliases'))
+                _printList(infos[4], _(u'relocated users'))
+    except VMME.VMMDomainException, e:
+        if e.code() is ERR.DOMAIN_ALIAS_EXISTS:
+            w_std(plan_a_b % {'subcommand': u'aliasdomaininfo',
+                'address': argv[2].lower()})
+            alias_domain_info()
+        else:
+            raise e
 
 def domain_transport():
     if argc < 3:
@@ -237,8 +245,16 @@ def alias_domain_add():
 def alias_domain_info():
     if argc < 3:
         usage(EXIT.MISSING_ARGS, _(u'Missing alias domain name.'))
-    else:
+    try:
         _printAliasDomInfo(vmm.aliasDomainInfo(argv[2].lower()))
+    except VMME.VMMAliasDomainException, e:
+        if e.code() is ERR.ALIASDOMAIN_ISDOMAIN:
+            w_std(plan_a_b % {'subcommand': u'domaininfo',
+                'address': argv[2].lower()})
+            argv[1] = u'di' # necessary manipulation to get the order
+            domain_info()
+        else:
+            raise e
 
 def alias_domain_switch():
     if argc < 3:
