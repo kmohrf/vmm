@@ -11,9 +11,12 @@ import locale
 from constants.VERSION import *
 import constants.ERROR as ERR
 
-# Set all of the locales according to the current environment variables
-# and get the character encoding.
-locale.setlocale(locale.LC_ALL, '')
+# Try to set all of the locales according to the current
+# environment variables and get the character encoding.
+try:
+    locale.setlocale(locale.LC_ALL, '')
+except locale.Error:
+    locale.setlocale(locale.LC_ALL, 'C')
 ENCODING = locale.nl_langinfo(locale.CODESET)
 
 def w_std(*args):
