@@ -54,7 +54,7 @@ class Alias(object):
         dom = Domain(self._dbh, self._addr._domainname)
         self._gid = dom.getID()
         if self._gid == 0:
-            raise VMMAE(_(u"The domain “%s” doesn't exist yet.") %\
+            raise VMMAE(_(u"The domain “%s” doesn't exist.") %\
                     self._addr._domainname, ERR.NO_SUCH_DOMAIN)
 
     def _checkExpansion(self, limit):
@@ -73,7 +73,7 @@ Hint: Increase Postfix' virtual_alias_expansion_limit
 
     def save(self, expansion_limit):
         if self._dest is None:
-           raise VMMAE(_(u"No destination address for alias denoted."),
+           raise VMMAE(_(u"No destination address specified for alias."),
                ERR.ALIAS_MISSING_DEST)
         if self._isNew:
             self._checkExpansion(expansion_limit)
@@ -97,7 +97,7 @@ Hint: Increase Postfix' virtual_alias_expansion_limit
             targets = [destination[0] for destination in destinations]
             return targets
         else:
-            raise VMMAE(_(u"The alias “%s” doesn't exists.") % self._addr,
+            raise VMMAE(_(u"The alias “%s” doesn't exist.") % self._addr,
                     ERR.NO_SUCH_ALIAS)
 
     def delete(self):
@@ -114,9 +114,9 @@ Hint: Increase Postfix' virtual_alias_expansion_limit
             self._dbh.commit()
         else:
             if self._dest is None:
-                msg = _(u"The alias “%s” doesn't exists.") % self._addr
+                msg = _(u"The alias “%s” doesn't exist.") % self._addr
             else:
                 msg = _(u"The alias “%(a)s” with destination “%(d)s” doesn't\
- exists.") % {'a': self._addr, 'd': self._dest}
+ exist.") % {'a': self._addr, 'd': self._dest}
             raise VMMAE(msg, ERR.NO_SUCH_ALIAS)
 

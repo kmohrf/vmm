@@ -95,7 +95,7 @@ class VirtualMailManager(object):
                 self.__Cfg.get('domdir', 'base'), ERR.NO_SUCH_DIRECTORY)
         for opt, val in self.__Cfg.items('bin'):
             if not os.path.exists(val):
-                raise VMMException(_(u'“%(binary)s” doesn\'t exists.\n\
+                raise VMMException(_(u'“%(binary)s” doesn\'t exist.\n\
 (vmm.cfg: section "bin", option "%(option)s")') %{'binary': val,'option': opt},
                     ERR.NO_SUCH_BINARY)
             elif not os.access(val, os.X_OK):
@@ -329,7 +329,7 @@ class VirtualMailManager(object):
                     mdstat = os.stat(userdir)
                     if (mdstat.st_uid, mdstat.st_gid) != (uid, gid):
                         raise VMMException(
-                         _(u'Owner/group mismatch in home directory detected.'),
+                         _(u'Detected owner/group mismatch in home directory.'),
                          ERR.MAILDIR_PERM_MISMATCH)
                     rmtree(userdir, ignore_errors=True)
                 else:
@@ -344,14 +344,13 @@ class VirtualMailManager(object):
             domdirdirs = domdir.replace(basedir+'/', '').split('/')
             domdirparent = os.path.join(basedir, domdirdirs[0])
             if basedir.count('..') or domdir.count('..'):
-                raise VMMException(
-                        _(u'FATAL: ".." in domain directory path detected.'),
-                            ERR.FOUND_DOTS_IN_PATH)
+                raise VMMException(_(u'Found ".." in domain directory path.'),
+                        ERR.FOUND_DOTS_IN_PATH)
             if os.path.isdir(domdirparent):
                 os.chdir(domdirparent)
                 if os.lstat(domdirdirs[1]).st_gid != gid:
-                    raise VMMException(
-                    _(u'FATAL: group mismatch in domain directory detected'),
+                    raise VMMException(_(
+                        u'Detected group mismatch in domain directory.'),
                         ERR.DOMAINDIR_GROUP_MISMATCH)
                 rmtree(domdirdirs[1], ignore_errors=True)
 
@@ -435,8 +434,8 @@ class VirtualMailManager(object):
         try:
             return self.__Cfg.getboolean('config', 'done')
         except ValueError, e:
-            raise VMMConfigException(_(u"""Configurtion error: "%s"
-(in section "connfig", option "done") see also: vmm.cfg(5)\n""") % str(e),
+            raise VMMConfigException(_(u"""Configuration error: "%s"
+(in section "config", option "done") see also: vmm.cfg(5)\n""") % str(e),
                   ERR.CONF_ERROR)
 
     def configure(self, section=None):
@@ -597,7 +596,7 @@ The keyword “detailed” is deprecated and will be removed in a future release
         alias._dest) and not VirtualMailManager.aliasExists(self.__dbh,
         alias._dest):
             self.__warnings.append(
-                _(u"The destination account/alias “%s” doesn't exists yet.")%\
+                _(u"The destination account/alias “%s” doesn't exist.")%\
                         alias._dest)
 
     def userDelete(self, emailaddress, force=None):
@@ -618,7 +617,7 @@ The keyword “detailed” is deprecated and will be removed in a future release
 The account has been successfully deleted from the database.
     But an error occurred while deleting the following directory:
     “%(directory)s”
-    Reason: %(raeson)s""") % {'directory': acc.getDir('home'),'raeson': e.msg()}
+    Reason: %(reason)s""") % {'directory': acc.getDir('home'),'reason': e.msg()}
                     self.__warnings.append(warning)
                 else:
                     raise e
@@ -654,7 +653,7 @@ The account has been successfully deleted from the database.
     def userPassword(self, emailaddress, password):
         acc = self.__getAccount(emailaddress)
         if acc.getUID() == 0:
-           raise VMMException(_(u"Account doesn't exists"), ERR.NO_SUCH_ACCOUNT)
+           raise VMMException(_(u"Account doesn't exist"), ERR.NO_SUCH_ACCOUNT)
         if password is None:
             password = self._readpass()
         acc.modify('password', self.__pwhash(password, user=emailaddress))

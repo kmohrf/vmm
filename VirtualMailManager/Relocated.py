@@ -55,13 +55,14 @@ class Relocated(object):
         dom = Domain(self._dbh, self._addr._domainname)
         self._gid = dom.getID()
         if self._gid == 0:
-            raise VMMRE(_(u"The domain “%s” doesn't exist yet.") %\
+            raise VMMRE(_(u"The domain “%s” doesn't exist.") %\
                     self._addr._domainname, ERR.NO_SUCH_DOMAIN)
 
     def save(self):
         if self._dest is None:
-           raise VMMRE(_(u"No destination address for relocated user denoted."),
-               ERR.RELOCATED_MISSING_DEST)
+           raise VMMRE(
+                   _(u"No destination address specified for relocated user."),
+                   ERR.RELOCATED_MISSING_DEST)
         if self._isNew:
             dbc = self._dbh.cursor()
             dbc.execute("INSERT INTO relocated VALUES (%s, %s, %s)",
@@ -84,7 +85,7 @@ class Relocated(object):
             return destination[0]
         else:
             raise VMMRE(
-                    _(u"The relocated user “%s” doesn't exists.") % self._addr,
+                    _(u"The relocated user “%s” doesn't exist.") % self._addr,
                     ERR.NO_SUCH_RELOCATED)
 
     def delete(self):
@@ -97,6 +98,6 @@ class Relocated(object):
             self._dbh.commit()
         else:
             raise VMMRE(
-                    _(u"The relocated user “%s” doesn't exists.") % self._addr,
+                    _(u"The relocated user “%s” doesn't exist.") % self._addr,
                     ERR.NO_SUCH_RELOCATED)
 

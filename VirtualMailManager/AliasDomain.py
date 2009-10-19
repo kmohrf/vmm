@@ -35,10 +35,10 @@ class AliasDomain(object):
             raise VADE(_(u'The alias domain “%s” already exists.') %self.__name,
                     ERR.ALIASDOMAIN_EXISTS)
         if self._domain is None:
-            raise VADE(_(u'No destination domain for alias domain denoted.'),
+            raise VADE(_(u'No destination domain specified for alias domain.'),
                     ERR.ALIASDOMAIN_NO_DOMDEST)
         if self._domain._id < 1:
-            raise VADE (_(u"The target domain “%s” doesn't exist yet.") %
+            raise VADE (_(u"The target domain “%s” doesn't exist.") %
                     self._domain._name, ERR.NO_SUCH_DOMAIN)
         dbc = self._dbh.cursor()
         dbc.execute('INSERT INTO domain_name (domainname, gid, is_primary)\
@@ -60,18 +60,18 @@ class AliasDomain(object):
                     _(u'There is no primary domain for the alias domain “%s”.')\
                             % self.__name, ERR.NO_SUCH_DOMAIN)
         else:
-            raise VADE(_(u"The alias domain “%s” doesn't exist yet.") %
+            raise VADE(_(u"The alias domain “%s” doesn't exist.") %
                     self.__name, ERR.NO_SUCH_ALIASDOMAIN)
 
     def switch(self):
         if self._domain is None:
-            raise VADE(_(u'No destination domain for alias domain denoted.'),
+            raise VADE(_(u'No destination domain specified for alias domain.'),
                     ERR.ALIASDOMAIN_NO_DOMDEST)
         if self._domain._id < 1:
-            raise VADE (_(u"The target domain “%s” doesn't exist yet.") %
+            raise VADE (_(u"The target domain “%s” doesn't exist.") %
                     self._domain._name, ERR.NO_SUCH_DOMAIN)
         if self.__gid < 1:
-            raise VADE(_(u"The alias domain “%s” doesn't exist yet.") %
+            raise VADE(_(u"The alias domain “%s” doesn't exist.") %
                     self.__name, ERR.NO_SUCH_ALIASDOMAIN)
         if self.__gid == self._domain._id:
             raise VADE(_(u"The alias domain “%(alias)s” is already assigned to\
@@ -94,6 +94,6 @@ class AliasDomain(object):
                 self._dbh.commit()
         else:
             raise VADE(
-                  _(u"The alias domain “%s” doesn't exist yet.") % self.__name,
+                  _(u"The alias domain “%s” doesn't exist.") % self.__name,
                   ERR.NO_SUCH_ALIASDOMAIN)
 

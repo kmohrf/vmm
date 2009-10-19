@@ -56,7 +56,7 @@ WHERE gid=%s AND local_part=%s",
         dom = Domain(self._dbh, self._addr._domainname)
         self._gid = dom.getID()
         if self._gid == 0:
-            raise AccE(_(u"The domain “%s” doesn't exist yet.") %\
+            raise AccE(_(u"The domain “%s” doesn't exist.") %\
                     self._addr._domainname, ERR.NO_SUCH_DOMAIN)
         self._base = dom.getDir()
         self._tid = dom.getTransportID()
@@ -78,7 +78,7 @@ WHERE gid=%s AND local_part=%s",
             raise AccE(_(u"Unknown service “%s”.") % service,
                     ERR.UNKNOWN_SERVICE)
         if self._uid < 1:
-            raise AccE(_(u"The account “%s” doesn't exists.") % self._addr,
+            raise AccE(_(u"The account “%s” doesn't exist.") % self._addr,
                     ERR.NO_SUCH_ACCOUNT)
         if dcvers > 11:
             sieve_col = 'sieve'
@@ -151,7 +151,7 @@ WHERE gid=%s AND local_part=%s",
 
     def modify(self, what, value):
         if self._uid == 0:
-            raise AccE(_(u"The account “%s” doesn't exists.") % self._addr,
+            raise AccE(_(u"The account “%s” doesn't exist.") % self._addr,
                     ERR.NO_SUCH_ACCOUNT)
         if what not in ['name', 'password', 'transport']:
             return False
@@ -182,7 +182,7 @@ WHERE gid=%s AND local_part=%s",
         info = dbc.fetchone()
         dbc.close()
         if info is None:
-            raise AccE(_(u"The account “%s” doesn't exists.") % self._addr,
+            raise AccE(_(u"The account “%s” doesn't exist.") % self._addr,
                     ERR.NO_SUCH_ACCOUNT)
         else:
             keys = ['name', 'uid', 'gid', 'maildir', 'transport', 'smtp',
@@ -215,7 +215,7 @@ WHERE gid=%s AND local_part=%s",
 
     def delete(self, delalias):
         if self._uid < 1:
-            raise AccE(_(u"The account “%s” doesn't exists.") % self._addr,
+            raise AccE(_(u"The account “%s” doesn't exist.") % self._addr,
                     ERR.NO_SUCH_ACCOUNT)
         dbc = self._dbh.cursor()
         if delalias == 'delalias':

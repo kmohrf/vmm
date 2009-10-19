@@ -158,7 +158,7 @@ class Domain(object):
             self._dbh.commit()
             dbc.close()
         else:
-            raise VMMDE(_(u"The domain “%s” doesn't exist yet.") % self._name,
+            raise VMMDE(_(u"The domain “%s” doesn't exist.") % self._name,
                 ERR.NO_SUCH_DOMAIN)
 
     def updateTransport(self, transport, force=False):
@@ -184,7 +184,7 @@ class Domain(object):
                     self._dbh.commit()
             dbc.close()
         else:
-            raise VMMDE(_(u"The domain “%s” doesn't exist yet.") % self._name,
+            raise VMMDE(_(u"The domain “%s” doesn't exist.") % self._name,
                 ERR.NO_SUCH_DOMAIN)
 
     def getID(self):
@@ -215,7 +215,7 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts,
         info = dbc.fetchone()
         dbc.close()
         if info is None:
-            raise VMMDE(_(u"The domain “%s” doesn't exist yet.") % self._name,
+            raise VMMDE(_(u"The domain “%s” doesn't exist.") % self._name,
                     ERR.NO_SUCH_DOMAIN)
         else:
             keys = ['gid', 'domainname', 'transport', 'domaindir',
