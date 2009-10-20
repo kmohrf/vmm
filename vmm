@@ -15,6 +15,14 @@ import VirtualMailManager.constants.EXIT as EXIT
 
 
 def usage(excode=0, errMsg=None):
+    # TP: Please adjust translated words like the original text.
+    # (It's a table header.) Extract from usage text:
+    # Usage: vmm SUBCOMMAND OBJECT ARGS*
+    #  short long
+    #  subcommand               object             args (* = optional)
+    #
+    #  da    domainadd          domain.tld         transport*
+    #  di    domaininfo         domain.tld         details*
     u_head = _(u"""\
 Usage: %s SUBCOMMAND OBJECT ARGS*
   short long
@@ -54,7 +62,7 @@ Usage: %s SUBCOMMAND OBJECT ARGS*
         if errMsg is None:
             w_err(excode, u_head, u_body)
         else:
-            w_err(excode, u_head, u_body, '%s: %s\n' % (_(u'Error'), errMsg))
+            w_err(excode, u_head, u_body, _(u'Error: %s\n') % errMsg)
     else:
         w_std(u_head, u_body)
         os.sys.exit(excode)
@@ -65,7 +73,7 @@ def get_vmm():
         return vmm
     except (VMME.VMMException, VMME.VMMNotRootException, VMME.VMMPermException,
             VMME.VMMConfigException), e:
-        w_err(e.code(), "%s: %s\n" % (_(u'Error'), e.msg()))
+        w_err(e.code(), _(u'Error: %s\n') % e.msg())
 
 def _getOrder():
     order = ()
@@ -92,6 +100,7 @@ def _getOrder():
     return order
 
 def _printInfo(info, title):
+    # TP: e.g. 'Domain information' or 'Account information'
     msg = u'%s %s' % (title, _(u'information'))
     w_std (u'%s\n%s' % (msg, u'-'*len(msg)))
     for k,u in _getOrder():
@@ -102,6 +111,7 @@ def _printInfo(info, title):
     print
 
 def _printList(alist, title):
+    # TP: e.g. 'Available alias addresses' or 'Available accounts'
     msg = u'%s %s' % (_(u'Available'), title)
     w_std(u'%s\n%s' % (msg, u'-'*len(msg)))
     if len(alist) > 0:
@@ -443,11 +453,15 @@ def show_warnings():
 
 def show_version():
     w_std('%s, %s %s (%s %s)\nPython %s %s %s\n\n%s %s' % (__prog__,
+    # TP: The words 'from', 'version' and 'on' are used in the version
+    # information:
+    # vmm, version 0.5.2 (from 09/09/09)
+    # Python 2.5.4 on FreeBSD
         _(u'version'), __version__, _(u'from'),
         strftime(locale.nl_langinfo(locale.D_FMT),
             strptime(__date__, '%Y-%m-%d')).decode(ENCODING, 'replace'),
         os.sys.version.split()[0], _(u'on'), os.uname()[0], __prog__,
-        'is free software and comes with ABSOLUTELY NO WARRANTY.'))
+        _(u'is free software and comes with ABSOLUTELY NO WARRANTY.')))
 
 #def main():
 if __name__ == '__main__':
@@ -518,13 +532,14 @@ if __name__ == '__main__':
         elif argv[1] in (u'v', u'version'):
             show_version()
         else:
-            usage(EXIT.UNKNOWN_COMMAND,
-                    u"%s: “%s”" % (_(u'Unknown subcommand'), argv[1]))
+            usage(EXIT.UNKNOWN_COMMAND, _(u'Unknown subcommand: “%s”')% argv[1])
         show_warnings()
     except (EOFError, KeyboardInterrupt):
-        w_err(EXIT.USER_INTERRUPT, '\n%s!\n' % _(u'Ouch'))
+        # TP: We have to cry, because the user has killed/interrupted vmm with
+        # Ctrl+C or Ctrl+D.
+        w_err(EXIT.USER_INTERRUPT, _(u'\nOuch!\n'))
     except (VMME.VMMConfigException, VMME.VMMException), e:
         if e.code() != ERR.DATABASE_ERROR:
-            w_err(e.code(), "%s: %s" % (_(u'Error'), e.msg()))
+            w_err(e.code(), _(u'Error: %s') % e.msg())
         else:
-            w_err(e.code(), "%s" % unicode(e.msg(), ENCODING, 'replace'))
+            w_err(e.code(), unicode(e.msg(), ENCODING, 'replace'))

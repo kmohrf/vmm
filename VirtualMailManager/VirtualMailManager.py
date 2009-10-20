@@ -188,7 +188,9 @@ class VirtualMailManager(object):
     relocatedExists = staticmethod(relocatedExists)
 
     def _readpass(self):
+        # TP: Please preserve the trailing space.
         readp_msg0 = _(u'Enter new password: ').encode(ENCODING, 'replace')
+        # TP: Please preserve the trailing space.
         readp_msg1 = _(u'Retype new password: ').encode(ENCODING, 'replace')
         mismatched = True
         while mismatched:

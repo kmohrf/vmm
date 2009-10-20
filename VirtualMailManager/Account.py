@@ -31,6 +31,9 @@ class Account(object):
         self._exists()
         if self._uid < 1 and VMM.VirtualMailManager.aliasExists(self._dbh,
                 self._addr):
+            # TP: Hm, what quotation marks should be used?
+            # If you are unsure have a look at:
+            # http://en.wikipedia.org/wiki/Quotation_mark,_non-English_usage
             raise AccE(_(u"There is already an alias with the address “%s”.") %\
                     self._addr, ERR.ALIAS_EXISTS)
         if self._uid < 1 and VMM.VirtualMailManager.relocatedExists(self._dbh,
@@ -190,8 +193,10 @@ WHERE gid=%s AND local_part=%s",
             info = dict(zip(keys, info))
             for service in ('smtp', 'pop3', 'imap', sieve_col):
                 if bool(info[service]):
+                    # TP: A service (pop3/imap/…) is enabled/usable for a user
                     info[service] = _('enabled')
                 else:
+                    # TP: A service (pop3/imap) isn't enabled/usable for a user
                     info[service] = _('disabled')
             info['address'] = self._addr
             info['maildir'] = '%s/%s/%s' % (self._base, info['uid'],
