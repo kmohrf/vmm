@@ -228,7 +228,7 @@ def domain_info():
     except VMME.VMMDomainException, e:
         if e.code() is ERR.DOMAIN_ALIAS_EXISTS:
             w_std(plan_a_b % {'subcommand': u'aliasdomaininfo',
-                'address': argv[2].lower()})
+                'object': argv[2].lower()})
             alias_domain_info()
         else:
             raise e
@@ -260,7 +260,7 @@ def alias_domain_info():
     except VMME.VMMAliasDomainException, e:
         if e.code() is ERR.ALIASDOMAIN_ISDOMAIN:
             w_std(plan_a_b % {'subcommand': u'domaininfo',
-                'address': argv[2].lower()})
+                'object': argv[2].lower()})
             argv[1] = u'di' # necessary manipulation to get the order
             domain_info()
         else:
@@ -315,11 +315,11 @@ def user_info():
     except VMME.VMMAccountException, e:
         if e.code() is ERR.ALIAS_EXISTS:
             w_std(plan_a_b % {'subcommand': u'aliasinfo',
-                'address': argv[2].lower()})
+                'object': argv[2].lower()})
             alias_info()
         elif e.code() is ERR.RELOCATED_EXISTS:
             w_std(plan_a_b % {'subcommand': u'relocatedinfo',
-                'address': argv[2].lower()})
+                'object': argv[2].lower()})
             relocated_info()
         else:
             raise e
@@ -381,12 +381,12 @@ def alias_info():
     except VMME.VMMAliasException, e:
         if e.code() is ERR.ACCOUNT_EXISTS:
             w_std(plan_a_b % {'subcommand': u'userinfo',
-                'address': argv[2].lower()})
+                'object': argv[2].lower()})
             argv[1] = u'ui' # necessary manipulation to get the order
             user_info()
         elif e.code() is ERR.RELOCATED_EXISTS:
             w_std(plan_a_b % {'subcommand': u'relocatedinfo',
-                'address': argv[2].lower()})
+                'object': argv[2].lower()})
             relocated_info()
         else:
             raise e
@@ -417,11 +417,11 @@ def relocated_info():
             'dest': vmm.relocatedInfo(relocated)})
     except VMME.VMMRelocatedException, e:
         if e.code() is ERR.ACCOUNT_EXISTS:
-            w_std(plan_a_b % {'subcommand': u'userinfo', 'address': relocated})
+            w_std(plan_a_b % {'subcommand': u'userinfo', 'object': relocated})
             argv[1] = u'ui' # necessary manipulation to get the order
             user_info()
         elif e.code() is ERR.ALIAS_EXISTS:
-            w_std(plan_a_b % {'subcommand': u'aliasinfo', 'address': relocated})
+            w_std(plan_a_b % {'subcommand': u'aliasinfo', 'object': relocated})
             alias_info()
         else:
             raise e
@@ -469,7 +469,7 @@ if __name__ == '__main__':
     gettext.install(__prog__, '/usr/local/share/locale', unicode=1)
     argv = [unicode(arg, ENCODING) for arg in os.sys.argv]
     argc = len(os.sys.argv)
-    plan_a_b =_(u'Plan A failed ... trying Plan B: %(subcommand)s %(address)s')
+    plan_a_b =_(u'Plan A failed ... trying Plan B: %(subcommand)s %(object)s')
 
     if argc < 2:
         usage(EXIT.MISSING_ARGS)
@@ -535,8 +535,8 @@ if __name__ == '__main__':
             usage(EXIT.UNKNOWN_COMMAND, _(u'Unknown subcommand: “%s”')% argv[1])
         show_warnings()
     except (EOFError, KeyboardInterrupt):
-        # TP: We have to cry, because the user has killed/interrupted vmm with
-        # Ctrl+C or Ctrl+D.
+        # TP: We have to cry, because root has killed/interrupted vmm
+        # with Ctrl+C or Ctrl+D.
         w_err(EXIT.USER_INTERRUPT, _(u'\nOuch!\n'))
     except (VMME.VMMConfigException, VMME.VMMException), e:
         if e.code() != ERR.DATABASE_ERROR:

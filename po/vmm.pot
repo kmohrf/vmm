@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vmm 0.5.2\n"
 "Report-Msgid-Bugs-To: neverseen@users.sourceforge.net\n"
-"POT-Creation-Date: 2009-10-20 04:15+0200\n"
+"POT-Creation-Date: 2009-10-20 19:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -617,7 +617,7 @@ msgstr ""
 
 #: vmm:472
 #, python-format
-msgid "Plan A failed ... trying Plan B: %(subcommand)s %(address)s"
+msgid "Plan A failed ... trying Plan B: %(subcommand)s %(object)s"
 msgstr ""
 
 #: vmm:535
@@ -625,8 +625,8 @@ msgstr ""
 msgid "Unknown subcommand: “%s”"
 msgstr ""
 
-#. TP: We have to cry, because the user has killed/interrupted vmm with
-#. Ctrl+C or Ctrl+D.
+#. TP: We have to cry, because root has killed/interrupted vmm
+#. with Ctrl+C or Ctrl+D.
 #: vmm:540
 msgid ""
 "\n"
