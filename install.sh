@@ -30,7 +30,7 @@ python setup.py -q install --prefix ${PREFIX}
 python setup.py clean --all >/dev/null
 
 install -b -m 0600 ${INSTALL_OPTS} vmm.cfg ${PREFIX}/etc/
-install ${INSTALL_OPTS_CF} pgsql-*.cf ${PF_CONFDIR}/
+install ${INSTALL_OPTS_CF} postfix/pgsql-*.cf ${PF_CONFDIR}/
 install -m 0700 ${INSTALL_OPTS} vmm ${PREFIX}/sbin
 
 [ -d ${LOCALE_DIR} ] || mkdir -m 0755 -p ${LOCALE_DIR}
@@ -70,7 +70,7 @@ for DOC in ${DOCS}; do
 done
 
 [ -d ${DOC_DIR}/examples ] || mkdir -m 0755 -p ${DOC_DIR}/examples
-install -m 0644 ${INSTALL_OPTS} pgsql-*.cf ${DOC_DIR}/examples
+install -m 0644 ${INSTALL_OPTS} postfix/pgsql-*.cf ${DOC_DIR}/examples
 install -m 0644 ${INSTALL_OPTS} vmm.cfg ${DOC_DIR}/examples
 
 echo
