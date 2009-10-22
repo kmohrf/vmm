@@ -193,13 +193,19 @@ class VirtualMailManager(object):
         # TP: Please preserve the trailing space.
         readp_msg1 = _(u'Retype new password: ').encode(ENCODING, 'replace')
         mismatched = True
+        flrs = 0
         while mismatched:
+            if flrs > 2:
+                raise VMMException(_(u'Too many failures - try again later.'),
+                        ERR.VMM_TOO_MANY_FAILURES)
             clear0 = getpass(prompt=readp_msg0)
             clear1 = getpass(prompt=readp_msg1)
             if clear0 != clear1:
+                flrs += 1
                 w_std(_(u'Sorry, passwords do not match'))
                 continue
-            if len(clear0) < 1 or len(clear1) < 1:
+            if len(clear0) < 1:
+                flrs += 1
                 w_std(_(u'Sorry, empty passwords are not permitted'))
                 continue
             mismatched = False
