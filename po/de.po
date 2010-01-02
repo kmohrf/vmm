@@ -1,5 +1,5 @@
 # German translations for vmm package.
-# Copyright (C) 2009 VEB IT
+# Copyright (C) 2009 Pascal Volk
 # Pascal Volk <p.volk@veb-it.de>, 2009.
 #
 msgid ""

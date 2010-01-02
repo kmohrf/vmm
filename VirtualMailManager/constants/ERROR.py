@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (c) 2007 - 2009, VEB IT
+# Copyright (c) 2007 - 2010, Pascal Volk
 # See COPYING for distribution information.
 
 ACCOUNT_AND_ALIAS_PRESENT = 20

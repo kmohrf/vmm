@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
-# Copyright (c) 2007 - 2009, VEB IT
+# Copyright (c) 2007 - 2010, Pascal Volk
 # See COPYING for distribution information.
 
-AUTHOR  = 'Pascal Volk <p.volk@veb-it.de>'
+AUTHOR  = 'Pascal Volk <neverseen@users.sourceforge.net>'
 RELDATE = '2009-09-09'
 VERSION = '0.5.2'
 __author__  = AUTHOR

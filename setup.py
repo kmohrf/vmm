@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright 2007 - 2009, VEB IT
+# Copyright 2007 - 2010, Pascal Volk
 # See COPYING for distribution information.
 
 import os
@@ -27,7 +27,7 @@ setup(name='VirtualMailManager',
       packages=['VirtualMailManager', 'VirtualMailManager.ext',
           'VirtualMailManager.constants'],
       author='Pascal Volk',
-      author_email='p.volk@veb-it.de',
+      author_email='neverseen@users.sourceforge.net',
       license='BSD License',
       url='http://vmm.localdomain.org/',
       download_url='http://sf.net/projects/vmm/files/',

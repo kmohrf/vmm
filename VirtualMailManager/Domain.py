@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (c) 2007 - 2009, VEB IT
+# Copyright (c) 2007 - 2010, Pascal Volk
 # See COPYING for distribution information.
 
 """Virtual Mail Manager's Domain class to manage e-mail domains."""
