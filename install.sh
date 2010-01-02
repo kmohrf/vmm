@@ -26,7 +26,7 @@ if [ $(id -u) -ne 0 ]; then
     exit 1
 fi
 
-python setup.py -q install --prefix ${PREFIX}
+python setup.py -q install --force --prefix ${PREFIX}
 python setup.py clean --all >/dev/null
 
 install -b -m 0600 ${INSTALL_OPTS} vmm.cfg ${PREFIX}/etc/

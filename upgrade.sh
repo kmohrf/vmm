@@ -43,7 +43,7 @@ elif [ $rv -ne 0 ]; then
     exit 1
 fi
 
-python setup.py -q install --prefix ${PREFIX}
+python setup.py -q install --force --prefix ${PREFIX}
 python setup.py clean --all >/dev/null
 
 install -m 0700 ${INSTALL_OPTS} vmm ${PREFIX}/sbin
@@ -57,14 +57,6 @@ for po in $(ls -1 *.po); do
     msgfmt -o ${LOCALE_DIR}/${lang}/LC_MESSAGES/vmm.mo ${po}
 done
 cd - >/dev/null
-
-# remove misplaced manual pages
-if [ -f /usr/local/share/man/man1/vmm.1 ]; then
-    rm -f /usr/local/share/man/man1/vmm.1
-fi
-if [ -f /usr/local/share/man/man5/vmm.cfg.5 ]; then
-    rm -f /usr/local/share/man/man5/vmm.cfg.5
-fi
 
 # install manual pages
 cd man
