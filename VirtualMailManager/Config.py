@@ -26,8 +26,8 @@ class Config(ConfigParser):
         ConfigParser.__init__(self)
         self.__cfgFileName = filename
         self.__cfgFile = None
-        self.__VMMsections = ['database', 'maildir', 'services', 'domdir',
-                'bin', 'misc', 'config']
+        self.__VMMsections = ('account', 'bin', 'database', 'domain',
+                              'maildir', 'misc', 'config')
         self.__changes = False
         self.__missing = {}
         self.__dbopts = [
@@ -39,20 +39,23 @@ class Config(ConfigParser):
         self.__mdopts = [
                 ['name', 'Maildir'],
                 ['folders', 'Drafts:Sent:Templates:Trash'],
-                ['mode', 448],
-                ['diskusage', 'false'],
-                ['delete', 'false']
                 ]
-        self.__serviceopts = [
+        self.__accountopts = [
+                ['delete_directory', 'false'],
+                ['directory_mode', 448],
+                ['disk_usage', 'false'],
+                ['password_len', 8],
+                ['random_password', 'false'],
                 ['smtp', 'true'],
                 ['pop3', 'true'],
                 ['imap', 'true'],
                 ['sieve', 'true']
                 ]
         self.__domdopts = [
-                ['base', '/srv/mail'],
-                ['mode', 504],
-                ['delete', 'false']
+                ['auto_postmaster', 'true'],
+                ['delete_directory', 'false'],
+                ['directory_mode', 504],
+                ['force_del', 'false'],
                 ]
         self.__binopts = [
                 ['dovecotpw', '/usr/sbin/dovecotpw'],
@@ -60,11 +63,11 @@ class Config(ConfigParser):
                 ['postconf', '/usr/sbin/postconf']
                 ]
         self.__miscopts = [
-                ['passwdscheme', 'PLAIN'],
+                ['base_dir', '/srv/mail'],
+                ['dovecot_vers', '11'],
                 ['gid_mail', 8],
-                ['forcedel', 'false'],
+                ['password_scheme', 'PLAIN'],
                 ['transport', 'dovecot:'],
-                ['dovecotvers', '11']
                 ]
 
     def load(self):
@@ -167,9 +170,9 @@ class Config(ConfigParser):
             opts = self.__dbopts
         elif section == 'maildir':
             opts = self.__mdopts
-        elif section == 'services':
-            opts = self.__serviceopts
-        elif section == 'domdir':
+        elif section == 'account':
+            opts = self.__accountopts
+        elif section == 'domain':
             opts = self.__domdopts
         elif section == 'bin':
             opts = self.__binopts

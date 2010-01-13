@@ -77,7 +77,7 @@ def get_vmm():
 
 def _getOrder():
     order = ()
-    if vmm.cfgGetInt('misc', 'dovecotvers') > 11:
+    if vmm.cfgGetInt('misc', 'dovecot_vers') > 11:
         sieve_name = u'sieve'
     else:
         sieve_name = u'managesieve'
@@ -87,7 +87,7 @@ def _getOrder():
                 (u'aliases', 0), (u'relocated', 0))
     elif argv[1] in (u'ui', u'userinfo'):
         if argc == 4 and argv[3] != u'aliases'\
-        or vmm.cfgGetBoolean('maildir', 'diskusage'):
+        or vmm.cfgGetBoolean('account', 'disk_usage'):
             order = ((u'address', 0), (u'name', 0), (u'uid', 1), (u'gid', 1),
                     (u'transport', 0), (u'maildir', 0), (u'disk usage', 0),
                     (u'smtp', 1), (u'pop3', 1), (u'imap', 1), (sieve_name, 1))
