@@ -83,16 +83,16 @@ class VirtualMailManager(object):
 
     def __chkenv(self):
         """"""
-        if not os.path.exists(self.__Cfg.get('misc', 'base_dir')):
+        basedir = self.__Cfg.get('misc', 'base_directory')
+        if not os.path.exists(basedir):
             old_umask = os.umask(0006)
-            os.makedirs(self.__Cfg.get('misc', 'base_dir'), 0771)
-            os.chown(self.__Cfg.get('misc', 'base_dir'), 0,
-                    self.__Cfg.getint('misc', 'gid_mail'))
+            os.makedirs(basedir, 0771)
+            os.chown(basedir, 0, self.__Cfg.getint('misc', 'gid_mail'))
             os.umask(old_umask)
-        elif not os.path.isdir(self.__Cfg.get('misc', 'base_dir')):
+        elif not os.path.isdir(basedir):
             raise VMMException(_(u'“%s” is not a directory.\n\
-(vmm.cfg: section "misc", option "base_dir")') %
-                self.__Cfg.get('misc', 'base_dir'), ERR.NO_SUCH_DIRECTORY)
+(vmm.cfg: section "misc", option "base_directory")') %
+                                 basedir, ERR.NO_SUCH_DIRECTORY)
         for opt, val in self.__Cfg.items('bin'):
             if not os.path.exists(val):
                 raise VMMException(_(u'“%(binary)s” doesn\'t exist.\n\
@@ -237,7 +237,7 @@ class VirtualMailManager(object):
             transport = self.__Cfg.get('misc', 'transport')
         self.__dbConnect()
         return Domain(self.__dbh, domainname,
-                self.__Cfg.get('misc', 'base_dir'), transport)
+                self.__Cfg.get('misc', 'base_directory'), transport)
 
     def __getDiskUsage(self, directory):
         """Estimate file space usage for the given directory.
@@ -270,7 +270,7 @@ class VirtualMailManager(object):
     def __domDirMake(self, domdir, gid):
         os.umask(0006)
         oldpwd = os.getcwd()
-        basedir = self.__Cfg.get('misc', 'base_dir')
+        basedir = self.__Cfg.get('misc', 'base_directory')
         domdirdirs = domdir.replace(basedir+'/', '').split('/')
 
         os.chdir(basedir)
@@ -348,7 +348,7 @@ class VirtualMailManager(object):
         if gid > 0:
             if not self.__isdir(domdir):
                 return
-            basedir = self.__Cfg.get('misc', 'base_dir')
+            basedir = self.__Cfg.get('misc', 'base_directory')
             domdirdirs = domdir.replace(basedir+'/', '').split('/')
             domdirparent = os.path.join(basedir, domdirdirs[0])
             if basedir.count('..') or domdir.count('..'):
@@ -487,7 +487,8 @@ class VirtualMailManager(object):
         dom = self.__getDomain(domainname)
         gid = dom.getID()
         domdir = dom.getDir()
-        if self.__Cfg.getboolean('domain', 'force_del') or force == 'delall':
+        if self.__Cfg.getboolean('domain', 'force_deletion')\
+        or force == 'delall':
             dom.delete(True, True)
         elif force == 'deluser':
             dom.delete(delUser=True)
@@ -589,7 +590,7 @@ The keyword “detailed” is deprecated and will be removed in a future release
             password = self._readpass()
             acc.setPassword(self.__pwhash(password))
         acc.save(self.__Cfg.get('maildir', 'name'),
-                self.__Cfg.getint('misc', 'dovecot_vers'),
+                self.__Cfg.getint('misc', 'dovecot_version'),
                 self.__Cfg.getboolean('account', 'smtp'),
                 self.__Cfg.getboolean('account', 'pop3'),
                 self.__Cfg.getboolean('account', 'imap'),
@@ -643,7 +644,7 @@ The account has been successfully deleted from the database.
             raise VMMException(_(u'Invalid argument: “%s”') % details,
                     ERR.INVALID_AGUMENT)
         acc = self.__getAccount(emailaddress)
-        info = acc.getInfo(self.__Cfg.getint('misc', 'dovecot_vers'))
+        info = acc.getInfo(self.__Cfg.getint('misc', 'dovecot_version'))
         if self.__Cfg.getboolean('account', 'disk_usage')\
         or details in ['du', 'full']:
             info['disk usage'] = self.__getDiskUsage('%(maildir)s' % info)
@@ -682,7 +683,7 @@ The service name “managesieve” is deprecated and will be removed\n\
    in a future release.\n\
    Please use the service name “sieve” instead.'))
         acc = self.__getAccount(emailaddress)
-        acc.disable(self.__Cfg.getint('misc', 'dovecot_vers'), service)
+        acc.disable(self.__Cfg.getint('misc', 'dovecot_version'), service)
 
     def userEnable(self, emailaddress, service=None):
         if service == 'managesieve':
@@ -692,7 +693,7 @@ The service name “managesieve” is deprecated and will be removed\n\
    in a future release.\n\
    Please use the service name “sieve” instead.'))
         acc = self.__getAccount(emailaddress)
-        acc.enable(self.__Cfg.getint('misc', 'dovecot_vers'), service)
+        acc.enable(self.__Cfg.getint('misc', 'dovecot_version'), service)
 
     def relocatedAdd(self, emailaddress, targetaddress):
         relocated = self.__getRelocated(emailaddress, targetaddress)

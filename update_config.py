@@ -76,7 +76,7 @@ def upd_052(cp):
     if cp.has_section('domdir'):
         for src, dst in (('domdir.mode',   'domain.directory_mode'),
                          ('domdir.delete', 'domain.delete_directory'),
-                         ('domdir.base',   'misc.base_dir')):
+                         ('domdir.base',   'misc.base_directory')):
             move_option(cp, src, dst)
         cp.remove_section('domdir')
     if cp.has_section('services'):
@@ -86,12 +86,12 @@ def upd_052(cp):
     for src, dst in (('maildir.mode',      'account.directory_mode'),
                      ('maildir.diskusage', 'account.disk_usage'),
                      ('maildir.delete',    'account.delete_directory'),
-                     ('misc.forcedel',     'domain.force_del'),
+                     ('misc.forcedel',     'domain.force_deletion'),
                      ('misc.passwdscheme', 'misc.password_scheme'),
-                     ('misc.dovecotvers',  'misc.dovecot_vers')):
+                     ('misc.dovecotvers',  'misc.dovecot_version')):
         move_option(cp, src, dst)
     for dst, val in (('account.random_password', 'false'),
-                     ('account.password_len',    '8'),
+                     ('account.password_length', '8'),
                      ('domain.auto_postmaster',  'true')):
         add_option(cp, dst, val)
 

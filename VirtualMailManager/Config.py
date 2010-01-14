@@ -44,7 +44,7 @@ class Config(ConfigParser):
                 ['delete_directory', 'false'],
                 ['directory_mode', 448],
                 ['disk_usage', 'false'],
-                ['password_len', 8],
+                ['password_length', 8],
                 ['random_password', 'false'],
                 ['smtp', 'true'],
                 ['pop3', 'true'],
@@ -55,7 +55,7 @@ class Config(ConfigParser):
                 ['auto_postmaster', 'true'],
                 ['delete_directory', 'false'],
                 ['directory_mode', 504],
-                ['force_del', 'false'],
+                ['force_deletion', 'false'],
                 ]
         self.__binopts = [
                 ['dovecotpw', '/usr/sbin/dovecotpw'],
@@ -63,8 +63,8 @@ class Config(ConfigParser):
                 ['postconf', '/usr/sbin/postconf']
                 ]
         self.__miscopts = [
-                ['base_dir', '/srv/mail'],
-                ['dovecot_vers', '11'],
+                ['base_directory', '/srv/mail'],
+                ['dovecot_version', '11'],
                 ['gid_mail', 8],
                 ['password_scheme', 'PLAIN'],
                 ['transport', 'dovecot:'],
