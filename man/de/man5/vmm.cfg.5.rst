@@ -68,8 +68,8 @@ Die zuerst gefundene Datei wird verwendet.
 
 ABSCHNITTE
 ==========
-Dieser Abschnitt beschreibt alle Abschnitte, sowie deren Optionen, der
-*vmm.cfg*.
+Im Folgenden werden die Abschnitte der *vmm.cfg* und deren Optionen
+beschrieben.
 
 ACCOUNT
 -------
@@ -102,15 +102,14 @@ Einstellungen fest.
     Bestimmt, ob sich neu angelegte Benutzer per IMAP anmelden können sollen.
 
 ``password_length`` : *Int*
-    Legt fest, wie viele Zahlen und/oder Buchstaben für ein automatisch
-    erzeugtes Passwort verwendet werden sollen. Alle Werte kleiner als 8
-    werden auf 8 erhöht.
+    Diese Option legt die Anzahl der Zeichen für automatisch erzeugte
+    Passwörter fest. Alle Werte kleiner als 8 werden auf 8 erhöht.
 
 ``pop3``
     Bestimmt, ob sich neu angelegte Benutzer per POP3 anmelden können sollen.
 
 ``random_password`` : *Boolean*
-    Mit dieser Option bestimmen Sie, ob **vmm**\(1) ein zufälliges Passwort
+    Mit dieser Option wird bestimmt , ob **vmm**\(1) ein zufälliges Passwort
     generieren soll, wenn kein Passwort an den **useradd** Unterbefehl
     übergeben wurde. Ist der Wert dieser Option *false*, wird **vmm** Sie
     auffordern, ein Passwort für den neun Account einzugeben.
@@ -172,14 +171,14 @@ Beim **config**-Abschnitt handelt es sich um einen internen
 Steuerungs-Abschnitt.
 
 ``done`` : *Boolean*
-    Diese Option hat den den Wert *false*, wenn **vmm**\(1) zum ersten Mal
+    Diese Option hat den Wert *false*, wenn **vmm**\(1) zum ersten Mal
     installiert wurde. Wenn Sie die Datei *vmm.cfg* von Hand editieren,
     weisen Sie dieser Option abschließend den Wert *true* zu. Wird die
     Konfiguration über das Kommando **vmm configure** angepasst, wird der
     Wert dieser Option automatisch auf *true* gesetzt.
 
-    Sollte diese Option den Wert *false* zugewiesen haben, so startet
-    **vmm**\(1) beim nächsten Aufruf im interaktiven Konfigurations-Modus.
+    Ist der Wert dieser Option  *false*, so startet **vmm**\(1) beim
+    nächsten Aufruf im interaktiven Konfigurations-Modus.
 
 Beispiel::
 
@@ -195,7 +194,7 @@ benötigten Optionen festzulegen.
     Der Hostname oder die IP-Adresse des Datenbank-Servers.
 
 ``name`` : *String*
-    Name der zu verwendenden Datenbank.
+    Der Name der zu verwendenden Datenbank.
 
 ``pass`` : *String*
     Das Passwort des Datenbank-Benutzers.
@@ -216,9 +215,8 @@ DOMAIN
 Im **domain**-Abschnitt werden Domain-spezifische Informationen konfiguriert.
 
 ``auto_postmaster`` : *Boolean*
-    Setzen Sie den Wert dieser Option auf *true*, wenn **vmm**\(1)
-    automatisch einen postmaster-Account erstellen soll, wenn Sie eine neue
-    Domain anlegen.
+    Ist der Wert dieser Option *true*, wird **vmm**\(1) beim Anlegen einer
+    Domain automatisch einen postmaster-Account erstellen.
 
 ``delete_directory`` : *Boolean*
     Bestimmt, ob beim Löschen einer Domain das Verzeichnis einer Domain,
@@ -231,8 +229,8 @@ Im **domain**-Abschnitt werden Domain-spezifische Informationen konfiguriert.
     | Beispiel: 'drwxrwx---' -> oktal 0770 -> dezimal 504
 
 ``force_deletion`` : *Boolean*
-    Legt fest, ob beim Löschen einer Domain alle vorhanden Konten und/oder
-    Aliase, ohne Nachfrage, gelöscht werden sollen.
+    Erzwingt das Löschen aller zugeordneten Konten und Aliase beim Löschen
+    einer Domain.
 
 Beispiel::
 
@@ -253,12 +251,12 @@ festgelegt.
     Maildirs keine Verzeichnisse angelegt werden, ist dieser Optionen ein
     einzelner Doppelpunkt ('**:**') als Wert zuzuweisen.
 
-    Wenn Sie Verzeichnisse mit Unterverzeichnissen anlegen wollen,
-    verwendenden Sie einen einzelnen Punkt ('**.**') als Separator.
+    Sollen Verzeichnisse mit Unterverzeichnissen angelegt werden, ist ein
+    einzelner Punkt ('**.**') als Separator zu verwenden.
 
 ``name`` : *String*
-    Standard-Name des Maildir-Verzeichnisses im Verzeichnis des jeweiligen
-    Anwenders.
+    Der Standard-Name des Maildir-Verzeichnisses im Verzeichnis des
+    jeweiligen Anwenders.
 
 Beispiel::
 
@@ -289,9 +287,8 @@ Im **misc**-Abschnitt werden verschiedene Einstellungen festgelegt.
     Die verketteten Major- und Minor-Teile der eingesetzten Dovecot-Version
     (siehe: **dovecot --version**).
 
-    Diese Option beeinflusst diverse Datenbankzugriffe. Da es zwischen
-    Dovecot v1.1.x und v1.2.x einige Änderungen gab. Zum Beispiel **11**,
-    falls **dovecot --version** den Wert 1.1.18 ausgibt.
+    Wenn das Kommando **dovecot --version** zum Beispiel *1.1.18* ausgibt,
+    ist dieser Option der Wert **11** zuzuweisen.
 
 Beispiel::
 

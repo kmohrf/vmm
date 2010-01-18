@@ -271,10 +271,8 @@ The **misc** section is used to define miscellaneous settings.
     The concatenated major and minor version number of the currently used
     Dovecot version. (see: **dovecot --version**).
 
-    This option affects various database operations. There are some
-    differences between Dovecot v1.1.x and v1.2.x. For example, when the
-    command **dovecot --version** shows 1.1.18, set the value of this option
-    to **11**.
+    When, for example, the command **dovecot --version** prints *1.1.18*, set
+    the value of this option to **11**.
 
 Example::
 

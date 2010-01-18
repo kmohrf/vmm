@@ -99,8 +99,8 @@ in der angegebenen Reihenfolge:
 Die zuerst gefundene Datei wird verwendet.
 .SH ABSCHNITTE
 .sp
-Dieser Abschnitt beschreibt alle Abschnitte, sowie deren Optionen, der
-\fIvmm.cfg\fP.
+Im Folgenden werden die Abschnitte der \fIvmm.cfg\fP und deren Optionen
+beschrieben.
 .SS ACCOUNT
 .sp
 Die Optionen des Abschnitts \fBaccount\fP legen Konto\-spezifische
@@ -145,9 +145,8 @@ Bestimmt, ob sich neu angelegte Benutzer per IMAP anmelden können sollen.
 .B \fCpassword_length\fP
 \fIInt\fP
 .sp
-Legt fest, wie viele Zahlen und/oder Buchstaben für ein automatisch
-erzeugtes Passwort verwendet werden sollen. Alle Werte kleiner als 8
-werden auf 8 erhöht.
+Diese Option legt die Anzahl der Zeichen für automatisch erzeugte
+Passwörter fest. Alle Werte kleiner als 8 werden auf 8 erhöht.
 .TP
 .B \fCpop3\fP
 .sp
@@ -156,7 +155,7 @@ Bestimmt, ob sich neu angelegte Benutzer per POP3 anmelden können sollen.
 .B \fCrandom_password\fP
 \fIBoolean\fP
 .sp
-Mit dieser Option bestimmen Sie, ob \fBvmm\fP(1) ein zufälliges Passwort
+Mit dieser Option wird bestimmt , ob \fBvmm\fP(1) ein zufälliges Passwort
 generieren soll, wenn kein Passwort an den \fBuseradd\fP Unterbefehl
 übergeben wurde. Ist der Wert dieser Option \fIfalse\fP, wird \fBvmm\fP Sie
 auffordern, ein Passwort für den neun Account einzugeben.
@@ -240,14 +239,14 @@ Steuerungs\-Abschnitt.
 .B \fCdone\fP
 \fIBoolean\fP
 .sp
-Diese Option hat den den Wert \fIfalse\fP, wenn \fBvmm\fP(1) zum ersten Mal
+Diese Option hat den Wert \fIfalse\fP, wenn \fBvmm\fP(1) zum ersten Mal
 installiert wurde. Wenn Sie die Datei \fIvmm.cfg\fP von Hand editieren,
 weisen Sie dieser Option abschließend den Wert \fItrue\fP zu. Wird die
 Konfiguration über das Kommando \fBvmm configure\fP angepasst, wird der
 Wert dieser Option automatisch auf \fItrue\fP gesetzt.
 .sp
-Sollte diese Option den Wert \fIfalse\fP zugewiesen haben, so startet
-\fBvmm\fP(1) beim nächsten Aufruf im interaktiven Konfigurations\-Modus.
+Ist der Wert dieser Option  \fIfalse\fP, so startet \fBvmm\fP(1) beim
+nächsten Aufruf im interaktiven Konfigurations\-Modus.
 .UNINDENT
 .sp
 Beispiel:
@@ -272,7 +271,7 @@ Der Hostname oder die IP\-Adresse des Datenbank\-Servers.
 .B \fCname\fP
 \fIString\fP
 .sp
-Name der zu verwendenden Datenbank.
+Der Name der zu verwendenden Datenbank.
 .TP
 .B \fCpass\fP
 \fIString\fP
@@ -304,9 +303,8 @@ Im \fBdomain\fP\-Abschnitt werden Domain\-spezifische Informationen konfiguriert
 .B \fCauto_postmaster\fP
 \fIBoolean\fP
 .sp
-Setzen Sie den Wert dieser Option auf \fItrue\fP, wenn \fBvmm\fP(1)
-automatisch einen postmaster\-Account erstellen soll, wenn Sie eine neue
-Domain anlegen.
+Ist der Wert dieser Option \fItrue\fP, wird \fBvmm\fP(1) beim Anlegen einer
+Domain automatisch einen postmaster\-Account erstellen.
 .TP
 .B \fCdelete_directory\fP
 \fIBoolean\fP
@@ -327,8 +325,7 @@ Beispiel: \(aqdrwxrwx\-\-\-\(aq \-> oktal 0770 \-> dezimal 504
 .B \fCforce_deletion\fP
 \fIBoolean\fP
 .sp
-Legt fest, ob beim Löschen einer Domain alle vorhanden Konten und/oder
-Aliase, ohne Nachfrage, gelöscht werden sollen.
+Erzwingt das Löschen von Konten und Aliase beim Löschen einer Domain.
 .UNINDENT
 .sp
 Beispiel:
@@ -356,14 +353,14 @@ innerhalb des Maildirs erstellt werden sollen. Sollen innerhalb des
 Maildirs keine Verzeichnisse angelegt werden, ist dieser Optionen ein
 einzelner Doppelpunkt (\(aq\fB:\fP\(aq) als Wert zuzuweisen.
 .sp
-Wenn Sie Verzeichnisse mit Unterverzeichnissen anlegen wollen,
-verwendenden Sie einen einzelnen Punkt (\(aq\fB.\fP\(aq) als Separator.
+Sollen Verzeichnisse mit Unterverzeichnissen angelegt werden, ist ein
+einzelner Punkt (\(aq\fB.\fP\(aq) als Separator zu verwenden.
 .TP
 .B \fCname\fP
 \fIString\fP
 .sp
-Standard\-Name des Maildir\-Verzeichnisses im Verzeichnis des jeweiligen
-Anwenders.
+Der Standard\-Name des Maildir\-Verzeichnisses im Verzeichnis des
+jeweiligen Anwenders.
 .UNINDENT
 .sp
 Beispiel:
@@ -409,9 +406,8 @@ Der Standard\-Transport aller Domains und Konten. Siehe auch:
 Die verketteten Major\- und Minor\-Teile der eingesetzten Dovecot\-Version
 (siehe: \fBdovecot \-\-version\fP).
 .sp
-Diese Option beeinflusst diverse Datenbankzugriffe. Da es zwischen
-Dovecot v1.1.x und v1.2.x einige Änderungen gab. Zum Beispiel \fB11\fP,
-falls \fBdovecot \-\-version\fP den Wert 1.1.18 ausgibt.
+Wenn das Kommando \fBdovecot \-\-version\fP zum Beispiel \fI1.1.18\fP ausgibt,
+ist dieser Option der Wert \fB11\fP zuzuweisen.
 .UNINDENT
 .sp
 Beispiel:

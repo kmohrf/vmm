@@ -1,3 +1,8 @@
+Config
+   cfs - configset sect.opt val
+   cfg - configget sect.opt
+
+   ds - domainservices: smtp pop imap sieve???
 
 - Aliases
     - avoid looping aliases

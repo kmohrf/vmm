@@ -30,9 +30,6 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.\" to create a man page strip the next part:
-.\" rst2man --strip-elements-with-class=htmlout in.rst out
-.
 .SH SYNOPSIS
 .sp
 vmm.cfg
@@ -396,10 +393,8 @@ Default transport for domains and accounts. For details see
 The concatenated major and minor version number of the currently used
 Dovecot version. (see: \fBdovecot \-\-version\fP).
 .sp
-This option affects various database operations. There are some
-differences between Dovecot v1.1.x and v1.2.x. For example, when the
-command \fBdovecot \-\-version\fP shows 1.1.18, set the value of this option
-to \fB11\fP.
+When, for example, the command \fBdovecot \-\-version\fP prints \fI1.1.18\fP, set
+the value of this option to \fB11\fP.
 .UNINDENT
 .sp
 Example:
