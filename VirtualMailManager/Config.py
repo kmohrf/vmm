@@ -151,6 +151,7 @@ class Config(ConfigParser):
         for s in self.__VMMsections:
             if not self.has_section(s):
                 self.__missing[s] = [True]
+                errors = True
             elif not self.__chkOptions(s):
                 errors = True
         return not errors
