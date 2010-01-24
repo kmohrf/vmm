@@ -38,6 +38,12 @@ def w_err(code, *args):
         _write('\n')
     os.sys.exit(code)
 
+def get_unicode(string):
+    """Converts `string` to `unicode`, if necessary."""
+    if isinstance(string, unicode):
+        return string
+    return unicode(string, ENCODING, 'replace')
+
 __all__ = [
         # imported modules
         'os', 're', 'locale',
@@ -46,6 +52,6 @@ __all__ = [
         # error codes
         'ERR',
         # defined stuff
-        'ENCODING', 'w_std', 'w_err'
+        'ENCODING', 'get_unicode', 'w_std', 'w_err'
         ]
 # EOF
