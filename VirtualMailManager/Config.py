@@ -332,9 +332,10 @@ class Config(LazyConfig):
             self.__cfgFile = open(self.__cfgFileName, 'r')
             self.readfp(self.__cfgFile)
         except (MissingSectionHeaderError, ParsingError), e:
-            self.__cfgFile.close()
             raise VMMConfigException(str(e), ERR.CONF_ERROR)
-        self.__cfgFile.close()
+        finally:
+            if not self.__cfgFile is None and not self.__cfgFile.closed:
+                self.__cfgFile.close()
 
     def check(self):
         """Performs a configuration check.

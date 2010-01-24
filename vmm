@@ -476,7 +476,7 @@ if __name__ == '__main__':
 
     vmm = get_vmm()
     try:
-        need_setup = not vmm.setupIsDone()
+        need_setup = not vmm.cfgDget('config.done')
         if   argv[1] in (u'cf', u'configure') or need_setup:
             configure()
         elif argv[1] in (u'da', u'domainadd'):

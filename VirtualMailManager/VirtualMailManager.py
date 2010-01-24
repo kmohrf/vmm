@@ -49,11 +49,11 @@ class VirtualMailManager(object):
         if self.__chkCfgFile():
             self.__Cfg = Cfg(self.__cfgFileName)
             self.__Cfg.load()
+        if not os.sys.argv[1] in ['cf', 'configure']:
             self.__Cfg.check()
+            self.__chkenv()
             self.__scheme = self.__Cfg.dget('misc.password_scheme')
             self._postconf = Postconf(self.__Cfg.dget('bin.postconf'))
-        if not os.sys.argv[1] in ['cf', 'configure']:
-            self.__chkenv()
 
     def __findCfgFile(self):
         for path in ['/root', '/usr/local/etc', '/etc']:
@@ -436,15 +436,6 @@ class VirtualMailManager(object):
     def cfgSet(self, option, value):
         return self.__Cfg.set(option, value)
 
-    def setupIsDone(self):
-        """Checks if vmm is configured, returns bool"""
-        try:
-            return self.__Cfg.dget('config.done')
-        except ValueError, e:
-            raise VMMConfigException(_(u"""Configuration error: "%s"
-(in section "config", option "done") see also: vmm.cfg(5)\n""") % str(e),
-                  ERR.CONF_ERROR)
-
     def configure(self, section=None):
         """Starts interactive configuration.
 
@@ -462,7 +453,7 @@ class VirtualMailManager(object):
             self.__Cfg.configure([section])
         else:
             raise VMMException(_(u"Invalid section: “%s”") % section,
-                ERR.INVALID_SECTION)
+                               ERR.INVALID_SECTION)
 
     def domainAdd(self, domainname, transport=None):
         dom = self.__getDomain(domainname, transport)
