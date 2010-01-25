@@ -7,7 +7,7 @@ configuration file for vmm
 --------------------------
 
 :Author:         Pascal Volk <neverseen@users.sourceforge.net>
-:Date:           2010-01-18
+:Date:           2010-01-25
 :Version:        vmm-0.6.0
 :Manual group:   vmm Manual
 :Manual section: 5
@@ -71,18 +71,18 @@ ACCOUNT
 The options in the section **account** are used to specify user account
 related settings.
 
-``delete_directory`` : *Boolean*
+``delete_directory (default: false)`` : *Boolean*
     Determines the behavior of **vmm**\(1) when an account is deleted. If
     this option is set to *true* the user's home directory will be deleted
     recursively.
 
-``directory_mode`` : *Int*
+``directory_mode (default: 448)`` : *Int*
     Access mode for a user's home directory and all directories inside.
     The value has to be specified in decimal (base 10) notation.
 
     | For example: 'drwx------' -> octal 0700 -> decimal 448
 
-``disk_usage`` : *Boolean*
+``disk_usage (default: false)`` : *Boolean*
     Determines whether the disk usage of a user's Maildir always should be
     summarized, using **du**\(1), and displayed with account information.
 
@@ -92,17 +92,18 @@ related settings.
     **du** or **full**, in order to display the current disk usage of an
     account.
 
-``imap`` : *Boolean*
+``imap (default: true)`` : *Boolean*
     Determines whether a newly created user can log in via IMAP.
 
-``password_length`` : *Int*
-    Determines how many characters and/or numbers should be used for random
-    generated passwords. Any value less than 8 will be increased to 8.
+``password_length (default: 8)`` : *Int*
+    Determines how many characters and/or numbers should be used for
+    randomly generated passwords. Any value less than 8 will be
+    increased to 8.
 
-``pop3`` : *Boolean*
+``pop3 (default: true)`` : *Boolean*
     Determines whether a newly created user can log in via POP3.
 
-``random_password`` : *Boolean*
+``random_password (default: false)`` : *Boolean*
     Determines whether **vmm** should generate a random password when no
     password was given for the **useradd** subcommand. If this option is
     set to *false* **vmm** will prompt you to enter a password for the new
@@ -111,10 +112,10 @@ related settings.
     You can specify the password length of generated passwords with the
     **password_length** option.
 
-``sieve`` : *Boolean*
+``sieve (default: true)`` : *Boolean*
     Determines whether a newly created user can log in via ManageSieve.
 
-``smtp`` : *Boolean*
+``smtp (default: true)`` : *Boolean*
      Determines whether a newly created user can log in via SMTP (SMTP AUTH).
 
 Example::
@@ -135,16 +136,16 @@ BIN
 The **bin** section is used to specify some paths to some binaries required
 by **vmm**\(1).
 
-``dovecotpw`` : *String*
+``dovecotpw (default: /usr/sbin/dovecotpw)`` : *String*
     The absolute path to the dovecotpw binary. This binary is used to
     generate a password hash, if **misc.password_scheme** is set to one of
     'SMD5', 'SSHA', 'CRAM-MD5', 'HMAC-MD5', 'LANMAN', 'NTLM' or 'RPA'.
 
-``du`` : *String*
+``du (default: /usr/bin/du)`` : *String*
     The absolute path to **du**\(1). This binary is used to summarize the
     disk usage of a user's Maildir.
 
-``postconf`` : *String*
+``postconf (default: /usr/sbin/postconf)`` : *String*
     The absolute path to Postfix' **postconf**\(1). This binary is required
     when **vmm**\(1) has to check for some Postfix settings, e.g.
     `virtual_alias_expansion_limit`.
@@ -160,7 +161,7 @@ CONFIG
 ------
 The **config** section is an internal used control section.
 
-``done`` : *Boolean*
+``done (default: false)`` : *Boolean*
     This option is set to *false* when **vmm**\(1) is installed for the first
     time. When you edit *vmm.cfg*, set this option to *true*. This option is
     also set to *true* when you configure **vmm**\(1) with the command **vmm
@@ -179,16 +180,16 @@ DATABASE
 The **database** section is used to specify some options required to
 connect to the database.
 
-``host`` : *String*
+``host (default: localhost)`` : *String*
     Hostname or IP address of the database server.
 
-``name`` : *String*
+``name (default: mailsys)`` : *String*
     Name of the database.
 
-``pass`` : *String*
+``pass (default: None)`` : *String*
     Database password.
 
-``user`` : *String*
+``user (default: None)`` : *String*
     Name of the database user.
 
 Example::
@@ -203,20 +204,20 @@ DOMAIN
 ------
 The **domain** section specifies some domain related settings.
 
-``auto_postmaster`` : *Boolean*
+``auto_postmaster (default: true)`` : *Boolean*
     Determines if **vmm**\(1) should create also a postmaster account when a
     new domain is created.
 
-``delete_directory`` : *Boolean*
+``delete_directory (default: false)`` : *Boolean*
     Specifies whether the domain directory and all user directories inside
     should be deleted when a domain is deleted.
 
-``directory_mode`` : *Int*
+``directory_mode (default: 504)`` : *Int*
     Access mode for the domain directory in decimal (base 10) notation.
 
     | For example: 'drwxrwx---' -> octal 0770 -> decimal 504
 
-``force_deletion`` : *Boolean*
+``force_deletion (default: false)`` : *Boolean*
     Force deletion of accounts and aliases when a domain is deleted.
 
 Example::
@@ -232,7 +233,7 @@ MAILDIR
 The **maildir** section is used to specify some default options for new
 created Maildirs and folders inside.
 
-``folders`` : *String*
+``folders (default: Drafts:Sent:Templates:Trash)`` : *String*
     A colon separated list of folder names, that should be created. If no
     folders should be created inside the Maildir, set the value of this
     option to a single colon ('**:**').
@@ -240,7 +241,7 @@ created Maildirs and folders inside.
     If you want to create folders containing one or more subfolders, separate
     them with a single dot ('**.**').
 
-``name`` : *String*
+``name (default: Maildir)`` : *String*
     Default name of the Maildir folder in users home directories.
 
 Example::
@@ -253,21 +254,21 @@ MISC
 ----
 The **misc** section is used to define miscellaneous settings.
 
-``base_directory`` : *String*
+``base_directory (default: /srv/mail)`` : *String*
     All domain directories will be created inside this directory.
 
-``password_scheme`` : *String*
+``password_scheme (default: CRAM-MD5)`` : *String*
     Password scheme to use (see also: **dovecotpw -l**).
 
-``gid_mail`` : *Int*
+``gid_mail (default: 8)`` : *Int*
     Numeric group ID of group mail (`mail_privileged_group` from
     *dovecot.conf*)
 
-``transport`` : *String*
+``transport (default: dovecot:)`` : *String*
     Default transport for domains and accounts. For details see
     **transport**\(5).
 
-``dovecot_version`` : *Int*
+``dovecot_version (default: 12)`` : *Int*
     The concatenated major and minor version number of the currently used
     Dovecot version. (see: **dovecot --version**).
 

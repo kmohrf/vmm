@@ -7,7 +7,7 @@ Konfigurationsdatei für vmm
 ---------------------------
 
 :Author:         Pascal Volk <neverseen@users.sourceforge.net>
-:Date:           2010-01-18
+:Date:           2010-01-25
 :Version:        vmm-0.6.0
 :Manual group:   vmm Manual
 :Manual section: 5
@@ -76,18 +76,18 @@ ACCOUNT
 Die Optionen des Abschnitts **account** legen Konto-spezifische
 Einstellungen fest.
 
-``delete_directory`` : *Boolean*
+``delete_directory (Vorgabe: false)`` : *Boolean*
     Bestimmt das Verhalten von **vmm**\(1) beim Löschen eines Kontos.
     Wenn der Wert dieser Option *true* ist, wird das Home-Verzeichnis des
     zu löschenden Anwenders rekursiv gelöscht.
 
-``directory_mode`` : *Int*
+``directory_mode (Vorgabe: 448)`` : *Int*
     Zugriffsbits des Home-Verzeichnisses, sowie aller enthaltenen
     Verzeichnisse, in Dezimal-Schreibweise (Basis 10).
 
     | Beispiel: 'drwx------' -> oktal 0700 -> dezimal 448
 
-``disk_usage`` : *Boolean*
+``disk_usage (Vorgabe: false)`` : *Boolean*
     Legt fest, ob die Festplattenbelegung des Maildirs eines Benutzers jedes
     Mal mit **du**\(1) ermittelt und mit den Konto-Informationen ausgegeben
     werden soll.
@@ -98,17 +98,17 @@ Einstellungen fest.
     eines der optionalen Argumente **du** oder **full** an **userinfo**
     übergeben, um sich die aktuelle Festplattenbelegung anzeigen zu lassen.
 
-``imap`` : *Boolean*
+``imap (Vorgabe: true)`` : *Boolean*
     Bestimmt, ob sich neu angelegte Benutzer per IMAP anmelden können sollen.
 
-``password_length`` : *Int*
+``password_length (Vorgabe: 8)`` : *Int*
     Diese Option legt die Anzahl der Zeichen für automatisch erzeugte
     Passwörter fest. Alle Werte kleiner als 8 werden auf 8 erhöht.
 
-``pop3``
+``pop3 (Vorgabe: true)`` : *Boolean*
     Bestimmt, ob sich neu angelegte Benutzer per POP3 anmelden können sollen.
 
-``random_password`` : *Boolean*
+``random_password (Vorgabe: false)`` : *Boolean*
     Mit dieser Option wird bestimmt , ob **vmm**\(1) ein zufälliges Passwort
     generieren soll, wenn kein Passwort an den **useradd** Unterbefehl
     übergeben wurde. Ist der Wert dieser Option *false*, wird **vmm** Sie
@@ -117,11 +117,11 @@ Einstellungen fest.
     Sie können die Länge für automatisch generierte Passwörter mit der
     Option **password_length** konfigurieren.
 
-``sieve`` : *Boolean*
+``sieve (Vorgabe: true)`` : *Boolean*
     Bestimmt, ob sich neu angelegte Benutzer per ManageSieve anmelden
     können sollen.
 
-``smtp`` : *Boolean*
+``smtp (Vorgabe: true)`` : *Boolean*
     Bestimmt, ob sich neu angelegte Benutzer per SMTP (SMTP AUTH) anmelden
     können sollen.
 
@@ -143,17 +143,17 @@ BIN
 Im **bin**-Abschnitt werden Pfade zu Binaries angegeben, die von
 **vmm**\(1) benötigt werden.
 
-``dovecotpw`` : *String*
+``dovecotpw (Vorgabe: /usr/sbin/dovecotpw)`` : *String*
     Der absolute Pfad zum dovecotpw Binary. Dieses Binary wird zur
     Hash-Erzeugung verwendet, wenn **misc.password_scheme** einen der
     nachfolgenden Werte hat: 'SMD5', 'SSHA', 'CRAM-MD5', 'HMAC-MD5',
     'LANMAN', 'NTLM' oder 'RPA'.
 
-``du`` : *String*
+``du (Vorgabe: /usr/bin/du)`` : *String*
     Der absolute Pfad zu **du**\(1). Dieses Binary wird verwendet, wenn
     die Festplattenbelegung eines Kontos ermittelt wird.
 
-``postconf`` : *String*
+``postconf (Vorgabe: /usr/sbin/postconf)`` : *String*
     Der absolute Pfad zu Postfix' **postconf**\(1). Dieses Binary wird
     verwendet, wenn **vmm**\(1) diverse Postfix-Einstellungen prüft, zum
     Beispiel das `virtual_alias_expansion_limit`.
@@ -170,7 +170,7 @@ CONFIG
 Beim **config**-Abschnitt handelt es sich um einen internen
 Steuerungs-Abschnitt.
 
-``done`` : *Boolean*
+``done (Vorgabe: false)`` : *Boolean*
     Diese Option hat den Wert *false*, wenn **vmm**\(1) zum ersten Mal
     installiert wurde. Wenn Sie die Datei *vmm.cfg* von Hand editieren,
     weisen Sie dieser Option abschließend den Wert *true* zu. Wird die
@@ -190,16 +190,16 @@ DATABASE
 Der **database**-Abschnitt wird verwendet, um die für den Datenbankzugriff
 benötigten Optionen festzulegen.
 
-``host`` : *String*
+``host (Vorgabe: localhost)`` : *String*
     Der Hostname oder die IP-Adresse des Datenbank-Servers.
 
-``name`` : *String*
+``name (Vorgabe: mailsys)`` : *String*
     Der Name der zu verwendenden Datenbank.
 
-``pass`` : *String*
+``pass (Vorgabe: Nichts)`` : *String*
     Das Passwort des Datenbank-Benutzers.
 
-``user`` : *String*
+``user (Vorgabe: Nichts)`` : *String*
     Der Name des Datenbank-Benutzers.
 
 Beispiel::
@@ -214,21 +214,21 @@ DOMAIN
 ------
 Im **domain**-Abschnitt werden Domain-spezifische Informationen konfiguriert.
 
-``auto_postmaster`` : *Boolean*
+``auto_postmaster (Vorgabe: true)`` : *Boolean*
     Ist der Wert dieser Option *true*, wird **vmm**\(1) beim Anlegen einer
     Domain automatisch einen postmaster-Account erstellen.
 
-``delete_directory`` : *Boolean*
+``delete_directory (Vorgabe: false)`` : *Boolean*
     Bestimmt, ob beim Löschen einer Domain das Verzeichnis einer Domain,
     inklusive aller Anwender-Verzeichnisse, rekursiv gelöscht werden soll.
 
-``directory_mode`` : *Int*
+``directory_mode (Vorgabe: 504)`` : *Int*
     Zugriffsbits des Domain-Verzeichnisses in Dezimal-Schreibweise (Basis
     10).
 
     | Beispiel: 'drwxrwx---' -> oktal 0770 -> dezimal 504
 
-``force_deletion`` : *Boolean*
+``force_deletion (Vorgabe: false)`` : *Boolean*
     Erzwingt das Löschen aller zugeordneten Konten und Aliase beim Löschen
     einer Domain.
 
@@ -245,7 +245,7 @@ MAILDIR
 Im **maildir**-Abschnitt werden die für die Maildirs erforderlichen Optionen
 festgelegt.
 
-``folders`` : *String*
+``folders (Vorgabe: Drafts:Sent:Templates:Trash)`` : *String*
     Eine durch Doppelpunkten getrennte Liste mit Verzeichnisnamen, die
     innerhalb des Maildirs erstellt werden sollen. Sollen innerhalb des
     Maildirs keine Verzeichnisse angelegt werden, ist dieser Optionen ein
@@ -254,7 +254,7 @@ festgelegt.
     Sollen Verzeichnisse mit Unterverzeichnissen angelegt werden, ist ein
     einzelner Punkt ('**.**') als Separator zu verwenden.
 
-``name`` : *String*
+``name (Vorgabe: Maildir)`` : *String*
     Der Standard-Name des Maildir-Verzeichnisses im Verzeichnis des
     jeweiligen Anwenders.
 
@@ -268,22 +268,22 @@ MISC
 ----
 Im **misc**-Abschnitt werden verschiedene Einstellungen festgelegt.
 
-``base_directory`` : *String*
+``base_directory (Vorgabe: /srv/mail)`` : *String*
     Alle Domain-Verzeichnisse werden innerhalb dieses Basis-Verzeichnisses
     angelegt.
 
-``password_scheme`` : *String*
+``password_scheme (Vorgabe: CRAM-MD5)`` : *String*
     Das zu verwendende Passwort-Schema (siehe auch: **dovecotpw -l**).
 
-``gid_mail`` : *Int*
+``gid_mail (Vorgabe: 8)`` : *Int*
     Die numerische Gruppen-ID der Gruppe mail, bzw. der Gruppe aus
     `mail_privileged_group` der Datei *dovecot.conf*.
 
-``transport`` : *String*
+``transport (Vorgabe: dovecot:)`` : *String*
     Der Standard-Transport aller Domains und Konten. Siehe auch:
     **transport**\(5)
 
-``dovecot_version`` : *Int*
+``dovecot_version (Vorgabe: 12)`` : *Int*
     Die verketteten Major- und Minor-Teile der eingesetzten Dovecot-Version
     (siehe: **dovecot --version**).
 
