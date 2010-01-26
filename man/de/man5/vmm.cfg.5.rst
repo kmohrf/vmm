@@ -7,7 +7,7 @@ Konfigurationsdatei für vmm
 ---------------------------
 
 :Author:         Pascal Volk <neverseen@users.sourceforge.net>
-:Date:           2010-01-25
+:Date:           2010-01-26
 :Version:        vmm-0.6.0
 :Manual group:   vmm Manual
 :Manual section: 5
@@ -24,12 +24,9 @@ BESCHREIBUNG
 ============
 **vmm**\(1) liest seine Konfigurationsparameter aus der Datei *vmm.cfg*.
 
-Die Konfigurationsdatei ist in mehrere Abschnitte unterteilt. Jeder Abschnitt
-wird mit dem, in eckigen Klammern '**[**' und '**]**' eingefassten, Namen des
-Abschnitts eingeleitet, gefolgt von '*Option* = *Wert*' Einträgen::
-
-    [database]
-    host = 127.0.0.1
+Die Konfigurationsdatei ist in mehrere Sektionen unterteilt. Jede Sektion
+wird mit dem in eckigen Klammern '**[**' und '**]**' eingefassten Namen der
+Sektion eingeleitet, gefolgt von '*Option* = *Wert*' Einträgen.
 
 Leerräume um das Gleichheitszeichen '=' und am Ende eines Wertes werden
 ignoriert.
@@ -54,6 +51,19 @@ Jeder Wert ist von einem der folgenden Datentypen:
 
   | Zum Beispiel: '**Wort**', '**Hallo Welt**' oder '**/usr/bin/strings**'
 
+Die meisten Optionen haben einen Vorgabewert. Dieser ist nach dem Namen der
+Option in Klammern angegebenen. Um den Vorgabewert einer Option zu
+verwenden, wird die entsprechende Zeile entweder mit **#** oder **;**
+auskommentiert oder die Zeile wird einfach aus der *vmm.cfg* entfernt.
+
+Eine minimale *vmm.cfg* könnte so aussehen::
+
+    [database]
+    user = ich
+    pass = xxxxxxxx
+
+    [config]
+    done = true
 
 SUCHREIHENFOLGE
 ---------------
@@ -66,14 +76,14 @@ in der angegebenen Reihenfolge:
 
 Die zuerst gefundene Datei wird verwendet.
 
-ABSCHNITTE
-==========
-Im Folgenden werden die Abschnitte der *vmm.cfg* und deren Optionen
+SEKTIONEN
+=========
+Im Folgenden werden die Sektionen der *vmm.cfg* und deren Optionen
 beschrieben.
 
 ACCOUNT
 -------
-Die Optionen des Abschnitts **account** legen Konto-spezifische
+Die Optionen der Sektion **account** legen Konto-spezifische
 Einstellungen fest.
 
 ``delete_directory (Vorgabe: false)`` : *Boolean*
@@ -140,8 +150,8 @@ Beispiel::
 
 BIN
 ---
-Im **bin**-Abschnitt werden Pfade zu Binaries angegeben, die von
-**vmm**\(1) benötigt werden.
+In der **bin**-Sektion werden die Pfade zu den von **vmm**\(1) benötigten
+Binaries angegeben.
 
 ``dovecotpw (Vorgabe: /usr/sbin/dovecotpw)`` : *String*
     Der absolute Pfad zum dovecotpw Binary. Dieses Binary wird zur
@@ -167,8 +177,8 @@ Beispiel::
 
 CONFIG
 ------
-Beim **config**-Abschnitt handelt es sich um einen internen
-Steuerungs-Abschnitt.
+Bei der **config**-Sektion handelt es sich um einen internen
+Steuerungs-Sektion.
 
 ``done (Vorgabe: false)`` : *Boolean*
     Diese Option hat den Wert *false*, wenn **vmm**\(1) zum ersten Mal
@@ -187,7 +197,7 @@ Beispiel::
 
 DATABASE
 --------
-Der **database**-Abschnitt wird verwendet, um die für den Datenbankzugriff
+Die **database**-Sektion wird verwendet, um die für den Datenbankzugriff
 benötigten Optionen festzulegen.
 
 ``host (Vorgabe: localhost)`` : *String*
@@ -212,7 +222,8 @@ Beispiel::
 
 DOMAIN
 ------
-Im **domain**-Abschnitt werden Domain-spezifische Informationen konfiguriert.
+In der **domain**-Sektion werden Domain-spezifische Informationen
+konfiguriert.
 
 ``auto_postmaster (Vorgabe: true)`` : *Boolean*
     Ist der Wert dieser Option *true*, wird **vmm**\(1) beim Anlegen einer
@@ -242,8 +253,8 @@ Beispiel::
 
 MAILDIR
 -------
-Im **maildir**-Abschnitt werden die für die Maildirs erforderlichen Optionen
-festgelegt.
+In der **maildir**-Sektion werden die für die Maildirs erforderlichen
+Optionen festgelegt.
 
 ``folders (Vorgabe: Drafts:Sent:Templates:Trash)`` : *String*
     Eine durch Doppelpunkten getrennte Liste mit Verzeichnisnamen, die
@@ -266,7 +277,7 @@ Beispiel::
 
 MISC
 ----
-Im **misc**-Abschnitt werden verschiedene Einstellungen festgelegt.
+In der **misc**-Sektion werden verschiedene Einstellungen festgelegt.
 
 ``base_directory (Vorgabe: /srv/mail)`` : *String*
     Alle Domain-Verzeichnisse werden innerhalb dieses Basis-Verzeichnisses
@@ -294,7 +305,7 @@ Beispiel::
 
     [misc]
     base_directory = /srv/mail
-    password_scheme = CRAM-MD5
+    password_scheme = PLAIN
     gid_mail = 8
     transport = dovecot:
     dovecot_version = 11

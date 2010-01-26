@@ -7,7 +7,7 @@ configuration file for vmm
 --------------------------
 
 :Author:         Pascal Volk <neverseen@users.sourceforge.net>
-:Date:           2010-01-25
+:Date:           2010-01-26
 :Version:        vmm-0.6.0
 :Manual group:   vmm Manual
 :Manual section: 5
@@ -26,10 +26,7 @@ DESCRIPTION
 
 The configuration file is split into multiple sections. A section starts with
 the section name, enclosed in square brackets '**[**' and '**]**', followed
-by '*option* = *value*' pairs::
-
-    [database]
-    host = 127.0.0.1
+by '*option* = *value*' pairs.
 
 Whitespace around the '=' and at the end of a value is ignored.
 
@@ -50,6 +47,19 @@ Each value uses one of the following data types:
 * *String* a sequence of characters and numbers.
 
   | For example '**word**', '**hello world**' or '**/usr/bin/strings**'
+
+Most options have a default value, shown in parentheses after the option's
+name. In order to use a option's default setting, comment out the line,
+either with a **#** or **;** or simply remove the setting from *vmm.cfg*.
+
+A minimal *vmm.cfg* would be::
+
+    [database]
+    user = me
+    pass = xxxxxxxx
+
+    [config]
+    done = true
 
 SEARCH ORDER
 -------------
@@ -279,7 +289,7 @@ Example::
 
     [misc]
     base_directory = /srv/mail
-    password_scheme = CRAM-MD5
+    password_scheme = PLAIN
     gid_mail = 8
     transport = dovecot:
     dovecot_version = 11
