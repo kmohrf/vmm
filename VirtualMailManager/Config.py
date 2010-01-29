@@ -140,8 +140,8 @@ class LazyConfig(RawConfigParser):
         return sect_opt
 
     def items(self, section):
-        """returns a ``list`` with key, value ``tuples`` from the given
-        ``section``: ``[(key, value), …]``"""
+        """returns an iterable that returns key, value ``tuples`` from the
+        given ``section``."""
         if section in self._sections:# check if the section was parsed
             d2 = self._sections[section]
         elif not section in self._cfg:
@@ -415,7 +415,7 @@ class Config(LazyConfig):
             self._modified = True
         w_std(_(u'Using configuration file: %s\n') % self.__cfgFileName)
         for s in sections:
-            w_std(_(u'* Config section: “%s”') % s )
+            w_std(_(u'* Configuration section: “%s”') % s )
             for opt, val in self.items(s):
                 failures = 0
                 while True:
