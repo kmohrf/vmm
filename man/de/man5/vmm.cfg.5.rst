@@ -7,22 +7,23 @@ Konfigurationsdatei für vmm
 ---------------------------
 
 :Author:         Pascal Volk <neverseen@users.sourceforge.net>
-:Date:           2010-01-26
+:Date:           2010-01-30
 :Version:        vmm-0.6.0
 :Manual group:   vmm Manual
 :Manual section: 5
 
 .. contents::
-    :backlinks: top
-    :class: htmlout
+  :backlinks: top
+  :class: htmlout
 
 SYNOPSIS
 ========
 vmm.cfg
 
+
 BESCHREIBUNG
 ============
-**vmm**\(1) liest seine Konfigurationsparameter aus der Datei *vmm.cfg*.
+|vmm(1)|_ liest seine Konfigurationsparameter aus der Datei *vmm.cfg*.
 
 Die Konfigurationsdatei ist in mehrere Sektionen unterteilt. Jede Sektion
 wird mit dem in eckigen Klammern '**[**' und '**]**' eingefassten Namen der
@@ -58,274 +59,360 @@ auskommentiert oder die Zeile wird einfach aus der *vmm.cfg* entfernt.
 
 Eine minimale *vmm.cfg* könnte so aussehen::
 
-    [database]
-    user = ich
-    pass = xxxxxxxx
+  [database]
+  user = ich
+  pass = xxxxxxxx
 
-    [config]
-    done = true
+  [config]
+  done = true
+
 
 SUCHREIHENFOLGE
 ---------------
-Standardmäßig sucht **vmm**\(1) die *vmm.cfg* in folgenden Verzeichnissen,
+Standardmäßig sucht |vmm(1)|_ die *vmm.cfg* in folgenden Verzeichnissen,
 in der angegebenen Reihenfolge:
 
-    | */root*
-    | */usr/local/etc*
-    | */etc*
+  | */root*
+  | */usr/local/etc*
+  | */etc*
 
 Die zuerst gefundene Datei wird verwendet.
+
 
 SEKTIONEN
 =========
 Im Folgenden werden die Sektionen der *vmm.cfg* und deren Optionen
 beschrieben.
 
+
 ACCOUNT
 -------
-Die Optionen der Sektion **account** legen Konto-spezifische
-Einstellungen fest.
+Die Optionen der Sektion **account** legen Konto-spezifische Einstellungen
+fest.
+
+.. _account.delete_directory:
 
 ``delete_directory (Vorgabe: false)`` : *Boolean*
-    Bestimmt das Verhalten von **vmm**\(1) beim Löschen eines Kontos.
-    Wenn der Wert dieser Option *true* ist, wird das Home-Verzeichnis des
-    zu löschenden Anwenders rekursiv gelöscht.
+  Bestimmt das Verhalten von |vmm(1)|_ beim Löschen eines Kontos
+  (|userdelete|_). Wenn der Wert dieser Option *true* ist, wird das
+  Home-Verzeichnis des zu löschenden Anwenders rekursiv gelöscht.
+
+.. _account.directory_mode:
 
 ``directory_mode (Vorgabe: 448)`` : *Int*
-    Zugriffsbits des Home-Verzeichnisses, sowie aller enthaltenen
-    Verzeichnisse, in Dezimal-Schreibweise (Basis 10).
+  Zugriffsbits des Home-Verzeichnisses, sowie aller enthaltenen
+  Verzeichnisse, in Dezimal-Schreibweise (Basis 10).
 
-    | Beispiel: 'drwx------' -> oktal 0700 -> dezimal 448
+  | Beispiel: 'drwx------' -> oktal 0700 -> dezimal 448
+
+.. _account.disk_usage:
 
 ``disk_usage (Vorgabe: false)`` : *Boolean*
-    Legt fest, ob die Festplattenbelegung des Maildirs eines Benutzers jedes
-    Mal mit **du**\(1) ermittelt und mit den Konto-Informationen ausgegeben
-    werden soll.
+  Legt fest, ob die Festplattenbelegung des Maildirs eines Benutzers jedes
+  Mal mit **du**\(1) ermittelt und mit den Konto-Informationen ausgegeben
+  werden soll.
 
-    Bei umfangreichen Maildirs kann das langsam sein. Falls Sie Quotas
-    aktiviert haben, wird der **vmm**-Unterbefehl **userinfo** ebenfalls
-    die aktuelle Quota-Nutzung des Kontos mit ausgegeben. Sie können auch
-    eines der optionalen Argumente **du** oder **full** an **userinfo**
-    übergeben, um sich die aktuelle Festplattenbelegung anzeigen zu lassen.
+  Bei umfangreichen Maildirs kann das langsam sein. Falls Sie Quotas
+  aktiviert haben, wird der **vmm**-Unterbefehl |userinfo|_ ebenfalls die
+  aktuelle Quota-Nutzung des Kontos mit ausgegeben. Sie können auch eines
+  der optionalen Argumente **du** oder **full** an |userinfo|_ übergeben,
+  um sich die aktuelle Festplattenbelegung anzeigen zu lassen.
+
+.. _account.imap:
 
 ``imap (Vorgabe: true)`` : *Boolean*
-    Bestimmt, ob sich neu angelegte Benutzer per IMAP anmelden können sollen.
+  Bestimmt, ob sich neu angelegte Benutzer per IMAP anmelden können sollen.
+
+.. _account.password_length:
 
 ``password_length (Vorgabe: 8)`` : *Int*
-    Diese Option legt die Anzahl der Zeichen für automatisch erzeugte
-    Passwörter fest. Alle Werte kleiner als 8 werden auf 8 erhöht.
+  Diese Option legt die Anzahl der Zeichen für automatisch erzeugte
+  Passwörter fest. Alle Werte kleiner als 8 werden auf 8 erhöht.
+
+.. _account.pop3:
 
 ``pop3 (Vorgabe: true)`` : *Boolean*
-    Bestimmt, ob sich neu angelegte Benutzer per POP3 anmelden können sollen.
+  Bestimmt, ob sich neu angelegte Benutzer per POP3 anmelden können sollen.
+
+.. _account.random_password:
 
 ``random_password (Vorgabe: false)`` : *Boolean*
-    Mit dieser Option wird bestimmt , ob **vmm**\(1) ein zufälliges Passwort
-    generieren soll, wenn kein Passwort an den **useradd** Unterbefehl
-    übergeben wurde. Ist der Wert dieser Option *false*, wird **vmm** Sie
-    auffordern, ein Passwort für den neun Account einzugeben.
+  Mit dieser Option wird bestimmt , ob **vmm** ein zufälliges Passwort
+  generieren soll, wenn kein Passwort an den Unterbefehl |useradd|_
+  übergeben wurde. Ist der Wert dieser Option *false*, wird **vmm** Sie
+  auffordern, ein Passwort für den neun Account einzugeben.
 
-    Sie können die Länge für automatisch generierte Passwörter mit der
-    Option **password_length** konfigurieren.
+  Sie können die Länge für automatisch generierte Passwörter mit der Option
+  |account.password_length|_ konfigurieren.
+
+.. _account.sieve:
 
 ``sieve (Vorgabe: true)`` : *Boolean*
-    Bestimmt, ob sich neu angelegte Benutzer per ManageSieve anmelden
-    können sollen.
+  Bestimmt, ob sich neu angelegte Benutzer per ManageSieve anmelden können
+  sollen.
+
+.. _account.smtp:
 
 ``smtp (Vorgabe: true)`` : *Boolean*
-    Bestimmt, ob sich neu angelegte Benutzer per SMTP (SMTP AUTH) anmelden
-    können sollen.
+  Bestimmt, ob sich neu angelegte Benutzer per SMTP (SMTP AUTH) anmelden
+  können sollen.
 
 Beispiel::
 
-    [account]
-    delete_directory = false
-    directory_mode = 448
-    disk_usage = false
-    random_password = true
-    password_length = 10
-    smtp = true
-    pop3 = true
-    imap = true
-    sieve = true
+  [account]
+  delete_directory = false
+  directory_mode = 448
+  disk_usage = false
+  random_password = true
+  password_length = 10
+  smtp = true
+  pop3 = true
+  imap = true
+  sieve = true
+
 
 BIN
 ---
-In der **bin**-Sektion werden die Pfade zu den von **vmm**\(1) benötigten
+In der **bin**-Sektion werden die Pfade zu den von |vmm(1)|_ benötigten
 Binaries angegeben.
 
+.. _bin.dovecotpw:
+
 ``dovecotpw (Vorgabe: /usr/sbin/dovecotpw)`` : *String*
-    Der absolute Pfad zum dovecotpw Binary. Dieses Binary wird zur
-    Hash-Erzeugung verwendet, wenn **misc.password_scheme** einen der
-    nachfolgenden Werte hat: 'SMD5', 'SSHA', 'CRAM-MD5', 'HMAC-MD5',
-    'LANMAN', 'NTLM' oder 'RPA'.
+  Der absolute Pfad zum dovecotpw Binary. Dieses Binary wird zur
+  Hash-Erzeugung verwendet, wenn |misc.password_scheme|_ einen der
+  nachfolgenden Werte hat: 'SMD5', 'SSHA', 'CRAM-MD5', 'HMAC-MD5', 'LANMAN',
+  'NTLM' oder 'RPA'.
+
+.. _bin.du:
 
 ``du (Vorgabe: /usr/bin/du)`` : *String*
-    Der absolute Pfad zu **du**\(1). Dieses Binary wird verwendet, wenn
-    die Festplattenbelegung eines Kontos ermittelt wird.
+  Der absolute Pfad zu **du**\(1). Dieses Binary wird verwendet, wenn die
+  Festplattenbelegung eines Kontos ermittelt wird.
+
+.. _bin.postconf:
 
 ``postconf (Vorgabe: /usr/sbin/postconf)`` : *String*
-    Der absolute Pfad zu Postfix' **postconf**\(1). Dieses Binary wird
-    verwendet, wenn **vmm**\(1) diverse Postfix-Einstellungen prüft, zum
-    Beispiel das `virtual_alias_expansion_limit`.
+  Der absolute Pfad zu Postfix' |postconf(1)|_. Dieses Binary wird
+  verwendet, wenn |vmm(1)|_ diverse Postfix-Einstellungen prüft, zum
+  Beispiel das |virtual_alias_expansion_limit|_.
 
 Beispiel::
 
-    [bin]
-    dovecotpw = /usr/sbin/dovecotpw
-    du = /usr/bin/du
-    postconf = /usr/sbin/postconf
+  [bin]
+  dovecotpw = /usr/sbin/dovecotpw
+  du = /usr/bin/du
+  postconf = /usr/sbin/postconf
+
 
 CONFIG
 ------
-Bei der **config**-Sektion handelt es sich um einen internen
+Bei der **config**-Sektion handelt es sich um eine interne
 Steuerungs-Sektion.
 
-``done (Vorgabe: false)`` : *Boolean*
-    Diese Option hat den Wert *false*, wenn **vmm**\(1) zum ersten Mal
-    installiert wurde. Wenn Sie die Datei *vmm.cfg* von Hand editieren,
-    weisen Sie dieser Option abschließend den Wert *true* zu. Wird die
-    Konfiguration über das Kommando **vmm configure** angepasst, wird der
-    Wert dieser Option automatisch auf *true* gesetzt.
+.. _config.done:
 
-    Ist der Wert dieser Option  *false*, so startet **vmm**\(1) beim
-    nächsten Aufruf im interaktiven Konfigurations-Modus.
+``done (Vorgabe: false)`` : *Boolean*
+  Diese Option hat den Wert *false*, wenn |vmm(1)|_ zum ersten Mal
+  installiert wurde. Wenn Sie die Datei *vmm.cfg* von Hand editieren, weisen
+  Sie dieser Option abschließend den Wert *true* zu. Wird die Konfiguration
+  über das Kommando |vmm configure|_ angepasst, wird der Wert dieser Option
+  automatisch auf *true* gesetzt.
+
+  Ist der Wert dieser Option  *false*, so startet |vmm(1)|_ beim nächsten
+  Aufruf im interaktiven Konfigurations-Modus.
 
 Beispiel::
 
-    [config]
-    done = true
+  [config]
+  done = true
+
 
 DATABASE
 --------
 Die **database**-Sektion wird verwendet, um die für den Datenbankzugriff
 benötigten Optionen festzulegen.
 
+.. _database.host:
+
 ``host (Vorgabe: localhost)`` : *String*
-    Der Hostname oder die IP-Adresse des Datenbank-Servers.
+  Der Hostname oder die IP-Adresse des Datenbank-Servers.
+
+.. _database.name:
 
 ``name (Vorgabe: mailsys)`` : *String*
-    Der Name der zu verwendenden Datenbank.
+  Der Name der zu verwendenden Datenbank.
+
+.. _database.pass:
 
 ``pass (Vorgabe: Nichts)`` : *String*
-    Das Passwort des Datenbank-Benutzers.
+  Das Passwort des Datenbank-Benutzers.
+
+.. _database.user:
 
 ``user (Vorgabe: Nichts)`` : *String*
-    Der Name des Datenbank-Benutzers.
+  Der Name des Datenbank-Benutzers.
 
 Beispiel::
 
-    [database]
-    host = localhost
-    user = vmm
-    pass = PY_SRJ}L/0p-oOk
-    name = mailsys
+  [database]
+  host = localhost
+  user = vmm
+  pass = PY_SRJ}L/0p-oOk
+  name = mailsys
+
 
 DOMAIN
 ------
 In der **domain**-Sektion werden Domain-spezifische Informationen
 konfiguriert.
 
+.. _domain.auto_postmaster:
+
 ``auto_postmaster (Vorgabe: true)`` : *Boolean*
-    Ist der Wert dieser Option *true*, wird **vmm**\(1) beim Anlegen einer
-    Domain automatisch einen postmaster-Account erstellen.
+  Ist der Wert dieser Option *true*, wird |vmm(1)|_ beim Anlegen einer
+  Domain (|domainadd|_) automatisch einen postmaster-Account erstellen.
+
+.. _domain.delete_directory:
 
 ``delete_directory (Vorgabe: false)`` : *Boolean*
-    Bestimmt, ob beim Löschen einer Domain das Verzeichnis einer Domain,
-    inklusive aller Anwender-Verzeichnisse, rekursiv gelöscht werden soll.
+  Bestimmt, ob beim Löschen einer Domain (|domaindelete|_) das Verzeichnis
+  der zu löschenden Domain, inklusive aller Anwender-Verzeichnisse, rekursiv
+  gelöscht werden soll.
+
+.. _domain.directory_mode:
 
 ``directory_mode (Vorgabe: 504)`` : *Int*
-    Zugriffsbits des Domain-Verzeichnisses in Dezimal-Schreibweise (Basis
-    10).
+  Zugriffsbits des Domain-Verzeichnisses in Dezimal-Schreibweise (Basis 10).
 
-    | Beispiel: 'drwxrwx---' -> oktal 0770 -> dezimal 504
+  | Beispiel: 'drwxrwx---' -> oktal 0770 -> dezimal 504
+
+.. _domain.force_deletion:
 
 ``force_deletion (Vorgabe: false)`` : *Boolean*
-    Erzwingt das Löschen aller zugeordneten Konten und Aliase beim Löschen
-    einer Domain.
+  Erzwingt das Löschen aller zugeordneten Konten und Aliase beim Löschen
+  einer Domain (|domaindelete|_).
 
 Beispiel::
 
-    [domain]
-    auto_postmaster = true
-    delete_directory = false
-    directory_mode = 504
-    force_deletion = false
+  [domain]
+  auto_postmaster = true
+  delete_directory = false
+  directory_mode = 504
+  force_deletion = false
+
 
 MAILDIR
 -------
 In der **maildir**-Sektion werden die für die Maildirs erforderlichen
 Optionen festgelegt.
 
-``folders (Vorgabe: Drafts:Sent:Templates:Trash)`` : *String*
-    Eine durch Doppelpunkten getrennte Liste mit Verzeichnisnamen, die
-    innerhalb des Maildirs erstellt werden sollen. Sollen innerhalb des
-    Maildirs keine Verzeichnisse angelegt werden, ist dieser Optionen ein
-    einzelner Doppelpunkt ('**:**') als Wert zuzuweisen.
+.. _maildir.folders:
 
-    Sollen Verzeichnisse mit Unterverzeichnissen angelegt werden, ist ein
-    einzelner Punkt ('**.**') als Separator zu verwenden.
+``folders (Vorgabe: Drafts:Sent:Templates:Trash)`` : *String*
+  Eine durch Doppelpunkten getrennte Liste mit Verzeichnisnamen, die
+  innerhalb des Maildirs erstellt werden sollen. Sollen innerhalb des
+  Maildirs keine Verzeichnisse angelegt werden, ist dieser Optionen ein
+  einzelner Doppelpunkt ('**:**') als Wert zuzuweisen.
+
+  Sollen Verzeichnisse mit Unterverzeichnissen angelegt werden, ist ein
+  einzelner Punkt ('**.**') als Separator zu verwenden.
+
+.. _maildir.name:
 
 ``name (Vorgabe: Maildir)`` : *String*
-    Der Standard-Name des Maildir-Verzeichnisses im Verzeichnis des
-    jeweiligen Anwenders.
+  Der Standard-Name des Maildir-Verzeichnisses im Verzeichnis des jeweiligen
+  Anwenders.
 
 Beispiel::
 
-    [maildir]
-    folders = Drafts:Sent:Templates:Trash:Lists.Dovecot:Lists.Postfix
-    name = Maildir
+  [maildir]
+  folders = Drafts:Sent:Templates:Trash:Lists.Dovecot:Lists.Postfix
+  name = Maildir
+
+.. _imap_uft7:
+
+.. note:: Sollen in der **folders**-Einstellung internationalisierte Namen
+  für Maildir-Verzeichnisse verwendet werden, sind diese in einer
+  modifizierten Variante des UTF-7-Zeichensatzes (siehe :RFC:`3501`, Sektion
+  5.1.3) anzugeben.
+
+  Dovecot stellt seit Version 1.2.0 das nützlich Hilfsprogramm **imap-utf7**
+  zur Verfügung. Dieses dient zur mUTF-7 <-> UTF-8 Konvertierung.
+..
+
+imap-utf7 Beispiel::
+
+  user@host:~$ /usr/local/libexec/dovecot/imap-utf7 -r Wysłane
+  Wys&AUI-ane
+  user@host:~$ /usr/local/libexec/dovecot/imap-utf7 "&AVo-mietnik"
+  Śmietnik
+
 
 MISC
 ----
 In der **misc**-Sektion werden verschiedene Einstellungen festgelegt.
 
+.. _misc.base_directory:
+
 ``base_directory (Vorgabe: /srv/mail)`` : *String*
-    Alle Domain-Verzeichnisse werden innerhalb dieses Basis-Verzeichnisses
-    angelegt.
+  Alle Domain-Verzeichnisse werden innerhalb dieses Basis-Verzeichnisses
+  angelegt.
+
+.. _misc.password_scheme:
 
 ``password_scheme (Vorgabe: CRAM-MD5)`` : *String*
-    Das zu verwendende Passwort-Schema (siehe auch: **dovecotpw -l**).
+  Das zu verwendende Passwort-Schema (siehe auch: **dovecotpw -l**).
+
+.. _misc.gid_mail:
 
 ``gid_mail (Vorgabe: 8)`` : *Int*
-    Die numerische Gruppen-ID der Gruppe mail, bzw. der Gruppe aus
-    `mail_privileged_group` der Datei *dovecot.conf*.
+  Die numerische Gruppen-ID der Gruppe mail, bzw. der Gruppe aus
+  `mail_privileged_group` der Datei *dovecot.conf*.
+
+.. _misc.transport:
 
 ``transport (Vorgabe: dovecot:)`` : *String*
-    Der Standard-Transport aller Domains und Konten. Siehe auch:
-    **transport**\(5)
+  Der Standard-Transport aller Domains und Konten. Siehe auch:
+  |transport(5)|_
+
+.. _misc.dovecot_version:
 
 ``dovecot_version (Vorgabe: 12)`` : *Int*
-    Die verketteten Major- und Minor-Teile der eingesetzten Dovecot-Version
-    (siehe: **dovecot --version**).
+  Die verketteten Major- und Minor-Teile der eingesetzten Dovecot-Version
+  (siehe: **dovecot --version**).
 
-    Wenn das Kommando **dovecot --version** zum Beispiel *1.1.18* ausgibt,
-    ist dieser Option der Wert **11** zuzuweisen.
+  Wenn das Kommando **dovecot --version** zum Beispiel *1.1.18* ausgibt, ist
+  dieser Option der Wert **11** zuzuweisen.
 
 Beispiel::
 
-    [misc]
-    base_directory = /srv/mail
-    password_scheme = PLAIN
-    gid_mail = 8
-    transport = dovecot:
-    dovecot_version = 11
+  [misc]
+  base_directory = /srv/mail
+  password_scheme = PLAIN
+  gid_mail = 8
+  transport = dovecot:
+  dovecot_version = 11
+
 
 DATEIEN
 =======
 */root/vmm.cfg*
-    | Wird verwendet, falls vorhanden.
+  | Wird verwendet, falls vorhanden.
 */usr/local/etc/vmm.cfg*
-    | Wird verwendet, sollte obige Datei nicht gefunden werden.
+  | Wird verwendet, sollte obige Datei nicht gefunden werden.
 */etc/vmm.cfg*
-    | Wird verwendet, falls obengenannte Dateien nicht existieren.
+  | Wird verwendet, falls obengenannte Dateien nicht existieren.
 
 SIEHE AUCH
 ==========
-vmm(1), Programm für die Kommandozeile, um E-Mail-Domains, -Konten und -Aliase
-zu verwalten.
+|vmm(1)|_
+
 
 COPYING
 =======
 vmm und die dazugehörigen Manualseiten wurden von Pascal Volk geschrieben
 und sind unter den Bedingungen der BSD Lizenz lizenziert.
 
+.. include:: ../../substitute_links.rst
+.. include:: ../../substitute_links_5.rst

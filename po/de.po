@@ -507,7 +507,7 @@ msgstr ""
 "  Unterbefehl              Objekt             args (* = optional)\n"
 
 #: vmm:65 vmm:76
-#, fuzzy, python-format
+#, python-format
 msgid "Error: %s\n"
 msgstr "Fehler: %s\n"
 
@@ -705,5 +705,5 @@ msgstr ""
 #: vmm:543
 #, python-format
 msgid "Error: %s"
-msgstr "Fehler %s"
+msgstr "Fehler: %s"
 
