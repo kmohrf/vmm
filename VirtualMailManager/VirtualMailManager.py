@@ -49,7 +49,7 @@ class VirtualMailManager(object):
         if self.__chkCfgFile():
             self.__Cfg = Cfg(self.__cfgFileName)
             self.__Cfg.load()
-        if not os.sys.argv[1] in ['cf', 'configure']:
+        if not os.sys.argv[1] in ('cf','configure','h','help','v','version'):
             self.__Cfg.check()
             self.__chkenv()
             self.__scheme = self.__Cfg.dget('misc.password_scheme')
