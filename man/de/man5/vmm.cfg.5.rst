@@ -7,7 +7,7 @@ Konfigurationsdatei für vmm
 ---------------------------
 
 :Author:         Pascal Volk <neverseen@users.sourceforge.net>
-:Date:           2010-01-30
+:Date:           2010-02-01
 :Version:        vmm-0.6.0
 :Manual group:   vmm Manual
 :Manual section: 5
@@ -62,9 +62,6 @@ Eine minimale *vmm.cfg* könnte so aussehen::
   [database]
   user = ich
   pass = xxxxxxxx
-
-  [config]
-  done = true
 
 
 SUCHREIHENFOLGE
@@ -203,29 +200,6 @@ Beispiel::
   dovecotpw = /usr/sbin/dovecotpw
   du = /usr/bin/du
   postconf = /usr/sbin/postconf
-
-
-CONFIG
-------
-Bei der **config**-Sektion handelt es sich um eine interne
-Steuerungs-Sektion.
-
-.. _config.done:
-
-``done (Vorgabe: false)`` : *Boolean*
-  Diese Option hat den Wert *false*, wenn |vmm(1)|_ zum ersten Mal
-  installiert wurde. Wenn Sie die Datei *vmm.cfg* von Hand editieren, weisen
-  Sie dieser Option abschließend den Wert *true* zu. Wird die Konfiguration
-  über das Kommando |vmm configure|_ angepasst, wird der Wert dieser Option
-  automatisch auf *true* gesetzt.
-
-  Ist der Wert dieser Option  *false*, so startet |vmm(1)|_ beim nächsten
-  Aufruf im interaktiven Konfigurations-Modus.
-
-Beispiel::
-
-  [config]
-  done = true
 
 
 DATABASE

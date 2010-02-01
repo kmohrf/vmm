@@ -445,11 +445,10 @@ class VirtualMailManager(object):
 
         Keyword arguments:
         section -- the section to configure (default None):
-            'database', 'maildir', 'bin' or 'misc'
         """
         if section is None:
             self.__Cfg.configure(self.__Cfg.getsections())
-        elif section in self.__Cfg.getsections():
+        elif self.__Cfg.has_section(section):
             self.__Cfg.configure([section])
         else:
             raise VMMException(_(u"Invalid section: “%s”") % section,

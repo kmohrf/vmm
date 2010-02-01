@@ -7,7 +7,7 @@ configuration file for vmm
 --------------------------
 
 :Author:         Pascal Volk <neverseen@users.sourceforge.net>
-:Date:           2010-01-30
+:Date:           2010-02-01
 :Version:        vmm-0.6.0
 :Manual group:   vmm Manual
 :Manual section: 5
@@ -58,9 +58,6 @@ A minimal *vmm.cfg* would be::
   [database]
   user = me
   pass = xxxxxxxx
-
-  [config]
-  done = true
 
 
 SEARCH ORDER
@@ -193,27 +190,6 @@ Example::
   dovecotpw = /usr/sbin/dovecotpw
   du = /usr/bin/du
   postconf = /usr/sbin/postconf
-
-
-CONFIG
-------
-The **config** section is an internal used control section.
-
-.. _config.done:
-
-``done (default: false)`` : *Boolean*
-  This option is set to *false* when |vmm(1)|_ is installed for the first
-  time. When you edit *vmm.cfg*, set this option to *true*. This option is
-  also set to *true* when you configure |vmm(1)|_ with the command |vmm
-  configure|_.
-
-  If this option is set to *false*, |vmm(1)|_ will start in the interactive
-  configurations mode.
-
-Example::
-
-  [config]
-  done = true
 
 
 DATABASE

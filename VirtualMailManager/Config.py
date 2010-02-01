@@ -320,7 +320,6 @@ class Config(LazyConfig):
                                        self.known_scheme),
                 'transport':       LCO(str, 'dovecot:',  self.get),
             },
-            'config': {'done': LCO(bool_t, False, self.get_boolean)}
         }
 
     def load(self):
@@ -354,8 +353,8 @@ class Config(LazyConfig):
             raise VMMConfigException(errmsg.getvalue(), ERR.CONF_ERROR)
 
     def getsections(self):
-        """Returns a generator object for all configurable sections."""
-        return (s for s in self._cfg.iterkeys() if s != 'config')
+        """Returns an iterator object for all configuration sections."""
+        return self._cfg.iterkeys()
 
     def is_dir(self, path):
         """Checks if ``path`` is a directory.
@@ -409,10 +408,6 @@ class Config(LazyConfig):
 [%(current_value)s]: ')
         failures = 0
 
-        # if config.done == false (default at 1st run),
-        # then set changes true
-        if not self.dget('config.done'):
-            self._modified = True
         w_std(_(u'Using configuration file: %s\n') % self.__cfgFileName)
         for s in sections:
             w_std(_(u'* Configuration section: “%s”') % s )
@@ -440,7 +435,6 @@ class Config(LazyConfig):
 
     def __saveChanges(self):
         """Writes changes to the configuration file."""
-        self.set('config.done', True)
         copy2(self.__cfgFileName, self.__cfgFileName+'.bak')
         self.__cfgFile = open(self.__cfgFileName, 'w')
         self.write(self.__cfgFile)
