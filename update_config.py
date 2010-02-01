@@ -36,7 +36,7 @@ def update(cp):
         raise SystemExit(3)
 
 def get_cfg_parser(cf):
-    fh = file(cf, 'r')
+    fh = open(cf, 'r')
     cp = ConfigParser()
     cp.readfp(fh)
     fh.close()
@@ -44,7 +44,7 @@ def get_cfg_parser(cf):
 
 def update_cfg_file(cp, cf):
     copy2(cf, cf+'.bak.'+str(time()))
-    fh = file(cf, 'w')
+    fh = open(cf, 'w')
     cp.write(fh)
     fh.close()
 
@@ -72,6 +72,9 @@ def get_option(cp, src):
     return cp.get(ss, so)
 
 def upd_052(cp):
+    global had_config
+
+    had_config = cp.remove_section('config')
     add_sections(cp, ('domain', 'account'))
     if cp.has_section('domdir'):
         for src, dst in (('domdir.mode',   'domain.directory_mode'),
@@ -90,23 +93,23 @@ def upd_052(cp):
                      ('misc.passwdscheme', 'misc.password_scheme'),
                      ('misc.dovecotvers',  'misc.dovecot_version')):
         move_option(cp, src, dst)
-    for dst, val in (('account.random_password', 'false'),
-                     ('account.password_length', '8'),
-                     ('domain.auto_postmaster',  'true')):
-        add_option(cp, dst, val)
 
 # def main():
 if __name__ == '__main__':
     sect_opt = []
+    had_config = False
     cf = get_config_file()
     cp = get_cfg_parser(cf)
     update(cp)
     if len(sect_opt):
+        had_config = False
         update_cfg_file(cp, cf)
         sect_opt.sort()
         print 'Please have a look at your configuration: %s' %cf
         print 'This are your Renamed/New settings:'
         for s_o, st in sect_opt:
             print '%s   %s = %s' % (st, s_o, get_option(cp, s_o))
+    if had_config:
+        update_cfg_file(cp, cf)
+        print 'Removed section "config" with option "done" (obsolte)'
         print
-
