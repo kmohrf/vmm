@@ -4,10 +4,10 @@
 
 """Virtual Mail Manager's Alias class to manage e-mail aliases."""
 
-from __main__ import ERR
-from Exceptions import VMMAliasException as VMMAE
-from Domain import Domain
-from EmailAddress import EmailAddress
+import VirtualMailManager.constants.ERROR as ERR
+from VirtualMailManager.Domain import Domain
+from VirtualMailManager.EmailAddress import EmailAddress
+from VirtualMailManager.Exceptions import VMMAliasException as VMMAE
 import VirtualMailManager as VMM
 
 class Alias(object):

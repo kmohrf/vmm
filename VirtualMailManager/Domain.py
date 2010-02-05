@@ -6,12 +6,16 @@
 
 from random import choice
 
-from __main__ import ERR
-from Exceptions import VMMDomainException as VMMDE
-import VirtualMailManager as VMM
-from Transport import Transport
+from VirtualMailManager import chk_domainname
+from VirtualMailManager.constants.ERROR import \
+     ACCOUNT_AND_ALIAS_PRESENT, ACCOUNT_PRESENT, ALIAS_PRESENT, \
+     DOMAIN_ALIAS_EXISTS, DOMAIN_EXISTS, NO_SUCH_DOMAIN
+from VirtualMailManager.Exceptions import VMMDomainException as VMMDE
+from VirtualMailManager.Transport import Transport
+
 
 MAILDIR_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz'
+
 
 class Domain(object):
     """Class to manage e-mail domains."""
@@ -25,7 +29,7 @@ class Domain(object):
         transport -- default vmm.cfg/misc/transport  (str)
         """
         self._dbh = dbh
-        self._name = VMM.VirtualMailManager.chkDomainname(domainname)
+        self._name = chk_domainname(domainname)
         self._basedir = basedir
         if transport is not None:
             self._transport = Transport(self._dbh, transport=transport)
@@ -34,8 +38,8 @@ class Domain(object):
         self._id = 0
         self._domaindir = None
         if not self._exists() and self._isAlias():
-            raise VMMDE(_(u"The domain “%s” is an alias domain.") %self._name,
-                    ERR.DOMAIN_ALIAS_EXISTS)
+            raise VMMDE(_(u"The domain “%s” is an alias domain.") % self._name,
+                        DOMAIN_ALIAS_EXISTS)
 
     def _exists(self):
         """Checks if the domain already exists.
@@ -120,13 +124,11 @@ class Domain(object):
             hasAlias = False
         if hasUser and hasAlias:
             raise VMMDE(_(u'There are accounts and aliases.'),
-                ERR.ACCOUNT_AND_ALIAS_PRESENT)
+                ACCOUNT_AND_ALIAS_PRESENT)
         elif hasUser:
-            raise VMMDE(_(u'There are accounts.'),
-                ERR.ACCOUNT_PRESENT)
+            raise VMMDE(_(u'There are accounts.'), ACCOUNT_PRESENT)
         elif hasAlias:
-            raise VMMDE(_(u'There are aliases.'),
-                ERR.ALIAS_PRESENT)
+            raise VMMDE(_(u'There are aliases.'), ALIAS_PRESENT)
 
     def save(self):
         """Stores the new domain in the database."""
@@ -141,7 +143,7 @@ class Domain(object):
             dbc.close()
         else:
             raise VMMDE(_(u'The domain “%s” already exists.') % self._name,
-                ERR.DOMAIN_EXISTS)
+                        DOMAIN_EXISTS)
 
     def delete(self, delUser=False, delAlias=False):
         """Deletes the domain.
@@ -159,7 +161,7 @@ class Domain(object):
             dbc.close()
         else:
             raise VMMDE(_(u"The domain “%s” doesn't exist.") % self._name,
-                ERR.NO_SUCH_DOMAIN)
+                        NO_SUCH_DOMAIN)
 
     def updateTransport(self, transport, force=False):
         """Sets a new transport for the domain.
@@ -185,7 +187,7 @@ class Domain(object):
             dbc.close()
         else:
             raise VMMDE(_(u"The domain “%s” doesn't exist.") % self._name,
-                ERR.NO_SUCH_DOMAIN)
+                        NO_SUCH_DOMAIN)
 
     def getID(self):
         """Returns the ID of the domain."""
@@ -216,7 +218,7 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts,
         dbc.close()
         if info is None:
             raise VMMDE(_(u"The domain “%s” doesn't exist.") % self._name,
-                    ERR.NO_SUCH_DOMAIN)
+                        NO_SUCH_DOMAIN)
         else:
             keys = ['gid', 'domainname', 'transport', 'domaindir',
                     'aliasdomains', 'accounts', 'aliases', 'relocated']
@@ -278,7 +280,7 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts,
 
 def search(dbh, pattern=None, like=False):
     if pattern is not None and like is False:
-        pattern = VMM.VirtualMailManager.chkDomainname(pattern)
+        pattern = chk_domainname(pattern)
     sql = 'SELECT gid, domainname, is_primary FROM domain_name'
     if pattern is None:
         pass

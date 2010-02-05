@@ -4,10 +4,10 @@
 
 """Virtual Mail Manager's Relocated class to manage relocated users."""
 
-from __main__ import ERR
-from Exceptions import VMMRelocatedException as VMMRE
-from Domain import Domain
-from EmailAddress import EmailAddress
+import VirtualMailManager.constants.ERROR as ERR
+from VirtualMailManager.Domain import Domain
+from VirtualMailManager.EmailAddress import EmailAddress
+from VirtualMailManager.Exceptions import VMMRelocatedException as VMMRE
 import VirtualMailManager as VMM
 
 class Relocated(object):

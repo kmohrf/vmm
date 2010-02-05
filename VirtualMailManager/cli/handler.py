@@ -2,40 +2,49 @@
 # Copyright (c) 2007 - 2010, Pascal Volk
 # See COPYING for distribution information.
 
-"""The main class for vmm."""
+"""
+   VirtualMailManager.Handler
 
+   A wrapper class. It wraps round all other classes and does some
+   dependencies checks.
 
-from encodings.idna import ToASCII, ToUnicode
-from getpass import getpass
+   Additionally it communicates with the PostgreSQL database, creates
+   or deletes directories of domains or users.
+"""
+
+import os
+import re
+
 from shutil import rmtree
 from subprocess import Popen, PIPE
 
 from pyPgSQL import PgSQL # python-pgsql - http://pypgsql.sourceforge.net
 
-from __main__ import os, re, ENCODING, ERR, w_std
-from ext.Postconf import Postconf
-from Account import Account
-from Alias import Alias
-from AliasDomain import AliasDomain
-from Config import Config as Cfg
-from Domain import Domain
-from EmailAddress import EmailAddress
-from Exceptions import *
-from Relocated import Relocated
+import VirtualMailManager.constants.ERROR as ERR
+from VirtualMailManager import ENCODING, ace2idna, exec_ok, read_pass
+from VirtualMailManager.Account import Account
+from VirtualMailManager.Alias import Alias
+from VirtualMailManager.AliasDomain import AliasDomain
+from VirtualMailManager.Config import Config as Cfg
+from VirtualMailManager.Domain import Domain
+from VirtualMailManager.EmailAddress import EmailAddress
+from VirtualMailManager.Exceptions import *
+from VirtualMailManager.Relocated import Relocated
+from VirtualMailManager.ext.Postconf import Postconf
 
 SALTCHARS = './0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-RE_ASCII_CHARS = """^[\x20-\x7E]*$"""
-RE_DOMAIN = """^(?:[a-z0-9-]{1,63}\.){1,}[a-z]{2,6}$"""
 RE_DOMAIN_SRCH = """^[a-z0-9-\.]+$"""
 RE_LOCALPART = """[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]"""
 RE_MBOX_NAMES = """^[\x20-\x25\x27-\x7E]*$"""
 
-class VirtualMailManager(object):
-    """The main class for vmm"""
+class Handler(object):
+    """Wrapper class to simplify the access on all the stuff from
+    VirtualMailManager"""
+    # TODO: accept a LazyConfig object as argument
     __slots__ = ('__Cfg', '__cfgFileName', '__dbh', '__scheme', '__warnings',
                  '_postconf')
     def __init__(self):
-        """Creates a new VirtualMailManager instance.
+        """Creates a new Handler instance.
         Throws a VMMNotRootException if your uid is greater 0.
         """
         self.__cfgFileName = ''
@@ -93,18 +102,25 @@ class VirtualMailManager(object):
 (vmm.cfg: section "misc", option "base_directory")') %
                                  basedir, ERR.NO_SUCH_DIRECTORY)
         for opt, val in self.__Cfg.items('bin'):
-            if not os.path.exists(val):
-                raise VMMException(_(u'“%(binary)s” doesn\'t exist.\n\
+            try:
+                exec_ok(val)
+            except VMMException, e:
+                code = e.code()
+                if code is ERR.NO_SUCH_BINARY:
+                    raise VMMException(_(u'“%(binary)s” doesn\'t exist.\n\
 (vmm.cfg: section "bin", option "%(option)s")') %{'binary': val,'option': opt},
-                    ERR.NO_SUCH_BINARY)
-            elif not os.access(val, os.X_OK):
-                raise VMMException(_(u'“%(binary)s” is not executable.\n\
+                                       ERR.NO_SUCH_BINARY)
+                elif code is ERR.NOT_EXECUTABLE:
+                    raise VMMException(_(u'“%(binary)s” is not executable.\n\
 (vmm.cfg: section "bin", option "%(option)s")') %{'binary': val,'option': opt},
-                    ERR.NOT_EXECUTABLE)
+                                       ERR.NOT_EXECUTABLE)
+                else:
+                    raise
 
     def __dbConnect(self):
         """Creates a pyPgSQL.PgSQL.connection instance."""
-        if self.__dbh is None or not self.__dbh._isOpen:
+        if self.__dbh is None or (isinstance(self.__dbh, PgSQL.Connection) and
+                                  not self.__dbh._isOpen):
             try:
                 self.__dbh = PgSQL.connect(
                         database=self.__Cfg.dget('database.name'),
@@ -117,42 +133,6 @@ class VirtualMailManager(object):
                 dbc.close()
             except PgSQL.libpq.DatabaseError, e:
                 raise VMMException(str(e), ERR.DATABASE_ERROR)
-
-    def idn2ascii(domainname):
-        """Converts an idn domainname in punycode.
-
-        Arguments:
-        domainname -- the domainname to convert (unicode)
-        """
-        return '.'.join([ToASCII(lbl) for lbl in domainname.split('.') if lbl])
-    idn2ascii = staticmethod(idn2ascii)
-
-    def ace2idna(domainname):
-        """Convertis a domainname from ACE according to IDNA
-
-        Arguments:
-        domainname -- the domainname to convert (str)
-        """
-        return u'.'.join([ToUnicode(lbl) for lbl in domainname.split('.')\
-                if lbl])
-    ace2idna = staticmethod(ace2idna)
-
-    def chkDomainname(domainname):
-        """Validates the domain name of an e-mail address.
-
-        Keyword arguments:
-        domainname -- the domain name that should be validated
-        """
-        if not re.match(RE_ASCII_CHARS, domainname):
-            domainname = VirtualMailManager.idn2ascii(domainname)
-        if len(domainname) > 255:
-            raise VMMException(_(u'The domain name is too long.'),
-                ERR.DOMAIN_TOO_LONG)
-        if not re.match(RE_DOMAIN, domainname):
-            raise VMMException(_(u'The domain name “%s” is invalid.') %\
-                    domainname, ERR.DOMAIN_INVALID)
-        return domainname
-    chkDomainname = staticmethod(chkDomainname)
 
     def _exists(dbh, query):
         dbc = dbh.cursor()
@@ -169,46 +149,23 @@ class VirtualMailManager(object):
         sql = "SELECT gid FROM users WHERE gid = (SELECT gid FROM domain_name\
  WHERE domainname = '%s') AND local_part = '%s'" % (address._domainname,
             address._localpart)
-        return VirtualMailManager._exists(dbh, sql)
+        return Handler._exists(dbh, sql)
     accountExists = staticmethod(accountExists)
 
     def aliasExists(dbh, address):
         sql = "SELECT DISTINCT gid FROM alias WHERE gid = (SELECT gid FROM\
  domain_name WHERE domainname = '%s') AND address = '%s'" %\
             (address._domainname, address._localpart)
-        return VirtualMailManager._exists(dbh, sql)
+        return Handler._exists(dbh, sql)
     aliasExists = staticmethod(aliasExists)
 
     def relocatedExists(dbh, address):
         sql = "SELECT gid FROM relocated WHERE gid = (SELECT gid FROM\
  domain_name WHERE domainname = '%s') AND address = '%s'" %\
             (address._domainname, address._localpart)
-        return VirtualMailManager._exists(dbh, sql)
+        return Handler._exists(dbh, sql)
     relocatedExists = staticmethod(relocatedExists)
 
-    def _readpass(self):
-        # TP: Please preserve the trailing space.
-        readp_msg0 = _(u'Enter new password: ').encode(ENCODING, 'replace')
-        # TP: Please preserve the trailing space.
-        readp_msg1 = _(u'Retype new password: ').encode(ENCODING, 'replace')
-        mismatched = True
-        flrs = 0
-        while mismatched:
-            if flrs > 2:
-                raise VMMException(_(u'Too many failures - try again later.'),
-                        ERR.VMM_TOO_MANY_FAILURES)
-            clear0 = getpass(prompt=readp_msg0)
-            clear1 = getpass(prompt=readp_msg1)
-            if clear0 != clear1:
-                flrs += 1
-                w_std(_(u'Sorry, passwords do not match'))
-                continue
-            if len(clear0) < 1:
-                flrs += 1
-                w_std(_(u'Sorry, empty passwords are not permitted'))
-                continue
-            mismatched = False
-        return clear0
 
     def __getAccount(self, address, password=None):
         self.__dbConnect()
@@ -500,8 +457,7 @@ The keyword “detailed” is deprecated and will be removed in a future release
         dom = self.__getDomain(domainname)
         dominfo = dom.getInfo()
         if dominfo['domainname'].startswith('xn--'):
-            dominfo['domainname'] += ' (%s)'\
-                % VirtualMailManager.ace2idna(dominfo['domainname'])
+            dominfo['domainname'] += ' (%s)' % ace2idna(dominfo['domainname'])
         if details is None:
             return dominfo
         elif details == 'accounts':
@@ -575,7 +531,7 @@ The keyword “detailed” is deprecated and will be removed in a future release
     def userAdd(self, emailaddress, password):
         acc = self.__getAccount(emailaddress, password)
         if password is None:
-            password = self._readpass()
+            password = read_pass()
             acc.setPassword(self.__pwhash(password))
         acc.save(self.__Cfg.dget('maildir.name'),
                  self.__Cfg.dget('misc.dovecot_version'),
@@ -589,8 +545,8 @@ The keyword “detailed” is deprecated and will be removed in a future release
         alias = self.__getAlias(aliasaddress, targetaddress)
         alias.save(long(self._postconf.read('virtual_alias_expansion_limit')))
         gid = self.__getDomain(alias._dest._domainname).getID()
-        if gid > 0 and not VirtualMailManager.accountExists(self.__dbh,
-        alias._dest) and not VirtualMailManager.aliasExists(self.__dbh,
+        if gid > 0 and not Handler.accountExists(self.__dbh,
+        alias._dest) and not Handler.aliasExists(self.__dbh,
         alias._dest):
             self.__warnings.append(
                 _(u"The destination account/alias “%s” doesn't exist.")%\
@@ -642,7 +598,7 @@ The account has been successfully deleted from the database.
         return info
 
     def userByID(self, uid):
-        from Account import getAccountByID
+        from Handler.Account import getAccountByID
         self.__dbConnect()
         return getAccountByID(uid, self.__dbh)
 
@@ -651,7 +607,7 @@ The account has been successfully deleted from the database.
         if acc.getUID() == 0:
            raise VMMException(_(u"Account doesn't exist"), ERR.NO_SUCH_ACCOUNT)
         if password is None:
-            password = self._readpass()
+            password = read_pass()
         acc.modify('password', self.__pwhash(password, user=emailaddress))
 
     def userName(self, emailaddress, name):
@@ -695,5 +651,5 @@ The service name “managesieve” is deprecated and will be removed\n\
         relocated.delete()
 
     def __del__(self):
-        if not self.__dbh is None and self.__dbh._isOpen:
+        if isinstance(self.__dbh, PgSQL.Connection) and self.__dbh._isOpen:
             self.__dbh.close()

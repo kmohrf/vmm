@@ -5,8 +5,10 @@
 """Virtual Mail Manager's MailLocation class to manage the mail_location
 for accounts."""
 
-from __main__ import re, ERR
-from Exceptions import VMMMailLocationException as MLE
+import re
+
+import VirtualMailManager.constants.ERROR as ERR
+from VirtualMailManager.Exceptions import VMMMailLocationException as MLE
 
 RE_MAILLOCATION = """^\w{1,20}$"""
 

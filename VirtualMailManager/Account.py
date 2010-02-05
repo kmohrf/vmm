@@ -4,12 +4,12 @@
 
 """Virtual Mail Manager's Account class to manage e-mail accounts."""
 
-from __main__ import ERR
-from Exceptions import VMMAccountException as AccE
-from Domain import Domain
-from Transport import Transport
-from MailLocation import MailLocation
-from EmailAddress import EmailAddress
+import VirtualMailManager.constants.ERROR as ERR
+from VirtualMailManager.Domain import Domain
+from VirtualMailManager.EmailAddress import EmailAddress
+from VirtualMailManager.Exceptions import VMMAccountException as AccE
+from VirtualMailManager.MailLocation import MailLocation
+from VirtualMailManager.Transport import Transport
 import VirtualMailManager as VMM
 
 class Account(object):

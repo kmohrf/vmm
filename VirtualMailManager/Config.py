@@ -36,10 +36,13 @@ This module defines a few classes:
 from shutil import copy2
 from ConfigParser import (Error, MissingSectionHeaderError, NoOptionError,
                           NoSectionError, ParsingError, RawConfigParser)
-from cStringIO import StringIO
+from cStringIO import StringIO# TODO: move interactive stff to cli
 
-from __main__ import os, ENCODING, ERR, get_unicode, w_std
-from Exceptions import VMMConfigException
+import VirtualMailManager.constants.ERROR as ERR
+
+from VirtualMailManager import ENCODING, exec_ok, get_unicode, is_dir
+from VirtualMailManager.cli import w_std# move to cli
+from VirtualMailManager.Exceptions import VMMConfigException
 
 
 class BadOptionError(Error):
@@ -62,9 +65,9 @@ class NoDefaultError(Error):
 
 class LazyConfig(RawConfigParser):
     """The **lazy** derivate of the `RawConfigParser`.
-    
+
     There are two additional getters:
-    
+
     `LazyConfig.pget()`
         The polymorphic getter, which returns a option's value with the
         appropriate type.
@@ -127,7 +130,7 @@ class LazyConfig(RawConfigParser):
             * `BadOptionError`
             * `NoSectionError`
             * `NoOptionError`
-        """ 
+        """
         sect_opt = section_option.lower().split('.')
         if len(sect_opt) != 2:# do we need a regexp to check the format?
             raise BadOptionError(
@@ -158,13 +161,13 @@ class LazyConfig(RawConfigParser):
 
     def dget(self, option):
         """Returns the value of the `option`.
-        
+
         If the option could not be found in the configuration file, the
         configured default value, from ``LazyConfig._cfg`` will be
         returned.
-        
+
         Arguments:
-        
+
         `option` : string
             the configuration option in the form
             "``section``\ **.**\ ``option``"
@@ -188,7 +191,7 @@ class LazyConfig(RawConfigParser):
 
     def set(self, option, value):
         """Set the value of an option.
-        
+
         Throws a ``ValueError`` if `value` couldn't be converted to
         ``LazyConfigOption.cls``"""
         section, option = self.__get_section_option(option)
@@ -202,7 +205,7 @@ class LazyConfig(RawConfigParser):
 
     def has_section(self, section):
         """Checks if ``section`` is a known configuration section."""
-        return section.lower() in self._cfg 
+        return section.lower() in self._cfg
 
     def has_option(self, option):
         """Checks if the option (section\ **.**\ option) is a known
@@ -212,7 +215,6 @@ class LazyConfig(RawConfigParser):
             return True
         except(BadOptionError, NoSectionError, NoOptionError):
             return False
-
 
 
 class LazyConfigOption(object):
@@ -266,7 +268,7 @@ class Config(LazyConfig):
         """Creates a new Config instance
 
         Arguments:
-     
+
         ``filename``
             path to the configuration file
         """
@@ -290,11 +292,9 @@ class Config(LazyConfig):
                 'smtp' :            LCO(bool_t, True,  self.get_boolean),
             },
             'bin': {
-                'dovecotpw': LCO(str, '/usr/sbin/dovecotpw', self.get,
-                                 self.exec_ok),
-                'du':        LCO(str, '/usr/bin/du', self.get, self.exec_ok),
-                'postconf':  LCO(str, '/usr/sbin/postconf', self.get,
-                                 self.exec_ok),
+                'dovecotpw': LCO(str, '/usr/sbin/dovecotpw', self.get, exec_ok),
+                'du':        LCO(str, '/usr/bin/du',        self.get, exec_ok),
+                'postconf':  LCO(str, '/usr/sbin/postconf', self.get, exec_ok),
             },
             'database': {
                 'host': LCO(str, 'localhost', self.get),
@@ -313,7 +313,7 @@ class Config(LazyConfig):
                 'name':    LCO(str, 'Maildir',                     self.get),
             },
             'misc': {
-                'base_directory':  LCO(str, '/srv/mail', self.get, self.is_dir),
+                'base_directory':  LCO(str, '/srv/mail', self.get, is_dir),
                 'dovecot_version': LCO(int, 12,          self.getint),
                 'gid_mail':        LCO(int, 8,           self.getint),
                 'password_scheme': LCO(str, 'CRAM-MD5',  self.get,
@@ -341,6 +341,8 @@ class Config(LazyConfig):
 
         Raises a VMMConfigException if the check fails.
         """
+        # TODO: There are only two settings w/o defaults.
+        #       So there is no need for cStringIO
         if not self.__chkCfg():
             errmsg = StringIO()
             errmsg.write(_(u'Missing options, which have no default value.\n'))
@@ -356,36 +358,10 @@ class Config(LazyConfig):
         """Returns an iterator object for all configuration sections."""
         return self._cfg.iterkeys()
 
-    def is_dir(self, path):
-        """Checks if ``path`` is a directory.
-        
-        Throws a `ConfigValueError` if ``path`` is not a directory.
-        """
-        path = self.__expand_path(path)
-        if not os.path.isdir(path):
-            raise ConfigValueError(_(u'“%s” is not a directory') % \
-                                   get_unicode(path))
-        return path
-
-    def exec_ok(self, binary):
-        """Checks if the ``binary`` exists and if it is executable.
-        
-        Throws a `ConfigValueError` if the ``binary`` isn't a file or is
-        not executable.
-        """
-        binary = self.__expand_path(binary)
-        if not os.path.isfile(binary):
-            raise ConfigValueError(_(u'“%s” is not a file') % \
-                                   get_unicode(binary))
-        if not os.access(binary, os.X_OK):
-            raise ConfigValueError(_(u'File is not executable: “%s”') % \
-                                   get_unicode(binary))
-        return binary
-
     def known_scheme(self, scheme):
         """Converts ``scheme`` to upper case and checks if is known by
         Dovecot (listed in VirtualMailManager.SCHEMES).
-        
+
         Throws a `ConfigValueError` if the scheme is not listed in
         VirtualMailManager.SCHEMES.
         """
@@ -404,6 +380,8 @@ class Config(LazyConfig):
         Arguments:
         sections -- list of strings with section names
         """
+        # TODO: Derivate CliConfig from Config an move the interactive
+        #       stuff to CliConfig
         input_fmt = _(u'Enter new value for option %(option)s \
 [%(current_value)s]: ')
         failures = 0
@@ -435,6 +413,7 @@ class Config(LazyConfig):
 
     def __saveChanges(self):
         """Writes changes to the configuration file."""
+        # TODO: Move interactive stuff to CliConfig
         copy2(self.__cfgFileName, self.__cfgFileName+'.bak')
         self.__cfgFile = open(self.__cfgFileName, 'w')
         self.write(self.__cfgFile)
@@ -442,7 +421,7 @@ class Config(LazyConfig):
 
     def __chkCfg(self):
         """Checks all section's options for settings w/o default values.
-        
+
         Returns ``True`` if everything is fine, else ``False``."""
         errors = False
         for section in self._cfg.iterkeys():
@@ -456,10 +435,3 @@ class Config(LazyConfig):
                 self.__missing[section] = missing
         return not errors
 
-    def __expand_path(self, path):
-        """Expands paths, starting with ``.`` or ``~``, to an absolute path."""
-        if path.startswith('.'):
-            return os.path.abspath(path)
-        if path.startswith('~'):
-            return os.path.expanduser(path)
-        return path

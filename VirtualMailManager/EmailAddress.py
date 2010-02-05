@@ -4,9 +4,11 @@
 
 """Virtual Mail Manager's EmailAddress class to handle e-mail addresses."""
 
-from __main__ import re, ERR
-from Exceptions import VMMEmailAddressException as VMMEAE
-import VirtualMailManager as VMM
+import re
+
+import VirtualMailManager.constants.ERROR as ERR
+from VirtualMailManager import chk_domainname
+from VirtualMailManager.Exceptions import VMMEmailAddressException as VMMEAE
 
 RE_LOCALPART = """[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]"""
 
@@ -40,15 +42,15 @@ class EmailAddress(object):
             localpart, domain = address.split('@')
         except ValueError:
             raise VMMEAE(_(u"Missing '@' sign in e-mail address “%s”.") %
-                address, ERR.INVALID_ADDRESS)
+                         address, ERR.INVALID_ADDRESS)
         except AttributeError:
             raise VMMEAE(_(u"“%s” doesn't look like an e-mail address.") %
-                address, ERR.INVALID_ADDRESS)
+                         address, ERR.INVALID_ADDRESS)
         if len(domain) > 0:
-            domain = VMM.VirtualMailManager.chkDomainname(domain)
+            domain = chk_domainname(domain)
         else:
-            raise VMMEAE(_(u"Missing domain name after “%s@”.") %
-                    localpart, ERR.DOMAIN_NO_NAME)
+            raise VMMEAE(_(u"Missing domain name after “%s@”.") % localpart,
+                         ERR.DOMAIN_NO_NAME)
         localpart = self.__chkLocalpart(localpart)
         self._localpart, self._domainname = localpart, domain
 

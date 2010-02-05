@@ -9,6 +9,10 @@ import gettext
 from time import strftime, strptime
 
 from VirtualMailManager import *
+from VirtualMailManager.cli import w_std, w_err
+
+
+# TODO: FIXME
 from VirtualMailManager.VirtualMailManager import VirtualMailManager
 import VirtualMailManager.Exceptions as VMME
 import VirtualMailManager.constants.EXIT as EXIT
@@ -123,7 +127,7 @@ def _printList(alist, title):
                 if not dom.startswith('xn--'):
                     w_std(u'\t%s' % dom)
                 else:
-                    w_std(u'\t%s (%s)' % (dom, vmm.ace2idna(dom)))
+                    w_std(u'\t%s (%s)' % (dom, ace2idna(dom)))
     else:
         w_std(_(u'\tNone'))
     print
@@ -147,7 +151,7 @@ def _printRelocated(addr_dest):
 
 def _formatDom(domain, main=True):
     if domain.startswith('xn--'):
-        domain = u'%s (%s)' % (domain, vmm.ace2idna(domain))
+        domain = u'%s (%s)' % (domain, ace2idna(domain))
     if main:
         return u'\t[+] %s' %  domain
     else:
@@ -174,7 +178,7 @@ def _printAliasDomInfo(info):
     msg = _('Alias domain information')
     for k in ['alias', 'domain']:
         if info[k].startswith('xn--'):
-            info[k] = "%s (%s)" % (info[k], vmm.ace2idna(info[k]))
+            info[k] = "%s (%s)" % (info[k], ace2idna(info[k]))
     w_std('%s\n%s' % (msg, '-'*len(msg)))
     w_std(
         _('\tThe alias domain %(alias)s belongs to:\n\t    * %(domain)s')%info)

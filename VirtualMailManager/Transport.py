@@ -5,8 +5,8 @@
 """Virtual Mail Manager's Transport class to manage the transport for
 domains and accounts."""
 
-from __main__ import ERR
-from Exceptions import VMMTransportException
+import VirtualMailManager.constants.ERROR as ERR
+from VirtualMailManager.Exceptions import VMMTransportException
 
 class Transport(object):
     """A wrapper class that provides access to the transport table"""
