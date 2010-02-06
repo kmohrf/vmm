@@ -34,14 +34,13 @@ This module defines a few classes:
 
 
 from shutil import copy2
-from ConfigParser import (Error, MissingSectionHeaderError, NoOptionError,
-                          NoSectionError, ParsingError, RawConfigParser)
+from ConfigParser import \
+     Error, MissingSectionHeaderError, NoOptionError, NoSectionError, \
+     ParsingError, RawConfigParser
 from cStringIO import StringIO# TODO: move interactive stff to cli
 
-import VirtualMailManager.constants.ERROR as ERR
-
 from VirtualMailManager import ENCODING, exec_ok, get_unicode, is_dir
-from VirtualMailManager.cli import w_std# move to cli
+from VirtualMailManager.constants.ERROR import CONF_ERROR
 from VirtualMailManager.Exceptions import VMMConfigException
 
 
@@ -105,7 +104,7 @@ class LazyConfig(RawConfigParser):
         if value.lower() in self._boolean_states:
             return self._boolean_states[value.lower()]
         else:
-            raise ConfigValueError(_(u'Not a boolean: “%s”') % \
+            raise ConfigValueError(_(u'Not a boolean: “%s”') %
                                    get_unicode(value))
 
     def get_boolean(self, section, option):
@@ -117,7 +116,7 @@ class LazyConfig(RawConfigParser):
                return tmp
         return self.getboolean(section, option)
 
-    def __get_section_option(self, section_option):
+    def _get_section_option(self, section_option):
         """splits ``section_option`` (section\ **.**\ option) in two parts
         and returns them as list ``[section, option]``, if:
 
@@ -134,7 +133,7 @@ class LazyConfig(RawConfigParser):
         sect_opt = section_option.lower().split('.')
         if len(sect_opt) != 2:# do we need a regexp to check the format?
             raise BadOptionError(
-                        _(u'Bad format: “%s” - expected: section.option') % \
+                        _(u'Bad format: “%s” - expected: section.option') %
                         get_unicode(section_option))
         if not sect_opt[0] in self._cfg:
             raise NoSectionError(sect_opt[0])
@@ -175,7 +174,7 @@ class LazyConfig(RawConfigParser):
         Throws a `NoDefaultError`, if no default value was passed to
         `LazyConfigOption.__init__()` for the `option`.
         """
-        section, option = self.__get_section_option(option)
+        section, option = self._get_section_option(option)
         try:
             return self._cfg[section][option].getter(section, option)
         except (NoSectionError, NoOptionError):
@@ -186,7 +185,7 @@ class LazyConfig(RawConfigParser):
 
     def pget(self, option):
         """Returns the value of the `option`."""
-        section, option = self.__get_section_option(option)
+        section, option = self._get_section_option(option)
         return self._cfg[section][option].getter(section, option)
 
     def set(self, option, value):
@@ -194,7 +193,7 @@ class LazyConfig(RawConfigParser):
 
         Throws a ``ValueError`` if `value` couldn't be converted to
         ``LazyConfigOption.cls``"""
-        section, option = self.__get_section_option(option)
+        section, option = self._get_section_option(option)
         val = self._cfg[section][option].cls(value)
         if not self._cfg[section][option].validate is None:
             val = self._cfg[section][option].validate(val)
@@ -211,7 +210,7 @@ class LazyConfig(RawConfigParser):
         """Checks if the option (section\ **.**\ option) is a known
         configuration option."""
         try:
-            self.__get_section_option(option)
+            self._get_section_option(option)
             return True
         except(BadOptionError, NoSectionError, NoOptionError):
             return False
@@ -273,8 +272,8 @@ class Config(LazyConfig):
             path to the configuration file
         """
         LazyConfig.__init__(self)
-        self.__cfgFileName = filename
-        self.__cfgFile = None
+        self._cfgFileName = filename
+        self._cfgFile = None
         self.__missing = {}
 
         LCO = LazyConfigOption
@@ -328,13 +327,13 @@ class Config(LazyConfig):
         Raises a VMMConfigException if the configuration syntax is invalid.
         """
         try:
-            self.__cfgFile = open(self.__cfgFileName, 'r')
-            self.readfp(self.__cfgFile)
+            self._cfgFile = open(self._cfgFileName, 'r')
+            self.readfp(self._cfgFile)
         except (MissingSectionHeaderError, ParsingError), e:
-            raise VMMConfigException(str(e), ERR.CONF_ERROR)
+            raise VMMConfigException(str(e), CONF_ERROR)
         finally:
-            if not self.__cfgFile is None and not self.__cfgFile.closed:
-                self.__cfgFile.close()
+            if not self._cfgFile is None and not self._cfgFile.closed:
+                self._cfgFile.close()
 
     def check(self):
         """Performs a configuration check.
@@ -346,15 +345,15 @@ class Config(LazyConfig):
         if not self.__chkCfg():
             errmsg = StringIO()
             errmsg.write(_(u'Missing options, which have no default value.\n'))
-            errmsg.write(_(u'Using configuration file: %s\n') %\
-                         self.__cfgFileName)
+            errmsg.write(_(u'Using configuration file: %s\n') %
+                         self._cfgFileName)
             for section, options in self.__missing.iteritems():
                 errmsg.write(_(u'* Section: %s\n') % section)
                 for option in options:
                     errmsg.write((u'    %s\n') % option)
-            raise VMMConfigException(errmsg.getvalue(), ERR.CONF_ERROR)
+            raise VMMConfigException(errmsg.getvalue(), CONF_ERROR)
 
-    def getsections(self):
+    def sections(self):
         """Returns an iterator object for all configuration sections."""
         return self._cfg.iterkeys()
 
@@ -374,51 +373,6 @@ class Config(LazyConfig):
         """
         return get_unicode(self.get(section, option))
 
-    def configure(self, sections):
-        """Interactive method for configuring all options in the given sections
-
-        Arguments:
-        sections -- list of strings with section names
-        """
-        # TODO: Derivate CliConfig from Config an move the interactive
-        #       stuff to CliConfig
-        input_fmt = _(u'Enter new value for option %(option)s \
-[%(current_value)s]: ')
-        failures = 0
-
-        w_std(_(u'Using configuration file: %s\n') % self.__cfgFileName)
-        for s in sections:
-            w_std(_(u'* Configuration section: “%s”') % s )
-            for opt, val in self.items(s):
-                failures = 0
-                while True:
-                    newval = raw_input(input_fmt.encode(ENCODING,'replace') %{
-                                       'option': opt, 'current_value': val})
-                    if newval and newval != val:
-                        try:
-                            self.set('%s.%s' % (s, opt), newval)
-                            break
-                        except (ValueError, ConfigValueError), e:
-                            w_std(_(u'Warning: %s') % e)
-                            failures += 1
-                            if failures > 2:
-                                raise VMMConfigException(
-                                    _(u'Too many failures - try again later.'),
-                                    ERR.VMM_TOO_MANY_FAILURES)
-                    else:
-                        break
-            print
-        if self._modified:
-            self.__saveChanges()
-
-    def __saveChanges(self):
-        """Writes changes to the configuration file."""
-        # TODO: Move interactive stuff to CliConfig
-        copy2(self.__cfgFileName, self.__cfgFileName+'.bak')
-        self.__cfgFile = open(self.__cfgFileName, 'w')
-        self.write(self.__cfgFile)
-        self.__cfgFile.close()
-
     def __chkCfg(self):
         """Checks all section's options for settings w/o default values.
 
@@ -427,11 +381,10 @@ class Config(LazyConfig):
         for section in self._cfg.iterkeys():
             missing = []
             for option, value in self._cfg[section].iteritems():
-                if (value.default is None
-                and not RawConfigParser.has_option(self, section, option)):
-                    missing.append(option)
-                    errors = True
+                if (value.default is None and
+                    not RawConfigParser.has_option(self, section, option)):
+                        missing.append(option)
+                        errors = True
             if len(missing):
                 self.__missing[section] = missing
         return not errors
-

@@ -80,12 +80,12 @@ class Handler(object):
         self.__findCfgFile()
         fstat = os.stat(self.__cfgFileName)
         fmode = int(oct(fstat.st_mode & 0777))
-        if fmode % 100 and fstat.st_uid != fstat.st_gid \
-        or fmode % 10 and fstat.st_uid == fstat.st_gid:
-            raise VMMPermException(_(
-                u'fix permissions (%(perms)s) for “%(file)s”\n\
+        if fmode % 100 and fstat.st_uid != fstat.st_gid or \
+            fmode % 10 and fstat.st_uid == fstat.st_gid:
+              raise VMMPermException(_(
+                    u'fix permissions (%(perms)s) for “%(file)s”\n\
 `chmod 0600 %(file)s` would be great.') % {'file':
-                self.__cfgFileName, 'perms': fmode}, ERR.CONF_WRONGPERM)
+                    self.__cfgFileName, 'perms': fmode}, ERR.CONF_WRONGPERM)
         else:
             return True
 
@@ -154,14 +154,14 @@ class Handler(object):
 
     def aliasExists(dbh, address):
         sql = "SELECT DISTINCT gid FROM alias WHERE gid = (SELECT gid FROM\
- domain_name WHERE domainname = '%s') AND address = '%s'" %\
+ domain_name WHERE domainname = '%s') AND address = '%s'" %
             (address._domainname, address._localpart)
         return Handler._exists(dbh, sql)
     aliasExists = staticmethod(aliasExists)
 
     def relocatedExists(dbh, address):
         sql = "SELECT gid FROM relocated WHERE gid = (SELECT gid FROM\
- domain_name WHERE domainname = '%s') AND address = '%s'" %\
+ domain_name WHERE domainname = '%s') AND address = '%s'" %
             (address._domainname, address._localpart)
         return Handler._exists(dbh, sql)
     relocatedExists = staticmethod(relocatedExists)
@@ -404,7 +404,7 @@ class Handler(object):
         section -- the section to configure (default None):
         """
         if section is None:
-            self.__Cfg.configure(self.__Cfg.getsections())
+            self.__Cfg.configure(self.__Cfg.sections())
         elif self.__Cfg.has_section(section):
             self.__Cfg.configure([section])
         else:
@@ -545,12 +545,11 @@ The keyword “detailed” is deprecated and will be removed in a future release
         alias = self.__getAlias(aliasaddress, targetaddress)
         alias.save(long(self._postconf.read('virtual_alias_expansion_limit')))
         gid = self.__getDomain(alias._dest._domainname).getID()
-        if gid > 0 and not Handler.accountExists(self.__dbh,
-        alias._dest) and not Handler.aliasExists(self.__dbh,
-        alias._dest):
+        if gid > 0 and (not Handler.accountExists(self.__dbh, alias._dest) and
+                        not Handler.aliasExists(self.__dbh, alias._dest)):
             self.__warnings.append(
-                _(u"The destination account/alias “%s” doesn't exist.")%\
-                        alias._dest)
+                    _(u"The destination account/alias “%s” doesn't exist.") %
+                                   alias._dest)
 
     def userDelete(self, emailaddress, force=None):
         if force not in [None, 'delalias']:

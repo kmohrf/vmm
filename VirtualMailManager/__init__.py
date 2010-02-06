@@ -76,7 +76,7 @@ def exec_ok(binary):
         raise VMMException(_(u'“%s” is not a file') % get_unicode(binary),
                            NO_SUCH_BINARY)
     if not os.access(binary, os.X_OK):
-        raise VMMException(_(u'File is not executable: “%s”') % \
+        raise VMMException(_(u'File is not executable: “%s”') %
                            get_unicode(binary), NOT_EXECUTABLE)
     return binary
 
