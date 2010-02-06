@@ -4,6 +4,7 @@
 # package initialization code
 #
 
+import gettext
 import os
 import re
 import locale
@@ -39,6 +40,8 @@ ENCODING = locale.nl_langinfo(locale.CODESET)
 RE_ASCII_CHARS = """^[\x20-\x7E]*$"""
 RE_DOMAIN = """^(?:[a-z0-9-]{1,63}\.){1,}[a-z]{2,6}$"""
 
+
+gettext.install('vmm', '/usr/local/share/locale', unicode=1)
 
 def get_unicode(string):
     """Converts `string` to `unicode`, if necessary."""

@@ -21,11 +21,10 @@ from subprocess import Popen, PIPE
 from pyPgSQL import PgSQL # python-pgsql - http://pypgsql.sourceforge.net
 
 import VirtualMailManager.constants.ERROR as ERR
-from VirtualMailManager import ENCODING, ace2idna, exec_ok, read_pass
+from VirtualMailManager import ENCODING, ace2idna, exec_ok
 from VirtualMailManager.Account import Account
 from VirtualMailManager.Alias import Alias
 from VirtualMailManager.AliasDomain import AliasDomain
-from VirtualMailManager.Config import Config as Cfg
 from VirtualMailManager.Domain import Domain
 from VirtualMailManager.EmailAddress import EmailAddress
 from VirtualMailManager.Exceptions import *
@@ -40,17 +39,27 @@ RE_MBOX_NAMES = """^[\x20-\x25\x27-\x7E]*$"""
 class Handler(object):
     """Wrapper class to simplify the access on all the stuff from
     VirtualMailManager"""
-    # TODO: accept a LazyConfig object as argument
     __slots__ = ('__Cfg', '__cfgFileName', '__dbh', '__scheme', '__warnings',
                  '_postconf')
-    def __init__(self):
+    def __init__(self, config_type='default'):
         """Creates a new Handler instance.
+
+        Accepted ``config_type``s are 'default' and 'cli'.
+
         Throws a VMMNotRootException if your uid is greater 0.
         """
         self.__cfgFileName = ''
         self.__warnings = []
         self.__Cfg = None
         self.__dbh = None
+
+        if config_type == 'default':
+            from VirtualMailManager.Config import Config as Cfg
+        elif config_type == 'cli':
+            from VirtualMailManager.cli.CliConfig import CliConfig as Cfg
+            from VirtualMailManager.cli import read_pass
+        else:
+            raise ValueError('invalid config_type: %r' % config_type)
 
         if os.geteuid():
             raise VMMNotRootException(_(u"You are not root.\n\tGood bye!\n"),
@@ -154,15 +163,15 @@ class Handler(object):
 
     def aliasExists(dbh, address):
         sql = "SELECT DISTINCT gid FROM alias WHERE gid = (SELECT gid FROM\
- domain_name WHERE domainname = '%s') AND address = '%s'" %
-            (address._domainname, address._localpart)
+ domain_name WHERE domainname = '%s') AND address = '%s'" % (
+                                        address._domainname, address._localpart)
         return Handler._exists(dbh, sql)
     aliasExists = staticmethod(aliasExists)
 
     def relocatedExists(dbh, address):
         sql = "SELECT gid FROM relocated WHERE gid = (SELECT gid FROM\
- domain_name WHERE domainname = '%s') AND address = '%s'" %
-            (address._domainname, address._localpart)
+ domain_name WHERE domainname = '%s') AND address = '%s'" % (
+                                        address._domainname, address._localpart)
         return Handler._exists(dbh, sql)
     relocatedExists = staticmethod(relocatedExists)
 

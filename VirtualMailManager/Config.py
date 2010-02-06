@@ -261,7 +261,7 @@ class LazyConfigOption(object):
 
 
 class Config(LazyConfig):
-    """This class is for reading and modifying vmm's configuration file."""
+    """This class is for reading vmm's configuration file."""
 
     def __init__(self, filename):
         """Creates a new Config instance
@@ -320,6 +320,9 @@ class Config(LazyConfig):
                 'transport':       LCO(str, 'dovecot:',  self.get),
             },
         }
+
+    def configure(self, sections):
+        raise NotImplementedError
 
     def load(self):
         """Loads the configuration, read only.
