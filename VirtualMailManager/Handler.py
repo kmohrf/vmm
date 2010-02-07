@@ -563,7 +563,7 @@ class Handler(object):
 The account has been successfully deleted from the database.
     But an error occurred while deleting the following directory:
     “%(directory)s”
-    Reason: %(reason)s""") %
+    Reason: %(reason)s""") % \
                     {'directory': acc.getDir('home'), 'reason': e.msg()}
                     self.__warnings.append(warning)
                 else:
