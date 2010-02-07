@@ -44,6 +44,7 @@ class Handler(object):
     VirtualMailManager"""
     __slots__ = ('_Cfg', '_cfgFileName', '__dbh', '_scheme', '__warnings',
                  '_postconf')
+
     def __init__(self, skip_some_checks=False):
         """Creates a new Handler instance.
 
@@ -89,7 +90,7 @@ class Handler(object):
         fmode = int(oct(fstat.st_mode & 0777))
         if fmode % 100 and fstat.st_uid != fstat.st_gid or \
             fmode % 10 and fstat.st_uid == fstat.st_gid:
-              raise VMMPermException(_(
+                raise VMMPermException(_(
                     u'fix permissions (%(perms)s) for “%(file)s”\n\
 `chmod 0600 %(file)s` would be great.') % {'file':
                     self._cfgFileName, 'perms': fmode}, ERR.CONF_WRONGPERM)
@@ -115,11 +116,13 @@ class Handler(object):
                 code = e.code()
                 if code is ERR.NO_SUCH_BINARY:
                     raise VMMException(_(u'“%(binary)s” doesn\'t exist.\n\
-(vmm.cfg: section "bin", option "%(option)s")') %{'binary': val,'option': opt},
+(vmm.cfg: section "bin", option "%(option)s")') %
+                                       {'binary': val, 'option': opt},
                                        ERR.NO_SUCH_BINARY)
                 elif code is ERR.NOT_EXECUTABLE:
-                    raise VMMException(_(u'“%(binary)s” is not executable.\n\
-(vmm.cfg: section "bin", option "%(option)s")') %{'binary': val,'option': opt},
+                    raise VMMException(_(u'“%(binary)s” is not executable.\
+\n(vmm.cfg: section "bin", option "%(option)s")') %
+                                       {'binary': val, 'option': opt},
                                        ERR.NOT_EXECUTABLE)
                 else:
                     raise
@@ -162,17 +165,16 @@ class Handler(object):
     def aliasExists(dbh, address):
         sql = "SELECT DISTINCT gid FROM alias WHERE gid = (SELECT gid FROM\
  domain_name WHERE domainname = '%s') AND address = '%s'" % (
-                                        address._domainname, address._localpart)
+                address._domainname, address._localpart)
         return Handler._exists(dbh, sql)
     aliasExists = staticmethod(aliasExists)
 
     def relocatedExists(dbh, address):
         sql = "SELECT gid FROM relocated WHERE gid = (SELECT gid FROM\
  domain_name WHERE domainname = '%s') AND address = '%s'" % (
-                                        address._domainname, address._localpart)
+                address._domainname, address._localpart)
         return Handler._exists(dbh, sql)
     relocatedExists = staticmethod(relocatedExists)
-
 
     def __getAccount(self, address, password=None):
         self.__dbConnect()
@@ -188,7 +190,7 @@ class Handler(object):
             destination = EmailAddress(destination)
         return Alias(self.__dbh, address, destination)
 
-    def __getRelocated(self,address, destination=None):
+    def __getRelocated(self, address, destination=None):
         self.__dbConnect()
         address = EmailAddress(address)
         if destination is not None:
@@ -234,7 +236,7 @@ class Handler(object):
         os.umask(0006)
         oldpwd = os.getcwd()
         basedir = self._Cfg.dget('misc.base_directory')
-        domdirdirs = domdir.replace(basedir+'/', '').split('/')
+        domdirdirs = domdir.replace(basedir + '/', '').split('/')
 
         os.chdir(basedir)
         if not os.path.isdir(domdirdirs[0]):
@@ -246,11 +248,12 @@ class Handler(object):
                        0, gid)
         os.chdir(oldpwd)
 
-    def __subscribeFL(self, folderlist, uid, gid):
+    def __subscribe(self, folderlist, uid, gid):
+        """Creates a subscriptions file with the mailboxes from `folderlist`"""
         fname = os.path.join(self._Cfg.dget('maildir.name'), 'subscriptions')
-        sf = file(fname, 'w')
+        sf = open(fname, 'w')
         for f in folderlist:
-            sf.write(f+'\n')
+            sf.write('%s\n' % f)
         sf.flush()
         sf.close()
         os.chown(fname, uid, gid)
@@ -270,11 +273,19 @@ class Handler(object):
 
         maildir = self._Cfg.dget('maildir.name')
         folders = [maildir]
+        append = folders.append
         for folder in self._Cfg.dget('maildir.folders').split(':'):
             folder = folder.strip()
-            if len(folder) and not folder.count('..')\
-            and re.match(RE_MBOX_NAMES, folder):
-                folders.append('%s/.%s' % (maildir, folder))
+            if len(folder) and not folder.count('..'):
+                if re.match(RE_MBOX_NAMES, folder):
+                    append('%s/.%s' % (maildir, folder))
+                else:
+                    self.__warnings.append(_('Skipped mailbox folder: %r') %
+                                           folder)
+            else:
+                self.__warnings.append(_('Skipped mailbox folder: %r') %
+                                       folder)
+
         subdirs = ['cur', 'new', 'tmp']
         mode = self._Cfg.dget('account.directory_mode')
 
@@ -284,8 +295,8 @@ class Handler(object):
             self.__makedir(folder, mode, uid, gid)
             for subdir in subdirs:
                 self.__makedir(os.path.join(folder, subdir), mode, uid, gid)
-        self.__subscribeFL([f.replace(maildir+'/.', '') for f in folders[1:]],
-                uid, gid)
+        self.__subscribe((f.replace(maildir + '/.', '') for f in folders[1:]),
+                         uid, gid)
         os.chdir(oldpwd)
 
     def __userDirDelete(self, domdir, uid, gid):
@@ -293,15 +304,15 @@ class Handler(object):
             userdir = '%s' % uid
             if userdir.count('..') or domdir.count('..'):
                 raise VMMException(_(u'Found ".." in home directory path.'),
-                    ERR.FOUND_DOTS_IN_PATH)
+                                   ERR.FOUND_DOTS_IN_PATH)
             if os.path.isdir(domdir):
                 os.chdir(domdir)
                 if os.path.isdir(userdir):
                     mdstat = os.stat(userdir)
                     if (mdstat.st_uid, mdstat.st_gid) != (uid, gid):
-                        raise VMMException(
-                         _(u'Detected owner/group mismatch in home directory.'),
-                         ERR.MAILDIR_PERM_MISMATCH)
+                        raise VMMException(_(
+                          u'Detected owner/group mismatch in home directory.'),
+                          ERR.MAILDIR_PERM_MISMATCH)
                     rmtree(userdir, ignore_errors=True)
                 else:
                     raise VMMException(_(u"No such directory: %s") %
@@ -312,7 +323,7 @@ class Handler(object):
             if not self.__isdir(domdir):
                 return
             basedir = self._Cfg.dget('misc.base_directory')
-            domdirdirs = domdir.replace(basedir+'/', '').split('/')
+            domdirdirs = domdir.replace(basedir + '/', '').split('/')
             domdirparent = os.path.join(basedir, domdirdirs[0])
             if basedir.count('..') or domdir.count('..'):
                 raise VMMException(_(u'Found ".." in domain directory path.'),
@@ -378,8 +389,9 @@ class Handler(object):
             return '{%s}%s' % (self._scheme, self.__pwMD4(password))
         elif self._scheme in ['SMD5', 'SSHA', 'CRAM-MD5', 'HMAC-MD5',
                 'LANMAN', 'NTLM', 'RPA']:
-            return Popen([self._Cfg.dget('bin.dovecotpw'), '-s',
-                self._scheme,'-p',password],stdout=PIPE).communicate()[0][:-1]
+            return Popen([self._Cfg.dget('bin.dovecotpw'),
+                         '-s', self._scheme, '-p', password],
+                         stdout=PIPE).communicate()[0][:-1]
         else:
             return '{%s}%s' % (self._scheme, password)
 
@@ -413,9 +425,10 @@ class Handler(object):
             dom.updateTransport(transport, force=True)
 
     def domainDelete(self, domainname, force=None):
-        if not force is None and force not in ['deluser','delalias','delall']:
-            raise VMMDomainException(_(u"Invalid argument: “%s”") % force,
-                ERR.INVALID_OPTION)
+        if not force is None and force not in ['deluser', 'delalias',
+                                               'delall']:
+                raise VMMDomainException(_(u'Invalid argument: “%s”') %
+                                         force, ERR.INVALID_OPTION)
         dom = self.__getDomain(domainname)
         gid = dom.getID()
         domdir = dom.getDir()
@@ -432,14 +445,9 @@ class Handler(object):
 
     def domainInfo(self, domainname, details=None):
         if details not in [None, 'accounts', 'aliasdomains', 'aliases', 'full',
-                'relocated', 'detailed']:
+                           'relocated']:
             raise VMMException(_(u'Invalid argument: “%s”') % details,
-                    ERR.INVALID_AGUMENT)
-        if details == 'detailed':
-            details = 'full'
-            self.__warnings.append(_(u'\
-The keyword “detailed” is deprecated and will be removed in a future release.\n\
-   Please use the keyword “full” to get full details.'))
+                               ERR.INVALID_AGUMENT)
         dom = self.__getDomain(domainname)
         dominfo = dom.getInfo()
         if dominfo['domainname'].startswith('xn--'):
@@ -534,7 +542,7 @@ The keyword “detailed” is deprecated and will be removed in a future release
         if gid > 0 and (not Handler.accountExists(self.__dbh, alias._dest) and
                         not Handler.aliasExists(self.__dbh, alias._dest)):
             self.__warnings.append(
-                    _(u"The destination account/alias “%s” doesn't exist.") %
+                _(u"The destination account/alias “%s” doesn't exist.") %
                                    alias._dest)
 
     def userDelete(self, emailaddress, force=None):
@@ -555,10 +563,11 @@ The keyword “detailed” is deprecated and will be removed in a future release
 The account has been successfully deleted from the database.
     But an error occurred while deleting the following directory:
     “%(directory)s”
-    Reason: %(reason)s""") % {'directory': acc.getDir('home'),'reason': e.msg()}
+    Reason: %(reason)s""") %
+                    {'directory': acc.getDir('home'), 'reason': e.msg()}
                     self.__warnings.append(warning)
                 else:
-                    raise e
+                    raise
 
     def aliasInfo(self, aliasaddress):
         alias = self.__getAlias(aliasaddress)
@@ -593,7 +602,8 @@ The account has been successfully deleted from the database.
             raise ValueError('could not accept password: %r' % password)
         acc = self.__getAccount(emailaddress)
         if acc.getUID() == 0:
-           raise VMMException(_(u"Account doesn't exist"), ERR.NO_SUCH_ACCOUNT)
+            raise VMMException(_(u"Account doesn't exist"),
+                               ERR.NO_SUCH_ACCOUNT)
         acc.modify('password', self.__pwhash(password, user=emailaddress))
 
     def userName(self, emailaddress, name):
