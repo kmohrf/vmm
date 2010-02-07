@@ -25,61 +25,59 @@ from VirtualMailManager import ENCODING, ace2idna, exec_ok
 from VirtualMailManager.Account import Account
 from VirtualMailManager.Alias import Alias
 from VirtualMailManager.AliasDomain import AliasDomain
+from VirtualMailManager.Config import Config as Cfg
 from VirtualMailManager.Domain import Domain
 from VirtualMailManager.EmailAddress import EmailAddress
 from VirtualMailManager.Exceptions import *
 from VirtualMailManager.Relocated import Relocated
 from VirtualMailManager.ext.Postconf import Postconf
 
+
 SALTCHARS = './0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 RE_DOMAIN_SRCH = """^[a-z0-9-\.]+$"""
 RE_LOCALPART = """[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]"""
 RE_MBOX_NAMES = """^[\x20-\x25\x27-\x7E]*$"""
 
+
 class Handler(object):
     """Wrapper class to simplify the access on all the stuff from
     VirtualMailManager"""
-    __slots__ = ('__Cfg', '__cfgFileName', '__dbh', '__scheme', '__warnings',
+    __slots__ = ('_Cfg', '_cfgFileName', '__dbh', '_scheme', '__warnings',
                  '_postconf')
-    def __init__(self, config_type='default'):
+    def __init__(self, skip_some_checks=False):
         """Creates a new Handler instance.
 
-        Accepted ``config_type``s are 'default' and 'cli'.
+        ``skip_some_checks`` : bool
+            When a derived class knows how to handle all checks this
+            argument may be ``True``. By default it is ``False`` and
+            all checks will be performed.
 
         Throws a VMMNotRootException if your uid is greater 0.
         """
-        self.__cfgFileName = ''
+        self._cfgFileName = ''
         self.__warnings = []
-        self.__Cfg = None
+        self._Cfg = None
         self.__dbh = None
-
-        if config_type == 'default':
-            from VirtualMailManager.Config import Config as Cfg
-        elif config_type == 'cli':
-            from VirtualMailManager.cli.CliConfig import CliConfig as Cfg
-            from VirtualMailManager.cli import read_pass
-        else:
-            raise ValueError('invalid config_type: %r' % config_type)
 
         if os.geteuid():
             raise VMMNotRootException(_(u"You are not root.\n\tGood bye!\n"),
                 ERR.CONF_NOPERM)
         if self.__chkCfgFile():
-            self.__Cfg = Cfg(self.__cfgFileName)
-            self.__Cfg.load()
-        if not os.sys.argv[1] in ('cf','configure','h','help','v','version'):
-            self.__Cfg.check()
-            self.__chkenv()
-            self.__scheme = self.__Cfg.dget('misc.password_scheme')
-            self._postconf = Postconf(self.__Cfg.dget('bin.postconf'))
+            self._Cfg = Cfg(self._cfgFileName)
+            self._Cfg.load()
+        if not skip_some_checks:
+            self._Cfg.check()
+            self._chkenv()
+            self._scheme = self._Cfg.dget('misc.password_scheme')
+            self._postconf = Postconf(self._Cfg.dget('bin.postconf'))
 
     def __findCfgFile(self):
         for path in ['/root', '/usr/local/etc', '/etc']:
             tmp = os.path.join(path, 'vmm.cfg')
             if os.path.isfile(tmp):
-                self.__cfgFileName = tmp
+                self._cfgFileName = tmp
                 break
-        if not len(self.__cfgFileName):
+        if not len(self._cfgFileName):
             raise VMMException(
                 _(u"No “vmm.cfg” found in: /root:/usr/local/etc:/etc"),
                 ERR.CONF_NOFILE)
@@ -87,30 +85,30 @@ class Handler(object):
     def __chkCfgFile(self):
         """Checks the configuration file, returns bool"""
         self.__findCfgFile()
-        fstat = os.stat(self.__cfgFileName)
+        fstat = os.stat(self._cfgFileName)
         fmode = int(oct(fstat.st_mode & 0777))
         if fmode % 100 and fstat.st_uid != fstat.st_gid or \
             fmode % 10 and fstat.st_uid == fstat.st_gid:
               raise VMMPermException(_(
                     u'fix permissions (%(perms)s) for “%(file)s”\n\
 `chmod 0600 %(file)s` would be great.') % {'file':
-                    self.__cfgFileName, 'perms': fmode}, ERR.CONF_WRONGPERM)
+                    self._cfgFileName, 'perms': fmode}, ERR.CONF_WRONGPERM)
         else:
             return True
 
-    def __chkenv(self):
+    def _chkenv(self):
         """"""
-        basedir = self.__Cfg.dget('misc.base_directory')
+        basedir = self._Cfg.dget('misc.base_directory')
         if not os.path.exists(basedir):
             old_umask = os.umask(0006)
             os.makedirs(basedir, 0771)
-            os.chown(basedir, 0, self.__Cfg.dget('misc.gid_mail'))
+            os.chown(basedir, 0, self._Cfg.dget('misc.gid_mail'))
             os.umask(old_umask)
         elif not os.path.isdir(basedir):
             raise VMMException(_(u'“%s” is not a directory.\n\
 (vmm.cfg: section "misc", option "base_directory")') %
                                  basedir, ERR.NO_SUCH_DIRECTORY)
-        for opt, val in self.__Cfg.items('bin'):
+        for opt, val in self._Cfg.items('bin'):
             try:
                 exec_ok(val)
             except VMMException, e:
@@ -132,10 +130,10 @@ class Handler(object):
                                   not self.__dbh._isOpen):
             try:
                 self.__dbh = PgSQL.connect(
-                        database=self.__Cfg.dget('database.name'),
-                        user=self.__Cfg.pget('database.user'),
-                        host=self.__Cfg.dget('database.host'),
-                        password=self.__Cfg.pget('database.pass'),
+                        database=self._Cfg.dget('database.name'),
+                        user=self._Cfg.pget('database.user'),
+                        host=self._Cfg.dget('database.host'),
+                        password=self._Cfg.pget('database.pass'),
                         client_encoding='utf8', unicode_results=True)
                 dbc = self.__dbh.cursor()
                 dbc.execute("SET NAMES 'UTF8'")
@@ -199,10 +197,10 @@ class Handler(object):
 
     def __getDomain(self, domainname, transport=None):
         if transport is None:
-            transport = self.__Cfg.dget('misc.transport')
+            transport = self._Cfg.dget('misc.transport')
         self.__dbConnect()
         return Domain(self.__dbh, domainname,
-                self.__Cfg.dget('misc.base_directory'), transport)
+                self._Cfg.dget('misc.base_directory'), transport)
 
     def __getDiskUsage(self, directory):
         """Estimate file space usage for the given directory.
@@ -211,7 +209,7 @@ class Handler(object):
         directory -- the directory to summarize recursively disk usage for
         """
         if self.__isdir(directory):
-            return Popen([self.__Cfg.dget('bin.du'), "-hs", directory],
+            return Popen([self._Cfg.dget('bin.du'), "-hs", directory],
                 stdout=PIPE).communicate()[0].split('\t')[0]
         else:
             return 0
@@ -224,7 +222,7 @@ class Handler(object):
 
     def __makedir(self, directory, mode=None, uid=None, gid=None):
         if mode is None:
-            mode = self.__Cfg.dget('account.directory_mode')
+            mode = self._Cfg.dget('account.directory_mode')
         if uid is None:
             uid = 0
         if gid is None:
@@ -235,21 +233,21 @@ class Handler(object):
     def __domDirMake(self, domdir, gid):
         os.umask(0006)
         oldpwd = os.getcwd()
-        basedir = self.__Cfg.dget('misc.base_directory')
+        basedir = self._Cfg.dget('misc.base_directory')
         domdirdirs = domdir.replace(basedir+'/', '').split('/')
 
         os.chdir(basedir)
         if not os.path.isdir(domdirdirs[0]):
             self.__makedir(domdirdirs[0], 489, 0,
-                           self.__Cfg.dget('misc.gid_mail'))
+                           self._Cfg.dget('misc.gid_mail'))
         os.chdir(domdirdirs[0])
         os.umask(0007)
-        self.__makedir(domdirdirs[1], self.__Cfg.dget('domain.directory_mode'),
+        self.__makedir(domdirdirs[1], self._Cfg.dget('domain.directory_mode'),
                        0, gid)
         os.chdir(oldpwd)
 
     def __subscribeFL(self, folderlist, uid, gid):
-        fname = os.path.join(self.__Cfg.dget('maildir.name'), 'subscriptions')
+        fname = os.path.join(self._Cfg.dget('maildir.name'), 'subscriptions')
         sf = file(fname, 'w')
         for f in folderlist:
             sf.write(f+'\n')
@@ -270,15 +268,15 @@ class Handler(object):
         oldpwd = os.getcwd()
         os.chdir(domdir)
 
-        maildir = self.__Cfg.dget('maildir.name')
+        maildir = self._Cfg.dget('maildir.name')
         folders = [maildir]
-        for folder in self.__Cfg.dget('maildir.folders').split(':'):
+        for folder in self._Cfg.dget('maildir.folders').split(':'):
             folder = folder.strip()
             if len(folder) and not folder.count('..')\
             and re.match(RE_MBOX_NAMES, folder):
                 folders.append('%s/.%s' % (maildir, folder))
         subdirs = ['cur', 'new', 'tmp']
-        mode = self.__Cfg.dget('account.directory_mode')
+        mode = self._Cfg.dget('account.directory_mode')
 
         self.__makedir('%s' % uid, mode, uid, gid)
         os.chdir('%s' % uid)
@@ -313,7 +311,7 @@ class Handler(object):
         if gid > 0:
             if not self.__isdir(domdir):
                 return
-            basedir = self.__Cfg.dget('misc.base_directory')
+            basedir = self._Cfg.dget('misc.base_directory')
             domdirdirs = domdir.replace(basedir+'/', '').split('/')
             domdirparent = os.path.join(basedir, domdirdirs[0])
             if basedir.count('..') or domdir.count('..'):
@@ -330,9 +328,9 @@ class Handler(object):
     def __getSalt(self):
         from random import choice
         salt = None
-        if self.__scheme == 'CRYPT':
+        if self._scheme == 'CRYPT':
             salt = '%s%s' % (choice(SALTCHARS), choice(SALTCHARS))
-        elif self.__scheme in ['MD5', 'MD5-CRYPT']:
+        elif self._scheme in ['MD5', 'MD5-CRYPT']:
             salt = '$1$%s$' % ''.join([choice(SALTCHARS) for x in xrange(8)])
         return salt
 
@@ -351,12 +349,12 @@ class Handler(object):
     def __pwMD5(self, password, emailaddress=None):
         import md5
         _md5 = md5.new(password)
-        if self.__scheme == 'LDAP-MD5':
+        if self._scheme == 'LDAP-MD5':
             from base64 import standard_b64encode
             return standard_b64encode(_md5.digest())
-        elif self.__scheme == 'PLAIN-MD5':
+        elif self._scheme == 'PLAIN-MD5':
             return _md5.hexdigest()
-        elif self.__scheme == 'DIGEST-MD5' and emailaddress is not None:
+        elif self._scheme == 'DIGEST-MD5' and emailaddress is not None:
             # use an empty realm - works better with usenames like user@dom
             _md5 = md5.new('%s::%s' % (emailaddress, password))
             return _md5.hexdigest()
@@ -369,21 +367,21 @@ class Handler(object):
 
     def __pwhash(self, password, scheme=None, user=None):
         if scheme is not None:
-            self.__scheme = scheme
-        if self.__scheme in ['CRYPT', 'MD5', 'MD5-CRYPT']:
-            return '{%s}%s' % (self.__scheme, self.__pwCrypt(password))
-        elif self.__scheme in ['SHA', 'SHA1']:
-            return '{%s}%s' % (self.__scheme, self.__pwSHA1(password))
-        elif self.__scheme in ['PLAIN-MD5', 'LDAP-MD5', 'DIGEST-MD5']:
-            return '{%s}%s' % (self.__scheme, self.__pwMD5(password, user))
-        elif self.__scheme == 'MD4':
-            return '{%s}%s' % (self.__scheme, self.__pwMD4(password))
-        elif self.__scheme in ['SMD5', 'SSHA', 'CRAM-MD5', 'HMAC-MD5',
+            self._scheme = scheme
+        if self._scheme in ['CRYPT', 'MD5', 'MD5-CRYPT']:
+            return '{%s}%s' % (self._scheme, self.__pwCrypt(password))
+        elif self._scheme in ['SHA', 'SHA1']:
+            return '{%s}%s' % (self._scheme, self.__pwSHA1(password))
+        elif self._scheme in ['PLAIN-MD5', 'LDAP-MD5', 'DIGEST-MD5']:
+            return '{%s}%s' % (self._scheme, self.__pwMD5(password, user))
+        elif self._scheme == 'MD4':
+            return '{%s}%s' % (self._scheme, self.__pwMD4(password))
+        elif self._scheme in ['SMD5', 'SSHA', 'CRAM-MD5', 'HMAC-MD5',
                 'LANMAN', 'NTLM', 'RPA']:
-            return Popen([self.__Cfg.dget('bin.dovecotpw'), '-s',
-                self.__scheme,'-p',password],stdout=PIPE).communicate()[0][:-1]
+            return Popen([self._Cfg.dget('bin.dovecotpw'), '-s',
+                self._scheme,'-p',password],stdout=PIPE).communicate()[0][:-1]
         else:
-            return '{%s}%s' % (self.__scheme, password)
+            return '{%s}%s' % (self._scheme, password)
 
     def hasWarnings(self):
         """Checks if warnings are present, returns bool."""
@@ -394,31 +392,10 @@ class Handler(object):
         return self.__warnings
 
     def cfgDget(self, option):
-        return self.__Cfg.dget(option)
+        return self._Cfg.dget(option)
 
     def cfgPget(self, option):
-        return self.__Cfg.pget(option)
-
-    def cfgSet(self, option, value):
-        return self.__Cfg.set(option, value)
-
-    def configure(self, section=None):
-        """Starts interactive configuration.
-
-        Configures in interactive mode options in the given section.
-        If no section is given (default) all options from all sections
-        will be prompted.
-
-        Keyword arguments:
-        section -- the section to configure (default None):
-        """
-        if section is None:
-            self.__Cfg.configure(self.__Cfg.sections())
-        elif self.__Cfg.has_section(section):
-            self.__Cfg.configure([section])
-        else:
-            raise VMMException(_(u"Invalid section: “%s”") % section,
-                               ERR.INVALID_SECTION)
+        return self._Cfg.pget(option)
 
     def domainAdd(self, domainname, transport=None):
         dom = self.__getDomain(domainname, transport)
@@ -442,7 +419,7 @@ class Handler(object):
         dom = self.__getDomain(domainname)
         gid = dom.getID()
         domdir = dom.getDir()
-        if self.__Cfg.dget('domain.force_deletion') or force == 'delall':
+        if self._Cfg.dget('domain.force_deletion') or force == 'delall':
             dom.delete(True, True)
         elif force == 'deluser':
             dom.delete(delUser=True)
@@ -450,7 +427,7 @@ class Handler(object):
             dom.delete(delAlias=True)
         else:
             dom.delete()
-        if self.__Cfg.dget('domain.delete_directory'):
+        if self._Cfg.dget('domain.delete_directory'):
             self.__domDirDelete(domdir, gid)
 
     def domainInfo(self, domainname, details=None):
@@ -538,16 +515,16 @@ The keyword “detailed” is deprecated and will be removed in a future release
         return search(self.__dbh, pattern=pattern, like=like)
 
     def userAdd(self, emailaddress, password):
-        acc = self.__getAccount(emailaddress, password)
-        if password is None:
-            password = read_pass()
-            acc.setPassword(self.__pwhash(password))
-        acc.save(self.__Cfg.dget('maildir.name'),
-                 self.__Cfg.dget('misc.dovecot_version'),
-                 self.__Cfg.dget('account.smtp'),
-                 self.__Cfg.dget('account.pop3'),
-                 self.__Cfg.dget('account.imap'),
-                 self.__Cfg.dget('account.sieve'))
+        if password is None or (isinstance(password, basestring) and
+                                not len(password)):
+            raise ValueError('could not accept password: %r' % password)
+        acc = self.__getAccount(emailaddress, self.__pwhash(password))
+        acc.save(self._Cfg.dget('maildir.name'),
+                 self._Cfg.dget('misc.dovecot_version'),
+                 self._Cfg.dget('account.smtp'),
+                 self._Cfg.dget('account.pop3'),
+                 self._Cfg.dget('account.imap'),
+                 self._Cfg.dget('account.sieve'))
         self.__mailDirMake(acc.getDir('domain'), acc.getUID(), acc.getGID())
 
     def aliasAdd(self, aliasaddress, targetaddress):
@@ -568,7 +545,7 @@ The keyword “detailed” is deprecated and will be removed in a future release
         uid = acc.getUID()
         gid = acc.getGID()
         acc.delete(force)
-        if self.__Cfg.dget('account.delete_directory'):
+        if self._Cfg.dget('account.delete_directory'):
             try:
                 self.__userDirDelete(acc.getDir('domain'), uid, gid)
             except VMMException, e:
@@ -596,8 +573,8 @@ The account has been successfully deleted from the database.
             raise VMMException(_(u'Invalid argument: “%s”') % details,
                                ERR.INVALID_AGUMENT)
         acc = self.__getAccount(emailaddress)
-        info = acc.getInfo(self.__Cfg.dget('misc.dovecot_version'))
-        if self.__Cfg.dget('account.disk_usage') or details in ('du', 'full'):
+        info = acc.getInfo(self._Cfg.dget('misc.dovecot_version'))
+        if self._Cfg.dget('account.disk_usage') or details in ('du', 'full'):
             info['disk usage'] = self.__getDiskUsage('%(maildir)s' % info)
             if details in (None, 'du'):
                 return info
@@ -611,11 +588,12 @@ The account has been successfully deleted from the database.
         return getAccountByID(uid, self.__dbh)
 
     def userPassword(self, emailaddress, password):
+        if password is None or (isinstance(password, basestring) and
+                                not len(password)):
+            raise ValueError('could not accept password: %r' % password)
         acc = self.__getAccount(emailaddress)
         if acc.getUID() == 0:
            raise VMMException(_(u"Account doesn't exist"), ERR.NO_SUCH_ACCOUNT)
-        if password is None:
-            password = read_pass()
         acc.modify('password', self.__pwhash(password, user=emailaddress))
 
     def userName(self, emailaddress, name):
@@ -634,7 +612,7 @@ The service name “managesieve” is deprecated and will be removed\n\
    in a future release.\n\
    Please use the service name “sieve” instead.'))
         acc = self.__getAccount(emailaddress)
-        acc.disable(self.__Cfg.dget('misc.dovecot_version'), service)
+        acc.disable(self._Cfg.dget('misc.dovecot_version'), service)
 
     def userEnable(self, emailaddress, service=None):
         if service == 'managesieve':
@@ -644,7 +622,7 @@ The service name “managesieve” is deprecated and will be removed\n\
    in a future release.\n\
    Please use the service name “sieve” instead.'))
         acc = self.__getAccount(emailaddress)
-        acc.enable(self.__Cfg.dget('misc.dovecot_version'), service)
+        acc.enable(self._Cfg.dget('misc.dovecot_version'), service)
 
     def relocatedAdd(self, emailaddress, targetaddress):
         relocated = self.__getRelocated(emailaddress, targetaddress)
