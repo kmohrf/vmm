@@ -2,7 +2,11 @@
 # Copyright (c) 2008 - 2010, Pascal Volk
 # See COPYING for distribution information.
 
-"""Virtual Mail Manager's EmailAddress class to handle e-mail addresses."""
+"""
+    VirtualMailManager.EmailAddress
+
+    Virtual Mail Manager's EmailAddress class to handle e-mail addresses.
+"""
 
 import re
 
@@ -16,44 +20,48 @@ RE_LOCALPART = """[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]"""
 
 
 class EmailAddress(object):
-    __slots__ = ('_localpart', '_domainname')
+    """Simple class for validated e-mail addresses."""
+    __slots__ = ('localpart', 'domainname')
 
     def __init__(self, address):
+        """Creates a new instance from the string/unicode ``address``."""
         if not isinstance(address, basestring):
             raise TypeError('address is not a str/unicode object: %r' %
                             address)
-        self._localpart = None
-        self._domainname = None
-        self.__chkAddress(address)
+        self.localpart = None
+        self.domainname = None
+        self._chk_address(address)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self._localpart == other._localpart and \
-                    self._domainname == other._domainname
+            return self.localpart == other.localpart and \
+                    self.domainname == other.domainname
         return NotImplemented
 
     def __ne__(self, other):
         if isinstance(other, self.__class__):
-            return self._localpart != other._localpart or \
-                    self._domainname != other._domainname
+            return self.localpart != other.localpart or \
+                    self.domainname != other.domainname
         return NotImplemented
 
     def __repr__(self):
-        return "EmailAddress('%s@%s')" % (self._localpart, self._domainname)
+        return "EmailAddress('%s@%s')" % (self.localpart, self.domainname)
 
     def __str__(self):
-        return "%s@%s" % (self._localpart, self._domainname)
+        return "%s@%s" % (self.localpart, self.domainname)
 
-    def __chkAddress(self, address):
+    def _chk_address(self, address):
+        """Checks if the string ``address`` could be used for an e-mail
+        address."""
         parts = address.split('@')
         p_len = len(parts)
         if p_len is 2:
-            self._localpart = self.__chkLocalpart(parts[0])
+            self.localpart = check_localpart(parts[0])
             if len(parts[1]) > 0:
-                self._domainname = chk_domainname(parts[1])
+                self.domainname = chk_domainname(parts[1])
             else:
                 raise VMMEAE(_(u"Missing domain name after “%s@”.") %
-                             self._localpart, DOMAIN_NO_NAME)
+                             self.localpart, DOMAIN_NO_NAME)
         elif p_len < 2:
             raise VMMEAE(_(u"Missing '@' sign in e-mail address “%s”.") %
                          address, INVALID_ADDRESS)
@@ -61,21 +69,27 @@ class EmailAddress(object):
             raise VMMEAE(_(u"Too many '@' signs in e-mail address “%s”.") %
                          address, INVALID_ADDRESS)
 
-    def __chkLocalpart(self, localpart):
-        """Validates the local-part of an e-mail address.
 
-        Arguments:
-        localpart -- local-part of the e-mail address that should be validated
-        """
-        if len(localpart) < 1:
-            raise VMMEAE(_(u'No local-part specified.'), LOCALPART_INVALID)
-        if len(localpart) > 64:
-            raise VMMEAE(_(u'The local-part “%s” is too long') % localpart,
-                         LOCALPART_TOO_LONG)
-        ic = set(re.findall(RE_LOCALPART, localpart))
-        if len(ic):
-            ichrs = u''.join((u'“%s” ' % c for c in ic))
-            raise VMMEAE(_(u"The local-part “%(lpart)s” contains invalid\
- characters: %(ichrs)s") % {'lpart': localpart, 'ichrs': ichrs},
-                         LOCALPART_INVALID)
-        return localpart
+_ = lambda msg: msg
+
+
+def check_localpart(localpart):
+    """Validates the local-part of an e-mail address.
+
+    Argument:
+    localpart -- local-part of the e-mail address that should be validated
+    """
+    if len(localpart) < 1:
+        raise VMMEAE(_(u'No local-part specified.'), LOCALPART_INVALID)
+    if len(localpart) > 64:
+        raise VMMEAE(_(u'The local-part “%s” is too long') % localpart,
+                     LOCALPART_TOO_LONG)
+    invalid_chars = set(re.findall(RE_LOCALPART, localpart))
+    if invalid_chars:
+        i_chrs = u''.join((u'“%s” ' % c for c in invalid_chars))
+        raise VMMEAE(_(u"The local-part “%(l_part)s” contains invalid\
+ characters: %(i_chrs)s") % {'l_part': localpart, 'i_chrs': i_chrs},
+                     LOCALPART_INVALID)
+    return localpart
+
+del _
