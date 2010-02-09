@@ -21,34 +21,44 @@ RE_LOCALPART = """[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]"""
 
 class EmailAddress(object):
     """Simple class for validated e-mail addresses."""
-    __slots__ = ('localpart', 'domainname')
+    __slots__ = ('_localpart', '_domainname')
 
     def __init__(self, address):
         """Creates a new instance from the string/unicode ``address``."""
         if not isinstance(address, basestring):
             raise TypeError('address is not a str/unicode object: %r' %
                             address)
-        self.localpart = None
-        self.domainname = None
+        self._localpart = None
+        self._domainname = None
         self._chk_address(address)
+
+    @property
+    def localpart(self):
+        """The local-part of the address *local-part@domain*"""
+        return self._localpart
+
+    @property
+    def domainname(self):
+        """The domain part of the address *local-part@domain*"""
+        return self._domainname
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self.localpart == other.localpart and \
-                    self.domainname == other.domainname
+            return self._localpart == other.localpart and \
+                    self._domainname == other.domainname
         return NotImplemented
 
     def __ne__(self, other):
         if isinstance(other, self.__class__):
-            return self.localpart != other.localpart or \
-                    self.domainname != other.domainname
+            return self._localpart != other.localpart or \
+                    self._domainname != other.domainname
         return NotImplemented
 
     def __repr__(self):
-        return "EmailAddress('%s@%s')" % (self.localpart, self.domainname)
+        return "EmailAddress('%s@%s')" % (self._localpart, self._domainname)
 
     def __str__(self):
-        return "%s@%s" % (self.localpart, self.domainname)
+        return "%s@%s" % (self._localpart, self._domainname)
 
     def _chk_address(self, address):
         """Checks if the string ``address`` could be used for an e-mail
@@ -56,12 +66,12 @@ class EmailAddress(object):
         parts = address.split('@')
         p_len = len(parts)
         if p_len is 2:
-            self.localpart = check_localpart(parts[0])
+            self._localpart = check_localpart(parts[0])
             if len(parts[1]) > 0:
-                self.domainname = chk_domainname(parts[1])
+                self._domainname = chk_domainname(parts[1])
             else:
                 raise VMMEAE(_(u"Missing domain name after “%s@”.") %
-                             self.localpart, DOMAIN_NO_NAME)
+                             self._localpart, DOMAIN_NO_NAME)
         elif p_len < 2:
             raise VMMEAE(_(u"Missing '@' sign in e-mail address “%s”.") %
                          address, INVALID_ADDRESS)
