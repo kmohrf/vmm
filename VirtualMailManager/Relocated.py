@@ -8,10 +8,10 @@
     Virtual Mail Manager's Relocated class to handle relocated users.
 """
 
-from VirtualMailManager.Domain import Domain
+from VirtualMailManager.Domain import get_gid
 from VirtualMailManager.EmailAddress import EmailAddress
 from VirtualMailManager.Exceptions import VMMRelocatedException as VMMRE
-from VirtualMailManager.constants.ERROR import NO_SUCH_DOMAIN, \
+from VirtualMailManager.constants.ERROR import \
      NO_SUCH_RELOCATED, RELOCATED_ADDR_DEST_IDENTICAL, RELOCATED_EXISTS
 
 
@@ -33,19 +33,10 @@ class Relocated(object):
         else:
             raise TypeError("Argument 'address' is not an EmailAddress")
         self._dbh = dbh
-        self._gid = 0
+        self._gid = get_gid(self._dbh, self._addr.domainname)
         self._dest = None
 
-        self.__set_gid()
         self.__load()
-
-    def __set_gid(self):
-        """Sets the `_gid` attribute, based on the `_addr.domainname`."""
-        dom = Domain(self._dbh, self._addr.domainname)
-        self._gid = dom.getID()
-        if self._gid == 0:
-            raise VMMRE(_(u"The domain “%s” doesn't exist.") %
-                        self._addr.domainname, NO_SUCH_DOMAIN)
 
     def __load(self):
         """Loads the destination address from the database into the

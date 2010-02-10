@@ -278,6 +278,7 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts,
             aliasdomains = [aname[0] for aname in anames]
         return aliasdomains
 
+
 def search(dbh, pattern=None, like=False):
     if pattern is not None and like is False:
         pattern = chk_domainname(pattern)
@@ -311,3 +312,18 @@ def search(dbh, pattern=None, like=False):
     del doms
     return order, domdict
 
+def get_gid(dbh, domainname):
+    """Returns the *GID* of the domain *domainname*.
+
+    Raises an `VMMDomainException` if the domain does not exist.
+    """
+    domainname = chk_domainname(domainname)
+    dbc = dbh.cursor()
+    dbc.execute('SELECT gid FROM domain_name WHERE domainname=%s', domainname)
+    gid = dbc.fetchone()
+    dbc.close()
+    if gid:
+        return gid[0]
+    else:
+        raise VMMDE(_(u"The domain “%s” doesn't exist.") % domainname,
+                    NO_SUCH_DOMAIN)

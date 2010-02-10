@@ -8,11 +8,11 @@
     Virtual Mail Manager's Alias class to manage e-mail aliases.
 """
 
-from VirtualMailManager.Domain import Domain
+from VirtualMailManager.Domain import get_gid
 from VirtualMailManager.EmailAddress import EmailAddress
 from VirtualMailManager.Exceptions import VMMAliasException as VMMAE
 from VirtualMailManager.constants.ERROR import ALIAS_ADDR_DEST_IDENTICAL, \
-     ALIAS_EXCEEDS_EXPANSION_LIMIT, ALIAS_EXISTS, NO_SUCH_ALIAS, NO_SUCH_DOMAIN
+     ALIAS_EXCEEDS_EXPANSION_LIMIT, ALIAS_EXISTS, NO_SUCH_ALIAS
 
 
 _ = lambda msg: msg
@@ -28,19 +28,10 @@ class Alias(object):
         else:
             raise TypeError("Argument 'address' is not an EmailAddress")
         self._dbh = dbh
-        self._gid = 0
+        self._gid = get_gid(self._dbh, self._addr.domainname)
         self._dests = []
 
-        self.__set_gid()
         self.__load_dests()
-
-    def __set_gid(self):
-        """Sets the alias' _gid based on its _addr.domainname."""
-        dom = Domain(self._dbh, self._addr.domainname)
-        self._gid = dom.getID()
-        if self._gid == 0:
-            raise VMMAE(_(u"The domain “%s” doesn't exist.") %
-                        self._addr.domainname, NO_SUCH_DOMAIN)
 
     def __load_dests(self):
         """Loads all known destination addresses into the _dests list."""
