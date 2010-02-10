@@ -177,23 +177,21 @@ class Handler(object):
     relocatedExists = staticmethod(relocatedExists)
 
     def __getAccount(self, address, password=None):
-        self.__dbConnect()
         address = EmailAddress(address)
         if not password is None:
             password = self.__pwhash(password)
+        self.__dbConnect()
         return Account(self._dbh, address, password)
 
     def __getAlias(self, address):
-        self.__dbConnect()
         address = EmailAddress(address)
+        self.__dbConnect()
         return Alias(self._dbh, address)
 
-    def __getRelocated(self, address, destination=None):
-        self.__dbConnect()
+    def __getRelocated(self, address):
         address = EmailAddress(address)
-        if destination is not None:
-            destination = EmailAddress(destination)
-        return Relocated(self._dbh, address, destination)
+        self.__dbConnect()
+        return Relocated(self._dbh, address)
 
     def __getDomain(self, domainname, transport=None):
         if transport is None:
@@ -659,14 +657,21 @@ The service name “managesieve” is deprecated and will be removed\n\
         acc.enable(self._Cfg.dget('misc.dovecot_version'), service)
 
     def relocatedAdd(self, emailaddress, targetaddress):
-        relocated = self.__getRelocated(emailaddress, targetaddress)
-        relocated.save()
+        """Creates a new `Relocated` entry in the database. If there is
+        already a relocated user with the given *emailaddress*, only the
+        *targetaddress* for the relocated user will be updated."""
+        relocated = self.__getRelocated(emailaddress)
+        relocated.setDestination(EmailAddress(targetaddress))
 
     def relocatedInfo(self, emailaddress):
+        """Returns the target address of the relocated user with the given
+        *emailaddress*."""
         relocated = self.__getRelocated(emailaddress)
         return relocated.getInfo()
 
     def relocatedDelete(self, emailaddress):
+        """Deletes the relocated user with the given *emailaddress* from
+        the database."""
         relocated = self.__getRelocated(emailaddress)
         relocated.delete()
 
