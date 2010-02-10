@@ -42,7 +42,7 @@ RE_MBOX_NAMES = """^[\x20-\x25\x27-\x7E]*$"""
 class Handler(object):
     """Wrapper class to simplify the access on all the stuff from
     VirtualMailManager"""
-    __slots__ = ('_Cfg', '_cfgFileName', '__dbh', '_scheme', '__warnings',
+    __slots__ = ('_Cfg', '_cfgFileName', '_dbh', '_scheme', '__warnings',
                  '_postconf')
 
     def __init__(self, skip_some_checks=False):
@@ -58,7 +58,7 @@ class Handler(object):
         self._cfgFileName = ''
         self.__warnings = []
         self._Cfg = None
-        self.__dbh = None
+        self._dbh = None
 
         if os.geteuid():
             raise VMMNotRootException(_(u"You are not root.\n\tGood bye!\n"),
@@ -129,16 +129,16 @@ class Handler(object):
 
     def __dbConnect(self):
         """Creates a pyPgSQL.PgSQL.connection instance."""
-        if self.__dbh is None or (isinstance(self.__dbh, PgSQL.Connection) and
-                                  not self.__dbh._isOpen):
+        if self._dbh is None or (isinstance(self._dbh, PgSQL.Connection) and
+                                  not self._dbh._isOpen):
             try:
-                self.__dbh = PgSQL.connect(
+                self._dbh = PgSQL.connect(
                         database=self._Cfg.dget('database.name'),
                         user=self._Cfg.pget('database.user'),
                         host=self._Cfg.dget('database.host'),
                         password=self._Cfg.pget('database.pass'),
                         client_encoding='utf8', unicode_results=True)
-                dbc = self.__dbh.cursor()
+                dbc = self._dbh.cursor()
                 dbc.execute("SET NAMES 'UTF8'")
                 dbc.close()
             except PgSQL.libpq.DatabaseError, e:
@@ -157,22 +157,22 @@ class Handler(object):
 
     def accountExists(dbh, address):
         sql = "SELECT gid FROM users WHERE gid = (SELECT gid FROM domain_name\
- WHERE domainname = '%s') AND local_part = '%s'" % (address._domainname,
-            address._localpart)
+ WHERE domainname = '%s') AND local_part = '%s'" % (address.domainname,
+            address.localpart)
         return Handler._exists(dbh, sql)
     accountExists = staticmethod(accountExists)
 
     def aliasExists(dbh, address):
         sql = "SELECT DISTINCT gid FROM alias WHERE gid = (SELECT gid FROM\
  domain_name WHERE domainname = '%s') AND address = '%s'" % (
-                address._domainname, address._localpart)
+                address.domainname, address.localpart)
         return Handler._exists(dbh, sql)
     aliasExists = staticmethod(aliasExists)
 
     def relocatedExists(dbh, address):
         sql = "SELECT gid FROM relocated WHERE gid = (SELECT gid FROM\
  domain_name WHERE domainname = '%s') AND address = '%s'" % (
-                address._domainname, address._localpart)
+                address.domainname, address.localpart)
         return Handler._exists(dbh, sql)
     relocatedExists = staticmethod(relocatedExists)
 
@@ -181,27 +181,25 @@ class Handler(object):
         address = EmailAddress(address)
         if not password is None:
             password = self.__pwhash(password)
-        return Account(self.__dbh, address, password)
+        return Account(self._dbh, address, password)
 
-    def __getAlias(self, address, destination=None):
+    def __getAlias(self, address):
         self.__dbConnect()
         address = EmailAddress(address)
-        if destination is not None:
-            destination = EmailAddress(destination)
-        return Alias(self.__dbh, address, destination)
+        return Alias(self._dbh, address)
 
     def __getRelocated(self, address, destination=None):
         self.__dbConnect()
         address = EmailAddress(address)
         if destination is not None:
             destination = EmailAddress(destination)
-        return Relocated(self.__dbh, address, destination)
+        return Relocated(self._dbh, address, destination)
 
     def __getDomain(self, domainname, transport=None):
         if transport is None:
             transport = self._Cfg.dget('misc.transport')
         self.__dbConnect()
-        return Domain(self.__dbh, domainname,
+        return Domain(self._dbh, domainname,
                 self._Cfg.dget('misc.base_directory'), transport)
 
     def __getDiskUsage(self, directory):
@@ -474,12 +472,12 @@ class Handler(object):
         domainname -- name of the target domain (str)
         """
         dom = self.__getDomain(domainname)
-        aliasDom = AliasDomain(self.__dbh, aliasname, dom)
+        aliasDom = AliasDomain(self._dbh, aliasname, dom)
         aliasDom.save()
 
     def aliasDomainInfo(self, aliasname):
         self.__dbConnect()
-        aliasDom = AliasDomain(self.__dbh, aliasname, None)
+        aliasDom = AliasDomain(self._dbh, aliasname, None)
         return aliasDom.info()
 
     def aliasDomainSwitch(self, aliasname, domainname):
@@ -490,7 +488,7 @@ class Handler(object):
         domainname -- name of the new target domain (str)
         """
         dom = self.__getDomain(domainname)
-        aliasDom = AliasDomain(self.__dbh, aliasname, dom)
+        aliasDom = AliasDomain(self._dbh, aliasname, dom)
         aliasDom.switch()
 
     def aliasDomainDelete(self, aliasname):
@@ -500,7 +498,7 @@ class Handler(object):
         aliasname -- the name of the alias domain (str)
         """
         self.__dbConnect()
-        aliasDom = AliasDomain(self.__dbh, aliasname, None)
+        aliasDom = AliasDomain(self._dbh, aliasname, None)
         aliasDom.delete()
 
     def domainList(self, pattern=None):
@@ -520,7 +518,7 @@ class Handler(object):
                     _(u"The pattern “%s” contains invalid characters.") %
                     pattern, ERR.DOMAIN_INVALID)
         self.__dbConnect()
-        return search(self.__dbh, pattern=pattern, like=like)
+        return search(self._dbh, pattern=pattern, like=like)
 
     def userAdd(self, emailaddress, password):
         if password is None or (isinstance(password, basestring) and
@@ -536,14 +534,18 @@ class Handler(object):
         self.__mailDirMake(acc.getDir('domain'), acc.getUID(), acc.getGID())
 
     def aliasAdd(self, aliasaddress, targetaddress):
-        alias = self.__getAlias(aliasaddress, targetaddress)
-        alias.save(long(self._postconf.read('virtual_alias_expansion_limit')))
-        gid = self.__getDomain(alias._dest._domainname).getID()
-        if gid > 0 and (not Handler.accountExists(self.__dbh, alias._dest) and
-                        not Handler.aliasExists(self.__dbh, alias._dest)):
+        """Creates a new `Alias` entry for the given *aliasaddress* with
+        the given *targetaddress*."""
+        alias = self.__getAlias(aliasaddress)
+        destination = EmailAddress(targetaddress)
+        alias.addDestination(destination,
+                    long(self._postconf.read('virtual_alias_expansion_limit')))
+        gid = self.__getDomain(destination.domainname).getID()
+        if gid > 0 and (not Handler.accountExists(self._dbh, destination) and
+                        not Handler.aliasExists(self._dbh, destination)):
             self.__warnings.append(
                 _(u"The destination account/alias “%s” doesn't exist.") %
-                                   alias._dest)
+                                   destination)
 
     def userDelete(self, emailaddress, force=None):
         if force not in [None, 'delalias']:
@@ -570,12 +572,34 @@ The account has been successfully deleted from the database.
                     raise
 
     def aliasInfo(self, aliasaddress):
+        """Returns an iterator object for all destinations (`EmailAddress`
+        instances) for the `Alias` with the given *aliasaddress*."""
         alias = self.__getAlias(aliasaddress)
-        return alias.getInfo()
+        try:
+            return alias.getDestinations()
+        except VMMAliasException, e:
+            if e.code() == ERR.NO_SUCH_ALIAS:
+                if Handler.accountExists(self._dbh, alias._addr):
+                    raise VMMException(
+                        _(u'There is already an account with address “%s”.') %
+                                       aliasaddress, ERR.ACCOUNT_EXISTS)
+                if Handler.relocatedExists(self._dbh, alias._addr):
+                    raise VMMException(_(u'There is already a relocated user \
+with the address “%s”.') %
+                                       aliasaddress, ERR.RELOCATED_EXISTS)
+                raise
+            else:
+                raise
 
     def aliasDelete(self, aliasaddress, targetaddress=None):
-        alias = self.__getAlias(aliasaddress, targetaddress)
-        alias.delete()
+        """Deletes the `Alias` *aliasaddress* with all its destinations from
+        the database. If *targetaddress* is not ``None``, only this
+        destination will be removed from the alias."""
+        alias = self.__getAlias(aliasaddress)
+        if targetaddress is None:
+            alias.delete()
+        else:
+            alias.delDestination(EmailAddress(targetaddress))
 
     def userInfo(self, emailaddress, details=None):
         if details not in (None, 'du', 'aliases', 'full'):
@@ -594,7 +618,7 @@ The account has been successfully deleted from the database.
     def userByID(self, uid):
         from Handler.Account import getAccountByID
         self.__dbConnect()
-        return getAccountByID(uid, self.__dbh)
+        return getAccountByID(uid, self._dbh)
 
     def userPassword(self, emailaddress, password):
         if password is None or (isinstance(password, basestring) and
@@ -647,5 +671,5 @@ The service name “managesieve” is deprecated and will be removed\n\
         relocated.delete()
 
     def __del__(self):
-        if isinstance(self.__dbh, PgSQL.Connection) and self.__dbh._isOpen:
-            self.__dbh.close()
+        if isinstance(self._dbh, PgSQL.Connection) and self._dbh._isOpen:
+            self._dbh.close()

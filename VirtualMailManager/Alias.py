@@ -2,121 +2,153 @@
 # Copyright (c) 2007 - 2010, Pascal Volk
 # See COPYING for distribution information.
 
-"""Virtual Mail Manager's Alias class to manage e-mail aliases."""
+"""
+    VirtualMailManager.Alias
 
-import VirtualMailManager.constants.ERROR as ERR
+    Virtual Mail Manager's Alias class to manage e-mail aliases.
+"""
+
 from VirtualMailManager.Domain import Domain
 from VirtualMailManager.EmailAddress import EmailAddress
 from VirtualMailManager.Exceptions import VMMAliasException as VMMAE
-import VirtualMailManager as VMM
+from VirtualMailManager.constants.ERROR import ALIAS_ADDR_DEST_IDENTICAL, \
+     ALIAS_EXCEEDS_EXPANSION_LIMIT, ALIAS_EXISTS, NO_SUCH_ALIAS, NO_SUCH_DOMAIN
+
+
+_ = lambda msg: msg
+
 
 class Alias(object):
     """Class to manage e-mail aliases."""
-    __slots__ = ('_addr', '_dest', '_gid', '_isNew', '_dbh')
-    def __init__(self, dbh, address, destination=None):
+    __slots__ = ('_addr', '_dests', '_gid', '_dbh')
+
+    def __init__(self, dbh, address):
         if isinstance(address, EmailAddress):
             self._addr = address
         else:
             raise TypeError("Argument 'address' is not an EmailAddress")
-        if destination is None:
-            self._dest = None
-        elif isinstance(destination, EmailAddress):
-            self._dest = destination
-        else:
-            raise TypeError("Argument 'destination' is not an EmailAddress")
-        if address == destination:
-            raise VMMAE(_(u"Address and destination are identical."),
-                ERR.ALIAS_ADDR_DEST_IDENTICAL)
         self._dbh = dbh
         self._gid = 0
-        self._isNew = False
-        self._setAddr()
-        if not self._dest is None:
-            self._exists()
-        if VMM.VirtualMailManager.accountExists(self._dbh, self._addr):
-            raise VMMAE(_(u"There is already an account with address “%s”.") %\
-                    self._addr, ERR.ACCOUNT_EXISTS)
-        if VMM.VirtualMailManager.relocatedExists(self._dbh, self._addr):
-            raise VMMAE(
-              _(u"There is already a relocated user with the address “%s”.") %\
-                    self._addr, ERR.RELOCATED_EXISTS)
+        self._dests = []
 
-    def _exists(self):
-        dbc = self._dbh.cursor()
-        dbc.execute("SELECT gid FROM alias WHERE gid=%s AND address=%s\
- AND destination=%s", self._gid, self._addr._localpart, str(self._dest))
-        gid = dbc.fetchone()
-        dbc.close()
-        if gid is None:
-            self._isNew = True
+        self.__set_gid()
+        self.__load_dests()
 
-    def _setAddr(self):
-        dom = Domain(self._dbh, self._addr._domainname)
+    def __set_gid(self):
+        """Sets the alias' _gid based on its _addr.domainname."""
+        dom = Domain(self._dbh, self._addr.domainname)
         self._gid = dom.getID()
         if self._gid == 0:
-            raise VMMAE(_(u"The domain “%s” doesn't exist.") %\
-                    self._addr._domainname, ERR.NO_SUCH_DOMAIN)
+            raise VMMAE(_(u"The domain “%s” doesn't exist.") %
+                        self._addr.domainname, NO_SUCH_DOMAIN)
 
-    def _checkExpansion(self, limit):
+    def __load_dests(self):
+        """Loads all known destination addresses into the _dests list."""
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT count(gid) FROM alias where gid=%s AND address=%s',
-                self._gid, self._addr._localpart)
-        curEx = dbc.fetchone()[0]
+        dbc.execute(
+                'SELECT destination FROM alias WHERE gid=%s AND address=%s',
+                    self._gid, self._addr.localpart)
+        dests = iter(dbc.fetchall())
+        if dbc.rowcount > 0:
+            dest_add = self._dests.append
+            for dest in dests:
+                dest_add(EmailAddress(dest[0]))
         dbc.close()
-        if curEx == limit:
-            errmsg = _(u"""Can't add new destination to alias “%(address)s”.
-Currently this alias expands into %(count)i recipients.
+
+    def __check_expansion(self, limit):
+        """Checks the current expansion limit of the alias."""
+        dcount = len(self._dests)
+        failed = False
+        if dcount == limit:
+            failed = True
+            errmsg = _(
+u"""Can't add new destination to alias “%(address)s”.
+Currently this alias expands into %(count)i/%(limit)i recipients.
 One more destination will render this alias unusable.
-Hint: Increase Postfix' virtual_alias_expansion_limit
-""") % {'address': self._addr, 'count': curEx}
-            raise VMMAE(errmsg, ERR.ALIAS_EXCEEDS_EXPANSION_LIMIT)
+Hint: Increase Postfix' virtual_alias_expansion_limit""")
+        elif dcount > limit:
+            failed = True
+            errmsg = _(
+u"""Can't add new destination to alias “%(address)s”.
+This alias already exceeds it's expansion limit (%(count)i/%(limit)i).
+So its unusable, all messages addressed to this alias will be bounced.
+Hint: Delete some destination addresses.""")
+        if failed:
+            raise VMMAE(errmsg % {'address': self._addr, 'count': dcount,
+                                  'limit': limit},
+                        ALIAS_EXCEEDS_EXPANSION_LIMIT)
 
-    def save(self, expansion_limit):
-        if self._dest is None:
-           raise VMMAE(_(u"No destination address specified for alias."),
-               ERR.ALIAS_MISSING_DEST)
-        if self._isNew:
-            self._checkExpansion(expansion_limit)
-            dbc = self._dbh.cursor()
-            dbc.execute("INSERT INTO alias (gid, address, destination) VALUES\
- (%s, %s, %s)", self._gid, self._addr._localpart, str(self._dest))
-            self._dbh.commit()
-            dbc.close()
-        else:
-            raise VMMAE(
-               _(u"The alias “%(a)s” with destination “%(d)s” already exists.")\
-                       % {'a': self._addr, 'd': self._dest}, ERR.ALIAS_EXISTS)
-
-    def getInfo(self):
+    def __delete(self, destination=None):
+        """Deletes a destination from the alias, if ``destination`` is not
+        ``None``. If ``destination`` is None, the alias with all it's
+        destination addresses will be deleted."""
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT destination FROM alias WHERE gid=%s AND address=%s',
-                self._gid, self._addr._localpart)
-        destinations = dbc.fetchall()
-        dbc.close()
-        if len(destinations) > 0:
-            targets = [destination[0] for destination in destinations]
-            return targets
-        else:
-            raise VMMAE(_(u"The alias “%s” doesn't exist.") % self._addr,
-                    ERR.NO_SUCH_ALIAS)
-
-    def delete(self):
-        dbc = self._dbh.cursor()
-        if self._dest is None:
+        if destination is None:
             dbc.execute("DELETE FROM alias WHERE gid=%s AND address=%s",
-                    self._gid, self._addr._localpart)
+                        self._gid, self._addr.localpart)
         else:
             dbc.execute("DELETE FROM alias WHERE gid=%s AND address=%s AND \
- destination=%s", self._gid, self._addr._localpart, str(self._dest))
-        rowcount = dbc.rowcount
-        dbc.close()
-        if rowcount > 0:
+ destination=%s",
+                        self._gid, self._addr.localpart, str(destination))
+        if dbc.rowcount > 0:
             self._dbh.commit()
-        else:
-            if self._dest is None:
-                msg = _(u"The alias “%s” doesn't exist.") % self._addr
-            else:
-                msg = _(u"The alias “%(a)s” with destination “%(d)s” doesn't\
- exist.") % {'a': self._addr, 'd': self._dest}
-            raise VMMAE(msg, ERR.NO_SUCH_ALIAS)
+        dbc.close()
 
+    def __len__(self):
+        """Returns the number of destinations of the alias."""
+        return len(self._dests)
+
+    def addDestination(self, destination, expansion_limit):
+        """Adds the ``destination`` `EmailAddress` to the alias."""
+        if not isinstance(destination, EmailAddress):
+            raise TypeError("Argument 'destination' is not an EmailAddress")
+        if self._addr == destination:
+            raise VMMAE(_(u"Address and destination are identical."),
+                        ALIAS_ADDR_DEST_IDENTICAL)
+        if not destination in self._dests:
+            self.__check_expansion(expansion_limit)
+            dbc = self._dbh.cursor()
+            dbc.execute('INSERT INTO alias (gid, address, destination) \
+VALUES (%s, %s, %s)',
+                        self._gid, self._addr.localpart, str(destination))
+            self._dbh.commit()
+            dbc.close()
+            self._dests.append(destination)
+        else:
+            raise VMMAE(_(
+                u'The alias “%(a)s” has already the destination “%(d)s”.') %
+                        {'a': self._addr, 'd': destination}, ALIAS_EXISTS)
+
+    def delDestination(self, destination):
+        """Deletes the specified ``destination`` address from the alias."""
+        if not isinstance(destination, EmailAddress):
+            raise TypeError("Argument 'destination' is not an EmailAddress")
+        if not self._dests:
+            raise VMMAE(_(u"The alias “%s” doesn't exist.") % self._addr,
+                        NO_SUCH_ALIAS)
+        if not destination in self._dests:
+            raise VMMAE(_(u"The address “%(d)s” isn't a destination of \
+the alias “%(a)s”.") %
+                        {'a': self._addr, 'd': destination}, NO_SUCH_ALIAS)
+        self.__delete(destination)
+        self._dests.remove(destination)
+
+    def getDestinations(self):
+        """Returns an iterator for all destinations of the alias."""
+        if self._dests:
+            return iter(self._dests)
+        else:
+            raise VMMAE(_(u"The alias “%s” doesn't exist.") % self._addr,
+                        NO_SUCH_ALIAS)
+
+    def delete(self):
+        """Deletes the alias with all it's destinations."""
+        if self._dests:
+            self.__delete()
+            del self._dests[:]
+        else:
+            raise VMMAE(_(u"The alias “%s” doesn't exist.") % self._addr,
+                        NO_SUCH_ALIAS)
+
+
+del _
