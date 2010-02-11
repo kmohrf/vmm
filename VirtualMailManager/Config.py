@@ -2,7 +2,10 @@
 # Copyright (c) 2007 - 2010, Pascal Volk
 # See COPYING for distribution information.
 
-"""vmm's configuration module for simplified configuration access.
+"""
+    VirtualMailManager.Config
+
+    VMM's configuration module for simplified configuration access.
 
 This module defines a few classes:
 
@@ -112,8 +115,8 @@ class LazyConfig(RawConfigParser):
         # be still a boolean value - lets see
         if self._modified:
            tmp = self.get(section, option)
-           if isinstance(tmp, bool):
-               return tmp
+           assert isinstance(tmp, bool), 'Oops, not a boolean: %r' % tmp
+           return tmp
         return self.getboolean(section, option)
 
     def _get_section_option(self, section_option):
@@ -131,6 +134,7 @@ class LazyConfig(RawConfigParser):
             * `NoOptionError`
         """
         sect_opt = section_option.lower().split('.')
+        # TODO: cache it
         if len(sect_opt) != 2:# do we need a regexp to check the format?
             raise BadOptionError(
                         _(u'Bad format: “%s” - expected: section.option') %
@@ -178,7 +182,7 @@ class LazyConfig(RawConfigParser):
         try:
             return self._cfg[section][option].getter(section, option)
         except (NoSectionError, NoOptionError):
-            if not self._cfg[section][option].default is None:
+            if not self._cfg[section][option].default is None:# may be False
                 return self._cfg[section][option].default
             else:
                 raise NoDefaultError(section, option)
@@ -195,7 +199,7 @@ class LazyConfig(RawConfigParser):
         ``LazyConfigOption.cls``"""
         section, option = self._get_section_option(option)
         val = self._cfg[section][option].cls(value)
-        if not self._cfg[section][option].validate is None:
+        if self._cfg[section][option].validate:
             val = self._cfg[section][option].validate(val)
         if not RawConfigParser.has_section(self, section):
             self.add_section(section)
@@ -223,7 +227,7 @@ class LazyConfigOption(object):
    and instances of classes derived from ``LazyConfig``, like the
    `Config` class.
     """
-    __slots__ = ('cls', 'default', 'getter', 'validate')
+    __slots__ = ('__cls', '__default', '__getter', '__validate')
 
     def __init__(self, cls, default, getter, validate=None):
         """Creates a new ``LazyConfigOption`` instance.
@@ -242,22 +246,36 @@ class LazyConfigOption(object):
             None or any method, that takes one argument, in order to check
             the value, when `LazyConfig.set()` is called.
         """
-        self.cls = cls
+        self.__cls = cls
+        self.__default = default
+        if not callable(getter):
+            raise TypeError('getter has to be a callable, got a %r' %
+                            getter.__class__.__name__)
+        self.__getter = getter
+        if validate and not callable(validate):
+            raise TypeError('validate has to be callable or None, got a %r' %
+                            validate.__class__.__name__)
+        self.__validate = validate
+
+    @property
+    def cls(self):
         """The class of the option's value e.g. `str`, `unicode` or `bool`"""
-        self.default = default
+        return self.__cls
+
+    @property
+    def default(self):
         """The option's default value, may be ``None``"""
-        if callable(getter):
-            self.getter = getter
-            """The getter method to get the option's value"""
-        else:
-            raise TypeError('getter has to be a callable, got a %r'\
-                            % getter.__class__.__name__)
-        if validate is None or callable(validate):
-            self.validate = validate
-            """A method to validate the value"""
-        else:
-            raise TypeError('validate has to be callable or None, got a %r'\
-                            % validate.__class__.__name__)
+        return self.__default
+
+    @property
+    def getter(self):
+        """The getter method or function to get the option's value"""
+        return self.__getter
+
+    @property
+    def validate(self):
+        """A method or function to validate the value"""
+        return self.__validate
 
 
 class Config(LazyConfig):
@@ -335,7 +353,7 @@ class Config(LazyConfig):
         except (MissingSectionHeaderError, ParsingError), e:
             raise VMMConfigException(str(e), CONF_ERROR)
         finally:
-            if not self._cfgFile is None and not self._cfgFile.closed:
+            if self._cfgFile and not self._cfgFile.closed:
                 self._cfgFile.close()
 
     def check(self):
@@ -388,6 +406,6 @@ class Config(LazyConfig):
                     not RawConfigParser.has_option(self, section, option)):
                         missing.append(option)
                         errors = True
-            if len(missing):
+            if missing:
                 self.__missing[section] = missing
         return not errors
