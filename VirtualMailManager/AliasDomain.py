@@ -5,7 +5,7 @@
 """Virtual Mail Manager's AliasDomain class to manage alias domains."""
 
 import VirtualMailManager.constants.ERROR as ERR
-from VirtualMailManager import chk_domainname
+from VirtualMailManager import check_domainname
 from VirtualMailManager.Exceptions import VMMAliasDomainException as VADE
 
 class AliasDomain(object):
@@ -13,7 +13,7 @@ class AliasDomain(object):
     __slots__ = ('__gid', '__name', '_domain', '_dbh')
     def __init__(self, dbh, domainname, targetDomain=None):
         self._dbh = dbh
-        self.__name = chk_domainname(domainname)
+        self.__name = check_domainname(domainname)
         self.__gid = 0
         self._domain = targetDomain
         self._exists()

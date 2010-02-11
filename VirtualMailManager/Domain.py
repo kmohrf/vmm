@@ -6,7 +6,7 @@
 
 from random import choice
 
-from VirtualMailManager import chk_domainname
+from VirtualMailManager import check_domainname
 from VirtualMailManager.constants.ERROR import \
      ACCOUNT_AND_ALIAS_PRESENT, ACCOUNT_PRESENT, ALIAS_PRESENT, \
      DOMAIN_ALIAS_EXISTS, DOMAIN_EXISTS, NO_SUCH_DOMAIN
@@ -29,7 +29,7 @@ class Domain(object):
         transport -- default vmm.cfg/misc/transport  (str)
         """
         self._dbh = dbh
-        self._name = chk_domainname(domainname)
+        self._name = check_domainname(domainname)
         self._basedir = basedir
         if transport is not None:
             self._transport = Transport(self._dbh, transport=transport)
@@ -281,7 +281,7 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts,
 
 def search(dbh, pattern=None, like=False):
     if pattern is not None and like is False:
-        pattern = chk_domainname(pattern)
+        pattern = check_domainname(pattern)
     sql = 'SELECT gid, domainname, is_primary FROM domain_name'
     if pattern is None:
         pass
@@ -317,7 +317,7 @@ def get_gid(dbh, domainname):
 
     Raises an `VMMDomainException` if the domain does not exist.
     """
-    domainname = chk_domainname(domainname)
+    domainname = check_domainname(domainname)
     dbc = dbh.cursor()
     dbc.execute('SELECT gid FROM domain_name WHERE domainname=%s', domainname)
     gid = dbc.fetchone()
