@@ -28,10 +28,9 @@ class Relocated(object):
 
         Use `setDestination()` to set/update the new address, where the
         user has moved to."""
-        if isinstance(address, EmailAddress):
-            self._addr = address
-        else:
+        if not isinstance(address, EmailAddress):
             raise TypeError("Argument 'address' is not an EmailAddress")
+        self._addr = address
         self._dbh = dbh
         self._gid = get_gid(self._dbh, self._addr.domainname)
         self._dest = None
@@ -53,22 +52,20 @@ class Relocated(object):
     def setDestination(self, destination):
         """Sets/updates the new address of the relocated user."""
         update = False
-        if isinstance(destination, EmailAddress):
-            if self._addr == destination:
-                raise VMMRE(_(u'Address and destination are identical.'),
-                            RELOCATED_ADDR_DEST_IDENTICAL)
-            if self._dest:
-                if self._dest == destination:
-                    raise VMMRE(
-                            _(u'The relocated user “%s” already exists.') %
-                                self._addr, RELOCATED_EXISTS)
-                else:
-                    self._dest = destination
-                    update = True
+        if not isinstance(destination, EmailAddress):
+            raise TypeError("Argument 'destination' is not an EmailAddress")
+        if self._addr == destination:
+            raise VMMRE(_(u'Address and destination are identical.'),
+                        RELOCATED_ADDR_DEST_IDENTICAL)
+        if self._dest:
+            if self._dest == destination:
+                raise VMMRE(_(u'The relocated user %r already exists.') %
+                            self._addr, RELOCATED_EXISTS)
             else:
                 self._dest = destination
+                update = True
         else:
-            raise TypeError("Argument 'destination' is not an EmailAddress")
+            self._dest = destination
 
         dbc = self._dbh.cursor()
         if not update:
@@ -83,16 +80,15 @@ WHERE gid=%s AND address=%s',
 
     def getInfo(self):
         """Returns the address to which mails should be sent."""
-        if self._dest:
-            return self._dest
-        else:
-            raise VMMRE(_(u"The relocated user “%s” doesn't exist.") %
+        if not self._dest:
+            raise VMMRE(_(u"The relocated user %r doesn't exist.") %
                         self._addr, NO_SUCH_RELOCATED)
+        return self._dest
 
     def delete(self):
         """Deletes the relocated entry from the database."""
         if not self._dest:
-            raise VMMRE(_(u"The relocated user “%s” doesn't exist.") %
+            raise VMMRE(_(u"The relocated user %r doesn't exist.") %
                         self._addr, NO_SUCH_RELOCATED)
         dbc = self._dbh.cursor()
         dbc.execute("DELETE FROM relocated WHERE gid = %s AND address = %s",
