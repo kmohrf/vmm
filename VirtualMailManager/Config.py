@@ -247,7 +247,10 @@ class LazyConfigOption(object):
             the value, when `LazyConfig.set()` is called.
         """
         self.__cls = cls
-        self.__default = default
+        if not default is None:# enforce the type of the default value
+            self.__default = self.__cls(default)
+        else:
+            self.__default = default
         if not callable(getter):
             raise TypeError('getter has to be a callable, got a %r' %
                             getter.__class__.__name__)
