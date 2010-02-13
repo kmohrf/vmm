@@ -36,7 +36,6 @@ This module defines a few classes:
 """
 
 
-from shutil import copy2
 from ConfigParser import \
      Error, MissingSectionHeaderError, NoOptionError, NoSectionError, \
      ParsingError, RawConfigParser
@@ -61,8 +60,8 @@ class NoDefaultError(Error):
     """Raised when the requested option has no default value."""
 
     def __init__(self, section, option):
-        Error.__init__(self, 'Option %r in section %r has no default value' %(
-                       option, section))
+        Error.__init__(self, 'Option %r in section %r has no default value' %
+                             (option, section))
 
 
 class LazyConfig(RawConfigParser):
@@ -84,6 +83,7 @@ class LazyConfig(RawConfigParser):
     combined to a single string in the form
     "``section``\ **.**\ ``option``".
     """
+
     def __init__(self):
         RawConfigParser.__init__(self)
         self._modified = False
@@ -107,16 +107,16 @@ class LazyConfig(RawConfigParser):
         if value.lower() in self._boolean_states:
             return self._boolean_states[value.lower()]
         else:
-            raise ConfigValueError(_(u'Not a boolean: “%s”') %
+            raise ConfigValueError(_(u"Not a boolean: '%s'") %
                                    get_unicode(value))
 
     def get_boolean(self, section, option):
         # if the setting was not written to the configuration file, it may
         # be still a boolean value - lets see
         if self._modified:
-           tmp = self.get(section, option)
-           assert isinstance(tmp, bool), 'Oops, not a boolean: %r' % tmp
-           return tmp
+            tmp = self.get(section, option)
+            assert isinstance(tmp, bool), 'Oops, not a boolean: %r' % tmp
+            return tmp
         return self.getboolean(section, option)
 
     def _get_section_option(self, section_option):
@@ -137,8 +137,8 @@ class LazyConfig(RawConfigParser):
         # TODO: cache it
         if len(sect_opt) != 2:# do we need a regexp to check the format?
             raise BadOptionError(
-                        _(u'Bad format: “%s” - expected: section.option') %
-                        get_unicode(section_option))
+                        _(u"Bad format: '%s' - expected: section.option") %
+                                 get_unicode(section_option))
         if not sect_opt[0] in self._cfg:
             raise NoSectionError(sect_opt[0])
         if not sect_opt[1] in self._cfg[sect_opt[0]]:
@@ -159,7 +159,8 @@ class LazyConfig(RawConfigParser):
         d = dict((k, self._cfg[section][k].default) \
                  for k in self._cfg[section].iterkeys())
         d.update(d2)
-        if '__name__' in d: del d['__name__']
+        if '__name__' in d:
+            del d['__name__']
         return d.iteritems()
 
     def dget(self, option):
