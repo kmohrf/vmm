@@ -8,6 +8,7 @@
     Adds some interactive stuff to the Config class.
 """
 
+from ConfigParser import RawConfigParser
 from shutil import copy2
 
 from VirtualMailManager import ENCODING

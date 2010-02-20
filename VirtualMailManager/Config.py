@@ -110,14 +110,20 @@ class LazyConfig(RawConfigParser):
             raise ConfigValueError(_(u"Not a boolean: '%s'") %
                                    get_unicode(value))
 
-    def get_boolean(self, section, option):
-        # if the setting was not written to the configuration file, it may
-        # be still a boolean value - lets see
-        if self._modified:
-            tmp = self.get(section, option)
-            assert isinstance(tmp, bool), 'Oops, not a boolean: %r' % tmp
+    def getboolean(self, section, option):
+        """Returns the boolean value of the option, in the given section.
+
+        For a boolean True, the value must be set to '1', 'on', 'yes',
+        'true' or True. For a boolean False, the value must set to '0',
+        'off', 'no', 'false' or False.
+        If the option has another value assigned this method will raise a
+        ValueError.
+        """
+        # if the setting was modified it may be still a boolean value lets see
+        tmp = self.get(section, option)
+        if isinstance(tmp, bool):
             return tmp
-        return self.getboolean(section, option)
+        return RawConfigParser.getboolean(self, section, option)
 
     def _get_section_option(self, section_option):
         """splits ``section_option`` (section\ **.**\ option) in two parts
@@ -302,15 +308,15 @@ class Config(LazyConfig):
         bool_t = self.bool_new
         self._cfg = {
             'account': {
-                'delete_directory': LCO(bool_t, False, self.get_boolean),
+                'delete_directory': LCO(bool_t, False, self.getboolean),
                 'directory_mode':   LCO(int,    448,   self.getint),
-                'disk_usage':       LCO(bool_t, False, self.get_boolean),
+                'disk_usage':       LCO(bool_t, False, self.getboolean),
                 'password_length':  LCO(int,    8,     self.getint),
-                'random_password':  LCO(bool_t, False, self.get_boolean),
-                'imap' :            LCO(bool_t, True,  self.get_boolean),
-                'pop3' :            LCO(bool_t, True,  self.get_boolean),
-                'sieve':            LCO(bool_t, True,  self.get_boolean),
-                'smtp' :            LCO(bool_t, True,  self.get_boolean),
+                'random_password':  LCO(bool_t, False, self.getboolean),
+                'imap' :            LCO(bool_t, True,  self.getboolean),
+                'pop3' :            LCO(bool_t, True,  self.getboolean),
+                'sieve':            LCO(bool_t, True,  self.getboolean),
+                'smtp' :            LCO(bool_t, True,  self.getboolean),
             },
             'bin': {
                 'dovecotpw': LCO(str, '/usr/sbin/dovecotpw', self.get, exec_ok),
@@ -324,10 +330,10 @@ class Config(LazyConfig):
                 'user': LCO(str, None,        self.get),
             },
             'domain': {
-                'auto_postmaster':  LCO(bool_t, True,  self.get_boolean),
-                'delete_directory': LCO(bool_t, False, self.get_boolean),
+                'auto_postmaster':  LCO(bool_t, True,  self.getboolean),
+                'delete_directory': LCO(bool_t, False, self.getboolean),
                 'directory_mode':   LCO(int,    504,   self.getint),
-                'force_deletion':   LCO(bool_t, False, self.get_boolean),
+                'force_deletion':   LCO(bool_t, False, self.getboolean),
             },
             'maildir': {
                 'folders': LCO(str, 'Drafts:Sent:Templates:Trash', self.get),
