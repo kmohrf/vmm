@@ -6,33 +6,6 @@
     VirtualMailManager.Config
 
     VMM's configuration module for simplified configuration access.
-
-This module defines a few classes:
-
-``LazyConfig``
-    This class provides the following additonal methods
-
-    * `LazyConfig.pget()`
-        polymorphic getter which returns the value with the appropriate
-        type.
-    * `LazyConfig.dget()`
-        like *pget()*, but checks additonal for default values in
-        `LazyConfig._cfg`.
-    * `LazyConfig.set()`
-        like `RawConfigParser.set()`, but converts the new value to the
-        appropriate type/class and optional validates the new value.
-    * `LazyConfig.bool_new()`
-        converts data from raw_input into boolean values.
-    * `LazyConfig.get_boolean()`
-        like `RawConfigParser.getboolean()`, but doesn't fail on real
-        `bool` values.
-
-``Config``
-    The Config class used by vmm.
-
-``LazyConfigOption``
-    The class for the configuration objects in the ``Config`` class'
-    ``_cfg`` dictionary.
 """
 
 
@@ -69,19 +42,17 @@ class LazyConfig(RawConfigParser):
 
     There are two additional getters:
 
-    `LazyConfig.pget()`
-        The polymorphic getter, which returns a option's value with the
-        appropriate type.
-    `LazyConfig.dget()`
-        Like `LazyConfig.pget()`, but returns the option's default, from
-        `LazyConfig._cfg['sectionname']['optionname'].default`, if the
-        option is not configured in a ini-like configuration file.
+    `pget()`
+      The polymorphic getter, which returns a option's value with the
+      appropriate type.
+    `dget()`
+      Like `LazyConfig.pget()`, but returns the option's default, from
+      `LazyConfig._cfg['sectionname']['optionname'].default`, if the
+      option is not configured in a ini-like configuration file.
 
-
-    `LazyConfig.set()` differs from ``RawConfigParser``'s ``set()`` method.
-    ``LazyConfig.set()`` takes the ``section`` and ``option`` arguments
-    combined to a single string in the form
-    "``section``\ **.**\ ``option``".
+    `set()` differs from `RawConfigParser`'s `set()` method. `set()` takes
+    the `section` and `option` arguments combined to a single string in the
+    form "section.option".
     """
 
     def __init__(self):
@@ -97,10 +68,10 @@ class LazyConfig(RawConfigParser):
     def bool_new(self, value):
         """Converts the string `value` into a `bool` and returns it.
 
-        | '1', 'on', 'yes' and 'true' will become ``True``
-        | '0', 'off', 'no' and 'false' will become ``False``
+        | '1', 'on', 'yes' and 'true' will become `True`
+        | '0', 'off', 'no' and 'false' will become `False`
 
-        Throws a `ConfigValueError` for all other values, except ``bool``\ s.
+        Throws a `ConfigValueError` for all other values, except bools.
         """
         if isinstance(value, bool):
             return value
@@ -200,10 +171,10 @@ class LazyConfig(RawConfigParser):
         return self._cfg[section][option].getter(section, option)
 
     def set(self, option, value):
-        """Set the value of an option.
+        """Set the `value` of the `option`.
 
-        Throws a ``ValueError`` if `value` couldn't be converted to
-        ``LazyConfigOption.cls``"""
+        Throws a `ValueError` if `value` couldn't be converted using
+        `LazyConfigOption.cls`"""
         section, option = self._get_section_option(option)
         val = self._cfg[section][option].cls(value)
         if self._cfg[section][option].validate:
@@ -214,12 +185,12 @@ class LazyConfig(RawConfigParser):
         self._modified = True
 
     def has_section(self, section):
-        """Checks if ``section`` is a known configuration section."""
+        """Checks if `section` is a known configuration section."""
         return section.lower() in self._cfg
 
     def has_option(self, option):
-        """Checks if the option (section\ **.**\ option) is a known
-        configuration option."""
+        """Checks if the option (section.option) is a known configuration
+        option."""
         try:
             self._get_section_option(option)
             return True
@@ -234,28 +205,28 @@ class LazyConfig(RawConfigParser):
 class LazyConfigOption(object):
     """A simple container class for configuration settings.
 
-   ``LazyConfigOption`` instances are required by `LazyConfig` instances,
-   and instances of classes derived from ``LazyConfig``, like the
-   `Config` class.
+    `LazyConfigOption` instances are required by `LazyConfig` instances,
+    and instances of classes derived from `LazyConfig`, like the
+    `Config` class.
     """
     __slots__ = ('__cls', '__default', '__getter', '__validate')
 
     def __init__(self, cls, default, getter, validate=None):
-        """Creates a new ``LazyConfigOption`` instance.
+        """Creates a new `LazyConfigOption` instance.
 
         Arguments:
 
-        ``cls`` : type
-            The class/type of the option's value
-        ``default``
-            Default value of the option. Use ``None`` if the option should
-            not have a default value.
-        ``getter`` : callable
-            A method's name of `RawConfigParser` and derived classes, to
-            get a option's value, e.g. `self.getint`.
-        ``validate`` : NoneType or a callable
-            None or any method, that takes one argument, in order to check
-            the value, when `LazyConfig.set()` is called.
+        `cls` : type
+          The class/type of the option's value
+        `default`
+          Default value of the option. Use ``None`` if the option should not
+          have a default value.
+        `getter` : callable
+          A method's name of `RawConfigParser` and derived classes, to get a
+          option's value, e.g. `self.getint`.
+        `validate` : NoneType or a callable
+          None or any method, that takes one argument, in order to check the
+          value, when `LazyConfig.set()` is called.
         """
         self.__cls = cls
         if not default is None:# enforce the type of the default value
@@ -278,7 +249,7 @@ class LazyConfigOption(object):
 
     @property
     def default(self):
-        """The option's default value, may be ``None``"""
+        """The option's default value, may be `None`"""
         return self.__default
 
     @property
@@ -300,8 +271,8 @@ class Config(LazyConfig):
 
         Arguments:
 
-        ``filename``
-            path to the configuration file
+        `filename` : str
+          path to the configuration file
         """
         LazyConfig.__init__(self)
         self._cfgFileName = filename
@@ -389,7 +360,7 @@ class Config(LazyConfig):
             raise VMMConfigException(errmsg.getvalue(), CONF_ERROR)
 
     def known_scheme(self, scheme):
-        """Converts ``scheme`` to upper case and checks if is known by
+        """Converts `scheme` to upper case and checks if is known by
         Dovecot (listed in VirtualMailManager.SCHEMES).
 
         Throws a `ConfigValueError` if the scheme is not listed in
@@ -399,15 +370,14 @@ class Config(LazyConfig):
         # TODO: VMM.SCHEMES
 
     def unicode(self, section, option):
-        """Returns the value of the ``option`` from ``section``, converted
-        to Unicode.
-        """
+        """Returns the value of the `option` from `section`, converted to
+        Unicode."""
         return get_unicode(self.get(section, option))
 
     def __chkCfg(self):
         """Checks all section's options for settings w/o a default value.
 
-        Returns ``True`` if everything is fine, else ``False``."""
+        Returns `True` if everything is fine, else `False`."""
         errors = False
         for section in self._cfg.iterkeys():
             missing = []

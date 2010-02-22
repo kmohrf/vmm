@@ -1,8 +1,12 @@
 # -*- coding: UTF-8 -*-
 # Copyright (c) 2007 - 2010, Pascal Volk
 # See COPYING for distribution information.
-# package initialization code
-#
+
+"""
+    VirtualMailManager
+
+    VirtualMailManager package initialization code
+"""
 
 import gettext
 import os
@@ -23,7 +27,7 @@ __all__ = [
     'os', 're', 'locale',
     # version information from VERSION
     '__author__', '__date__', '__version__',
-    # error codes
+    # defined stuff
     'ENCODING', 'ace2idna', 'check_domainname', 'check_localpart', 'exec_ok',
     'expand_path', 'get_unicode', 'idn2ascii', 'is_dir',
 ]
@@ -66,29 +70,29 @@ def expand_path(path):
 
 
 def is_dir(path):
-    """Checks if ``path`` is a directory.
+    """Checks if `path` is a directory.
 
-    Throws a `VMMException` if ``path`` is not a directory.
+    Throws a `VMMException` if `path` is not a directory.
     """
     path = expand_path(path)
     if not os.path.isdir(path):
-        raise VMMException(_(u'“%s” is not a directory') %
+        raise VMMException(_(u"'%s' is not a directory") %
                             get_unicode(path), NO_SUCH_DIRECTORY)
     return path
 
 
 def exec_ok(binary):
-    """Checks if the ``binary`` exists and if it is executable.
+    """Checks if the `binary` exists and if it is executable.
 
-    Throws a `VMMException` if the ``binary`` isn't a file or is not
+    Throws a `VMMException` if the `binary` isn't a file or is not
     executable.
     """
     binary = expand_path(binary)
     if not os.path.isfile(binary):
-        raise VMMException(_(u'“%s” is not a file') % get_unicode(binary),
+        raise VMMException(_(u"'%s' is not a file") % get_unicode(binary),
                            NO_SUCH_BINARY)
     if not os.access(binary, os.X_OK):
-        raise VMMException(_(u'File is not executable: “%s”') %
+        raise VMMException(_(u"File is not executable: '%s'") %
                            get_unicode(binary), NOT_EXECUTABLE)
     return binary
 
@@ -122,7 +126,7 @@ def check_domainname(domainname):
 
 
 def check_localpart(localpart):
-    """Returns the validated local-part *localpart*.
+    """Returns the validated local-part `localpart`.
 
     Throws a `VMMException` if the local-part is too long or contains
     invalid characters.
