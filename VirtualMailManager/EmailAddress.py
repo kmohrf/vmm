@@ -14,7 +14,6 @@ from VirtualMailManager.constants.ERROR import \
 from VirtualMailManager.Exceptions import VMMEmailAddressException as VMMEAE
 
 
-RE_LOCALPART = """[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]"""
 _ = lambda msg: msg
 
 

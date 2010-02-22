@@ -37,7 +37,6 @@ except locale.Error:
     locale.setlocale(locale.LC_ALL, 'C')
 ENCODING = locale.nl_langinfo(locale.CODESET)
 
-RE_ASCII_CHARS = r"^[\x20-\x7E]*$"
 RE_DOMAIN = r"^(?:[a-z0-9-]{1,63}\.){1,}[a-z]{2,6}$"
 RE_LOCALPART = r"[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]"
 

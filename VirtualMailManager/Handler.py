@@ -35,7 +35,6 @@ from VirtualMailManager.ext.Postconf import Postconf
 
 SALTCHARS = './0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 RE_DOMAIN_SRCH = """^[a-z0-9-\.]+$"""
-RE_LOCALPART = """[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]"""
 RE_MBOX_NAMES = """^[\x20-\x25\x27-\x7E]*$"""
 
 
