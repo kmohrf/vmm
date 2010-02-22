@@ -41,7 +41,7 @@ from ConfigParser import \
      ParsingError, RawConfigParser
 from cStringIO import StringIO# TODO: move interactive stff to cli
 
-from VirtualMailManager import ENCODING, exec_ok, get_unicode, is_dir
+from VirtualMailManager import exec_ok, get_unicode, is_dir
 from VirtualMailManager.constants.ERROR import CONF_ERROR
 from VirtualMailManager.Exceptions import VMMConfigException
 
@@ -226,6 +226,10 @@ class LazyConfig(RawConfigParser):
         except(BadOptionError, NoSectionError, NoOptionError):
             return False
 
+    def sections(self):
+        """Returns an iterator object for all configuration sections."""
+        return self._cfg.iterkeys()
+
 
 class LazyConfigOption(object):
     """A simple container class for configuration settings.
@@ -384,10 +388,6 @@ class Config(LazyConfig):
                     errmsg.write((u'    %s\n') % option)
             raise VMMConfigException(errmsg.getvalue(), CONF_ERROR)
 
-    def sections(self):
-        """Returns an iterator object for all configuration sections."""
-        return self._cfg.iterkeys()
-
     def known_scheme(self, scheme):
         """Converts ``scheme`` to upper case and checks if is known by
         Dovecot (listed in VirtualMailManager.SCHEMES).
@@ -405,7 +405,7 @@ class Config(LazyConfig):
         return get_unicode(self.get(section, option))
 
     def __chkCfg(self):
-        """Checks all section's options for settings w/o default values.
+        """Checks all section's options for settings w/o a default value.
 
         Returns ``True`` if everything is fine, else ``False``."""
         errors = False
