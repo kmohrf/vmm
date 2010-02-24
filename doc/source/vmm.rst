@@ -118,28 +118,28 @@ Functions
 Examples
 --------
 
-    >>> from VirtualMailManager import *
-    >>> ace2idna('xn--pypal-4ve.tld')
-    u'p\u0430ypal.tld'
-    >>> idn2ascii(u'öko.de')
-    'xn--ko-eka.de'
-    >>> check_domainname(u'pаypal.tld')
-    'xn--pypal-4ve.tld'
-    >>> check_localpart('john.doe')
-    'john.doe'
-    >>> exec_ok('usr/bin/vim')
-    Traceback (most recent call last):
-      File "<stdin>", line 1, in <module>
-      File "./VirtualMailManager/__init__.py", line 93, in exec_ok
-        NO_SUCH_BINARY)
-    VirtualMailManager.Exceptions.VMMException: 'usr/bin/vim' is not a file
-    >>> exec_ok('/usr/bin/vim')
-    '/usr/bin/vim'
-    >>> expand_path('.')
-    '/home/user/hg/vmm'
-    >>> get_unicode('hello world')
-    u'hello world'
-    >>> is_dir('~/hg')
-    '/home/user/hg'
-    >>> 
+  >>> from VirtualMailManager import *
+  >>> ace2idna('xn--pypal-4ve.tld')
+  u'p\u0430ypal.tld'
+  >>> idn2ascii(u'öko.de')
+  'xn--ko-eka.de'
+  >>> check_domainname(u'pаypal.tld')
+  'xn--pypal-4ve.tld'
+  >>> check_localpart('john.doe')
+  'john.doe'
+  >>> exec_ok('usr/bin/vim')
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    File "./VirtualMailManager/__init__.py", line 93, in exec_ok
+      NO_SUCH_BINARY)
+  VirtualMailManager.Exceptions.VMMException: 'usr/bin/vim' is not a file
+  >>> exec_ok('/usr/bin/vim')
+  '/usr/bin/vim'
+  >>> expand_path('.')
+  '/home/user/hg/vmm'
+  >>> get_unicode('hello world')
+  u'hello world'
+  >>> is_dir('~/hg')
+  '/home/user/hg'
+  >>> 
 
