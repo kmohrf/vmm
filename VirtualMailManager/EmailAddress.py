@@ -23,9 +23,7 @@ class EmailAddress(object):
 
     def __init__(self, address):
         """Creates a new instance from the string/unicode ``address``."""
-        if not isinstance(address, basestring):
-            raise TypeError('address is not a str/unicode object: %r' %
-                            address)
+        assert isinstance(address, basestring)
         self._localpart = None
         self._domainname = None
         self._chk_address(address)

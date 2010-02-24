@@ -23,8 +23,7 @@ class Alias(object):
     __slots__ = ('_addr', '_dests', '_gid', '_dbh')
 
     def __init__(self, dbh, address):
-        if not isinstance(address, EmailAddress):
-            raise TypeError("Argument 'address' is not an EmailAddress")
+        assert isinstance(address, EmailAddress)
         self._addr = address
         self._dbh = dbh
         self._gid = get_gid(self._dbh, self._addr.domainname)
@@ -90,8 +89,7 @@ Hint: Delete some destination addresses.""")
 
     def addDestination(self, destination, expansion_limit):
         """Adds the ``destination`` `EmailAddress` to the alias."""
-        if not isinstance(destination, EmailAddress):
-            raise TypeError("Argument 'destination' is not an EmailAddress")
+        assert isinstance(destination, EmailAddress)
         if self._addr == destination:
             raise VMMAE(_(u"Address and destination are identical."),
                         ALIAS_ADDR_DEST_IDENTICAL)
@@ -111,8 +109,7 @@ VALUES (%s, %s, %s)',
 
     def delDestination(self, destination):
         """Deletes the specified ``destination`` address from the alias."""
-        if not isinstance(destination, EmailAddress):
-            raise TypeError("Argument 'destination' is not an EmailAddress")
+        assert isinstance(destination, EmailAddress)
         if not self._dests:
             raise VMMAE(_(u"The alias %r doesn't exist.") % str(self._addr),
                         NO_SUCH_ALIAS)

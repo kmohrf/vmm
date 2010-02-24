@@ -28,8 +28,7 @@ class Relocated(object):
 
         Use `setDestination()` to set/update the new address, where the
         user has moved to."""
-        if not isinstance(address, EmailAddress):
-            raise TypeError("Argument 'address' is not an EmailAddress")
+        assert isinstance(address, EmailAddress)
         self._addr = address
         self._dbh = dbh
         self._gid = get_gid(self._dbh, self._addr.domainname)
@@ -52,8 +51,7 @@ class Relocated(object):
     def setDestination(self, destination):
         """Sets/updates the new address of the relocated user."""
         update = False
-        if not isinstance(destination, EmailAddress):
-            raise TypeError("Argument 'destination' is not an EmailAddress")
+        assert isinstance(destination, EmailAddress)
         if self._addr == destination:
             raise VMMRE(_(u'Address and destination are identical.'),
                         RELOCATED_ADDR_DEST_IDENTICAL)
