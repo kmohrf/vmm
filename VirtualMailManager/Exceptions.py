@@ -2,10 +2,16 @@
 # Copyright (c) 2007 - 2010, Pascal Volk
 # See COPYING for distribution information.
 
-"""Exception classes for Virtual Mail Manager"""
+"""
+    VirtualMailManager.Exceptions
+
+    VMM's Exception classes
+"""
+
 
 class VMMException(Exception):
-    """Exception class for VirtualMailManager exceptions"""
+    """Exception base class for VirtualMailManager exceptions"""
+
     def __init__(self, msg, code):
         Exception.__init__(self, msg)
         self._code = int(code)
@@ -21,57 +27,57 @@ class VMMException(Exception):
         """Returns the numeric exception error code."""
         return self._code
 
+
 class VMMConfigException(VMMException):
-    """Exception class for Configurtion exceptions"""
-    def __init__(self, msg, code):
-        VMMException.__init__(self, msg, code)
+    """Exception class for configuration exceptions"""
+    pass
+
 
 class VMMPermException(VMMException):
     """Exception class for permissions exceptions"""
-    def __init__(self, msg, code):
-        VMMException.__init__(self, msg, code)
+    pass
+
 
 class VMMNotRootException(VMMException):
     """Exception class for non-root exceptions"""
-    def __init__(self, msg, code):
-        VMMException.__init__(self, msg, code)
+    pass
+
 
 class VMMDomainException(VMMException):
     """Exception class for Domain exceptions"""
-    def __init__(self, msg, code):
-        VMMException.__init__(self, msg, code)
+    pass
+
 
 class VMMAliasDomainException(VMMException):
     """Exception class for AliasDomain exceptions"""
-    def __init__(self, msg, code):
-        VMMException.__init__(self, msg, code)
+    pass
+
 
 class VMMAccountException(VMMException):
     """Exception class for Account exceptions"""
-    def __init__(self, msg, code):
-        VMMException.__init__(self, msg, code)
+    pass
+
 
 class VMMAliasException(VMMException):
     """Exception class for Alias exceptions"""
-    def __init__(self, msg, code):
-        VMMException.__init__(self, msg, code)
+    pass
+
 
 class VMMEmailAddressException(VMMException):
     """Exception class for EmailAddress exceptions"""
-    def __init__(self, msg, code):
-        VMMException.__init__(self, msg, code)
+    pass
+
 
 class VMMMailLocationException(VMMException):
     """Exception class for MailLocation exceptions"""
-    def __init__(self, msg, code):
-        VMMException.__init__(self, msg, code)
+    pass
+
 
 class VMMRelocatedException(VMMException):
     """Exception class for Relocated exceptions"""
-    def __init__(self, msg, code):
-        VMMException.__init__(self, msg, code)
+    pass
+
 
 class VMMTransportException(VMMException):
     """Exception class for Transport exceptions"""
-    def __init__(self, msg, code):
-        VMMException.__init__(self, msg, code)
+    pass
