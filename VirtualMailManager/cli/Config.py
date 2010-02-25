@@ -31,7 +31,7 @@ class CliConfig(Config):
 [%(current_value)s]: ')
         failures = 0
 
-        w_std(_(u'Using configuration file: %s\n') % self._cfgFileName)
+        w_std(_(u'Using configuration file: %s\n') % self._cfg_filename)
         for s in sections:
             w_std(_(u'* Configuration section: %r') % s)
             for opt, val in self.items(s):
@@ -82,7 +82,7 @@ class CliConfig(Config):
 
     def __saveChanges(self):
         """Writes changes to the configuration file."""
-        copy2(self._cfgFileName, self._cfgFileName + '.bak')
-        self._cfgFile = open(self._cfgFileName, 'w')
-        self.write(self._cfgFile)
-        self._cfgFile.close()
+        copy2(self._cfg_filename, self._cfg_filename + '.bak')
+        self._cfg_file = open(self._cfg_filename, 'w')
+        self.write(self._cfg_file)
+        self._cfg_file.close()

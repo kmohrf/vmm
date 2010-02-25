@@ -24,18 +24,6 @@ Constants and data
   The systems current character encoding, e.g. ``'UTF-8'`` or
   ``'ANSI_X3.4-1968'`` (aka ASCII).
 
-.. data:: __author__
-
-  The author's name
-
-.. data:: __date__
-
-  The release date
-
-.. data:: __version__
-
-  VirtualMailManager's version
-
 
 Functions
 ---------

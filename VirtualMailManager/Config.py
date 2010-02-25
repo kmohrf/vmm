@@ -19,6 +19,9 @@ from VirtualMailManager.constants.ERROR import CONF_ERROR
 from VirtualMailManager.Exceptions import VMMConfigException
 
 
+_ = lambda msg: msg
+
+
 class BadOptionError(Error):
     """Raised when a option isn't in the format 'section.option'."""
     pass
@@ -50,20 +53,21 @@ class LazyConfig(RawConfigParser):
       `LazyConfig._cfg['sectionname']['optionname'].default`, if the
       option is not configured in a ini-like configuration file.
 
-    `set()` differs from `RawConfigParser`'s `set()` method. `set()` takes
-    the `section` and `option` arguments combined to a single string in the
-    form "section.option".
+    `set()` differs from `RawConfigParser`'s `set()` method. `set()`
+    takes the `section` and `option` arguments combined to a single
+    string in the form "section.option".
+
     """
 
     def __init__(self):
         RawConfigParser.__init__(self)
         self._modified = False
+        # sample _cfg dict.  Create your own in your derived class.
         self._cfg = {
             'sectionname': {
-                'optionname': LazyConfigOption(int, 1, self.getint)
+                'optionname': LazyConfigOption(int, 1, self.getint),
             }
         }
-        """sample _cfg dictionary. Create your own in your derived class."""
 
     def bool_new(self, value):
         """Converts the string `value` into a `bool` and returns it.
@@ -82,35 +86,38 @@ class LazyConfig(RawConfigParser):
                                    get_unicode(value))
 
     def getboolean(self, section, option):
-        """Returns the boolean value of the option, in the given section.
+        """Returns the boolean value of the option, in the given
+        section.
 
         For a boolean True, the value must be set to '1', 'on', 'yes',
         'true' or True. For a boolean False, the value must set to '0',
         'off', 'no', 'false' or False.
-        If the option has another value assigned this method will raise a
-        ValueError.
+        If the option has another value assigned this method will raise
+        a ValueError.
+
         """
         # if the setting was modified it may be still a boolean value lets see
         tmp = self.get(section, option)
         if isinstance(tmp, bool):
             return tmp
         if not tmp.lower() in self._boolean_states:
-            raise ValueError, 'Not a boolean: %s' % tmp
+            raise ValueError('Not a boolean: %s' % tmp)
         return self._boolean_states[tmp.lower()]
 
     def _get_section_option(self, section_option):
-        """splits ``section_option`` (section\ **.**\ option) in two parts
-        and returns them as list ``[section, option]``, if:
+        """splits ``section_option`` (section.option) in two parts and
+        returns them as list ``[section, option]``, if:
 
-            * it likes the format of ``section_option``
-            * the ``section`` is known
-            * the ``option`` is known
+          * it likes the format of ``section_option``
+          * the ``section`` is known
+          * the ``option`` is known
 
         Else one of the following exceptions will be thrown:
 
-            * `BadOptionError`
-            * `NoSectionError`
-            * `NoOptionError`
+          * `BadOptionError`
+          * `NoSectionError`
+          * `NoOptionError`
+
         """
         sect_opt = section_option.lower().split('.')
         # TODO: cache it
@@ -125,22 +132,24 @@ class LazyConfig(RawConfigParser):
         return sect_opt
 
     def items(self, section):
-        """returns an iterable that returns key, value ``tuples`` from the
-        given ``section``."""
+        """returns an iterable that returns key, value ``tuples`` from
+        the given ``section``.
+
+        """
         if section in self._sections:# check if the section was parsed
-            d2 = self._sections[section]
+            sect = self._sections[section]
         elif not section in self._cfg:
             raise NoSectionError(section)
         else:
             return ((k, self._cfg[section][k].default) \
                     for k in self._cfg[section].iterkeys())
         # still here? Get defaults and merge defaults with configured setting
-        d = dict((k, self._cfg[section][k].default) \
-                 for k in self._cfg[section].iterkeys())
-        d.update(d2)
-        if '__name__' in d:
-            del d['__name__']
-        return d.iteritems()
+        defaults = dict((k, self._cfg[section][k].default) \
+                        for k in self._cfg[section].iterkeys())
+        defaults.update(sect)
+        if '__name__' in defaults:
+            del defaults['__name__']
+        return defaults.iteritems()
 
     def dget(self, option):
         """Returns the value of the `option`.
@@ -152,11 +161,11 @@ class LazyConfig(RawConfigParser):
         Arguments:
 
         `option` : string
-            the configuration option in the form
-            "``section``\ **.**\ ``option``"
+            the configuration option in the form "section.option"
 
         Throws a `NoDefaultError`, if no default value was passed to
         `LazyConfigOption.__init__()` for the `option`.
+
         """
         section, option = self._get_section_option(option)
         try:
@@ -176,7 +185,9 @@ class LazyConfig(RawConfigParser):
         """Set the `value` of the `option`.
 
         Throws a `ValueError` if `value` couldn't be converted using
-        `LazyConfigOption.cls`"""
+        `LazyConfigOption.cls`.
+
+        """
         section, option = self._get_section_option(option)
         val = self._cfg[section][option].cls(value)
         if self._cfg[section][option].validate:
@@ -191,8 +202,10 @@ class LazyConfig(RawConfigParser):
         return section.lower() in self._cfg
 
     def has_option(self, option):
-        """Checks if the option (section.option) is a known configuration
-        option."""
+        """Checks if the option (section.option) is a known
+        configuration option.
+
+        """
         try:
             self._get_section_option(option)
             return True
@@ -210,6 +223,7 @@ class LazyConfigOption(object):
     `LazyConfigOption` instances are required by `LazyConfig` instances,
     and instances of classes derived from `LazyConfig`, like the
     `Config` class.
+
     """
     __slots__ = ('__cls', '__default', '__getter', '__validate')
 
@@ -221,14 +235,15 @@ class LazyConfigOption(object):
         `cls` : type
           The class/type of the option's value
         `default`
-          Default value of the option. Use ``None`` if the option should not
-          have a default value.
+          Default value of the option. Use ``None`` if the option should
+          not have a default value.
         `getter` : callable
-          A method's name of `RawConfigParser` and derived classes, to get a
-          option's value, e.g. `self.getint`.
+          A method's name of `RawConfigParser` and derived classes, to
+          get a option's value, e.g. `self.getint`.
         `validate` : NoneType or a callable
-          None or any method, that takes one argument, in order to check the
-          value, when `LazyConfig.set()` is called.
+          None or any method, that takes one argument, in order to
+          check the value, when `LazyConfig.set()` is called.
+
         """
         self.__cls = cls
         if not default is None:# enforce the type of the default value
@@ -246,7 +261,10 @@ class LazyConfigOption(object):
 
     @property
     def cls(self):
-        """The class of the option's value e.g. `str`, `unicode` or `bool`"""
+        """The class of the option's value e.g. `str`, `unicode` or
+        `bool`.
+
+        """
         return self.__cls
 
     @property
@@ -275,10 +293,11 @@ class Config(LazyConfig):
 
         `filename` : str
           path to the configuration file
+
         """
         LazyConfig.__init__(self)
-        self._cfgFileName = filename
-        self._cfgFile = None
+        self._cfg_filename = filename
+        self._cfg_file = None
         self.__missing = {}
 
         LCO = LazyConfigOption
@@ -286,75 +305,76 @@ class Config(LazyConfig):
         self._cfg = {
             'account': {
                 'delete_directory': LCO(bool_t, False, self.getboolean),
-                'directory_mode':   LCO(int,    448,   self.getint),
-                'disk_usage':       LCO(bool_t, False, self.getboolean),
-                'password_length':  LCO(int,    8,     self.getint),
-                'random_password':  LCO(bool_t, False, self.getboolean),
-                'imap' :            LCO(bool_t, True,  self.getboolean),
-                'pop3' :            LCO(bool_t, True,  self.getboolean),
-                'sieve':            LCO(bool_t, True,  self.getboolean),
-                'smtp' :            LCO(bool_t, True,  self.getboolean),
+                'directory_mode': LCO(int, 448, self.getint),
+                'disk_usage': LCO(bool_t, False, self.getboolean),
+                'password_length': LCO(int, 8, self.getint),
+                'random_password': LCO(bool_t, False, self.getboolean),
+                'imap': LCO(bool_t, True, self.getboolean),
+                'pop3': LCO(bool_t, True, self.getboolean),
+                'sieve': LCO(bool_t, True, self.getboolean),
+                'smtp': LCO(bool_t, True, self.getboolean),
             },
             'bin': {
-                'dovecotpw': LCO(str, '/usr/sbin/dovecotpw', self.get, exec_ok),
-                'du':        LCO(str, '/usr/bin/du',        self.get, exec_ok),
-                'postconf':  LCO(str, '/usr/sbin/postconf', self.get, exec_ok),
+                'dovecotpw': LCO(str, '/usr/sbin/dovecotpw', self.get,
+                                 exec_ok),
+                'du': LCO(str, '/usr/bin/du', self.get, exec_ok),
+                'postconf': LCO(str, '/usr/sbin/postconf', self.get, exec_ok),
             },
             'database': {
                 'host': LCO(str, 'localhost', self.get),
-                'name': LCO(str, 'mailsys',   self.get),
-                'pass': LCO(str, None,        self.get),
-                'user': LCO(str, None,        self.get),
+                'name': LCO(str, 'mailsys', self.get),
+                'pass': LCO(str, None, self.get),
+                'user': LCO(str, None, self.get),
             },
             'domain': {
-                'auto_postmaster':  LCO(bool_t, True,  self.getboolean),
+                'auto_postmaster': LCO(bool_t, True, self.getboolean),
                 'delete_directory': LCO(bool_t, False, self.getboolean),
-                'directory_mode':   LCO(int,    504,   self.getint),
-                'force_deletion':   LCO(bool_t, False, self.getboolean),
+                'directory_mode': LCO(int, 504, self.getint),
+                'force_deletion': LCO(bool_t, False, self.getboolean),
             },
             'maildir': {
                 'folders': LCO(str, 'Drafts:Sent:Templates:Trash', self.get),
-                'name':    LCO(str, 'Maildir',                     self.get),
+                'name': LCO(str, 'Maildir', self.get),
             },
             'misc': {
-                'base_directory':  LCO(str, '/srv/mail', self.get, is_dir),
-                'dovecot_version': LCO(int, 12,          self.getint),
-                'gid_mail':        LCO(int, 8,           self.getint),
-                'password_scheme': LCO(str, 'CRAM-MD5',  self.get,
+                'base_directory': LCO(str, '/srv/mail', self.get, is_dir),
+                'dovecot_version': LCO(int, 12, self.getint),
+                'gid_mail': LCO(int, 8, self.getint),
+                'password_scheme': LCO(str, 'CRAM-MD5', self.get,
                                        self.known_scheme),
-                'transport':       LCO(str, 'dovecot:',  self.get),
+                'transport': LCO(str, 'dovecot:', self.get),
             },
         }
-
-    def configure(self, sections):
-        raise NotImplementedError
 
     def load(self):
         """Loads the configuration, read only.
 
-        Raises a VMMConfigException if the configuration syntax is invalid.
+        Raises a VMMConfigException if the configuration syntax is
+        invalid.
+
         """
         try:
-            self._cfgFile = open(self._cfgFileName, 'r')
-            self.readfp(self._cfgFile)
-        except (MissingSectionHeaderError, ParsingError), e:
-            raise VMMConfigException(str(e), CONF_ERROR)
+            self._cfg_file = open(self._cfg_filename, 'r')
+            self.readfp(self._cfg_file)
+        except (MissingSectionHeaderError, ParsingError), err:
+            raise VMMConfigException(str(err), CONF_ERROR)
         finally:
-            if self._cfgFile and not self._cfgFile.closed:
-                self._cfgFile.close()
+            if self._cfg_file and not self._cfg_file.closed:
+                self._cfg_file.close()
 
     def check(self):
         """Performs a configuration check.
 
         Raises a VMMConfigException if the check fails.
+
         """
         # TODO: There are only two settings w/o defaults.
         #       So there is no need for cStringIO
-        if not self.__chkCfg():
+        if not self.__chk_cfg():
             errmsg = StringIO()
             errmsg.write(_(u'Missing options, which have no default value.\n'))
             errmsg.write(_(u'Using configuration file: %s\n') %
-                         self._cfgFileName)
+                         self._cfg_filename)
             for section, options in self.__missing.iteritems():
                 errmsg.write(_(u'* Section: %s\n') % section)
                 for option in options:
@@ -367,27 +387,36 @@ class Config(LazyConfig):
 
         Throws a `ConfigValueError` if the scheme is not listed in
         VirtualMailManager.SCHEMES.
+
         """
         scheme = scheme.upper()
         # TODO: VMM.SCHEMES
 
     def unicode(self, section, option):
-        """Returns the value of the `option` from `section`, converted to
-        Unicode."""
+        """Returns the value of the `option` from `section`, converted
+        to Unicode.
+
+        """
         return get_unicode(self.get(section, option))
 
-    def __chkCfg(self):
-        """Checks all section's options for settings w/o a default value.
+    def __chk_cfg(self):
+        """Checks all section's options for settings w/o a default
+        value.
 
-        Returns `True` if everything is fine, else `False`."""
+        Returns `True` if everything is fine, else `False`.
+
+        """
         errors = False
         for section in self._cfg.iterkeys():
             missing = []
             for option, value in self._cfg[section].iteritems():
                 if (value.default is None and
                     not RawConfigParser.has_option(self, section, option)):
-                        missing.append(option)
-                        errors = True
+                    missing.append(option)
+                    errors = True
             if missing:
                 self.__missing[section] = missing
         return not errors
+
+
+del _

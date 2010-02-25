@@ -8,16 +8,16 @@
     VirtualMailManager's command line interface.
 """
 
+import os
 from cStringIO import StringIO
 from getpass import getpass
 from textwrap import TextWrapper
 
-import VirtualMailManager
+from VirtualMailManager import ENCODING
 
 
 __all__ = ('get_winsize', 'read_pass', 'string_io', 'w_err', 'w_std')
 
-os = VirtualMailManager.os
 _std_write = os.sys.stdout.write
 _err_write = os.sys.stderr.write
 
@@ -26,7 +26,7 @@ def w_std(*args):
     """Writes each arg of `args`, encoded in the current ENCODING, to stdout
     and appends a newline."""
     for arg in args:
-        _std_write(arg.encode(VirtualMailManager.ENCODING, 'replace'))
+        _std_write(arg.encode(ENCODING, 'replace'))
         _std_write('\n')
 
 
@@ -37,7 +37,7 @@ def w_err(code, *args):
     This function additional interrupts the program execution and uses
     `code` system exit status."""
     for arg in args:
-        _err_write(arg.encode(VirtualMailManager.ENCODING, 'replace'))
+        _err_write(arg.encode(ENCODING, 'replace'))
         _err_write('\n')
     os.sys.exit(code)
 

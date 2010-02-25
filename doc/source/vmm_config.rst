@@ -49,10 +49,10 @@ LazyConfig
               LCO = LazyConfigOption
               self._cfg = {
                   'database': {# section database:
-                      'host': LCO(str, '::1', self.get),# options of the
-                      'name': LCO(str, 'dbx', self.get),# database section.
-                      'pass': LCO(str, None,  self.get),# No defaults for the
-                      'user': LCO(str, None,  self.get),# user and pass options
+                      'host': LCO(str, '::1', self.get), # options of the
+                      'name': LCO(str, 'dbx', self.get), # database section.
+                      'pass': LCO(str, None, self.get),  # No defaults for the
+                      'user': LCO(str, None, self.get),  # user and pass options
                   }
               }
 

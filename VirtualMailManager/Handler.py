@@ -535,7 +535,7 @@ class Handler(object):
         the given *targetaddress*."""
         alias = self.__getAlias(aliasaddress)
         destination = EmailAddress(targetaddress)
-        alias.addDestination(destination,
+        alias.add_destination(destination,
                     long(self._postconf.read('virtual_alias_expansion_limit')))
         gid = self.__getDomain(destination.domainname).getID()
         if gid > 0 and (not Handler.accountExists(self._dbh, destination) and
@@ -573,7 +573,7 @@ The account has been successfully deleted from the database.
         instances) for the `Alias` with the given *aliasaddress*."""
         alias = self.__getAlias(aliasaddress)
         try:
-            return alias.getDestinations()
+            return alias.get_destinations()
         except VMMAliasException, e:
             if e.code() == ERR.NO_SUCH_ALIAS:
                 if Handler.accountExists(self._dbh, alias._addr):
@@ -596,7 +596,7 @@ with the address “%s”.') %
         if targetaddress is None:
             alias.delete()
         else:
-            alias.delDestination(EmailAddress(targetaddress))
+            alias.del_destination(EmailAddress(targetaddress))
 
     def userInfo(self, emailaddress, details=None):
         if details not in (None, 'du', 'aliases', 'full'):
@@ -660,13 +660,13 @@ The service name “managesieve” is deprecated and will be removed\n\
         already a relocated user with the given *emailaddress*, only the
         *targetaddress* for the relocated user will be updated."""
         relocated = self.__getRelocated(emailaddress)
-        relocated.setDestination(EmailAddress(targetaddress))
+        relocated.set_destination(EmailAddress(targetaddress))
 
     def relocatedInfo(self, emailaddress):
         """Returns the target address of the relocated user with the given
         *emailaddress*."""
         relocated = self.__getRelocated(emailaddress)
-        return relocated.getInfo()
+        return relocated.get_info()
 
     def relocatedDelete(self, emailaddress):
         """Deletes the relocated user with the given *emailaddress* from

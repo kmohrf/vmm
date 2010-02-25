@@ -68,9 +68,11 @@ Hint: Delete some destination addresses.""")
                         ALIAS_EXCEEDS_EXPANSION_LIMIT)
 
     def __delete(self, destination=None):
-        """Deletes a destination from the alias, if ``destination`` is not
-        ``None``. If ``destination`` is None, the alias with all it's
-        destination addresses will be deleted."""
+        """Deletes a destination from the alias, if ``destination`` is
+        not ``None``.  If ``destination`` is None, the alias with all
+        it's destination addresses will be deleted.
+
+        """
         dbc = self._dbh.cursor()
         if not destination:
             dbc.execute("DELETE FROM alias WHERE gid=%s AND address=%s",
@@ -87,7 +89,7 @@ Hint: Delete some destination addresses.""")
         """Returns the number of destinations of the alias."""
         return len(self._dests)
 
-    def addDestination(self, destination, expansion_limit):
+    def add_destination(self, destination, expansion_limit):
         """Adds the ``destination`` `EmailAddress` to the alias."""
         assert isinstance(destination, EmailAddress)
         if self._addr == destination:
@@ -107,7 +109,7 @@ VALUES (%s, %s, %s)',
         dbc.close()
         self._dests.append(destination)
 
-    def delDestination(self, destination):
+    def del_destination(self, destination):
         """Deletes the specified ``destination`` address from the alias."""
         assert isinstance(destination, EmailAddress)
         if not self._dests:
@@ -121,7 +123,7 @@ the alias %(a)r.") %
         self.__delete(destination)
         self._dests.remove(destination)
 
-    def getDestinations(self):
+    def get_destinations(self):
         """Returns an iterator for all destinations of the alias."""
         if not self._dests:
             raise VMMAE(_(u"The alias %r doesn't exist.") % str(self._addr),

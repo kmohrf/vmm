@@ -23,11 +23,13 @@ class Relocated(object):
     __slots__ = ('_addr', '_dest', '_gid', '_dbh')
 
     def __init__(self, dbh, address):
-        """Creates a new *Relocated* instance. The ``address`` is the
+        """Creates a new *Relocated* instance.  The ``address`` is the
         old e-mail address of the user.
 
         Use `setDestination()` to set/update the new address, where the
-        user has moved to."""
+        user has moved to.
+
+        """
         assert isinstance(address, EmailAddress)
         self._addr = address
         self._dbh = dbh
@@ -38,7 +40,9 @@ class Relocated(object):
 
     def __load(self):
         """Loads the destination address from the database into the
-        `_dest` attribute."""
+        `_dest` attribute.
+
+        """
         dbc = self._dbh.cursor()
         dbc.execute(
             'SELECT destination FROM relocated WHERE gid=%s AND address=%s',
@@ -48,7 +52,7 @@ class Relocated(object):
         if destination:
             self._dest = EmailAddress(destination[0])
 
-    def setDestination(self, destination):
+    def set_destination(self, destination):
         """Sets/updates the new address of the relocated user."""
         update = False
         assert isinstance(destination, EmailAddress)
@@ -76,7 +80,7 @@ WHERE gid=%s AND address=%s',
         self._dbh.commit()
         dbc.close()
 
-    def getInfo(self):
+    def get_info(self):
         """Returns the address to which mails should be sent."""
         if not self._dest:
             raise VMMRE(_(u"The relocated user %r doesn't exist.") %

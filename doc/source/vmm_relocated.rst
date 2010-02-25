@@ -20,9 +20,9 @@ Relocated
 .. class:: Relocated(dbh, address)
 
   Creates a new *Relocated* instance. If the relocated user with the given
-  *address* is already stored in the database use :meth:`getInfo` to get the
+  *address* is already stored in the database use :meth:`get_info` to get the
   destination address of the relocated user. To set or update the destination
-  of the relocated user use :meth:`setDestination`. Use :meth:`delete` in
+  of the relocated user use :meth:`set_destination`. Use :meth:`delete` in
   order to delete the relocated user from the database.
   
   :param dbh: a database connection
@@ -40,7 +40,7 @@ Relocated
     Deletes the relocated user from the database.
 
 
-  .. method:: getInfo()
+  .. method:: get_info()
 
     :rtype: :class:`VirtualMailManager.EmailAddress.EmailAddress`
     :raise VirtualMailManager.Exceptions.VMMRelocatedException: if the
@@ -49,7 +49,7 @@ Relocated
     Returns the destination e-mail address of the relocated user.
 
 
-  .. method:: setDestination(destination)
+  .. method:: set_destination(destination)
 
     :param destination: the new address where the relocated user has moved to
     :type destination: :class:`VirtualMailManager.EmailAddress.EmailAddress`

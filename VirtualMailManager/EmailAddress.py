@@ -58,7 +58,7 @@ class EmailAddress(object):
 
     def _chk_address(self, address):
         """Checks if the string ``address`` could be used for an e-mail
-        address. If so, it will assign the corresponding values to the
+        address.  If so, it will assign the corresponding values to the
         attributes `_localpart` and `_domainname`."""
         parts = address.split('@')
         p_len = len(parts)
