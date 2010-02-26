@@ -16,7 +16,7 @@ Contents:
    vmm_config.rst
    vmm_emailaddress.rst
    vmm_relocated.rst
-   vmm_exceptions.rst
+   vmm_errors.rst
    vmm_constants_error.rst
 
 Indices and tables

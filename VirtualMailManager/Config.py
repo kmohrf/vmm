@@ -16,7 +16,7 @@ from cStringIO import StringIO# TODO: move interactive stff to cli
 
 from VirtualMailManager import exec_ok, get_unicode, is_dir
 from VirtualMailManager.constants.ERROR import CONF_ERROR
-from VirtualMailManager.Exceptions import VMMConfigException
+from VirtualMailManager.errors import ConfigError
 
 
 _ = lambda msg: msg
@@ -188,6 +188,8 @@ class LazyConfig(RawConfigParser):
         `LazyConfigOption.cls`.
 
         """
+        # pylint: disable-msg=W0221
+        # @pylint: _L A Z Y_
         section, option = self._get_section_option(option)
         val = self._cfg[section][option].cls(value)
         if self._cfg[section][option].validate:
@@ -206,6 +208,8 @@ class LazyConfig(RawConfigParser):
         configuration option.
 
         """
+        # pylint: disable-msg=W0221
+        # @pylint: _L A Z Y_
         try:
             self._get_section_option(option)
             return True
@@ -349,7 +353,7 @@ class Config(LazyConfig):
     def load(self):
         """Loads the configuration, read only.
 
-        Raises a VMMConfigException if the configuration syntax is
+        Raises a ConfigError if the configuration syntax is
         invalid.
 
         """
@@ -357,7 +361,7 @@ class Config(LazyConfig):
             self._cfg_file = open(self._cfg_filename, 'r')
             self.readfp(self._cfg_file)
         except (MissingSectionHeaderError, ParsingError), err:
-            raise VMMConfigException(str(err), CONF_ERROR)
+            raise ConfigError(str(err), CONF_ERROR)
         finally:
             if self._cfg_file and not self._cfg_file.closed:
                 self._cfg_file.close()
@@ -365,7 +369,7 @@ class Config(LazyConfig):
     def check(self):
         """Performs a configuration check.
 
-        Raises a VMMConfigException if the check fails.
+        Raises a ConfigError if the check fails.
 
         """
         # TODO: There are only two settings w/o defaults.
@@ -379,7 +383,7 @@ class Config(LazyConfig):
                 errmsg.write(_(u'* Section: %s\n') % section)
                 for option in options:
                     errmsg.write((u'    %s\n') % option)
-            raise VMMConfigException(errmsg.getvalue(), CONF_ERROR)
+            raise ConfigError(errmsg.getvalue(), CONF_ERROR)
 
     def known_scheme(self, scheme):
         """Converts `scheme` to upper case and checks if is known by

@@ -3,81 +3,73 @@
 # See COPYING for distribution information.
 
 """
-    VirtualMailManager.Exceptions
+    VirtualMailManager.errors
 
     VMM's Exception classes
 """
 
 
-class VMMException(Exception):
+class VMMError(Exception):
     """Exception base class for VirtualMailManager exceptions"""
 
     def __init__(self, msg, code):
         Exception.__init__(self, msg)
-        self._code = int(code)
-        ### for older python versions, like py 2.4.4 on OpenBSD 4.2
-        if not hasattr(self, 'message'):
-            self.message = msg
+        self.msg = msg
+        self.code = int(code)
 
-    def msg(self):
-        """Returns the exception message."""
-        return self.message
+    def __repr__(self):
+        return '%s(%r, %r)' % (self.__class__.__name__, self.msg, self.code)
 
-    def code(self):
-        """Returns the numeric exception error code."""
-        return self._code
-
-
-class VMMConfigException(VMMException):
+class ConfigError(VMMError):
     """Exception class for configuration exceptions"""
     pass
 
 
-class VMMPermException(VMMException):
+class PermissionError(VMMError):
     """Exception class for permissions exceptions"""
     pass
 
 
-class VMMNotRootException(VMMException):
+class NotRootError(VMMError):
     """Exception class for non-root exceptions"""
     pass
 
 
-class VMMDomainException(VMMException):
+class DomainError(VMMError):
     """Exception class for Domain exceptions"""
     pass
 
 
-class VMMAliasDomainException(VMMException):
+class AliasDomainError(VMMError):
     """Exception class for AliasDomain exceptions"""
     pass
 
 
-class VMMAccountException(VMMException):
+class AccountError(VMMError):
     """Exception class for Account exceptions"""
     pass
 
 
-class VMMAliasException(VMMException):
+class AliasError(VMMError):
     """Exception class for Alias exceptions"""
     pass
 
 
-class VMMEmailAddressException(VMMException):
+class EmailAddressError(VMMError):
     """Exception class for EmailAddress exceptions"""
     pass
 
 
-class VMMMailLocationException(VMMException):
+class MailLocationError(VMMError):
     """Exception class for MailLocation exceptions"""
     pass
 
 
-class VMMRelocatedException(VMMException):
+class RelocatedError(VMMError):
     """Exception class for Relocated exceptions"""
     pass
 
 
-class VMMTransportException(VMMException):
+class TransportError(VMMError):
     """Exception class for Transport exceptions"""
     pass

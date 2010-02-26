@@ -9,7 +9,7 @@
 .. toctree::
    :maxdepth: 2
 
-Error codes, used by all :mod:`VirtualMailManager.Exceptions`.
+Error codes, used by all :mod:`VirtualMailManager.errors`.
 
 .. data:: ACCOUNT_AND_ALIAS_PRESENT
 

@@ -6,7 +6,7 @@
 
 import VirtualMailManager.constants.ERROR as ERR
 from VirtualMailManager import check_domainname
-from VirtualMailManager.Exceptions import VMMAliasDomainException as VADE
+from VirtualMailManager.errors import AliasDomainError as ADE
 
 class AliasDomain(object):
     """Class to manage e-mail alias domains."""
@@ -27,18 +27,18 @@ class AliasDomain(object):
         if alias is not None:
             self.__gid, primary = alias
             if primary:
-                raise VADE(_(u"The domain “%s” is a primary domain.") %
+                raise ADE(_(u"The domain “%s” is a primary domain.") %
                         self.__name, ERR.ALIASDOMAIN_ISDOMAIN)
 
     def save(self):
         if self.__gid > 0:
-            raise VADE(_(u'The alias domain “%s” already exists.') %self.__name,
+            raise ADE(_(u'The alias domain “%s” already exists.') %self.__name,
                     ERR.ALIASDOMAIN_EXISTS)
         if self._domain is None:
-            raise VADE(_(u'No destination domain specified for alias domain.'),
+            raise ADE(_(u'No destination domain specified for alias domain.'),
                     ERR.ALIASDOMAIN_NO_DOMDEST)
         if self._domain._id < 1:
-            raise VADE (_(u"The target domain “%s” doesn't exist.") %
+            raise ADE (_(u"The target domain “%s” doesn't exist.") %
                     self._domain._name, ERR.NO_SUCH_DOMAIN)
         dbc = self._dbh.cursor()
         dbc.execute('INSERT INTO domain_name (domainname, gid, is_primary)\
@@ -56,25 +56,25 @@ class AliasDomain(object):
             if domain is not None:
                 return {'alias': self.__name, 'domain': domain[0]}
             else:# an almost unlikely case, isn't it?
-                raise VADE(
+                raise ADE(
                     _(u'There is no primary domain for the alias domain “%s”.')\
                             % self.__name, ERR.NO_SUCH_DOMAIN)
         else:
-            raise VADE(_(u"The alias domain “%s” doesn't exist.") %
-                    self.__name, ERR.NO_SUCH_ALIASDOMAIN)
+            raise ADE(_(u"The alias domain “%s” doesn't exist.") % self.__name,
+                        ERR.NO_SUCH_ALIASDOMAIN)
 
     def switch(self):
         if self._domain is None:
-            raise VADE(_(u'No destination domain specified for alias domain.'),
+            raise ADE(_(u'No destination domain specified for alias domain.'),
                     ERR.ALIASDOMAIN_NO_DOMDEST)
         if self._domain._id < 1:
-            raise VADE (_(u"The target domain “%s” doesn't exist.") %
+            raise ADE (_(u"The target domain “%s” doesn't exist.") %
                     self._domain._name, ERR.NO_SUCH_DOMAIN)
         if self.__gid < 1:
-            raise VADE(_(u"The alias domain “%s” doesn't exist.") %
-                    self.__name, ERR.NO_SUCH_ALIASDOMAIN)
+            raise ADE(_(u"The alias domain “%s” doesn't exist.") % self.__name,
+                        ERR.NO_SUCH_ALIASDOMAIN)
         if self.__gid == self._domain._id:
-            raise VADE(_(u"The alias domain “%(alias)s” is already assigned to\
+            raise ADE(_(u"The alias domain “%(alias)s” is already assigned to\
  the domain “%(domain)s”.") %
                     {'alias': self.__name, 'domain': self._domain._name},
                     ERR.ALIASDOMAIN_EXISTS)
@@ -93,7 +93,6 @@ class AliasDomain(object):
             if dbc.rowcount > 0:
                 self._dbh.commit()
         else:
-            raise VADE(
-                  _(u"The alias domain “%s” doesn't exist.") % self.__name,
-                  ERR.NO_SUCH_ALIASDOMAIN)
+            raise ADE(_(u"The alias domain “%s” doesn't exist.") % self.__name,
+                        ERR.NO_SUCH_ALIASDOMAIN)
 

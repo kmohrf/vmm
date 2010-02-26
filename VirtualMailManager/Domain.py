@@ -10,7 +10,7 @@ from VirtualMailManager import check_domainname
 from VirtualMailManager.constants.ERROR import \
      ACCOUNT_AND_ALIAS_PRESENT, ACCOUNT_PRESENT, ALIAS_PRESENT, \
      DOMAIN_ALIAS_EXISTS, DOMAIN_EXISTS, NO_SUCH_DOMAIN
-from VirtualMailManager.Exceptions import VMMDomainException as VMMDE
+from VirtualMailManager.errors import DomainError as DomErr
 from VirtualMailManager.Transport import Transport
 
 
@@ -38,8 +38,8 @@ class Domain(object):
         self._id = 0
         self._domaindir = None
         if not self._exists() and self._isAlias():
-            raise VMMDE(_(u"The domain “%s” is an alias domain.") % self._name,
-                        DOMAIN_ALIAS_EXISTS)
+            raise DomErr(_(u"The domain “%s” is an alias domain.") %
+                         self._name, DOMAIN_ALIAS_EXISTS)
 
     def _exists(self):
         """Checks if the domain already exists.
@@ -123,12 +123,12 @@ class Domain(object):
         else:
             hasAlias = False
         if hasUser and hasAlias:
-            raise VMMDE(_(u'There are accounts and aliases.'),
-                ACCOUNT_AND_ALIAS_PRESENT)
+            raise DomErr(_(u'There are accounts and aliases.'),
+                         ACCOUNT_AND_ALIAS_PRESENT)
         elif hasUser:
-            raise VMMDE(_(u'There are accounts.'), ACCOUNT_PRESENT)
+            raise DomErr(_(u'There are accounts.'), ACCOUNT_PRESENT)
         elif hasAlias:
-            raise VMMDE(_(u'There are aliases.'), ALIAS_PRESENT)
+            raise DomErr(_(u'There are aliases.'), ALIAS_PRESENT)
 
     def save(self):
         """Stores the new domain in the database."""
@@ -142,8 +142,8 @@ class Domain(object):
             self._dbh.commit()
             dbc.close()
         else:
-            raise VMMDE(_(u'The domain “%s” already exists.') % self._name,
-                        DOMAIN_EXISTS)
+            raise DomErr(_(u'The domain “%s” already exists.') % self._name,
+                         DOMAIN_EXISTS)
 
     def delete(self, delUser=False, delAlias=False):
         """Deletes the domain.
@@ -160,8 +160,8 @@ class Domain(object):
             self._dbh.commit()
             dbc.close()
         else:
-            raise VMMDE(_(u"The domain “%s” doesn't exist.") % self._name,
-                        NO_SUCH_DOMAIN)
+            raise DomErr(_(u"The domain “%s” doesn't exist.") % self._name,
+                         NO_SUCH_DOMAIN)
 
     def updateTransport(self, transport, force=False):
         """Sets a new transport for the domain.
@@ -186,8 +186,8 @@ class Domain(object):
                     self._dbh.commit()
             dbc.close()
         else:
-            raise VMMDE(_(u"The domain “%s” doesn't exist.") % self._name,
-                        NO_SUCH_DOMAIN)
+            raise DomErr(_(u"The domain “%s” doesn't exist.") % self._name,
+                         NO_SUCH_DOMAIN)
 
     def getID(self):
         """Returns the ID of the domain."""
@@ -217,8 +217,8 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts,
         info = dbc.fetchone()
         dbc.close()
         if info is None:
-            raise VMMDE(_(u"The domain “%s” doesn't exist.") % self._name,
-                        NO_SUCH_DOMAIN)
+            raise DomErr(_(u"The domain “%s” doesn't exist.") % self._name,
+                         NO_SUCH_DOMAIN)
         else:
             keys = ['gid', 'domainname', 'transport', 'domaindir',
                     'aliasdomains', 'accounts', 'aliases', 'relocated']
@@ -315,7 +315,7 @@ def search(dbh, pattern=None, like=False):
 def get_gid(dbh, domainname):
     """Returns the *GID* of the domain *domainname*.
 
-    Raises an `VMMDomainException` if the domain does not exist.
+    Raises an `DomainError` if the domain does not exist.
     """
     domainname = check_domainname(domainname)
     dbc = dbh.cursor()
@@ -325,5 +325,5 @@ def get_gid(dbh, domainname):
     if gid:
         return gid[0]
     else:
-        raise VMMDE(_(u"The domain “%s” doesn't exist.") % domainname,
-                    NO_SUCH_DOMAIN)
+        raise DomErr(_(u"The domain “%s” doesn't exist.") % domainname,
+                     NO_SUCH_DOMAIN)

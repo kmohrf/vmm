@@ -10,7 +10,7 @@
 
 from VirtualMailManager.Domain import get_gid
 from VirtualMailManager.EmailAddress import EmailAddress
-from VirtualMailManager.Exceptions import VMMRelocatedException as VMMRE
+from VirtualMailManager.errors import RelocatedError as RErr
 from VirtualMailManager.constants.ERROR import \
      NO_SUCH_RELOCATED, RELOCATED_ADDR_DEST_IDENTICAL, RELOCATED_EXISTS
 
@@ -57,12 +57,12 @@ class Relocated(object):
         update = False
         assert isinstance(destination, EmailAddress)
         if self._addr == destination:
-            raise VMMRE(_(u'Address and destination are identical.'),
-                        RELOCATED_ADDR_DEST_IDENTICAL)
+            raise RErr(_(u'Address and destination are identical.'),
+                       RELOCATED_ADDR_DEST_IDENTICAL)
         if self._dest:
             if self._dest == destination:
-                raise VMMRE(_(u'The relocated user %r already exists.') %
-                            self._addr, RELOCATED_EXISTS)
+                raise RErr(_(u'The relocated user %r already exists.') %
+                           self._addr, RELOCATED_EXISTS)
             else:
                 self._dest = destination
                 update = True
@@ -83,15 +83,15 @@ WHERE gid=%s AND address=%s',
     def get_info(self):
         """Returns the address to which mails should be sent."""
         if not self._dest:
-            raise VMMRE(_(u"The relocated user %r doesn't exist.") %
-                        self._addr, NO_SUCH_RELOCATED)
+            raise RErr(_(u"The relocated user %r doesn't exist.") %
+                       self._addr, NO_SUCH_RELOCATED)
         return self._dest
 
     def delete(self):
         """Deletes the relocated entry from the database."""
         if not self._dest:
-            raise VMMRE(_(u"The relocated user %r doesn't exist.") %
-                        self._addr, NO_SUCH_RELOCATED)
+            raise RErr(_(u"The relocated user %r doesn't exist.") % self._addr,
+                       NO_SUCH_RELOCATED)
         dbc = self._dbh.cursor()
         dbc.execute("DELETE FROM relocated WHERE gid = %s AND address = %s",
                     self._gid, self._addr.localpart)

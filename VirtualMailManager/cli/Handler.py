@@ -10,7 +10,7 @@
 
 import os
 
-from VirtualMailManager.Exceptions import VMMException
+from VirtualMailManager.errors import VMMError
 from VirtualMailManager.Handler import Handler
 from VirtualMailManager.cli import read_pass
 from VirtualMailManager.cli.Config import CliConfig as Cfg
@@ -33,7 +33,7 @@ class CliHandler(Handler):
     def __init__(self):
         """Creates a new CliHandler instance.
 
-        Throws a VMMNotRootException if your uid is greater 0.
+        Throws a NotRootError if your uid is greater 0.
         """
         # Overwrite the parent CTor partly, we use the CliConfig class
         # and add some command line checks.
@@ -64,8 +64,8 @@ class CliHandler(Handler):
         elif self._Cfg.has_section(section):
             self._Cfg.configure([section])
         else:
-            raise VMMException(_(u'Invalid section: “%s”') % section,
-                               INVALID_SECTION)
+            raise VMMError(_(u'Invalid section: “%s”') % section,
+                           INVALID_SECTION)
 
     def userAdd(self, emailaddress, password):
         if password is None:

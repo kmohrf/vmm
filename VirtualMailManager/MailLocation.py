@@ -8,7 +8,7 @@ for accounts."""
 import re
 
 import VirtualMailManager.constants.ERROR as ERR
-from VirtualMailManager.Exceptions import VMMMailLocationException as MLE
+from VirtualMailManager.errors import MailLocationError as MLE
 
 RE_MAILLOCATION = """^\w{1,20}$"""
 

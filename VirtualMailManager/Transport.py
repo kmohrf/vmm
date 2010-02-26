@@ -6,7 +6,7 @@
 domains and accounts."""
 
 import VirtualMailManager.constants.ERROR as ERR
-from VirtualMailManager.Exceptions import VMMTransportException
+from VirtualMailManager.errors import TransportError
 
 class Transport(object):
     """A wrapper class that provides access to the transport table"""
@@ -23,14 +23,14 @@ class Transport(object):
         """
         self._dbh = dbh
         if tid is None and transport is None:
-            raise VMMTransportException(
+            raise TransportError(
                 _('Either tid or transport must be specified.'),
                 ERR.TRANSPORT_INIT)
         elif tid is not None:
             try:
                 self.__id = long(tid)
             except ValueError:
-                raise VMMTransportException(_('tid must be an int/long.'),
+                raise TransportError(_('tid must be an int/long.'),
                     ERR.TRANSPORT_INIT)
             self._loadByID()
         else:
@@ -58,7 +58,7 @@ class Transport(object):
         if result is not None:
             self.__transport = result[0]
         else:
-            raise VMMTransportException(_('Unknown tid specified.'),
+            raise TransportError(_('Unknown tid specified.'),
                 ERR.UNKNOWN_TRANSPORT_ID)
 
     def _loadByName(self):

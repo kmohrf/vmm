@@ -20,7 +20,7 @@ from VirtualMailManager.constants.ERROR import \
      NOT_EXECUTABLE, NO_SUCH_BINARY, NO_SUCH_DIRECTORY
 from VirtualMailManager.constants.version import __author__, __date__, \
      __version__
-from VirtualMailManager.Exceptions import VMMException
+from VirtualMailManager.errors import VMMError
 
 
 __all__ = [
@@ -69,30 +69,30 @@ def expand_path(path):
 def is_dir(path):
     """Checks if `path` is a directory.
 
-    Throws a `VMMException` if `path` is not a directory.
+    Throws a `VMMError` if `path` is not a directory.
 
     """
     path = expand_path(path)
     if not os.path.isdir(path):
-        raise VMMException(_(u"'%s' is not a directory") %
-                            get_unicode(path), NO_SUCH_DIRECTORY)
+        raise VMMError(_(u"'%s' is not a directory") % get_unicode(path),
+                       NO_SUCH_DIRECTORY)
     return path
 
 
 def exec_ok(binary):
     """Checks if the `binary` exists and if it is executable.
 
-    Throws a `VMMException` if the `binary` isn't a file or is not
+    Throws a `VMMError` if the `binary` isn't a file or is not
     executable.
 
     """
     binary = expand_path(binary)
     if not os.path.isfile(binary):
-        raise VMMException(_(u"'%s' is not a file") % get_unicode(binary),
-                           NO_SUCH_BINARY)
+        raise VMMError(_(u"'%s' is not a file") % get_unicode(binary),
+                       NO_SUCH_BINARY)
     if not os.access(binary, os.X_OK):
-        raise VMMException(_(u"File is not executable: '%s'") %
-                           get_unicode(binary), NOT_EXECUTABLE)
+        raise VMMError(_(u"File is not executable: '%s'") % 
+                       get_unicode(binary), NOT_EXECUTABLE)
     return binary
 
 
@@ -112,37 +112,37 @@ def check_domainname(domainname):
     It also converts the name of the domain from IDN to ASCII, if
     necessary.
 
-    Throws an `VMMException`, if the domain name is too long or doesn't
+    Throws an `VMMError`, if the domain name is too long or doesn't
     look like a valid domain name (label.label.label).
 
     """
     if not RE_DOMAIN.match(domainname):
         domainname = idn2ascii(domainname)
     if len(domainname) > 255:
-        raise VMMException(_(u'The domain name is too long'), DOMAIN_TOO_LONG)
+        raise VMMError(_(u'The domain name is too long'), DOMAIN_TOO_LONG)
     if not RE_DOMAIN.match(domainname):
-        raise VMMException(_(u'The domain name %r is invalid') % domainname,
-                           DOMAIN_INVALID)
+        raise VMMError(_(u'The domain name %r is invalid') % domainname,
+                       DOMAIN_INVALID)
     return domainname
 
 
 def check_localpart(localpart):
     """Returns the validated local-part `localpart`.
 
-    Throws a `VMMException` if the local-part is too long or contains
+    Throws a `VMMError` if the local-part is too long or contains
     invalid characters.
 
     """
     if len(localpart) > 64:
-        raise VMMException(_(u'The local-part %r is too long') % localpart,
-                           LOCALPART_TOO_LONG)
+        raise VMMError(_(u'The local-part %r is too long') % localpart,
+                       LOCALPART_TOO_LONG)
     invalid_chars = set(RE_LOCALPART.findall(localpart))
     if invalid_chars:
         i_chars = u''.join((u'"%s" ' % c for c in invalid_chars))
-        raise VMMException(_(u"The local-part %(l_part)r contains invalid \
+        raise VMMError(_(u"The local-part %(l_part)r contains invalid \
 characters: %(i_chars)s") %
-                           {'l_part': localpart, 'i_chars': i_chars},
-                           LOCALPART_INVALID)
+                       {'l_part': localpart, 'i_chars': i_chars},
+                       LOCALPART_INVALID)
     return localpart
 
 

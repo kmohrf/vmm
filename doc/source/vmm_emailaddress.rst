@@ -23,9 +23,9 @@ EmailAddress
 
   :param address: string representation of an e-mail addresses
   :type address: :obj:`basestring`
-  :raise VirtualMailManager.Exceptions.VMMEmailAddressException: if the
+  :raise VirtualMailManager.errors.EmailAddressError: if the
     *address* is syntactically wrong.
-  :raise VirtualMailManager.Exceptions.VMMException: if the validation of the
+  :raise VirtualMailManager.errors.VMMError: if the validation of the
     local-part or domain name fails.
 
   An EmailAddress instance has the both read-only attributes:

@@ -8,7 +8,7 @@ import re
 from subprocess import Popen, PIPE
 
 import VirtualMailManager.constants.ERROR as ERR
-from VirtualMailManager.Exceptions import VMMException
+from VirtualMailManager.errors import VMMError
 
 RE_PC_PARAMS = """^\w+$"""
 RE_PC_VARIABLES = r"""\$\b\w+\b"""
@@ -39,7 +39,7 @@ class Postconf(object):
         expand_vars -- default True (bool)
         """
         if not re.match(RE_PC_PARAMS, parameter):
-            raise VMMException(_(u'The value “%s” doesn\'t look like a valid\
+            raise VMMError(_(u'The value “%s” doesn\'t look like a valid\
  postfix configuration parameter name.') % parameter, ERR.VMM_ERROR)
         self.__val = self.__read(parameter)
         if expand_vars:
@@ -66,7 +66,7 @@ class Postconf(object):
         out, err = Popen([self.__bin, '-h', parameter], stdout=PIPE,
                 stderr=PIPE).communicate()
         if len(err):
-            raise VMMException(err.strip(), ERR.VMM_ERROR)
+            raise VMMError(err.strip(), ERR.VMM_ERROR)
         return out.strip()
 
     def __readMulti(self, parameters):
@@ -75,7 +75,7 @@ class Postconf(object):
             cmd.append(parameter[1:])
         out, err = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()
         if len(err):
-            raise VMMException(err.strip(), ERR.VMM_ERROR)
+            raise VMMError(err.strip(), ERR.VMM_ERROR)
         par_val = {}
         for line in out.splitlines():
             par, val = line.split(' = ')

@@ -45,7 +45,7 @@ Functions
   :param domainname: the name of the domain
   :type domainname: :obj:`basestring`
   :rtype: str
-  :raise VirtualMailManager.Exceptions.VMMException: if the domain name is
+  :raise VirtualMailManager.errors.VMMError: if the domain name is
     too long or doesn't look like a valid domain name (label.label.label).
 
 .. function:: check_localpart(localpart)
@@ -55,7 +55,7 @@ Functions
   :param localpart: The local-part of an e-mail address.
   :type localpart: str
   :rtype: str
-  :raise VirtualMailManager.Exceptions.VMMException: if the local-part is too
+  :raise VirtualMailManager.errors.VMMError: if the local-part is too
     long or contains invalid characters.
 
 .. function:: exec_ok(binary)
@@ -65,7 +65,7 @@ Functions
   :param binary: path to the binary
   :type binary: str
   :rtype: str
-  :raise VirtualMailManager.Exceptions.VMMException: if *binary* isn't a file
+  :raise VirtualMailManager.errors.VMMError: if *binary* isn't a file
     or is not executable.
 
 .. function:: expand_path(path)
@@ -99,8 +99,7 @@ Functions
   :param path: Path to a directory
   :type path: str
   :rtype: str
-  :raise VirtualMailManager.Exceptions.VMMException: if *path* is not a
-    directory.
+  :raise VirtualMailManager.errors.VMMError: if *path* is not a directory.
 
 
 Examples
@@ -120,7 +119,7 @@ Examples
     File "<stdin>", line 1, in <module>
     File "./VirtualMailManager/__init__.py", line 93, in exec_ok
       NO_SUCH_BINARY)
-  VirtualMailManager.Exceptions.VMMException: 'usr/bin/vim' is not a file
+  VirtualMailManager.errors.VMMError: 'usr/bin/vim' is not a file
   >>> exec_ok('/usr/bin/vim')
   '/usr/bin/vim'
   >>> expand_path('.')

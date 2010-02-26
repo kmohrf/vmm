@@ -28,7 +28,7 @@ from VirtualMailManager.AliasDomain import AliasDomain
 from VirtualMailManager.Config import Config as Cfg
 from VirtualMailManager.Domain import Domain
 from VirtualMailManager.EmailAddress import EmailAddress
-from VirtualMailManager.Exceptions import *
+from VirtualMailManager.errors import VMMError, AliasError
 from VirtualMailManager.Relocated import Relocated
 from VirtualMailManager.ext.Postconf import Postconf
 
@@ -52,7 +52,7 @@ class Handler(object):
             argument may be ``True``. By default it is ``False`` and
             all checks will be performed.
 
-        Throws a VMMNotRootException if your uid is greater 0.
+        Throws a NotRootError if your uid is greater 0.
         """
         self._cfgFileName = ''
         self.__warnings = []
@@ -60,7 +60,7 @@ class Handler(object):
         self._dbh = None
 
         if os.geteuid():
-            raise VMMNotRootException(_(u"You are not root.\n\tGood bye!\n"),
+            raise NotRootError(_(u"You are not root.\n\tGood bye!\n"),
                 ERR.CONF_NOPERM)
         if self.__chkCfgFile():
             self._Cfg = Cfg(self._cfgFileName)
@@ -78,7 +78,7 @@ class Handler(object):
                 self._cfgFileName = tmp
                 break
         if not len(self._cfgFileName):
-            raise VMMException(
+            raise VMMError(
                 _(u"No “vmm.cfg” found in: /root:/usr/local/etc:/etc"),
                 ERR.CONF_NOFILE)
 
@@ -89,7 +89,7 @@ class Handler(object):
         fmode = int(oct(fstat.st_mode & 0777))
         if fmode % 100 and fstat.st_uid != fstat.st_gid or \
             fmode % 10 and fstat.st_uid == fstat.st_gid:
-                raise VMMPermException(_(
+                raise PermissionError(_(
                     u'fix permissions (%(perms)s) for “%(file)s”\n\
 `chmod 0600 %(file)s` would be great.') % {'file':
                     self._cfgFileName, 'perms': fmode}, ERR.CONF_WRONGPERM)
@@ -105,21 +105,20 @@ class Handler(object):
             os.chown(basedir, 0, self._Cfg.dget('misc.gid_mail'))
             os.umask(old_umask)
         elif not os.path.isdir(basedir):
-            raise VMMException(_(u'“%s” is not a directory.\n\
+            raise VMMError(_(u'“%s” is not a directory.\n\
 (vmm.cfg: section "misc", option "base_directory")') %
                                  basedir, ERR.NO_SUCH_DIRECTORY)
         for opt, val in self._Cfg.items('bin'):
             try:
                 exec_ok(val)
-            except VMMException, e:
-                code = e.code()
-                if code is ERR.NO_SUCH_BINARY:
-                    raise VMMException(_(u'“%(binary)s” doesn\'t exist.\n\
+            except VMMError, e:
+                if e.code is ERR.NO_SUCH_BINARY:
+                    raise VMMError(_(u'“%(binary)s” doesn\'t exist.\n\
 (vmm.cfg: section "bin", option "%(option)s")') %
                                        {'binary': val, 'option': opt},
                                        ERR.NO_SUCH_BINARY)
-                elif code is ERR.NOT_EXECUTABLE:
-                    raise VMMException(_(u'“%(binary)s” is not executable.\
+                elif e.code is ERR.NOT_EXECUTABLE:
+                    raise VMMError(_(u'“%(binary)s” is not executable.\
 \n(vmm.cfg: section "bin", option "%(option)s")') %
                                        {'binary': val, 'option': opt},
                                        ERR.NOT_EXECUTABLE)
@@ -141,7 +140,7 @@ class Handler(object):
                 dbc.execute("SET NAMES 'UTF8'")
                 dbc.close()
             except PgSQL.libpq.DatabaseError, e:
-                raise VMMException(str(e), ERR.DATABASE_ERROR)
+                raise VMMError(str(e), ERR.DATABASE_ERROR)
 
     def _exists(dbh, query):
         dbc = dbh.cursor()
@@ -298,19 +297,19 @@ class Handler(object):
         if uid > 0 and gid > 0:
             userdir = '%s' % uid
             if userdir.count('..') or domdir.count('..'):
-                raise VMMException(_(u'Found ".." in home directory path.'),
+                raise VMMError(_(u'Found ".." in home directory path.'),
                                    ERR.FOUND_DOTS_IN_PATH)
             if os.path.isdir(domdir):
                 os.chdir(domdir)
                 if os.path.isdir(userdir):
                     mdstat = os.stat(userdir)
                     if (mdstat.st_uid, mdstat.st_gid) != (uid, gid):
-                        raise VMMException(_(
+                        raise VMMError(_(
                           u'Detected owner/group mismatch in home directory.'),
                           ERR.MAILDIR_PERM_MISMATCH)
                     rmtree(userdir, ignore_errors=True)
                 else:
-                    raise VMMException(_(u"No such directory: %s") %
+                    raise VMMError(_(u"No such directory: %s") %
                         os.path.join(domdir, userdir), ERR.NO_SUCH_DIRECTORY)
 
     def __domDirDelete(self, domdir, gid):
@@ -321,12 +320,12 @@ class Handler(object):
             domdirdirs = domdir.replace(basedir + '/', '').split('/')
             domdirparent = os.path.join(basedir, domdirdirs[0])
             if basedir.count('..') or domdir.count('..'):
-                raise VMMException(_(u'Found ".." in domain directory path.'),
+                raise VMMError(_(u'Found ".." in domain directory path.'),
                         ERR.FOUND_DOTS_IN_PATH)
             if os.path.isdir(domdirparent):
                 os.chdir(domdirparent)
                 if os.lstat(domdirdirs[1]).st_gid != gid:
-                    raise VMMException(_(
+                    raise VMMError(_(
                         u'Detected group mismatch in domain directory.'),
                         ERR.DOMAINDIR_GROUP_MISMATCH)
                 rmtree(domdirdirs[1], ignore_errors=True)
@@ -411,7 +410,7 @@ class Handler(object):
 
     def domainTransport(self, domainname, transport, force=None):
         if force is not None and force != 'force':
-            raise VMMDomainException(_(u"Invalid argument: “%s”") % force,
+            raise DomainError(_(u"Invalid argument: “%s”") % force,
                 ERR.INVALID_OPTION)
         dom = self.__getDomain(domainname, None)
         if force is None:
@@ -422,7 +421,7 @@ class Handler(object):
     def domainDelete(self, domainname, force=None):
         if not force is None and force not in ['deluser', 'delalias',
                                                'delall']:
-                raise VMMDomainException(_(u'Invalid argument: “%s”') %
+                raise DomainError(_(u'Invalid argument: “%s”') %
                                          force, ERR.INVALID_OPTION)
         dom = self.__getDomain(domainname)
         gid = dom.getID()
@@ -441,7 +440,7 @@ class Handler(object):
     def domainInfo(self, domainname, details=None):
         if details not in [None, 'accounts', 'aliasdomains', 'aliases', 'full',
                            'relocated']:
-            raise VMMException(_(u'Invalid argument: “%s”') % details,
+            raise VMMError(_(u'Invalid argument: “%s”') % details,
                                ERR.INVALID_AGUMENT)
         dom = self.__getDomain(domainname)
         dominfo = dom.getInfo()
@@ -511,7 +510,7 @@ class Handler(object):
                 elif pattern.endswith('%'):
                     domain = pattern[:-1]
                 if not re.match(RE_DOMAIN_SRCH, domain):
-                    raise VMMException(
+                    raise VMMError(
                     _(u"The pattern “%s” contains invalid characters.") %
                     pattern, ERR.DOMAIN_INVALID)
         self.__dbConnect()
@@ -546,7 +545,7 @@ class Handler(object):
 
     def userDelete(self, emailaddress, force=None):
         if force not in [None, 'delalias']:
-            raise VMMException(_(u"Invalid argument: “%s”") % force,
+            raise VMMError(_(u"Invalid argument: “%s”") % force,
                     ERR.INVALID_AGUMENT)
         acc = self.__getAccount(emailaddress)
         uid = acc.getUID()
@@ -555,15 +554,15 @@ class Handler(object):
         if self._Cfg.dget('account.delete_directory'):
             try:
                 self.__userDirDelete(acc.getDir('domain'), uid, gid)
-            except VMMException, e:
-                if e.code() in [ERR.FOUND_DOTS_IN_PATH,
+            except VMMError, e:
+                if e.code in [ERR.FOUND_DOTS_IN_PATH,
                         ERR.MAILDIR_PERM_MISMATCH, ERR.NO_SUCH_DIRECTORY]:
                     warning = _(u"""\
 The account has been successfully deleted from the database.
     But an error occurred while deleting the following directory:
     “%(directory)s”
     Reason: %(reason)s""") % \
-                    {'directory': acc.getDir('home'), 'reason': e.msg()}
+                    {'directory': acc.getDir('home'), 'reason': e.msg}
                     self.__warnings.append(warning)
                 else:
                     raise
@@ -574,14 +573,14 @@ The account has been successfully deleted from the database.
         alias = self.__getAlias(aliasaddress)
         try:
             return alias.get_destinations()
-        except VMMAliasException, e:
-            if e.code() == ERR.NO_SUCH_ALIAS:
+        except AliasError, e:
+            if e.code == ERR.NO_SUCH_ALIAS:
                 if Handler.accountExists(self._dbh, alias._addr):
-                    raise VMMException(
+                    raise VMMError(
                         _(u'There is already an account with address “%s”.') %
                                        aliasaddress, ERR.ACCOUNT_EXISTS)
                 if Handler.relocatedExists(self._dbh, alias._addr):
-                    raise VMMException(_(u'There is already a relocated user \
+                    raise VMMError(_(u'There is already a relocated user \
 with the address “%s”.') %
                                        aliasaddress, ERR.RELOCATED_EXISTS)
                 raise
@@ -600,7 +599,7 @@ with the address “%s”.') %
 
     def userInfo(self, emailaddress, details=None):
         if details not in (None, 'du', 'aliases', 'full'):
-            raise VMMException(_(u'Invalid argument: “%s”') % details,
+            raise VMMError(_(u'Invalid argument: “%s”') % details,
                                ERR.INVALID_AGUMENT)
         acc = self.__getAccount(emailaddress)
         info = acc.getInfo(self._Cfg.dget('misc.dovecot_version'))
@@ -623,7 +622,7 @@ with the address “%s”.') %
             raise ValueError('could not accept password: %r' % password)
         acc = self.__getAccount(emailaddress)
         if acc.getUID() == 0:
-            raise VMMException(_(u"Account doesn't exist"),
+            raise VMMError(_(u"Account doesn't exist"),
                                ERR.NO_SUCH_ACCOUNT)
         acc.modify('password', self.__pwhash(password, user=emailaddress))
 

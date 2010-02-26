@@ -10,7 +10,7 @@
 
 from VirtualMailManager.Domain import get_gid
 from VirtualMailManager.EmailAddress import EmailAddress
-from VirtualMailManager.Exceptions import VMMAliasException as VMMAE
+from VirtualMailManager.errors import AliasError as AErr
 from VirtualMailManager.constants.ERROR import ALIAS_ADDR_DEST_IDENTICAL, \
      ALIAS_EXCEEDS_EXPANSION_LIMIT, ALIAS_EXISTS, NO_SUCH_ALIAS
 
@@ -63,9 +63,9 @@ This alias already exceeds it's expansion limit (%(count)i/%(limit)i).
 So its unusable, all messages addressed to this alias will be bounced.
 Hint: Delete some destination addresses.""")
         if failed:
-            raise VMMAE(errmsg % {'address': str(self._addr), 'count': dcount,
-                                  'limit': limit},
-                        ALIAS_EXCEEDS_EXPANSION_LIMIT)
+            raise AErr(errmsg % {'address': str(self._addr), 'count': dcount,
+                                 'limit': limit},
+                       ALIAS_EXCEEDS_EXPANSION_LIMIT)
 
     def __delete(self, destination=None):
         """Deletes a destination from the alias, if ``destination`` is
@@ -93,13 +93,13 @@ Hint: Delete some destination addresses.""")
         """Adds the ``destination`` `EmailAddress` to the alias."""
         assert isinstance(destination, EmailAddress)
         if self._addr == destination:
-            raise VMMAE(_(u"Address and destination are identical."),
-                        ALIAS_ADDR_DEST_IDENTICAL)
+            raise AErr(_(u"Address and destination are identical."),
+                       ALIAS_ADDR_DEST_IDENTICAL)
         if destination in self._dests:
-            raise VMMAE(_(
+            raise AErr(_(
                 u'The alias %(a)r has already the destination %(d)r.') %
-                        {'a': str(self._addr), 'd': str(destination)},
-                        ALIAS_EXISTS)
+                       {'a': str(self._addr), 'd': str(destination)},
+                       ALIAS_EXISTS)
         self.__check_expansion(expansion_limit)
         dbc = self._dbh.cursor()
         dbc.execute('INSERT INTO alias (gid, address, destination) \
@@ -113,28 +113,28 @@ VALUES (%s, %s, %s)',
         """Deletes the specified ``destination`` address from the alias."""
         assert isinstance(destination, EmailAddress)
         if not self._dests:
-            raise VMMAE(_(u"The alias %r doesn't exist.") % str(self._addr),
-                        NO_SUCH_ALIAS)
+            raise AErr(_(u"The alias %r doesn't exist.") % str(self._addr),
+                       NO_SUCH_ALIAS)
         if not destination in self._dests:
-            raise VMMAE(_(u"The address %(d)r isn't a destination of \
+            raise AErr(_(u"The address %(d)r isn't a destination of \
 the alias %(a)r.") %
-                        {'a': str(self._addr), 'd': str(destination)},
-                        NO_SUCH_ALIAS)
+                       {'a': str(self._addr), 'd': str(destination)},
+                       NO_SUCH_ALIAS)
         self.__delete(destination)
         self._dests.remove(destination)
 
     def get_destinations(self):
         """Returns an iterator for all destinations of the alias."""
         if not self._dests:
-            raise VMMAE(_(u"The alias %r doesn't exist.") % str(self._addr),
-                        NO_SUCH_ALIAS)
+            raise AErr(_(u"The alias %r doesn't exist.") % str(self._addr),
+                       NO_SUCH_ALIAS)
         return iter(self._dests)
 
     def delete(self):
         """Deletes the alias with all it's destinations."""
         if not self._dests:
-            raise VMMAE(_(u"The alias %r doesn't exist.") % str(self._addr),
-                        NO_SUCH_ALIAS)
+            raise AErr(_(u"The alias %r doesn't exist.") % str(self._addr),
+                       NO_SUCH_ALIAS)
         self.__delete()
         del self._dests[:]
 

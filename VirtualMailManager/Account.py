@@ -7,14 +7,14 @@
 import VirtualMailManager.constants.ERROR as ERR
 from VirtualMailManager.Domain import Domain
 from VirtualMailManager.EmailAddress import EmailAddress
-from VirtualMailManager.Exceptions import VMMAccountException as AccE
+from VirtualMailManager.errors import AccountError as AccE
 from VirtualMailManager.MailLocation import MailLocation
 from VirtualMailManager.Transport import Transport
-import VirtualMailManager as VMM
 
 class Account(object):
     """Class to manage e-mail accounts."""
     __slots__ = ('_addr','_base','_gid','_mid','_passwd','_tid','_uid','_dbh')
+
     def __init__(self, dbh, address, password=None):
         self._dbh = dbh
         self._base = None
@@ -29,24 +29,23 @@ class Account(object):
         self._passwd = password
         self._setAddr()
         self._exists()
-        if self._uid < 1 and VMM.VirtualMailManager.aliasExists(self._dbh,
-                self._addr):
+        from VirtualMailManager.Handler import Handler
+        if self._uid < 1 and Handler.aliasExists(self._dbh, self._addr):
             # TP: Hm, what quotation marks should be used?
             # If you are unsure have a look at:
             # http://en.wikipedia.org/wiki/Quotation_mark,_non-English_usage
-            raise AccE(_(u"There is already an alias with the address “%s”.") %\
-                    self._addr, ERR.ALIAS_EXISTS)
-        if self._uid < 1 and VMM.VirtualMailManager.relocatedExists(self._dbh,
-                self._addr):
+            raise AccE(_(u"There is already an alias with the address “%s”.") %
+                       self._addr, ERR.ALIAS_EXISTS)
+        if self._uid < 1 and Handler.relocatedExists(self._dbh, self._addr):
             raise AccE(
-              _(u"There is already a relocated user with the address “%s”.") %\
-                    self._addr, ERR.RELOCATED_EXISTS)
+              _(u"There is already a relocated user with the address “%s”.") %
+                       self._addr, ERR.RELOCATED_EXISTS)
 
     def _exists(self):
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT uid, mid, tid FROM users \
-WHERE gid=%s AND local_part=%s",
-                self._gid, self._addr._localpart)
+        dbc.execute(
+            "SELECT uid, mid, tid FROM users WHERE gid=%s AND local_part=%s",
+                    self._gid, self._addr._localpart)
         result = dbc.fetchone()
         dbc.close()
         if result is not None:
@@ -59,8 +58,8 @@ WHERE gid=%s AND local_part=%s",
         dom = Domain(self._dbh, self._addr._domainname)
         self._gid = dom.getID()
         if self._gid == 0:
-            raise AccE(_(u"The domain “%s” doesn't exist.") %\
-                    self._addr._domainname, ERR.NO_SUCH_DOMAIN)
+            raise AccE(_(u"The domain “%s” doesn't exist.") %
+                       self._addr._domainname, ERR.NO_SUCH_DOMAIN)
         self._base = dom.getDir()
         self._tid = dom.getTransportID()
 

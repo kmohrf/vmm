@@ -11,7 +11,7 @@
 from VirtualMailManager import check_domainname, check_localpart
 from VirtualMailManager.constants.ERROR import \
      DOMAIN_NO_NAME, INVALID_ADDRESS, LOCALPART_INVALID
-from VirtualMailManager.Exceptions import VMMEmailAddressException as VMMEAE
+from VirtualMailManager.errors import EmailAddressError as EAErr
 
 
 _ = lambda msg: msg
@@ -63,17 +63,17 @@ class EmailAddress(object):
         parts = address.split('@')
         p_len = len(parts)
         if p_len < 2:
-            raise VMMEAE(_(u"Missing the '@' sign in address %r") % address,
-                         INVALID_ADDRESS)
+            raise EAErr(_(u"Missing the '@' sign in address %r") % address,
+                        INVALID_ADDRESS)
         elif p_len > 2:
-            raise VMMEAE(_(u"Too many '@' signs in address %r") % address,
-                         INVALID_ADDRESS)
+            raise EAErr(_(u"Too many '@' signs in address %r") % address,
+                        INVALID_ADDRESS)
         if not parts[0]:
-            raise VMMEAE(_(u"Missing local-part in address %r") % address,
-                         LOCALPART_INVALID)
+            raise EAErr(_(u'Missing local-part in address %r') % address,
+                        LOCALPART_INVALID)
         if not parts[1]:
-            raise VMMEAE(_(u"Missing domain name in address %r") % address,
-                         DOMAIN_NO_NAME)
+            raise EAErr(_(u'Missing domain name in address %r') % address,
+                        DOMAIN_NO_NAME)
         self._localpart = check_localpart(parts[0])
         self._domainname = check_domainname(parts[1])
 

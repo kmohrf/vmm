@@ -13,7 +13,7 @@ from shutil import copy2
 
 from VirtualMailManager import ENCODING
 from VirtualMailManager.Config import Config, ConfigValueError, LazyConfig
-from VirtualMailManager.Exceptions import VMMConfigException
+from VirtualMailManager.errors import ConfigError
 from VirtualMailManager.cli import w_std
 from VirtualMailManager.constants.ERROR import VMM_TOO_MANY_FAILURES
 
@@ -47,9 +47,9 @@ class CliConfig(Config):
                             w_std(_(u'Warning: %s') % e)
                             failures += 1
                             if failures > 2:
-                                raise VMMConfigException(
+                                raise ConfigError(
                                     _(u'Too many failures - try again later.'),
-                                                         VMM_TOO_MANY_FAILURES)
+                                                  VMM_TOO_MANY_FAILURES)
                     else:
                         break
             print

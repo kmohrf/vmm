@@ -158,7 +158,7 @@ LazyConfig
       and it fails
     :raise ValueError: if an other setter (:attr:`LazyConfigOption.cls`) or
       validator (:attr:`LazyConfigOption.validate`) fails.
-    :raise VirtualMailManager.Exceptions.VMMException: if
+    :raise VirtualMailManager.errors.VMMError: if
       :attr:`LazyConfigOption.validate` is set to
       :func:`VirtualMailManager.exec_ok` or :func:`VirtualMailManager.is_dir`.
 
@@ -232,13 +232,13 @@ The final configuration class of the virtual mail manager.
 
     Checks all section's options for settings w/o a default value.
 
-    :raise VirtualMailManager.Exceptions.VMMConfigException: if the check fails
+    :raise VirtualMailManager.errors.ConfigError: if the check fails
 
   .. method:: load()
 
     Loads the configuration read-only.
 
-    :raise VirtualMailManager.Exceptions.VMMConfigException: if the
+    :raise VirtualMailManager.errors.ConfigError: if the
       configuration syntax is invalid
 
   .. method:: unicode(section, option)
@@ -256,19 +256,19 @@ The final configuration class of the virtual mail manager.
 Exceptions
 ----------
 
-.. exception:: BadOptionError (msg)
+.. exception:: BadOptionError(msg)
 
   Bases: :exc:`ConfigParser.Error`
 
   Raised when a option isn't in the format 'section.option'.
 
-.. exception:: ConfigValueError (msg)
+.. exception:: ConfigValueError(msg)
 
   Bases: :exc:`ConfigParser.Error`
 
   Raised when creating or validating of new values fails.
 
-.. exception:: NoDefaultError (section, option)
+.. exception:: NoDefaultError(section, option)
 
   Bases: :exc:`ConfigParser.Error`
 

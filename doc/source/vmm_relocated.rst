@@ -34,8 +34,8 @@ Relocated
   .. method:: delete()
   
     :rtype: :obj:`None`
-    :raise VirtualMailManager.Exceptions.VMMRelocatedException: if the
-      relocated user doesn't exist.
+    :raise VirtualMailManager.errors.RelocatedError: if the relocated user
+      doesn't exist.
 
     Deletes the relocated user from the database.
 
@@ -43,8 +43,8 @@ Relocated
   .. method:: get_info()
 
     :rtype: :class:`VirtualMailManager.EmailAddress.EmailAddress`
-    :raise VirtualMailManager.Exceptions.VMMRelocatedException: if the
-      relocated user doesn't exist.
+    :raise VirtualMailManager.errors.RelocatedError: if the relocated user
+      doesn't exist.
 
     Returns the destination e-mail address of the relocated user.
 
@@ -54,8 +54,7 @@ Relocated
     :param destination: the new address where the relocated user has moved to
     :type destination: :class:`VirtualMailManager.EmailAddress.EmailAddress`
     :rtype: :obj:`None`
-    :raise VirtualMailManager.Exceptions.VMMRelocatedException: if the
-      *destination* address is already saved or is the same as the relocated
-      user's address.
+    :raise VirtualMailManager.errors.RelocatedError: if the *destination*
+      address is already saved or is the same as the relocated user's address.
 
     Sets or updates the *destination* address of the relocated user.
