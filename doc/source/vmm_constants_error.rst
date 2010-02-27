@@ -43,6 +43,8 @@ Error codes, used by all :mod:`VirtualMailManager.errors`.
 
   The alias address and its destination are the same
 
+  obsolete?
+
 .. data:: ALIAS_EXCEEDS_EXPANSION_LIMIT
 
   The Alias has reached or exceeds its expansion limit
@@ -50,6 +52,8 @@ Error codes, used by all :mod:`VirtualMailManager.errors`.
 .. data:: ALIAS_EXISTS
 
   Alias with the given destination exists already
+
+  obsolete?
 
 .. data:: ALIAS_MISSING_DEST
 

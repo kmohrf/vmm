@@ -26,7 +26,7 @@ Relocated
   order to delete the relocated user from the database.
   
   :param dbh: a database connection
-  :type dbh: :class:`PgSQL.Connection`
+  :type dbh: :class:`pyPgSQL.PgSQL.Connection`
   :param address: the e-mail address of the relocated user.
   :type address: :class:`VirtualMailManager.EmailAddress.EmailAddress`
 
