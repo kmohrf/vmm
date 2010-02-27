@@ -50,6 +50,9 @@ class EmailAddress(object):
                     self._domainname != other.domainname
         return NotImplemented
 
+    def __hash__(self):
+        return hash((self._localpart.lower(), self._domainname.lower()))
+
     def __repr__(self):
         return "EmailAddress('%s@%s')" % (self._localpart, self._domainname)
 
