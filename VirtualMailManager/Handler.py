@@ -26,9 +26,9 @@ from VirtualMailManager.Account import Account
 from VirtualMailManager.Alias import Alias
 from VirtualMailManager.AliasDomain import AliasDomain
 from VirtualMailManager.Config import Config as Cfg
-from VirtualMailManager.Domain import Domain
+from VirtualMailManager.Domain import Domain, get_gid
 from VirtualMailManager.EmailAddress import EmailAddress
-from VirtualMailManager.errors import VMMError, AliasError
+from VirtualMailManager.errors import VMMError, AliasError, DomainError
 from VirtualMailManager.Relocated import Relocated
 from VirtualMailManager.ext.Postconf import Postconf
 
@@ -394,8 +394,13 @@ class Handler(object):
         return bool(len(self.__warnings))
 
     def getWarnings(self):
-        """Returns a list with all available warnings."""
-        return self.__warnings
+        """Returns a list with all available warnings and resets all
+        warnings.
+
+        """
+        ret_val = self.__warnings[:]
+        del self.__warnings[:]
+        return ret_val
 
     def cfgDget(self, option):
         return self._Cfg.dget(option)
@@ -529,19 +534,32 @@ class Handler(object):
                  self._Cfg.dget('account.sieve'))
         self.__mailDirMake(acc.getDir('domain'), acc.getUID(), acc.getGID())
 
-    def aliasAdd(self, aliasaddress, targetaddress):
+    def aliasAdd(self, aliasaddress, *targetaddresses):
         """Creates a new `Alias` entry for the given *aliasaddress* with
-        the given *targetaddress*."""
+        the given *targetaddresses*."""
         alias = self.__getAlias(aliasaddress)
-        destination = EmailAddress(targetaddress)
-        alias.add_destination(destination,
-                    long(self._postconf.read('virtual_alias_expansion_limit')))
-        gid = self.__getDomain(destination.domainname).getID()
-        if gid > 0 and (not Handler.accountExists(self._dbh, destination) and
-                        not Handler.aliasExists(self._dbh, destination)):
-            self.__warnings.append(
-                _(u"The destination account/alias “%s” doesn't exist.") %
-                                   destination)
+        destinations = [EmailAddress(address) for address in targetaddresses]
+        warnings = []
+        destinations = alias.add_destinations(destinations,
+                    long(self._postconf.read('virtual_alias_expansion_limit')),
+                                              warnings)
+        if warnings:
+            self.__warnings.append(_('Ignored destination addresses:'))
+            self.__warnings.extend(('  * %s' % w for w in warnings))
+        for destination in destinations:
+            try:
+                gid = get_gid(self._dbh, destination.domainname)
+            except DomainError, e:
+                if e.code == ERR.NO_SUCH_DOMAIN:
+                    continue
+                else:
+                    raise
+            if gid > 0 and \
+                    (not Handler.accountExists(self._dbh, destination) and
+                     not Handler.aliasExists(self._dbh, destination)):
+                self.__warnings.append(
+                    _(u"The destination account/alias %r doesn't exist.") %
+                                       str(destination))
 
     def userDelete(self, emailaddress, force=None):
         if force not in [None, 'delalias']:

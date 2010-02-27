@@ -11,6 +11,7 @@
 from VirtualMailManager.Domain import get_gid
 from VirtualMailManager.EmailAddress import EmailAddress
 from VirtualMailManager.errors import AliasError as AErr
+from VirtualMailManager.pycompat import all
 from VirtualMailManager.constants.ERROR import ALIAS_ADDR_DEST_IDENTICAL, \
      ALIAS_EXCEEDS_EXPANSION_LIMIT, ALIAS_EXISTS, NO_SUCH_ALIAS
 
@@ -44,27 +45,27 @@ class Alias(object):
                 dest_add(EmailAddress(dest[0]))
         dbc.close()
 
-    def __check_expansion(self, limit):
+    def __check_expansion(self, count_new, limit):
         """Checks the current expansion limit of the alias."""
         dcount = len(self._dests)
         failed = False
-        if dcount == limit:
+        if dcount == limit or dcount + count_new > limit:
             failed = True
             errmsg = _(
-u"""Can't add new destination to alias %(address)r.
+u"""Can't add %(count_new)i new destination(s) to alias %(address)r.
 Currently this alias expands into %(count)i/%(limit)i recipients.
-One more destination will render this alias unusable.
+%(count_new)i additional destination(s) will render this alias unusable.
 Hint: Increase Postfix' virtual_alias_expansion_limit""")
         elif dcount > limit:
             failed = True
             errmsg = _(
-u"""Can't add new destination to alias %(address)r.
+u"""Can't add %(count_new)i new destination(s) to alias %(address)r.
 This alias already exceeds it's expansion limit (%(count)i/%(limit)i).
 So its unusable, all messages addressed to this alias will be bounced.
 Hint: Delete some destination addresses.""")
         if failed:
             raise AErr(errmsg % {'address': str(self._addr), 'count': dcount,
-                                 'limit': limit},
+                                 'limit': limit, 'count_new': count_new},
                        ALIAS_EXCEEDS_EXPANSION_LIMIT)
 
     def __delete(self, destination=None):
@@ -89,25 +90,39 @@ Hint: Delete some destination addresses.""")
         """Returns the number of destinations of the alias."""
         return len(self._dests)
 
-    def add_destination(self, destination, expansion_limit):
-        """Adds the ``destination`` `EmailAddress` to the alias."""
-        assert isinstance(destination, EmailAddress)
-        if self._addr == destination:
-            raise AErr(_(u"Address and destination are identical."),
-                       ALIAS_ADDR_DEST_IDENTICAL)
-        if destination in self._dests:
-            raise AErr(_(
-                u'The alias %(a)r has already the destination %(d)r.') %
-                       {'a': str(self._addr), 'd': str(destination)},
-                       ALIAS_EXISTS)
-        self.__check_expansion(expansion_limit)
+    def add_destinations(self, destinations, expansion_limit, warnings=None):
+        """Adds the `EmailAddress`es from *destinations* list to the
+        destinations of the alias.
+
+        Destinations, that are already assigned to the alias, will be
+        removed from *destinations*.  When done, this method will return
+        a set with all destinations, that was saved in the database.
+        """
+        destinations = set(destinations)
+        assert destinations and \
+                all(isinstance(dest, EmailAddress) for dest in destinations)
+        if not warnings is None:
+            assert isinstance(warnings, list)
+        if self._addr in destinations:
+            destinations.remove(self._addr)
+            if not warnings is None:
+                warnings.append(self._addr)
+        duplicates = destinations.intersection(set(self._dests))
+        if duplicates:
+            destinations.difference_update(set(self._dests))
+            if not warnings is None:
+                warnings.extend(duplicates)
+        if not destinations:
+            return destinations
+        self.__check_expansion(len(destinations), expansion_limit)
         dbc = self._dbh.cursor()
-        dbc.execute('INSERT INTO alias (gid, address, destination) \
-VALUES (%s, %s, %s)',
-                    self._gid, self._addr.localpart, str(destination))
+        dbc.executemany("INSERT INTO alias VALUES (%d, '%s', %%s)" %
+                        (self._gid, self._addr.localpart),
+                        (str(destination) for destination in destinations))
         self._dbh.commit()
         dbc.close()
-        self._dests.append(destination)
+        self._dests.extend(destinations)
+        return destinations
 
     def del_destination(self, destination):
         """Deletes the specified ``destination`` address from the alias."""
@@ -131,7 +146,7 @@ the alias %(a)r.") %
         return iter(self._dests)
 
     def delete(self):
-        """Deletes the alias with all it's destinations."""
+        """Deletes the alias with all its destinations."""
         if not self._dests:
             raise AErr(_(u"The alias %r doesn't exist.") % str(self._addr),
                        NO_SUCH_ALIAS)
