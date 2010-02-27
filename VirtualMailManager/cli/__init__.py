@@ -23,22 +23,24 @@ _err_write = os.sys.stderr.write
 
 
 def w_std(*args):
-    """Writes each arg of `args`, encoded in the current ENCODING, to stdout
-    and appends a newline."""
-    for arg in args:
-        _std_write(arg.encode(ENCODING, 'replace'))
-        _std_write('\n')
+    """Writes a line for each arg of *args*, encoded in the current
+    ENCODING, to stdout.
+
+    """
+    _std_write('\n'.join(arg.encode(ENCODING, 'replace') for arg in args))
+    _std_write('\n')
 
 
 def w_err(code, *args):
-    """Writes each arg of `args`, encoded in the current ENCODING, to stderr
-    and appends a newline.
+    """Writes a line for each arg of *args*, encoded in the current
+    ENCODING, to stderr.
 
     This function additional interrupts the program execution and uses
-    `code` system exit status."""
-    for arg in args:
-        _err_write(arg.encode(ENCODING, 'replace'))
-        _err_write('\n')
+    *code* as the system exit status.
+
+    """
+    _err_write('\n'.join(arg.encode(ENCODING, 'replace') for arg in args))
+    _err_write('\n')
     os.sys.exit(code)
 
 
