@@ -11,7 +11,7 @@
 from VirtualMailManager.Domain import get_gid
 from VirtualMailManager.EmailAddress import EmailAddress
 from VirtualMailManager.errors import RelocatedError as RErr
-from VirtualMailManager.constants.ERROR import \
+from VirtualMailManager.constants.ERROR import NO_SUCH_DOMAIN, \
      NO_SUCH_RELOCATED, RELOCATED_ADDR_DEST_IDENTICAL, RELOCATED_EXISTS
 
 
@@ -34,6 +34,9 @@ class Relocated(object):
         self._addr = address
         self._dbh = dbh
         self._gid = get_gid(self._dbh, self._addr.domainname)
+        if not self._gid:
+            raise RErr(_(u"The domain %r doesn't exist.") %
+                       self._addr.domainname, NO_SUCH_DOMAIN)
         self._dest = None
 
         self.__load()

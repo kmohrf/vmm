@@ -547,16 +547,9 @@ class Handler(object):
             self.__warnings.append(_('Ignored destination addresses:'))
             self.__warnings.extend(('  * %s' % w for w in warnings))
         for destination in destinations:
-            try:
-                gid = get_gid(self._dbh, destination.domainname)
-            except DomainError, e:
-                if e.code == ERR.NO_SUCH_DOMAIN:
-                    continue
-                else:
-                    raise
-            if gid > 0 and \
-                    (not Handler.accountExists(self._dbh, destination) and
-                     not Handler.aliasExists(self._dbh, destination)):
+            gid = get_gid(self._dbh, destination.domainname)
+            if gid and (not Handler.accountExists(self._dbh, destination) and
+                        not Handler.aliasExists(self._dbh, destination)):
                 self.__warnings.append(
                     _(u"The destination account/alias %r doesn't exist.") %
                                        str(destination))

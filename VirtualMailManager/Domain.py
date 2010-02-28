@@ -313,9 +313,10 @@ def search(dbh, pattern=None, like=False):
     return order, domdict
 
 def get_gid(dbh, domainname):
-    """Returns the *GID* of the domain *domainname*.
+    """Returns the group id of the domain *domainname*.
 
-    Raises an `DomainError` if the domain does not exist.
+    If the domain couldn't be found in the database 0 will be returned.
+
     """
     domainname = check_domainname(domainname)
     dbc = dbh.cursor()
@@ -324,6 +325,4 @@ def get_gid(dbh, domainname):
     dbc.close()
     if gid:
         return gid[0]
-    else:
-        raise DomErr(_(u"The domain “%s” doesn't exist.") % domainname,
-                     NO_SUCH_DOMAIN)
+    return 0

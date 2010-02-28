@@ -12,8 +12,8 @@ from VirtualMailManager.Domain import get_gid
 from VirtualMailManager.EmailAddress import EmailAddress
 from VirtualMailManager.errors import AliasError as AErr
 from VirtualMailManager.pycompat import all
-from VirtualMailManager.constants.ERROR import ALIAS_ADDR_DEST_IDENTICAL, \
-     ALIAS_EXCEEDS_EXPANSION_LIMIT, ALIAS_EXISTS, NO_SUCH_ALIAS
+from VirtualMailManager.constants.ERROR import \
+     ALIAS_EXCEEDS_EXPANSION_LIMIT, NO_SUCH_ALIAS, NO_SUCH_DOMAIN
 
 
 _ = lambda msg: msg
@@ -28,6 +28,9 @@ class Alias(object):
         self._addr = address
         self._dbh = dbh
         self._gid = get_gid(self._dbh, self._addr.domainname)
+        if not self._gid:
+            raise AErr(_(u"The domain %r doesn't exist.") %
+                       self._addr.domainname, NO_SUCH_DOMAIN)
         self._dests = []
 
         self.__load_dests()
