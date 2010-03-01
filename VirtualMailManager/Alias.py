@@ -43,9 +43,7 @@ class Alias(object):
                     self._gid, self._addr.localpart)
         dests = iter(dbc.fetchall())
         if dbc.rowcount > 0:
-            dest_add = self._dests.append
-            for dest in dests:
-                dest_add(EmailAddress(dest[0]))
+            self._dests.extend(EmailAddress(dest[0]) for dest in dests)
         dbc.close()
 
     def __check_expansion(self, count_new, limit):

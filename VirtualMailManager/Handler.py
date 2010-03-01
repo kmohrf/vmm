@@ -246,8 +246,8 @@ class Handler(object):
         """Creates a subscriptions file with the mailboxes from `folderlist`"""
         fname = os.path.join(self._Cfg.dget('maildir.name'), 'subscriptions')
         sf = open(fname, 'w')
-        for f in folderlist:
-            sf.write('%s\n' % f)
+        sf.write('\n'.join(folderlist))
+        sf.write('\n')
         sf.flush()
         sf.close()
         os.chown(fname, uid, gid)

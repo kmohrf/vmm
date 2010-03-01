@@ -71,8 +71,7 @@ class Postconf(object):
 
     def __readMulti(self, parameters):
         cmd = [self.__bin]
-        for parameter in parameters:
-            cmd.append(parameter[1:])
+        cmd.extend(parameter[1:] for parameter in parameters)
         out, err = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()
         if len(err):
             raise VMMError(err.strip(), ERR.VMM_ERROR)
