@@ -11,9 +11,14 @@ from VirtualMailManager.errors import AccountError as AccE
 from VirtualMailManager.MailLocation import MailLocation
 from VirtualMailManager.Transport import Transport
 
+
+_ = lambda msg: msg
+
+
 class Account(object):
     """Class to manage e-mail accounts."""
-    __slots__ = ('_addr','_base','_gid','_mid','_passwd','_tid','_uid','_dbh')
+    __slots__ = ('_addr', '_base', '_gid', '_mid', '_passwd', '_tid', '_uid',
+                 '_dbh')
 
     def __init__(self, dbh, address, password=None):
         self._dbh = dbh
@@ -45,7 +50,7 @@ class Account(object):
         dbc = self._dbh.cursor()
         dbc.execute(
             "SELECT uid, mid, tid FROM users WHERE gid=%s AND local_part=%s",
-                    self._gid, self._addr._localpart)
+                    self._gid, self._addr.localpart)
         result = dbc.fetchone()
         dbc.close()
         if result is not None:
@@ -55,11 +60,11 @@ class Account(object):
             return False
 
     def _setAddr(self):
-        dom = Domain(self._dbh, self._addr._domainname)
+        dom = Domain(self._dbh, self._addr.domainname)
         self._gid = dom.getID()
         if self._gid == 0:
             raise AccE(_(u"The domain “%s” doesn't exist.") %
-                       self._addr._domainname, ERR.NO_SUCH_DOMAIN)
+                       self._addr.domainname, ERR.NO_SUCH_DOMAIN)
         self._base = dom.getDir()
         self._tid = dom.getTransportID()
 
@@ -105,7 +110,7 @@ class Account(object):
     def __aliaseCount(self):
         dbc = self._dbh.cursor()
         q = "SELECT COUNT(destination) FROM alias WHERE destination = '%s'"\
-            %self._addr
+            % self._addr
         dbc.execute(q)
         a_count = dbc.fetchone()[0]
         dbc.close()
@@ -141,7 +146,7 @@ class Account(object):
             self._prepare(maillocation)
             sql = "INSERT INTO users (local_part, passwd, uid, gid, mid, tid,\
  smtp, pop3, imap, %s) VALUES ('%s', '%s', %d, %d, %d, %d, %s, %s, %s, %s)" % (
-                sieve_col, self._addr._localpart, self._passwd, self._uid,
+                sieve_col, self._addr.localpart, self._passwd, self._uid,
                 self._gid, self._mid, self._tid, smtp, pop3, imap, sieve)
             dbc = self._dbh.cursor()
             dbc.execute(sql)
@@ -162,7 +167,7 @@ class Account(object):
             dbc.execute('UPDATE users SET passwd = %s WHERE uid = %s',
                     value, self._uid)
         elif what == 'transport':
-            self._tid = Transport(self._dbh, transport=value).getID()
+            self._tid = Transport(self._dbh, transport=value).id
             dbc.execute('UPDATE users SET tid = %s WHERE uid = %s',
                     self._tid, self._uid)
         else:
@@ -202,7 +207,7 @@ class Account(object):
                     MailLocation(self._dbh,
                         mid=info['maildir']).getMailLocation())
             info['transport'] = Transport(self._dbh,
-                    tid=info['transport']).getTransport()
+                                          tid=info['transport']).transport
             return info
 
     def getAliases(self):
@@ -241,8 +246,10 @@ class Account(object):
                 dbc.close()
                 raise AccE(
                   _(u"There are %(count)d aliases with the destination address\
- “%(address)s”.") %{'count': a_count, 'address': self._addr}, ERR.ALIAS_PRESENT)
+ “%(address)s”.") % {'count': a_count, 'address': self._addr},
+                  ERR.ALIAS_PRESENT)
         dbc.close()
+
 
 def getAccountByID(uid, dbh):
     try:
@@ -264,3 +271,5 @@ def getAccountByID(uid, dbh):
     info = dict(zip(keys, info))
     return info
 
+
+del _

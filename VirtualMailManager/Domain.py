@@ -15,11 +15,14 @@ from VirtualMailManager.Transport import Transport
 
 
 MAILDIR_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz'
+_ = lambda x: x
 
 
 class Domain(object):
     """Class to manage e-mail domains."""
-    __slots__ = ('_basedir','_domaindir','_id','_name','_transport','_dbh')
+    __slots__ = ('_basedir', '_domaindir', '_id', '_name', '_transport',
+                 '_dbh')
+
     def __init__(self, dbh, domainname, basedir=None, transport=None):
         """Creates a new Domain instance.
 
@@ -136,7 +139,7 @@ class Domain(object):
             self._prepare()
             dbc = self._dbh.cursor()
             dbc.execute("INSERT INTO domain_data (gid, tid, domaindir)\
- VALUES (%s, %s, %s)", self._id, self._transport.getID(), self._domaindir)
+ VALUES (%s, %s, %s)", self._id, self._transport.id, self._domaindir)
             dbc.execute("INSERT INTO domain_name (domainname, gid, is_primary)\
  VALUES (%s, %s, %s)", self._name, self._id, True)
             self._dbh.commit()
@@ -155,8 +158,9 @@ class Domain(object):
         if self._id > 0:
             self._chkDelete(delUser, delAlias)
             dbc = self._dbh.cursor()
-            for t in ('alias','users','relocated','domain_name','domain_data'):
-                dbc.execute("DELETE FROM %s WHERE gid = %d" % (t, self._id))
+            for tbl in ('alias', 'users', 'relocated', 'domain_name',
+                        'domain_data'):
+                dbc.execute("DELETE FROM %s WHERE gid = %d" % (tbl, self._id))
             self._dbh.commit()
             dbc.close()
         else:
@@ -171,17 +175,17 @@ class Domain(object):
         force -- True/False force new transport for all accounts (bool)
         """
         if self._id > 0:
-            if transport == self._transport.getTransport():
+            if transport == self._transport.transport:
                 return
             trsp = Transport(self._dbh, transport=transport)
             dbc = self._dbh.cursor()
             dbc.execute("UPDATE domain_data SET tid = %s WHERE gid = %s",
-                    trsp.getID(), self._id)
+                        trsp.id, self._id)
             if dbc.rowcount > 0:
                 self._dbh.commit()
             if force:
                 dbc.execute("UPDATE users SET tid = %s WHERE gid = %s",
-                        trsp.getID(), self._id)
+                            trsp.id, self._id)
                 if dbc.rowcount > 0:
                     self._dbh.commit()
             dbc.close()
@@ -199,11 +203,11 @@ class Domain(object):
 
     def getTransport(self):
         """Returns domain's transport."""
-        return self._transport.getTransport()
+        return self._transport.transport
 
     def getTransportID(self):
         """Returns the ID from the domain's transport."""
-        return self._transport.getID()
+        return self._transport.id
 
     def getInfo(self):
         """Returns a dictionary with information about the domain."""
@@ -242,7 +246,7 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts,
         """Returns a list with all aliases from the domain."""
         dbc = self._dbh.cursor()
         dbc.execute("SELECT DISTINCT address FROM alias WHERE gid = %s\
- ORDER BY address",  self._id)
+ ORDER BY address", self._id)
         addresses = dbc.fetchall()
         dbc.close()
         aliases = []
@@ -312,6 +316,7 @@ def search(dbh, pattern=None, like=False):
     del doms
     return order, domdict
 
+
 def get_gid(dbh, domainname):
     """Returns the group id of the domain *domainname*.
 
@@ -326,3 +331,6 @@ def get_gid(dbh, domainname):
     if gid:
         return gid[0]
     return 0
+
+
+del _
