@@ -21,3 +21,18 @@ except NameError:
             if not element:
                 return False
         return True
+
+
+# http://docs.python.org/library/functions.html#any
+try:
+    any = any
+except NameError:
+    def any(iterable):
+        """Return True if any element of the *iterable* is true.  If the
+        iterable is empty, return False.
+
+        """
+        for element in iterable:
+            if element:
+                return True
+        return False
