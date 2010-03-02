@@ -147,6 +147,8 @@ Error codes, used by all :mod:`VirtualMailManager.errors`.
 
   Can't create a new MailLocation instance
 
+  obsolete?
+
 .. data:: NOT_EXECUTABLE
 
   The binary is not executable
@@ -196,9 +198,13 @@ Error codes, used by all :mod:`VirtualMailManager.errors`.
 
   Can't initialize a new Transport instance
 
+  obsolete?
+
 .. data:: UNKNOWN_MAILLOCATION_ID
 
   There is no MailLocation entry with the given ID
+
+  obsolete?
 
 .. data:: UNKNOWN_SERVICE
 
