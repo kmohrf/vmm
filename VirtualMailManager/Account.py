@@ -8,7 +8,8 @@ import VirtualMailManager.constants.ERROR as ERR
 from VirtualMailManager.Domain import Domain
 from VirtualMailManager.EmailAddress import EmailAddress
 from VirtualMailManager.errors import AccountError as AccE
-from VirtualMailManager.MailLocation import MailLocation
+from VirtualMailManager.maillocation import MailLocation, MAILDIR_NAME, \
+     MBOX_NAME, MDBOX_NAME, SDBOX_NAME
 from VirtualMailManager.Transport import Transport
 
 
@@ -75,8 +76,12 @@ class Account(object):
         dbc.close()
 
     def _prepare(self, maillocation):
+        if not maillocation.lower() in map(lambda x: x.lower(), (MAILDIR_NAME,
+                                           MBOX_NAME, MDBOX_NAME, SDBOX_NAME)):
+            raise AccE(_(u'Unknown mail_location directory name: %r') %
+                       maillocation, ERR.UNKNOWN_MAILLOCATION_NAME)
         self._setID()
-        self._mid = MailLocation(self._dbh, maillocation=maillocation).getID()
+        self._mid = MailLocation(type_=maillocation).mid
 
     def _switchState(self, state, dcvers, service):
         if not isinstance(state, bool):
@@ -192,7 +197,7 @@ class Account(object):
             raise AccE(_(u"The account “%s” doesn't exist.") % self._addr,
                     ERR.NO_SUCH_ACCOUNT)
         else:
-            keys = ['name', 'uid', 'gid', 'maildir', 'transport', 'smtp',
+            keys = ['name', 'uid', 'gid', 'mid', 'transport', 'smtp',
                     'pop3', 'imap', sieve_col]
             info = dict(zip(keys, info))
             for service in ('smtp', 'pop3', 'imap', sieve_col):
@@ -203,9 +208,8 @@ class Account(object):
                     # TP: A service (pop3/imap) isn't enabled/usable for a user
                     info[service] = _('disabled')
             info['address'] = self._addr
-            info['maildir'] = '%s/%s/%s' % (self._base, info['uid'],
-                    MailLocation(self._dbh,
-                        mid=info['maildir']).getMailLocation())
+            info['home'] = '%s/%s' % (self._base, info['uid'])
+            info['mail_location'] = MailLocation(mid=info['mid']).mail_location
             info['transport'] = Transport(self._dbh,
                                           tid=info['transport']).transport
             return info

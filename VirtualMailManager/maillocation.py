@@ -98,3 +98,8 @@ class MailLocation(object):
     def mail_location(self):
         """The mail_location, e.g. ``maildir:~/Maildir``"""
         return self.__str__()
+
+    @property
+    def mid(self):
+        """The mail_location's unique ID."""
+        return _type_id[self._info['directory'].lower()]

@@ -214,6 +214,10 @@ Error codes, used by all :mod:`VirtualMailManager.errors`.
 
   There is no Transport entry with the given ID
 
+.. data:: UNKNOWN_MAILLOCATION_NAME
+
+  The given mail_location directory couldn't be accepted
+
 .. data:: VMM_ERROR
 
   Internal error
