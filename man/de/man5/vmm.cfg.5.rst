@@ -7,7 +7,7 @@ Konfigurationsdatei für vmm
 ---------------------------
 
 :Author:         Pascal Volk <neverseen@users.sourceforge.net>
-:Date:           2010-02-01
+:Date:           2010-03-03
 :Version:        vmm-0.6.0
 :Manual group:   vmm Manual
 :Manual section: 5
@@ -276,33 +276,45 @@ Beispiel::
   force_deletion = false
 
 
-MAILDIR
+MAILBOX
 -------
-In der **maildir**-Sektion werden die für die Maildirs erforderlichen
-Optionen festgelegt.
+In der **mailbox**-Sektion werden die für die Erstellung von Mailboxen
+erforderlichen Optionen festgelegt. Die INBOX wird in jedem Fall erstellt.
 
-.. _maildir.folders:
+.. _mailbox.folders:
 
 ``folders (Vorgabe: Drafts:Sent:Templates:Trash)`` : *String*
-  Eine durch Doppelpunkten getrennte Liste mit Verzeichnisnamen, die
-  innerhalb des Maildirs erstellt werden sollen. Sollen innerhalb des
-  Maildirs keine Verzeichnisse angelegt werden, ist dieser Optionen ein
+  Eine durch Doppelpunkten getrennte Liste mit Mailboxnamen die
+  erstellt werden sollen. (Wird derzeit nur berücksichtigt, wenn
+  |mailbox.format|_ entweder **maildir** oder **mbox** ist. Sollte das
+  gewählte Format ein anderes sein, kann Dovecots autocreate Plugin
+  <http://wiki.dovecot.org/Plugins/Autocreate> verwendet werden.) Sollen
+  keine zusätzlichen Mailboxen angelegt werden, ist dieser Optionen ein
   einzelner Doppelpunkt ('**:**') als Wert zuzuweisen.
 
   Sollen Verzeichnisse mit Unterverzeichnissen angelegt werden, ist ein
   einzelner Punkt ('**.**') als Separator zu verwenden.
 
-.. _maildir.name:
+.. _mailbox.format:
 
-``name (Vorgabe: Maildir)`` : *String*
-  Der Standard-Name des Maildir-Verzeichnisses im Verzeichnis des jeweiligen
-  Anwenders.
+``format (Vorgabe: maildir)`` : *String*
+  Das zu verwendende Format der Mailbox der Benutzer. Abhängig von der
+  verwendeten Dovecot-Version, stehen bis zu vier Formate zur Verfügung:
+
+    ``maildir``
+      seit Dovecot v1.0.0
+    ``mbox``
+      seit Dovecot v1.0.0
+    ``dbox``
+      seit Dovecot v1.2.0
+    ``mdbox``
+      seit Dovecot v2.0.0
 
 Beispiel::
 
-  [maildir]
+  [mailbox]
   folders = Drafts:Sent:Templates:Trash:Lists.Dovecot:Lists.Postfix
-  name = Maildir
+  format = maildir
 
 .. _imap_uft7:
 

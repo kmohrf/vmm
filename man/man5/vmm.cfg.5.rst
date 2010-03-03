@@ -7,7 +7,7 @@ configuration file for vmm
 --------------------------
 
 :Author:         Pascal Volk <neverseen@users.sourceforge.net>
-:Date:           2010-02-01
+:Date:           2010-03-03
 :Version:        vmm-0.6.0
 :Manual group:   vmm Manual
 :Manual section: 5
@@ -264,31 +264,44 @@ Example::
   force_deletion = false
 
 
-MAILDIR
+MAILBOX
 -------
-The **maildir** section is used to specify some default options for new
-created Maildirs and folders inside.
+The **mailbox** section is used to specify some options for new created
+mailboxes in the users home directories. The INBOX will be created always.
 
-.. _maildir.folders:
+.. _mailbox.folders:
 
 ``folders (default: Drafts:Sent:Templates:Trash)`` : *String*
-  A colon separated list of folder names, that should be created. If no
-  folders should be created inside the Maildir, set the value of this option
-  to a single colon ('**:**').
+  A colon separated list of mailboxes that should be created. (Works currently
+  only if the |mailbox.format|_ is either **maildir** or **mbox**. For other
+  formats use Dovecot's autocreate plugin
+  <http://wiki.dovecot.org/Plugins/Autocreate>.) If no additionally mailboxes
+  should be created, set the value of this option to a single colon ('**:**').
 
   If you want to create folders containing one or more subfolders, separate
   them with a single dot ('**.**').
 
-.. _maildir.name:
+.. _mailbox.format:
 
-``name (default: Maildir)`` : *String*
-  Default name of the Maildir folder in users home directories.
+``format (default: maildir)`` : *String*
+  The mailbox format to be used for a user's mailbox. Depending on the used
+  Dovecot version there are up to four supported formats:
+
+    ``maildir``
+      since Dovecot v1.0.0
+    ``mbox``
+      since Dovecot v1.0.0
+    ``dbox``
+      since Dovecot v1.2.0
+    ``mdbox``
+      comes with Dovecot v2.0.0
+
 
 Example::
 
-  [maildir]
+  [mailbox]
   folders = Drafts:Sent:Templates:Trash:Lists.Dovecot:Lists.Postfix
-  name = Maildir
+  format = maildir
 
 .. _imap_uft7:
 

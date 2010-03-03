@@ -1,6 +1,7 @@
 .. Substitutions in section 5
 
 .. |account.password_length| replace:: **password_length**
+.. |mailbox.format| replace:: **format**
 .. |misc.password_scheme| replace:: **misc.password_scheme**
 
 .. |vmm configure| replace:: **vmm configure**
