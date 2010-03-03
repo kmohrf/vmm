@@ -13,9 +13,8 @@
 from VirtualMailManager.pycompat import any
 
 
-__all__ = ('MailLocation',
-           'MAILDIR_ID', 'MBOX_ID', 'MDBOX_ID', 'SDBOX_ID',
-           'MAILDIR_NAME', 'MBOX_NAME', 'MDBOX_NAME', 'SDBOX_NAME')
+__all__ = ('MailLocation', 'known_format',
+           'MAILDIR_ID', 'MBOX_ID', 'MDBOX_ID', 'SDBOX_ID')
 
 MAILDIR_ID = 0x1
 MBOX_ID = 0x2
@@ -28,20 +27,20 @@ SDBOX_NAME = 'dbox'
 
 _storage = {
     MAILDIR_ID: dict(dovecot_version=10, postfix=True, prefix='maildir:',
-                     directory=MAILDIR_NAME),
+                     directory=MAILDIR_NAME, mid=MAILDIR_ID),
     MBOX_ID: dict(dovecot_version=10, postfix=True, prefix='mbox:',
-                  directory=MBOX_NAME),
+                  directory=MBOX_NAME, mid=MBOX_ID),
     MDBOX_ID: dict(dovecot_version=20, postfix=False, prefix='mdbox:',
-                   directory=MDBOX_NAME),
+                   directory=MDBOX_NAME, mid=MDBOX_ID),
     SDBOX_ID: dict(dovecot_version=12, postfix=False, prefix='dbox:',
-                   directory=SDBOX_NAME),
+                   directory=SDBOX_NAME, mid=SDBOX_ID),
 }
 
-_type_id = {
+_format_id = {
     'maildir': MAILDIR_ID,
-    MBOX_NAME: MBOX_ID,
-    MDBOX_NAME: MDBOX_ID,
-    SDBOX_NAME: SDBOX_ID,
+    'mbox': MBOX_ID,
+    'mdbox': MDBOX_ID,
+    'dbox': SDBOX_ID,
 }
 
 
@@ -49,26 +48,26 @@ class MailLocation(object):
     """A small class for mail_location relevant information."""
     __slots__ = ('_info')
 
-    def __init__(self, mid=None, type_=None):
+    def __init__(self, mid=None, format=None):
         """Creates a new MailLocation instance.
 
-        Either mid or type_ must be specified.
+        Either a mid or the format must be specified.
 
         Keyword arguments:
         mid -- the id of a mail_location (int)
           one of the maillocation constants: `MAILDIR_ID`, `MBOX_ID`,
           `MDBOX_ID` and `SDBOX_ID`
-        type_ -- the type/mailbox format of the mail_location (str)
-          one of the maillocation constants: `MAILDIR_NAME`, `MBOX_NAME`,
-          `MDBOX_NAME` and `SDBOX_NAME`
+        format -- the mailbox format of the mail_location. One out of:
+        ``maildir``, ``mbox``, ``dbox`` and ``mdbox``.
         """
-        assert any((mid, type_))
+        assert any((mid, format))
         if mid:
             assert isinstance(mid, (int, long)) and mid in _storage
             self._info = _storage[mid]
         else:
-            assert isinstance(type_, basestring) and type_.lower() in _type_id
-            self._info = _storage[_type_id[type_.lower()]]
+            assert isinstance(format, basestring) and \
+                    format.lower() in _format_id
+            self._info = _storage[_format_id[format.lower()]]
 
     def __str__(self):
         return '%(prefix)s~/%(directory)s' % self._info
@@ -102,4 +101,9 @@ class MailLocation(object):
     @property
     def mid(self):
         """The mail_location's unique ID."""
-        return _type_id[self._info['directory'].lower()]
+        return self._info['mid']
+
+
+def known_format(format):
+    """Checks if the mailbox *format* is known, returns bool."""
+    return format.lower() in _format_id
