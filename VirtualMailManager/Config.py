@@ -336,9 +336,9 @@ class Config(LazyConfig):
                 'directory_mode': LCO(int, 504, self.getint),
                 'force_deletion': LCO(bool_t, False, self.getboolean),
             },
-            'maildir': {
+            'mailbox': {
                 'folders': LCO(str, 'Drafts:Sent:Templates:Trash', self.get),
-                'name': LCO(str, 'Maildir', self.get),
+                'format': LCO(str, 'maildir', self.get),
             },
             'misc': {
                 'base_directory': LCO(str, '/srv/mail', self.get, is_dir),

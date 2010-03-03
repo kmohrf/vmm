@@ -75,7 +75,7 @@ def upd_052(cp):
     global had_config
 
     had_config = cp.remove_section('config')
-    add_sections(cp, ('domain', 'account'))
+    add_sections(cp, ('domain', 'account', 'mailbox'))
     if cp.has_section('domdir'):
         for src, dst in (('domdir.mode',   'domain.directory_mode'),
                          ('domdir.delete', 'domain.delete_directory'),
@@ -89,10 +89,12 @@ def upd_052(cp):
     for src, dst in (('maildir.mode',      'account.directory_mode'),
                      ('maildir.diskusage', 'account.disk_usage'),
                      ('maildir.delete',    'account.delete_directory'),
+                     ('maildir.folders',   'mailbox.folders'),
                      ('misc.forcedel',     'domain.force_deletion'),
                      ('misc.passwdscheme', 'misc.password_scheme'),
                      ('misc.dovecotvers',  'misc.dovecot_version')):
         move_option(cp, src, dst)
+    cp.remove_section('maildir')
 
 # def main():
 if __name__ == '__main__':
