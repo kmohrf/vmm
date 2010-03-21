@@ -415,8 +415,11 @@ class VirtualMailManager(object):
             return '{%s}%s' % (self.__scheme, self.__pwMD4(password))
         elif self.__scheme in ['SMD5', 'SSHA', 'CRAM-MD5', 'HMAC-MD5',
                 'LANMAN', 'NTLM', 'RPA']:
-            return Popen([self.__Cfg.get('bin', 'dovecotpw'), '-s',
-                self.__scheme,'-p',password],stdout=PIPE).communicate()[0][:-1]
+            cmd_args = [self.__Cfg.get('bin', 'dovecotpw'), '-s',
+                        self.__scheme, '-p', password]
+            if self.__Cfg.getint('misc', 'dovecotvers') >= 20:
+                cmd_args.insert(1, 'pw')
+            return Popen(cmd_args, stdout=PIPE).communicate()[0][:-1]
         else:
             return '{%s}%s' % (self.__scheme, password)
 
