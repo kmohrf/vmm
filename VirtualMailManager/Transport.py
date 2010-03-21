@@ -2,89 +2,95 @@
 # Copyright (c) 2008 - 2010, Pascal Volk
 # See COPYING for distribution information.
 
-"""Virtual Mail Manager's Transport class to manage the transport for
-domains and accounts."""
+"""
+    VirtualMailManager.Transport
 
-from __main__ import ERR
-from Exceptions import VMMTransportException
+    Virtual Mail Manager's Transport class to manage the transport for
+    domains and accounts.
+"""
+
+from VirtualMailManager.constants.ERROR import UNKNOWN_TRANSPORT_ID
+from VirtualMailManager.errors import TransportError
+from VirtualMailManager.pycompat import any
+
 
 class Transport(object):
     """A wrapper class that provides access to the transport table"""
-    __slots__ = ('__id', '__transport', '_dbh')
+    __slots__ = ('_id', '_transport', '_dbh')
+
     def __init__(self, dbh, tid=None, transport=None):
         """Creates a new Transport instance.
 
-        Either tid or transport must be specified.
+        Either tid or transport must be specified. When both arguments
+        are given, tid will be used.
 
         Keyword arguments:
         dbh -- a pyPgSQL.PgSQL.connection
-        tid -- the id of a transport (long)
+        tid -- the id of a transport (int/long)
         transport -- the value of the transport (str)
+
         """
         self._dbh = dbh
-        if tid is None and transport is None:
-            raise VMMTransportException(
-                _('Either tid or transport must be specified.'),
-                ERR.TRANSPORT_INIT)
-        elif tid is not None:
-            try:
-                self.__id = long(tid)
-            except ValueError:
-                raise VMMTransportException(_('tid must be an int/long.'),
-                    ERR.TRANSPORT_INIT)
+        assert any((tid, transport))
+        if tid:
+            assert not isinstance(tid, bool) and isinstance(tid, (int, long))
+            self._id = tid
             self._loadByID()
         else:
-            self.__transport = transport
+            assert isinstance(transport, basestring)
+            self._transport = transport
             self._loadByName()
+
+    @property
+    def id(self):
+        """The transport's unique ID."""
+        return self._id
+
+    @property
+    def transport(self):
+        """The transport's value, ex: 'dovecot:'"""
+        return self._transport
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self.__id == other.getID()
+            return self._id == other.id
         return NotImplemented
 
     def __ne__(self, other):
         if isinstance(other, self.__class__):
-            return self.__id != other.getID()
+            return self._id != other.id
         return NotImplemented
 
     def __str__(self):
-        return self.__transport
+        return self._transport
 
     def _loadByID(self):
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT transport FROM transport WHERE tid = %s', self.__id)
+        dbc.execute('SELECT transport FROM transport WHERE tid = %s', self._id)
         result = dbc.fetchone()
         dbc.close()
-        if result is not None:
-            self.__transport = result[0]
+        if result:
+            self._transport = result[0]
         else:
-            raise VMMTransportException(_('Unknown tid specified.'),
-                ERR.UNKNOWN_TRANSPORT_ID)
+            raise TransportError(_('Unknown tid specified.'),
+                                 UNKNOWN_TRANSPORT_ID)
 
     def _loadByName(self):
         dbc = self._dbh.cursor()
         dbc.execute('SELECT tid FROM transport WHERE transport = %s',
-                self.__transport)
+                    self._transport)
         result = dbc.fetchone()
         dbc.close()
-        if result is not None:
-            self.__id = result[0]
+        if result:
+            self._id = result[0]
         else:
             self._save()
 
     def _save(self):
         dbc = self._dbh.cursor()
         dbc.execute("SELECT nextval('transport_id')")
-        self.__id = dbc.fetchone()[0]
-        dbc.execute('INSERT INTO transport (tid, transport) VALUES (%s, %s)',
-                self.__id, self.__transport)
+        self._id = dbc.fetchone()[0]
+        dbc.execute('INSERT INTO transport VALUES (%s, %s)', self._id,
+                    self._transport)
         self._dbh.commit()
         dbc.close()
-
-    def getID(self):
-        """Returns the unique ID of the transport."""
-        return self.__id
-
-    def getTransport(self):
-        """Returns the value of transport, ex: 'dovecot:'"""
-        return self.__transport

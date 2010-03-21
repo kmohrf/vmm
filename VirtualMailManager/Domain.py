@@ -6,16 +6,23 @@
 
 from random import choice
 
-from __main__ import ERR
-from Exceptions import VMMDomainException as VMMDE
-import VirtualMailManager as VMM
-from Transport import Transport
+from VirtualMailManager import check_domainname
+from VirtualMailManager.constants.ERROR import \
+     ACCOUNT_AND_ALIAS_PRESENT, ACCOUNT_PRESENT, ALIAS_PRESENT, \
+     DOMAIN_ALIAS_EXISTS, DOMAIN_EXISTS, NO_SUCH_DOMAIN
+from VirtualMailManager.errors import DomainError as DomErr
+from VirtualMailManager.Transport import Transport
+
 
 MAILDIR_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz'
+_ = lambda x: x
+
 
 class Domain(object):
     """Class to manage e-mail domains."""
-    __slots__ = ('_basedir','_domaindir','_id','_name','_transport','_dbh')
+    __slots__ = ('_basedir', '_domaindir', '_id', '_name', '_transport',
+                 '_dbh')
+
     def __init__(self, dbh, domainname, basedir=None, transport=None):
         """Creates a new Domain instance.
 
@@ -25,7 +32,7 @@ class Domain(object):
         transport -- default vmm.cfg/misc/transport  (str)
         """
         self._dbh = dbh
-        self._name = VMM.VirtualMailManager.chkDomainname(domainname)
+        self._name = check_domainname(domainname)
         self._basedir = basedir
         if transport is not None:
             self._transport = Transport(self._dbh, transport=transport)
@@ -34,8 +41,8 @@ class Domain(object):
         self._id = 0
         self._domaindir = None
         if not self._exists() and self._isAlias():
-            raise VMMDE(_(u"The domain “%s” is an alias domain.") %self._name,
-                    ERR.DOMAIN_ALIAS_EXISTS)
+            raise DomErr(_(u"The domain “%s” is an alias domain.") %
+                         self._name, DOMAIN_ALIAS_EXISTS)
 
     def _exists(self):
         """Checks if the domain already exists.
@@ -119,14 +126,12 @@ class Domain(object):
         else:
             hasAlias = False
         if hasUser and hasAlias:
-            raise VMMDE(_(u'There are accounts and aliases.'),
-                ERR.ACCOUNT_AND_ALIAS_PRESENT)
+            raise DomErr(_(u'There are accounts and aliases.'),
+                         ACCOUNT_AND_ALIAS_PRESENT)
         elif hasUser:
-            raise VMMDE(_(u'There are accounts.'),
-                ERR.ACCOUNT_PRESENT)
+            raise DomErr(_(u'There are accounts.'), ACCOUNT_PRESENT)
         elif hasAlias:
-            raise VMMDE(_(u'There are aliases.'),
-                ERR.ALIAS_PRESENT)
+            raise DomErr(_(u'There are aliases.'), ALIAS_PRESENT)
 
     def save(self):
         """Stores the new domain in the database."""
@@ -134,14 +139,14 @@ class Domain(object):
             self._prepare()
             dbc = self._dbh.cursor()
             dbc.execute("INSERT INTO domain_data (gid, tid, domaindir)\
- VALUES (%s, %s, %s)", self._id, self._transport.getID(), self._domaindir)
+ VALUES (%s, %s, %s)", self._id, self._transport.id, self._domaindir)
             dbc.execute("INSERT INTO domain_name (domainname, gid, is_primary)\
  VALUES (%s, %s, %s)", self._name, self._id, True)
             self._dbh.commit()
             dbc.close()
         else:
-            raise VMMDE(_(u'The domain “%s” already exists.') % self._name,
-                ERR.DOMAIN_EXISTS)
+            raise DomErr(_(u'The domain “%s” already exists.') % self._name,
+                         DOMAIN_EXISTS)
 
     def delete(self, delUser=False, delAlias=False):
         """Deletes the domain.
@@ -153,13 +158,14 @@ class Domain(object):
         if self._id > 0:
             self._chkDelete(delUser, delAlias)
             dbc = self._dbh.cursor()
-            for t in ('alias','users','relocated','domain_name','domain_data'):
-                dbc.execute("DELETE FROM %s WHERE gid = %d" % (t, self._id))
+            for tbl in ('alias', 'users', 'relocated', 'domain_name',
+                        'domain_data'):
+                dbc.execute("DELETE FROM %s WHERE gid = %d" % (tbl, self._id))
             self._dbh.commit()
             dbc.close()
         else:
-            raise VMMDE(_(u"The domain “%s” doesn't exist.") % self._name,
-                ERR.NO_SUCH_DOMAIN)
+            raise DomErr(_(u"The domain “%s” doesn't exist.") % self._name,
+                         NO_SUCH_DOMAIN)
 
     def updateTransport(self, transport, force=False):
         """Sets a new transport for the domain.
@@ -169,23 +175,23 @@ class Domain(object):
         force -- True/False force new transport for all accounts (bool)
         """
         if self._id > 0:
-            if transport == self._transport.getTransport():
+            if transport == self._transport.transport:
                 return
             trsp = Transport(self._dbh, transport=transport)
             dbc = self._dbh.cursor()
             dbc.execute("UPDATE domain_data SET tid = %s WHERE gid = %s",
-                    trsp.getID(), self._id)
+                        trsp.id, self._id)
             if dbc.rowcount > 0:
                 self._dbh.commit()
             if force:
                 dbc.execute("UPDATE users SET tid = %s WHERE gid = %s",
-                        trsp.getID(), self._id)
+                            trsp.id, self._id)
                 if dbc.rowcount > 0:
                     self._dbh.commit()
             dbc.close()
         else:
-            raise VMMDE(_(u"The domain “%s” doesn't exist.") % self._name,
-                ERR.NO_SUCH_DOMAIN)
+            raise DomErr(_(u"The domain “%s” doesn't exist.") % self._name,
+                         NO_SUCH_DOMAIN)
 
     def getID(self):
         """Returns the ID of the domain."""
@@ -197,11 +203,11 @@ class Domain(object):
 
     def getTransport(self):
         """Returns domain's transport."""
-        return self._transport.getTransport()
+        return self._transport.transport
 
     def getTransportID(self):
         """Returns the ID from the domain's transport."""
-        return self._transport.getID()
+        return self._transport.id
 
     def getInfo(self):
         """Returns a dictionary with information about the domain."""
@@ -215,8 +221,8 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts,
         info = dbc.fetchone()
         dbc.close()
         if info is None:
-            raise VMMDE(_(u"The domain “%s” doesn't exist.") % self._name,
-                    ERR.NO_SUCH_DOMAIN)
+            raise DomErr(_(u"The domain “%s” doesn't exist.") % self._name,
+                         NO_SUCH_DOMAIN)
         else:
             keys = ['gid', 'domainname', 'transport', 'domaindir',
                     'aliasdomains', 'accounts', 'aliases', 'relocated']
@@ -240,7 +246,7 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts,
         """Returns a list with all aliases from the domain."""
         dbc = self._dbh.cursor()
         dbc.execute("SELECT DISTINCT address FROM alias WHERE gid = %s\
- ORDER BY address",  self._id)
+ ORDER BY address", self._id)
         addresses = dbc.fetchall()
         dbc.close()
         aliases = []
@@ -276,9 +282,10 @@ SELECT gid, domainname, transport, domaindir, aliasdomains, accounts,
             aliasdomains = [aname[0] for aname in anames]
         return aliasdomains
 
+
 def search(dbh, pattern=None, like=False):
     if pattern is not None and like is False:
-        pattern = VMM.VirtualMailManager.chkDomainname(pattern)
+        pattern = check_domainname(pattern)
     sql = 'SELECT gid, domainname, is_primary FROM domain_name'
     if pattern is None:
         pass
@@ -309,3 +316,21 @@ def search(dbh, pattern=None, like=False):
     del doms
     return order, domdict
 
+
+def get_gid(dbh, domainname):
+    """Returns the group id of the domain *domainname*.
+
+    If the domain couldn't be found in the database 0 will be returned.
+
+    """
+    domainname = check_domainname(domainname)
+    dbc = dbh.cursor()
+    dbc.execute('SELECT gid FROM domain_name WHERE domainname=%s', domainname)
+    gid = dbc.fetchone()
+    dbc.close()
+    if gid:
+        return gid[0]
+    return 0
+
+
+del _
