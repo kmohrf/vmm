@@ -381,18 +381,18 @@ def alias_info():
         usage(EXIT.MISSING_ARGS, _(u'Missing alias address'))
     try:
         _printAliases(argv[2].lower(), vmm.aliasInfo(argv[2].lower()))
-    except VMME.VMMAliasException, e:
+    except VMME.VMMException, e:
         if e.code() is ERR.ACCOUNT_EXISTS:
             w_std(plan_a_b % {'subcommand': u'userinfo',
-                'object': argv[2].lower()})
+                              'object': argv[2].lower()})
             argv[1] = u'ui' # necessary manipulation to get the order
             user_info()
         elif e.code() is ERR.RELOCATED_EXISTS:
             w_std(plan_a_b % {'subcommand': u'relocatedinfo',
-                'object': argv[2].lower()})
+                              'object': argv[2].lower()})
             relocated_info()
         else:
-            raise e
+            raise
 
 def alias_delete():
     if argc < 3:
