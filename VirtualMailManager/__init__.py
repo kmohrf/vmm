@@ -134,12 +134,12 @@ def check_localpart(localpart):
 
     """
     if len(localpart) > 64:
-        raise VMMError(_(u'The local-part %r is too long') % localpart,
+        raise VMMError(_(u"The local-part '%s' is too long") % localpart,
                        LOCALPART_TOO_LONG)
     invalid_chars = set(RE_LOCALPART.findall(localpart))
     if invalid_chars:
         i_chars = u''.join((u'"%s" ' % c for c in invalid_chars))
-        raise VMMError(_(u"The local-part %(l_part)r contains invalid \
+        raise VMMError(_(u"The local-part '%(l_part)s' contains invalid \
 characters: %(i_chars)s") %
                        {'l_part': localpart, 'i_chars': i_chars},
                        LOCALPART_INVALID)
