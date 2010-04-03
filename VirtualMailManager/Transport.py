@@ -16,7 +16,7 @@ from VirtualMailManager.pycompat import any
 
 class Transport(object):
     """A wrapper class that provides access to the transport table"""
-    __slots__ = ('_id', '_transport', '_dbh')
+    __slots__ = ('_tid', '_transport', '_dbh')
 
     def __init__(self, dbh, tid=None, transport=None):
         """Creates a new Transport instance.
@@ -34,7 +34,7 @@ class Transport(object):
         assert any((tid, transport))
         if tid:
             assert not isinstance(tid, bool) and isinstance(tid, (int, long))
-            self._id = tid
+            self._tid = tid
             self._loadByID()
         else:
             assert isinstance(transport, basestring)
@@ -42,9 +42,9 @@ class Transport(object):
             self._loadByName()
 
     @property
-    def id(self):
+    def tid(self):
         """The transport's unique ID."""
-        return self._id
+        return self._tid
 
     @property
     def transport(self):
@@ -53,12 +53,12 @@ class Transport(object):
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self._id == other.id
+            return self._tid == other.tid
         return NotImplemented
 
     def __ne__(self, other):
         if isinstance(other, self.__class__):
-            return self._id != other.id
+            return self._tid != other.tid
         return NotImplemented
 
     def __str__(self):
@@ -66,7 +66,7 @@ class Transport(object):
 
     def _loadByID(self):
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT transport FROM transport WHERE tid = %s', self._id)
+        dbc.execute('SELECT transport FROM transport WHERE tid=%s', self._tid)
         result = dbc.fetchone()
         dbc.close()
         if result:
@@ -82,15 +82,15 @@ class Transport(object):
         result = dbc.fetchone()
         dbc.close()
         if result:
-            self._id = result[0]
+            self._tid = result[0]
         else:
             self._save()
 
     def _save(self):
         dbc = self._dbh.cursor()
         dbc.execute("SELECT nextval('transport_id')")
-        self._id = dbc.fetchone()[0]
-        dbc.execute('INSERT INTO transport VALUES (%s, %s)', self._id,
+        self._tid = dbc.fetchone()[0]
+        dbc.execute('INSERT INTO transport VALUES (%s, %s)', self._tid,
                     self._transport)
         self._dbh.commit()
         dbc.close()

@@ -170,7 +170,7 @@ class Account(object):
             dbc.execute('UPDATE users SET passwd = %s WHERE uid = %s',
                     value, self._uid)
         elif what == 'transport':
-            self._tid = Transport(self._dbh, transport=value).id
+            self._tid = Transport(self._dbh, transport=value).tid
             dbc.execute('UPDATE users SET tid = %s WHERE uid = %s',
                     self._tid, self._uid)
         else:
