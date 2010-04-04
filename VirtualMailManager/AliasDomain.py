@@ -37,12 +37,12 @@ class AliasDomain(object):
         if self._domain is None:
             raise ADE(_(u'No destination domain specified for alias domain.'),
                     ERR.ALIASDOMAIN_NO_DOMDEST)
-        if self._domain._id < 1:
+        if self._domain.gid < 1:
             raise ADE (_(u"The target domain “%s” doesn't exist.") %
-                    self._domain._name, ERR.NO_SUCH_DOMAIN)
+                    self._domain.name, ERR.NO_SUCH_DOMAIN)
         dbc = self._dbh.cursor()
         dbc.execute('INSERT INTO domain_name (domainname, gid, is_primary)\
- VALUES (%s, %s, FALSE)', self.__name, self._domain._id)
+ VALUES (%s, %s, FALSE)', self.__name, self._domain.gid)
         self._dbh.commit()
         dbc.close()
 
@@ -67,21 +67,21 @@ class AliasDomain(object):
         if self._domain is None:
             raise ADE(_(u'No destination domain specified for alias domain.'),
                     ERR.ALIASDOMAIN_NO_DOMDEST)
-        if self._domain._id < 1:
+        if self._domain.gid < 1:
             raise ADE (_(u"The target domain “%s” doesn't exist.") %
-                    self._domain._name, ERR.NO_SUCH_DOMAIN)
+                    self._domain.name, ERR.NO_SUCH_DOMAIN)
         if self.__gid < 1:
             raise ADE(_(u"The alias domain “%s” doesn't exist.") % self.__name,
                         ERR.NO_SUCH_ALIASDOMAIN)
-        if self.__gid == self._domain._id:
+        if self.__gid == self._domain.gid:
             raise ADE(_(u"The alias domain “%(alias)s” is already assigned to\
  the domain “%(domain)s”.") %
-                    {'alias': self.__name, 'domain': self._domain._name},
+                    {'alias': self.__name, 'domain': self._domain.name},
                     ERR.ALIASDOMAIN_EXISTS)
         dbc = self._dbh.cursor()
         dbc.execute('UPDATE domain_name SET gid = %s WHERE gid = %s\
  AND domainname = %s AND NOT is_primary',
-                self._domain._id, self.__gid, self.__name)
+                self._domain.gid, self.__gid, self.__name)
         self._dbh.commit()
         dbc.close()
 

@@ -61,12 +61,12 @@ class Account(object):
 
     def _setAddr(self):
         dom = Domain(self._dbh, self._addr.domainname)
-        self._gid = dom.getID()
+        self._gid = dom.gid
         if self._gid == 0:
             raise AccE(_(u"The domain “%s” doesn't exist.") %
                        self._addr.domainname, ERR.NO_SUCH_DOMAIN)
-        self._base = dom.getDir()
-        self._tid = dom.getTransportID()
+        self._base = dom.directory
+        self._tid = dom.transport.tid
 
     def _setID(self):
         dbc = self._dbh.cursor()

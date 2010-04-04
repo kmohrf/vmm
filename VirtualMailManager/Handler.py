@@ -30,6 +30,7 @@ from VirtualMailManager.Domain import Domain, get_gid
 from VirtualMailManager.EmailAddress import EmailAddress
 from VirtualMailManager.errors import VMMError, AliasError, DomainError
 from VirtualMailManager.Relocated import Relocated
+from VirtualMailManager.Transport import Transport
 from VirtualMailManager.ext.Postconf import Postconf
 
 
@@ -191,12 +192,9 @@ class Handler(object):
         self.__dbConnect()
         return Relocated(self._dbh, address)
 
-    def __getDomain(self, domainname, transport=None):
-        if transport is None:
-            transport = self._Cfg.dget('misc.transport')
+    def __getDomain(self, domainname):
         self.__dbConnect()
-        return Domain(self._dbh, domainname,
-                self._Cfg.dget('misc.base_directory'), transport)
+        return Domain(self._dbh, domainname)
 
     def __getDiskUsage(self, directory):
         """Estimate file space usage for the given directory.
@@ -227,6 +225,7 @@ class Handler(object):
         os.chown(directory, uid, gid)
 
     def __domDirMake(self, domdir, gid):
+        #TODO: clenaup!
         os.umask(0006)
         oldpwd = os.getcwd()
         basedir = self._Cfg.dget('misc.base_directory')
@@ -411,19 +410,26 @@ class Handler(object):
         return self._Cfg.pget(option)
 
     def domainAdd(self, domainname, transport=None):
-        dom = self.__getDomain(domainname, transport)
+        dom = self.__getDomain(domainname)
+        if transport is None:
+            dom.set_transport(Transport(self._dbh,
+                              transport=self._Cfg.dget('misc.transport')))
+        else:
+            dom.set_transport(Transport(self._dbh, transport=transport))
+        dom.set_directory(self._Cfg.dget('misc.base_directory'))
         dom.save()
-        self.__domDirMake(dom.getDir(), dom.getID())
+        self.__domDirMake(dom.directory, dom.gid)
 
     def domainTransport(self, domainname, transport, force=None):
         if force is not None and force != 'force':
             raise DomainError(_(u"Invalid argument: “%s”") % force,
                 ERR.INVALID_OPTION)
-        dom = self.__getDomain(domainname, None)
+        dom = self.__getDomain(domainname)
+        trsp = Transport(self._dbh, transport=transport)
         if force is None:
-            dom.updateTransport(transport)
+            dom.update_transport(trsp)
         else:
-            dom.updateTransport(transport, force=True)
+            dom.update_transport(trsp, force=True)
 
     def domainDelete(self, domainname, force=None):
         if not force is None and force not in ['deluser', 'delalias',
@@ -431,14 +437,14 @@ class Handler(object):
                 raise DomainError(_(u'Invalid argument: “%s”') %
                                          force, ERR.INVALID_OPTION)
         dom = self.__getDomain(domainname)
-        gid = dom.getID()
-        domdir = dom.getDir()
+        gid = dom.gid
+        domdir = dom.directory
         if self._Cfg.dget('domain.force_deletion') or force == 'delall':
             dom.delete(True, True)
         elif force == 'deluser':
-            dom.delete(delUser=True)
+            dom.delete(deluser=True)
         elif force == 'delalias':
-            dom.delete(delAlias=True)
+            dom.delete(delalias=True)
         else:
             dom.delete()
         if self._Cfg.dget('domain.delete_directory'):
@@ -450,22 +456,22 @@ class Handler(object):
             raise VMMError(_(u'Invalid argument: “%s”') % details,
                                ERR.INVALID_AGUMENT)
         dom = self.__getDomain(domainname)
-        dominfo = dom.getInfo()
+        dominfo = dom.get_info()
         if dominfo['domainname'].startswith('xn--'):
             dominfo['domainname'] += ' (%s)' % ace2idna(dominfo['domainname'])
         if details is None:
             return dominfo
         elif details == 'accounts':
-            return (dominfo, dom.getAccounts())
+            return (dominfo, dom.get_accounts())
         elif details == 'aliasdomains':
-            return (dominfo, dom.getAliaseNames())
+            return (dominfo, dom.get_aliase_names())
         elif details == 'aliases':
-            return (dominfo, dom.getAliases())
+            return (dominfo, dom.get_aliases())
         elif details == 'relocated':
-            return(dominfo, dom.getRelocated())
+            return(dominfo, dom.get_relocated())
         else:
-            return (dominfo, dom.getAliaseNames(), dom.getAccounts(),
-                    dom.getAliases(), dom.getRelocated())
+            return (dominfo, dom.get_aliase_names(), dom.get_accounts(),
+                    dom.get_aliases(), dom.get_relocated())
 
     def aliasDomainAdd(self, aliasname, domainname):
         """Adds an alias domain to the domain.
