@@ -516,15 +516,10 @@ class Handler(object):
         if pattern is not None:
             if pattern.startswith('%') or pattern.endswith('%'):
                 like = True
-                if pattern.startswith('%') and pattern.endswith('%'):
-                    domain = pattern[1:-1]
-                elif pattern.startswith('%'):
-                    domain = pattern[1:]
-                elif pattern.endswith('%'):
-                    domain = pattern[:-1]
+                domain = pattern.strip('%')
                 if not re.match(RE_DOMAIN_SRCH, domain):
                     raise VMMError(
-                    _(u"The pattern “%s” contains invalid characters.") %
+                    _(u"The pattern '%s' contains invalid characters.") %
                     pattern, ERR.DOMAIN_INVALID)
         self.__dbConnect()
         return search(self._dbh, pattern=pattern, like=like)
