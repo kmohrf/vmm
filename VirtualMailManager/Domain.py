@@ -289,23 +289,25 @@ def search(dbh, pattern=None, like=False):
     sql += ' ORDER BY is_primary DESC, domainname'
     dbc = dbh.cursor()
     dbc.execute(sql)
-    doms = dbc.fetchall()
+    result = dbc.fetchall()
     dbc.close()
 
-    domdict = {}
-    order = [dom[0] for dom in doms if dom[2]]
-    if len(order) == 0:
-        for dom in doms:
-            if dom[0] not in order:
-                order.append(dom[0])
-    for gid, dom, is_primary in doms:
+    gids = [domain[0] for domain in result if domain[2]]
+    domains = {}
+    for gid, domain, is_primary in result:
         if is_primary:
-            domdict[gid] = [dom]
+            if not gid in domains:
+                domains[gid] = [domain]
+            else:
+                domains[gid].insert(0, domain)
         else:
-            try:
-                domdict[gid].append(dom)
-            except KeyError:
-                domdict[gid] = [None, dom]
-    del doms
-    return order, domdict
+            if gid in gids:
+                if gid in domains:
+                    domains[gid].append(domain)
+                else:
+                    domains[gid] = [domain]
+            else:
+                gids.append(gid)
+                domains[gid] = [None, domain]
+    return gids, domains
 
