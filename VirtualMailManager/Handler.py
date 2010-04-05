@@ -18,7 +18,7 @@ import re
 from shutil import rmtree
 from subprocess import Popen, PIPE
 
-from pyPgSQL import PgSQL # python-pgsql - http://pypgsql.sourceforge.net
+from pyPgSQL import PgSQL  # python-pgsql - http://pypgsql.sourceforge.net
 
 import VirtualMailManager.constants.ERROR as ERR
 from VirtualMailManager import ENCODING, ace2idna, exec_ok
@@ -35,7 +35,7 @@ from VirtualMailManager.ext.Postconf import Postconf
 
 
 SALTCHARS = './0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-RE_DOMAIN_SRCH = """^[a-z0-9-\.]+$"""
+RE_DOMAIN_SEARCH = """^[a-z0-9-\.]+$"""
 RE_MBOX_NAMES = """^[\x20-\x25\x27-\x7E]*$"""
 
 
@@ -511,16 +511,14 @@ class Handler(object):
         aliasDom.delete()
 
     def domainList(self, pattern=None):
-        from Domain import search
+        from VirtualMailManager.Domain import search
         like = False
-        if pattern is not None:
-            if pattern.startswith('%') or pattern.endswith('%'):
-                like = True
-                domain = pattern.strip('%')
-                if not re.match(RE_DOMAIN_SRCH, domain):
-                    raise VMMError(
-                    _(u"The pattern '%s' contains invalid characters.") %
-                    pattern, ERR.DOMAIN_INVALID)
+        if pattern and (pattern.startswith('%') or pattern.endswith('%')):
+            like = True
+            if not re.match(RE_DOMAIN_SEARCH, pattern.strip('%')):
+                raise VMMError(
+                        _(u"The pattern '%s' contains invalid characters.") %
+                               pattern, ERR.DOMAIN_INVALID)
         self.__dbConnect()
         return search(self._dbh, pattern=pattern, like=like)
 
@@ -626,7 +624,7 @@ with the address “%s”.') %
         return info
 
     def userByID(self, uid):
-        from Handler.Account import getAccountByID
+        from VirtualMailManager.Account import getAccountByID
         self.__dbConnect()
         return getAccountByID(uid, self._dbh)
 
