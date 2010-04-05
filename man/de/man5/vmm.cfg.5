@@ -1,273 +1,458 @@
-.TH vmm.cfg 5 "17 Aug 2009" "Pascal Volk"
+.\" Man page generated from reStructeredText.
+.
+.TH VMM.CFG 5 "2010-01-18" "vmm-0.6.0" "vmm Manual"
 .SH NAME
 vmm.cfg \- Konfigurationsdatei für vmm
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
 .SH SYNOPSIS
+.sp
 vmm.cfg
 .SH BESCHREIBUNG
-\fBvmm\fR(1) liest Konfigurationsparameter aus der Datei \fIvmm.cfg\fP.
-.br
+.sp
+\fBvmm\fP(1) liest seine Konfigurationsparameter aus der Datei \fIvmm.cfg\fP.
+.sp
 Die Konfigurationsdatei ist in mehrere Abschnitte unterteilt. Jeder Abschnitt
-wird mit dem, in eckigen Klammern '[' und ']' eingefassten, Namen des Abschnitts
-eingeleitet (z. B. \fB[database]\fP), gefolgt von \'Option = Wert\' Einträgen
-(Z. B. \fBhost = 127.0.0.1\fP).
-.br
-Leerräume um das Gleichheitszeichen '=' und am Ende eine Wertes werden
-ignoriert.
-.PP
-Leerzeilen und Zeilen, die mit einer '#' oder einem ';' anfangen, werden
-ignoriert.
-.PP
-Jeder Wert ist von einem der folgenden Datentypen:
-.IP \(bu
-.I Boolean
-um zu bestimmen, ob etwas eingeschaltet/aktiviert (true) oder
-ausgeschaltet/deaktiviert (false) ist.
-.br
-Mögliche Werte für \fBtrue\fP sind: \fB1\fP, \fByes\fP, \fBtrue\fP und \fBon\fP.
-.br
-Mögliche Werte für \fBfalse\fP sind: \fB0\fP, \fBno\fP, \fBfalse\fP und
-\fBoff\fP.
-.IP \(bu
-.I Int
-eine Integer-Zahl, geschrieben ohne eine gebrochene oder dezimale Komponente.
-.br
-Beispielsweise sind \fB1\fP, \fB50\fP oder \fB321\fP Integer-Zahlen.
-.IP \(bu
-.I String
-eine Folge von Buchstaben und Zahlen.
-.br
-Zum Beispiel: '\fBWort\fP', '\fBHallo Welt\fP', oder '\fB/usr/bin/strings\fP'
-.SS SUCHREIHENFOLGE
-Standardmäßig sucht vmm die \fIvmm.cfg\fP in folgenden Verzeichnissen, in dieser
-Reihenfolge:
-.RS
-.PD 0
-.TP
-.I
-/root
-.TP
-.I
-/usr/local/etc
-.TP
-.I
-/etc
-.PD
-.RE
-.PP
-Die zuerst gefundene Datei wird verwendet.
-.\" -----
-.SH DATABASE ABSCHNITT
-Der \fBdatabase\fP-Abschnitt wird verwendet, um die für den Datenbankzugriff
-benötigten Optionen festzulegen.
-.TP
-\fBhost\fP (\fIString\fP)
-Der Hostname oder die IP-Adresse des Datenbank-Servers.
-.TP
-\fBuser\fP (\fIString\fP)
-Der Name des Datenbank-Benutzers.
-.TP
-\fBpass\fP (\fIString\fP)
-Das Passwort des Datenbank-Benutzers
-.TP
-\fBname\fP (\fIString\fP)
-Name der zu verwendenden Datenbank.
-.TP
-\fBBeispiel\fP:
+wird mit dem, in eckigen Klammern \(aq\fB[\fP\(aq und \(aq\fB]\fP\(aq eingefassten, Namen des
+Abschnitts eingeleitet, gefolgt von \(aq\fIOption\fP = \fIWert\fP\(aq Einträgen:
+.sp
+.nf
+.ft C
 [database]
-.br
-host = localhost
-.br
-user = vmm
-.br
-pass = T~_:L4OYyl]TU?)
-.br
-name = mailsys
-.\" -----
-.SH MAILDIR ABSCHNITT
-Im \fBmaildir\fP-Abschnitt werden die für die Maildirs erforderlichen Optionen
-festgelegt.
+host = 127.0.0.1
+.ft P
+.fi
+.sp
+Leerräume um das Gleichheitszeichen \(aq=\(aq und am Ende eines Wertes werden
+ignoriert.
+.sp
+Leerzeilen und Zeilen, die mit einer \(aq#\(aq oder einem \(aq;\(aq anfangen, werden
+ignoriert.
+.sp
+Jeder Wert ist von einem der folgenden Datentypen:
+.INDENT 0.0
+.IP \(bu 2
+.
+\fIBoolean\fP um zu bestimmen, ob etwas eingeschaltet/aktiviert (true) oder
+ausgeschaltet/deaktiviert (false) ist.
+.nf
+Mögliche Werte für \fItrue\fP sind: \fB1\fP, \fByes\fP, \fBtrue\fP und \fBon\fP.
+Mögliche Werte für \fIfalse\fP sind: \fB0\fP, \fBno\fP, \fBfalse\fP und \fBoff\fP.
+.fi
+.sp
+.IP \(bu 2
+.
+\fIInt\fP eine Integer\-Zahl, geschrieben ohne eine gebrochene oder dezimale
+Komponente.
+.nf
+Beispielsweise \fB1\fP, \fB50\fP oder \fB321\fP sind Integer\-Zahlen.
+.fi
+.sp
+.IP \(bu 2
+.
+\fIString\fP eine Folge von Buchstaben und Zahlen.
+.nf
+Zum Beispiel: \(aq\fBWort\fP\(aq, \(aq\fBHallo Welt\fP\(aq oder \(aq\fB/usr/bin/strings\fP\(aq
+.fi
+.sp
+.UNINDENT
+.SS SUCHREIHENFOLGE
+.sp
+Standardmäßig sucht \fBvmm\fP(1) die \fIvmm.cfg\fP in folgenden Verzeichnissen,
+in der angegebenen Reihenfolge:
+.INDENT 0.0
+.INDENT 3.5
+.nf
+\fI/root\fP
+\fI/usr/local/etc\fP
+\fI/etc\fP
+.fi
+.sp
+.UNINDENT
+.UNINDENT
+.sp
+Die zuerst gefundene Datei wird verwendet.
+.SH ABSCHNITTE
+.sp
+Im Folgenden werden die Abschnitte der \fIvmm.cfg\fP und deren Optionen
+beschrieben.
+.SS ACCOUNT
+.sp
+Die Optionen des Abschnitts \fBaccount\fP legen Konto\-spezifische
+Einstellungen fest.
+.INDENT 0.0
 .TP
-\fBname\fP (\fIString\fP)
-Standard-Name des Maildir-Verzeichnisses im Verzeichnis des jeweiligen
-Anwenders.
+.B \fCdelete_directory\fP
+\fIBoolean\fP
+.sp
+Bestimmt das Verhalten von \fBvmm\fP(1) beim Löschen eines Kontos.
+Wenn der Wert dieser Option \fItrue\fP ist, wird das Home\-Verzeichnis des
+zu löschenden Anwenders rekursiv gelöscht.
 .TP
-\fBfolders\fP (\fIString\fP)
-Eine durch Doppelpunkten getrennte Liste mit Verzeichnisnamen, die innerhalb des
-Maildirs erstellt werden sollen.
-.br
-Sollen innerhalb des Maildirs keine Verzeichnisse angelegt werden, ist dieser
-Optionen ein einzelner Doppelpunkt (':') als Wert zuzuweisen.
+.B \fCdirectory_mode\fP
+\fIInt\fP
+.sp
+Zugriffsbits des Home\-Verzeichnisses, sowie aller enthaltenen
+Verzeichnisse, in Dezimal\-Schreibweise (Basis 10).
+.nf
+Beispiel: \(aqdrwx\-\-\-\-\-\-\(aq \-> oktal 0700 \-> dezimal 448
+.fi
+.sp
 .TP
-\fBmode\fP (\fIInt\fP)
-Zugriffsbits des Maildirs in Dezimal-Schreibweise (Basis 10).
-.br
-Beispiel: \'drwx------' -> oktal 0700 -> dezimal 448
+.B \fCdisk_usage\fP
+\fIBoolean\fP
+.sp
+Legt fest, ob die Festplattenbelegung des Maildirs eines Benutzers jedes
+Mal mit \fBdu\fP(1) ermittelt und mit den Konto\-Informationen ausgegeben
+werden soll.
+.sp
+Bei umfangreichen Maildirs kann das langsam sein. Falls Sie Quotas
+aktiviert haben, wird der \fBvmm\fP\-Unterbefehl \fBuserinfo\fP ebenfalls
+die aktuelle Quota\-Nutzung des Kontos mit ausgegeben. Sie können auch
+eines der optionalen Argumente \fBdu\fP oder \fBfull\fP an \fBuserinfo\fP
+übergeben, um sich die aktuelle Festplattenbelegung anzeigen zu lassen.
 .TP
-\fBdiskusage\fP (\fIBoolean\fP)
-Legt fest, ob die Festplattenbelegung des Maildirs jedes Mal, wenn
-Konto-Informationen ausgegeben werden, ermittelt und mit ausgegeben werden
-sollen.
+.B \fCimap\fP
+\fIBoolean\fP
+.sp
+Bestimmt, ob sich neu angelegte Benutzer per IMAP anmelden können sollen.
 .TP
-\fBdelete\fP (\fIBoolean\fP)
-Bestimmt, ob das Maildir rekursiv gelöscht werden soll, wenn ein Konto gelöscht
-wird.
+.B \fCpassword_length\fP
+\fIInt\fP
+.sp
+Diese Option legt die Anzahl der Zeichen für automatisch erzeugte
+Passwörter fest. Alle Werte kleiner als 8 werden auf 8 erhöht.
 .TP
-\fBBeispiel\fP:
-[maildir]
-.br
-name = Maildir
-.br
-folders = Drafts:Sent:Templates:Trash:INBOX.News
-.br
-mode = 448
-.br
-diskusage = false
-.br
-delete = false
-.\" -----
-.SH SERVICES ABSCHNITT
-Im \fBservices\fP-Abschnitt werden die Standard-Beschränkungen für alle Konten
-festgelegt.
+.B \fCpop3\fP
+.sp
+Bestimmt, ob sich neu angelegte Benutzer per POP3 anmelden können sollen.
 .TP
-\fBsmtp\fP (\fIBoolean\fP)
-Legt fest, ob sich ein Anwender standardmäßig per SMTP einloggen kann.
+.B \fCrandom_password\fP
+\fIBoolean\fP
+.sp
+Mit dieser Option wird bestimmt , ob \fBvmm\fP(1) ein zufälliges Passwort
+generieren soll, wenn kein Passwort an den \fBuseradd\fP Unterbefehl
+übergeben wurde. Ist der Wert dieser Option \fIfalse\fP, wird \fBvmm\fP Sie
+auffordern, ein Passwort für den neun Account einzugeben.
+.sp
+Sie können die Länge für automatisch generierte Passwörter mit der
+Option \fBpassword_length\fP konfigurieren.
 .TP
-\fBpop3\fP (\fIBoolean\fP)
-Legt fest, ob sich ein Anwender standardmäßig per POP3 einloggen kann.
+.B \fCsieve\fP
+\fIBoolean\fP
+.sp
+Bestimmt, ob sich neu angelegte Benutzer per ManageSieve anmelden
+können sollen.
 .TP
-\fBimap\fP (\fIBoolean\fP)
-Legt fest, ob sich ein Anwender standardmäßig per IMAP einloggen kann.
-.TP
-\fBsieve\fP (\fIBoolean\fP)
-Legt fest, ob sich ein Anwender standardmäßig per MANAGESIEVE einloggen kann.
-.TP
-\fBBeispiel\fP:
-[services]
-.br
+.B \fCsmtp\fP
+\fIBoolean\fP
+.sp
+Bestimmt, ob sich neu angelegte Benutzer per SMTP (SMTP AUTH) anmelden
+können sollen.
+.UNINDENT
+.sp
+Beispiel:
+.sp
+.nf
+.ft C
+[account]
+delete_directory = false
+directory_mode = 448
+disk_usage = false
+random_password = true
+password_length = 10
 smtp = true
-.br
 pop3 = true
-.br
-imap = false
-.br
-sieve = false
-.\" -----
-.SH DOMDIR ABSCHNITT
-Im \fBdomdir\fP-Abschnitt werden die Optionen der Domain-Verzeichnisse bestimmt.
+imap = true
+sieve = true
+.ft P
+.fi
+.SS BIN
+.sp
+Im \fBbin\fP\-Abschnitt werden Pfade zu Binaries angegeben, die von
+\fBvmm\fP(1) benötigt werden.
+.INDENT 0.0
 .TP
-\fBbase\fP (\fIString\fP)
-Alle Domain-Verzeichnisse werden unterhalb dieses Basis-Verzeichnisses angelegt.
+.B \fCdovecotpw\fP
+\fIString\fP
+.sp
+Der absolute Pfad zum dovecotpw Binary. Dieses Binary wird zur
+Hash\-Erzeugung verwendet, wenn \fBmisc.password_scheme\fP einen der
+nachfolgenden Werte hat: \(aqSMD5\(aq, \(aqSSHA\(aq, \(aqCRAM\-MD5\(aq, \(aqHMAC\-MD5\(aq,
+\(aqLANMAN\(aq, \(aqNTLM\(aq oder \(aqRPA\(aq.
 .TP
-\fBmode\fP (\fIInt\fP)
-Zugriffsbits des Domain-Verzeichnisses in Dezimal-Schreibweise (Basis 10).
-.br
-Beispiel: 'drwxrwx---' -> oktal 0770 -> dezimal 504
+.B \fCdu\fP
+\fIString\fP
+.sp
+Der absolute Pfad zu \fBdu\fP(1). Dieses Binary wird verwendet, wenn
+die Festplattenbelegung eines Kontos ermittelt wird.
 .TP
-\fBdelete\fP (\fIBoolean\fP)
-Bestimmt, ob beim Löschen einer Domain das Verzeichnis einer Domain, inklusive
-aller Anwender-Verzeichnisse, rekursiv gelöscht werden soll.
-.TP
-\fBBeispiel\fP:
-[domdir]
-.br
-base = /srv/mail
-.br
-mode = 504
-.br
-delete = false
-.\" -----
-.SH BIN ABSCHNITT
-Der \fBbin\fP-Abschnitt wird verwendet, um Pfade zu Binaries, die von \fBvmm\fP
-benötigt werden, anzugeben.
-.TP
-\fBdovecotpw\fP (\fIString\fP)
-Der absolute Pfad zum dovecotpw-Binary. Dieses wird verwendet, wenn als
-Passwort-Schema eines der folgenden verwendet wird: 'SMD5', 'SSHA', 'CRAM-MD5',
-\'HMAC-MD5', 'LANMAN', 'NTLM' oder 'RPA'.
-.TP
-\fBdu\fP (\fIString\fP)
-Der absolute Pfad zu \fBdu\fR(1). Dieses Binary wird verwendet, wenn die
-Festplattenbelegung eines Kontos ermittelt wird.
-.TP
-\fBpostconf\fP (\fIString\fP)
-Der absolute Pfad zu Postfix' \fBpostconf\fR(1).
-.br
-Dieses Binary wird verwendet, wenn \fBvmm\fR(1) diverse Postfix-Einstellungen
-prüft, zum Beispiel virtual_alias_expansion_limit.
-.TP
-\fBBeispiel\fP:
+.B \fCpostconf\fP
+\fIString\fP
+.sp
+Der absolute Pfad zu Postfix\(aq \fBpostconf\fP(1). Dieses Binary wird
+verwendet, wenn \fBvmm\fP(1) diverse Postfix\-Einstellungen prüft, zum
+Beispiel das \fIvirtual_alias_expansion_limit\fP.
+.UNINDENT
+.sp
+Beispiel:
+.sp
+.nf
+.ft C
 [bin]
-.br
 dovecotpw = /usr/sbin/dovecotpw
-.br
 du = /usr/bin/du
-.br
 postconf = /usr/sbin/postconf
-.\" -----
-.SH MISC ABSCHNITT
-Im \fBmisc\fP-Abschnitt werden verschiedene Einstellungen festgelegt.
+.ft P
+.fi
+.SS CONFIG
+.sp
+Beim \fBconfig\fP\-Abschnitt handelt es sich um einen internen
+Steuerungs\-Abschnitt.
+.INDENT 0.0
 .TP
-\fBpasswdscheme\fP (\fIString\fP)
-Das zu verwendende Passwort-Schema (siehe auch: dovecotpw -l)
-.TP
-\fBgid_mail\fP (\fIInt\fP)
-Die numerische Gruppen-ID der Gruppe mail, bzw. der Gruppe aus
-mail_privileged_group der Datei dovecot.conf.
-.TP
-\fBforcedel\fP (\fIBoolean\fP)
-Legt fest, ob beim Löschen einer Domain alle vorhanden Konten und/oder Aliase,
-ohne Nachfrage, gelöscht werden sollen.
-.TP
-\fBtransport\fP (\fIString\fP)
-Der Standard-Transport aller Domains und Konten.
-.TP
-\fBdovecotvers\fP (\fIInt\fP)
-Die verketteten Major- und Minor-Teile der eingesetzten Dovecot-Version
-(siehe: dovecot --version).
-.br
-Diese Option beeinflusst diverse Datenbankzugriffe. Da es zwischen Dovecot
-v1.1.x und v1.2.x einige Änderungen gab. Zum Beispiel \fB11\fP, falls
-\fBdovecot --version\fP den Wert \fB1.1\fP.18 ausgibt.
-.TP
-\fBBeispiel\fP:
-[misc]
-.br
-passwdscheme = CRAM-MD5
-.br
-gid_mail = 8
-.br
-forcedel = false
-.br
-transport = dovecot:
-.br
-dovecotvers = 11
-.\" -----
-.SH CONFIG ABSCHNITT
-Beim \fBconfig\fP-Abschnitt handelt es sich um einen internen
-Steuerungs-Abschnitt.
-.TP
-\fBdone\fP (\fIBoolean\fP)
-Diese Option hat den den Wert \fIfalse\fP, wenn vmm zum ersten Mal installiert
-wurde. Wenn die Datei \fIvmm.cfg\fP von Hand editiert wird, weisen Sie dieser
-Option abschließend den Wert \fItrue\fP zu.
-.br
-Wird die Konfiguration über das Kommando \fBvmm configure\fP angepasst, wird der
+.B \fCdone\fP
+\fIBoolean\fP
+.sp
+Diese Option hat den Wert \fIfalse\fP, wenn \fBvmm\fP(1) zum ersten Mal
+installiert wurde. Wenn Sie die Datei \fIvmm.cfg\fP von Hand editieren,
+weisen Sie dieser Option abschließend den Wert \fItrue\fP zu. Wird die
+Konfiguration über das Kommando \fBvmm configure\fP angepasst, wird der
 Wert dieser Option automatisch auf \fItrue\fP gesetzt.
-.br
-Sollte diese Option den Wert \fIfalse\fP zugewiesen haben, so startet \fBvmm\fP
-beim nächsten Aufruf im interaktiven Konfigurations-Modus.
-.TP
-\fBBeispiel\fP:
+.sp
+Ist der Wert dieser Option  \fIfalse\fP, so startet \fBvmm\fP(1) beim
+nächsten Aufruf im interaktiven Konfigurations\-Modus.
+.UNINDENT
+.sp
+Beispiel:
+.sp
+.nf
+.ft C
 [config]
-.br
 done = true
-.\" -----
+.ft P
+.fi
+.SS DATABASE
+.sp
+Der \fBdatabase\fP\-Abschnitt wird verwendet, um die für den Datenbankzugriff
+benötigten Optionen festzulegen.
+.INDENT 0.0
+.TP
+.B \fChost\fP
+\fIString\fP
+.sp
+Der Hostname oder die IP\-Adresse des Datenbank\-Servers.
+.TP
+.B \fCname\fP
+\fIString\fP
+.sp
+Der Name der zu verwendenden Datenbank.
+.TP
+.B \fCpass\fP
+\fIString\fP
+.sp
+Das Passwort des Datenbank\-Benutzers.
+.TP
+.B \fCuser\fP
+\fIString\fP
+.sp
+Der Name des Datenbank\-Benutzers.
+.UNINDENT
+.sp
+Beispiel:
+.sp
+.nf
+.ft C
+[database]
+host = localhost
+user = vmm
+pass = PY_SRJ}L/0p\-oOk
+name = mailsys
+.ft P
+.fi
+.SS DOMAIN
+.sp
+Im \fBdomain\fP\-Abschnitt werden Domain\-spezifische Informationen konfiguriert.
+.INDENT 0.0
+.TP
+.B \fCauto_postmaster\fP
+\fIBoolean\fP
+.sp
+Ist der Wert dieser Option \fItrue\fP, wird \fBvmm\fP(1) beim Anlegen einer
+Domain automatisch einen postmaster\-Account erstellen.
+.TP
+.B \fCdelete_directory\fP
+\fIBoolean\fP
+.sp
+Bestimmt, ob beim Löschen einer Domain das Verzeichnis einer Domain,
+inklusive aller Anwender\-Verzeichnisse, rekursiv gelöscht werden soll.
+.TP
+.B \fCdirectory_mode\fP
+\fIInt\fP
+.sp
+Zugriffsbits des Domain\-Verzeichnisses in Dezimal\-Schreibweise (Basis
+10).
+.nf
+Beispiel: \(aqdrwxrwx\-\-\-\(aq \-> oktal 0770 \-> dezimal 504
+.fi
+.sp
+.TP
+.B \fCforce_deletion\fP
+\fIBoolean\fP
+.sp
+Erzwingt das Löschen von Konten und Aliase beim Löschen einer Domain.
+.UNINDENT
+.sp
+Beispiel:
+.sp
+.nf
+.ft C
+[domain]
+auto_postmaster = true
+delete_directory = false
+directory_mode = 504
+force_deletion = false
+.ft P
+.fi
+.SS MAILDIR
+.sp
+Im \fBmaildir\fP\-Abschnitt werden die für die Maildirs erforderlichen Optionen
+festgelegt.
+.INDENT 0.0
+.TP
+.B \fCfolders\fP
+\fIString\fP
+.sp
+Eine durch Doppelpunkten getrennte Liste mit Verzeichnisnamen, die
+innerhalb des Maildirs erstellt werden sollen. Sollen innerhalb des
+Maildirs keine Verzeichnisse angelegt werden, ist dieser Optionen ein
+einzelner Doppelpunkt (\(aq\fB:\fP\(aq) als Wert zuzuweisen.
+.sp
+Sollen Verzeichnisse mit Unterverzeichnissen angelegt werden, ist ein
+einzelner Punkt (\(aq\fB.\fP\(aq) als Separator zu verwenden.
+.TP
+.B \fCname\fP
+\fIString\fP
+.sp
+Der Standard\-Name des Maildir\-Verzeichnisses im Verzeichnis des
+jeweiligen Anwenders.
+.UNINDENT
+.sp
+Beispiel:
+.sp
+.nf
+.ft C
+[maildir]
+folders = Drafts:Sent:Templates:Trash:Lists.Dovecot:Lists.Postfix
+name = Maildir
+.ft P
+.fi
+.SS MISC
+.sp
+Im \fBmisc\fP\-Abschnitt werden verschiedene Einstellungen festgelegt.
+.INDENT 0.0
+.TP
+.B \fCbase_directory\fP
+\fIString\fP
+.sp
+Alle Domain\-Verzeichnisse werden innerhalb dieses Basis\-Verzeichnisses
+angelegt.
+.TP
+.B \fCpassword_scheme\fP
+\fIString\fP
+.sp
+Das zu verwendende Passwort\-Schema (siehe auch: \fBdovecotpw \-l\fP).
+.TP
+.B \fCgid_mail\fP
+\fIInt\fP
+.sp
+Die numerische Gruppen\-ID der Gruppe mail, bzw. der Gruppe aus
+\fImail_privileged_group\fP der Datei \fIdovecot.conf\fP.
+.TP
+.B \fCtransport\fP
+\fIString\fP
+.sp
+Der Standard\-Transport aller Domains und Konten. Siehe auch:
+\fBtransport\fP(5)
+.TP
+.B \fCdovecot_version\fP
+\fIInt\fP
+.sp
+Die verketteten Major\- und Minor\-Teile der eingesetzten Dovecot\-Version
+(siehe: \fBdovecot \-\-version\fP).
+.sp
+Wenn das Kommando \fBdovecot \-\-version\fP zum Beispiel \fI1.1.18\fP ausgibt,
+ist dieser Option der Wert \fB11\fP zuzuweisen.
+.UNINDENT
+.sp
+Beispiel:
+.sp
+.nf
+.ft C
+[misc]
+base_directory = /srv/mail
+password_scheme = CRAM\-MD5
+gid_mail = 8
+transport = dovecot:
+dovecot_version = 11
+.ft P
+.fi
 .SH DATEIEN
-vmm.cfg
+.INDENT 0.0
+.TP
+.B \fI/root/vmm.cfg\fP
+.nf
+Wird verwendet, falls vorhanden.
+.fi
+.sp
+.TP
+.B \fI/usr/local/etc/vmm.cfg\fP
+.nf
+Wird verwendet, sollte obige Datei nicht gefunden werden.
+.fi
+.sp
+.TP
+.B \fI/etc/vmm.cfg\fP
+.nf
+Wird verwendet, falls obengenannte Dateien nicht existieren.
+.fi
+.sp
+.UNINDENT
 .SH SIEHE AUCH
-vmm(1), Programm für die Kommandozeile, um E-Mail-Domains, -Konten und -Aliase
+.sp
+vmm(1), Programm für die Kommandozeile, um E\-Mail\-Domains, \-Konten und \-Aliase
 zu verwalten.
-.SH AUTOR
-\fBvmm\fP und die dazugehörigen Manualseiten wurden von Pascal Volk
-<\fIneverseen@users.sourceforge.net\fP> geschrieben und sind unter den
-Bedingungen der BSD Lizenz lizenziert.
+.SH COPYING
+.sp
+vmm und die dazugehörigen Manualseiten wurden von Pascal Volk geschrieben
+und sind unter den Bedingungen der BSD Lizenz lizenziert.
+.SH AUTHOR
+Pascal Volk <neverseen@users.sourceforge.net>
+.\" Generated by docutils manpage writer.
+.\" 
+.

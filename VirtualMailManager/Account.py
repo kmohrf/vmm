@@ -4,17 +4,22 @@
 
 """Virtual Mail Manager's Account class to manage e-mail accounts."""
 
-from __main__ import ERR
-from Exceptions import VMMAccountException as AccE
-from Domain import Domain
-from Transport import Transport
-from MailLocation import MailLocation
-from EmailAddress import EmailAddress
-import VirtualMailManager as VMM
+import VirtualMailManager.constants.ERROR as ERR
+from VirtualMailManager.Domain import Domain
+from VirtualMailManager.EmailAddress import EmailAddress
+from VirtualMailManager.errors import AccountError as AccE
+from VirtualMailManager.maillocation import MailLocation, known_format
+from VirtualMailManager.Transport import Transport
+
+
+_ = lambda msg: msg
+
 
 class Account(object):
     """Class to manage e-mail accounts."""
-    __slots__ = ('_addr','_base','_gid','_mid','_passwd','_tid','_uid','_dbh')
+    __slots__ = ('_addr', '_base', '_gid', '_mid', '_passwd', '_tid', '_uid',
+                 '_dbh')
+
     def __init__(self, dbh, address, password=None):
         self._dbh = dbh
         self._base = None
@@ -29,24 +34,23 @@ class Account(object):
         self._passwd = password
         self._setAddr()
         self._exists()
-        if self._uid < 1 and VMM.VirtualMailManager.aliasExists(self._dbh,
-                self._addr):
+        from VirtualMailManager.Handler import Handler
+        if self._uid < 1 and Handler.aliasExists(self._dbh, self._addr):
             # TP: Hm, what quotation marks should be used?
             # If you are unsure have a look at:
             # http://en.wikipedia.org/wiki/Quotation_mark,_non-English_usage
-            raise AccE(_(u"There is already an alias with the address “%s”.") %\
-                    self._addr, ERR.ALIAS_EXISTS)
-        if self._uid < 1 and VMM.VirtualMailManager.relocatedExists(self._dbh,
-                self._addr):
+            raise AccE(_(u"There is already an alias with the address “%s”.") %
+                       self._addr, ERR.ALIAS_EXISTS)
+        if self._uid < 1 and Handler.relocatedExists(self._dbh, self._addr):
             raise AccE(
-              _(u"There is already a relocated user with the address “%s”.") %\
-                    self._addr, ERR.RELOCATED_EXISTS)
+              _(u"There is already a relocated user with the address “%s”.") %
+                       self._addr, ERR.RELOCATED_EXISTS)
 
     def _exists(self):
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT uid, mid, tid FROM users \
-WHERE gid=%s AND local_part=%s",
-                self._gid, self._addr._localpart)
+        dbc.execute(
+            "SELECT uid, mid, tid FROM users WHERE gid=%s AND local_part=%s",
+                    self._gid, self._addr.localpart)
         result = dbc.fetchone()
         dbc.close()
         if result is not None:
@@ -56,13 +60,13 @@ WHERE gid=%s AND local_part=%s",
             return False
 
     def _setAddr(self):
-        dom = Domain(self._dbh, self._addr._domainname)
-        self._gid = dom.getID()
+        dom = Domain(self._dbh, self._addr.domainname)
+        self._gid = dom.gid
         if self._gid == 0:
-            raise AccE(_(u"The domain “%s” doesn't exist.") %\
-                    self._addr._domainname, ERR.NO_SUCH_DOMAIN)
-        self._base = dom.getDir()
-        self._tid = dom.getTransportID()
+            raise AccE(_(u"The domain “%s” doesn't exist.") %
+                       self._addr.domainname, ERR.NO_SUCH_DOMAIN)
+        self._base = dom.directory
+        self._tid = dom.transport.tid
 
     def _setID(self):
         dbc = self._dbh.cursor()
@@ -71,8 +75,11 @@ WHERE gid=%s AND local_part=%s",
         dbc.close()
 
     def _prepare(self, maillocation):
+        if not known_format(maillocation):                                  
+            raise AccE(_(u'Unknown mail_location mailbox format: %r') %
+                       maillocation, ERR.UNKNOWN_MAILLOCATION_NAME)
         self._setID()
-        self._mid = MailLocation(self._dbh, maillocation=maillocation).getID()
+        self._mid = MailLocation(format=maillocation).mid
 
     def _switchState(self, state, dcvers, service):
         if not isinstance(state, bool):
@@ -106,7 +113,7 @@ WHERE gid=%s AND local_part=%s",
     def __aliaseCount(self):
         dbc = self._dbh.cursor()
         q = "SELECT COUNT(destination) FROM alias WHERE destination = '%s'"\
-            %self._addr
+            % self._addr
         dbc.execute(q)
         a_count = dbc.fetchone()[0]
         dbc.close()
@@ -142,7 +149,7 @@ WHERE gid=%s AND local_part=%s",
             self._prepare(maillocation)
             sql = "INSERT INTO users (local_part, passwd, uid, gid, mid, tid,\
  smtp, pop3, imap, %s) VALUES ('%s', '%s', %d, %d, %d, %d, %s, %s, %s, %s)" % (
-                sieve_col, self._addr._localpart, self._passwd, self._uid,
+                sieve_col, self._addr.localpart, self._passwd, self._uid,
                 self._gid, self._mid, self._tid, smtp, pop3, imap, sieve)
             dbc = self._dbh.cursor()
             dbc.execute(sql)
@@ -163,7 +170,7 @@ WHERE gid=%s AND local_part=%s",
             dbc.execute('UPDATE users SET passwd = %s WHERE uid = %s',
                     value, self._uid)
         elif what == 'transport':
-            self._tid = Transport(self._dbh, transport=value).getID()
+            self._tid = Transport(self._dbh, transport=value).tid
             dbc.execute('UPDATE users SET tid = %s WHERE uid = %s',
                     self._tid, self._uid)
         else:
@@ -188,7 +195,7 @@ WHERE gid=%s AND local_part=%s",
             raise AccE(_(u"The account “%s” doesn't exist.") % self._addr,
                     ERR.NO_SUCH_ACCOUNT)
         else:
-            keys = ['name', 'uid', 'gid', 'maildir', 'transport', 'smtp',
+            keys = ['name', 'uid', 'gid', 'mid', 'transport', 'smtp',
                     'pop3', 'imap', sieve_col]
             info = dict(zip(keys, info))
             for service in ('smtp', 'pop3', 'imap', sieve_col):
@@ -199,11 +206,10 @@ WHERE gid=%s AND local_part=%s",
                     # TP: A service (pop3/imap) isn't enabled/usable for a user
                     info[service] = _('disabled')
             info['address'] = self._addr
-            info['maildir'] = '%s/%s/%s' % (self._base, info['uid'],
-                    MailLocation(self._dbh,
-                        mid=info['maildir']).getMailLocation())
+            info['home'] = '%s/%s' % (self._base, info['uid'])
+            info['mail_location'] = MailLocation(mid=info['mid']).mail_location
             info['transport'] = Transport(self._dbh,
-                    tid=info['transport']).getTransport()
+                                          tid=info['transport']).transport
             return info
 
     def getAliases(self):
@@ -242,8 +248,10 @@ WHERE gid=%s AND local_part=%s",
                 dbc.close()
                 raise AccE(
                   _(u"There are %(count)d aliases with the destination address\
- “%(address)s”.") %{'count': a_count, 'address': self._addr}, ERR.ALIAS_PRESENT)
+ “%(address)s”.") % {'count': a_count, 'address': self._addr},
+                  ERR.ALIAS_PRESENT)
         dbc.close()
+
 
 def getAccountByID(uid, dbh):
     try:
@@ -265,3 +273,5 @@ def getAccountByID(uid, dbh):
     info = dict(zip(keys, info))
     return info
 
+
+del _
