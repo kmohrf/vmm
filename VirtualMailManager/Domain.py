@@ -340,15 +340,14 @@ def search(dbh, pattern=None, like=False):
     `like` : bool
       should be `True` when *pattern* starts/ends with a "%" sign
     """
-    if pattern is not None and like is False:
+    if pattern and not like:
         pattern = check_domainname(pattern)
     sql = 'SELECT gid, domainname, is_primary FROM domain_name'
-    if pattern is None:
-        pass
-    elif like:
-        sql += " WHERE domainname LIKE '%s'" % pattern
-    else:
-        sql += " WHERE domainname = '%s'" % pattern
+    if pattern:
+        if like:
+            sql += " WHERE domainname LIKE '%s'" % pattern
+        else:
+            sql += " WHERE domainname = '%s'" % pattern
     sql += ' ORDER BY is_primary DESC, domainname'
     dbc = dbh.cursor()
     dbc.execute(sql)
