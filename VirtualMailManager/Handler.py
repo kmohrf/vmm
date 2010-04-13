@@ -476,38 +476,50 @@ class Handler(object):
     def aliasDomainAdd(self, aliasname, domainname):
         """Adds an alias domain to the domain.
 
-        Keyword arguments:
-        aliasname -- the name of the alias domain (str)
-        domainname -- name of the target domain (str)
+        Arguments:
+
+        `aliasname` : basestring
+          The name of the alias domain
+        `domainname` : basestring
+          The name of the target domain
         """
         dom = self.__getDomain(domainname)
-        aliasDom = AliasDomain(self._dbh, aliasname, dom)
+        aliasDom = AliasDomain(self._dbh, aliasname)
+        aliasDom.set_destination(dom)
         aliasDom.save()
 
     def aliasDomainInfo(self, aliasname):
+        """Returns a dict (keys: "alias" and "domain") with the names of
+        the alias domain and its primary domain."""
         self.__dbConnect()
-        aliasDom = AliasDomain(self._dbh, aliasname, None)
+        aliasDom = AliasDomain(self._dbh, aliasname)
         return aliasDom.info()
 
     def aliasDomainSwitch(self, aliasname, domainname):
         """Modifies the target domain of an existing alias domain.
 
-        Keyword arguments:
-        aliasname -- the name of the alias domain (str)
-        domainname -- name of the new target domain (str)
+        Arguments:
+
+        `aliasname` : basestring
+          The name of the alias domain
+        `domainname` : basestring
+          The name of the new target domain
         """
         dom = self.__getDomain(domainname)
-        aliasDom = AliasDomain(self._dbh, aliasname, dom)
+        aliasDom = AliasDomain(self._dbh, aliasname)
+        aliasDom.set_destination(dom)
         aliasDom.switch()
 
     def aliasDomainDelete(self, aliasname):
-        """Deletes the specified alias domain.
+        """Deletes the given alias domain.
 
-        Keyword arguments:
-        aliasname -- the name of the alias domain (str)
+        Argument:
+
+        `aliasname` : basestring
+          The name of the alias domain
         """
         self.__dbConnect()
-        aliasDom = AliasDomain(self._dbh, aliasname, None)
+        aliasDom = AliasDomain(self._dbh, aliasname)
         aliasDom.delete()
 
     def domainList(self, pattern=None):
