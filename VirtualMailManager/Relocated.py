@@ -41,6 +41,10 @@ class Relocated(object):
 
         self.__load()
 
+    def __nonzero__(self):
+        """Returns `True` if the Relocated is known, `False` if it's new."""
+        return self._dest is not None
+
     def __load(self):
         """Loads the destination address from the database into the
         `_dest` attribute.
@@ -64,7 +68,7 @@ class Relocated(object):
                        RELOCATED_ADDR_DEST_IDENTICAL)
         if self._dest:
             if self._dest == destination:
-                raise RErr(_(u'The relocated user %r already exists.') %
+                raise RErr(_(u"The relocated user '%s' already exists.") %
                            self._addr, RELOCATED_EXISTS)
             else:
                 self._dest = destination
@@ -86,15 +90,15 @@ WHERE gid=%s AND address=%s',
     def get_info(self):
         """Returns the address to which mails should be sent."""
         if not self._dest:
-            raise RErr(_(u"The relocated user %r doesn't exist.") %
+            raise RErr(_(u"The relocated user '%s' doesn't exist.") %
                        self._addr, NO_SUCH_RELOCATED)
         return self._dest
 
     def delete(self):
         """Deletes the relocated entry from the database."""
         if not self._dest:
-            raise RErr(_(u"The relocated user %r doesn't exist.") % self._addr,
-                       NO_SUCH_RELOCATED)
+            raise RErr(_(u"The relocated user '%s' doesn't exist.") %
+                       self._addr, NO_SUCH_RELOCATED)
         dbc = self._dbh.cursor()
         dbc.execute("DELETE FROM relocated WHERE gid = %s AND address = %s",
                     self._gid, self._addr.localpart)
