@@ -12,8 +12,8 @@ from VirtualMailManager.Domain import Domain
 from VirtualMailManager.EmailAddress import EmailAddress
 from VirtualMailManager.Transport import Transport
 from VirtualMailManager.constants.ERROR import \
-     ACCOUNT_EXISTS, ACCOUNT_MISSING_PASSWORD, ALIAS_EXISTS, ALIAS_PRESENT, \
-     INVALID_AGUMENT, NO_SUCH_ACCOUNT, NO_SUCH_DOMAIN, RELOCATED_EXISTS, \
+     ACCOUNT_EXISTS, ACCOUNT_MISSING_PASSWORD, ALIAS_PRESENT, \
+     INVALID_AGUMENT, NO_SUCH_ACCOUNT, NO_SUCH_DOMAIN, \
      UNKNOWN_MAILLOCATION_NAME, UNKNOWN_SERVICE
 from VirtualMailManager.errors import AccountError as AErr
 from VirtualMailManager.maillocation import MailLocation, known_format
@@ -85,7 +85,7 @@ class Account(object):
                        maillocation, UNKNOWN_MAILLOCATION_NAME)
         self._mid = MailLocation(format=maillocation).mid
         if not self._tid:
-            self._tid = self._domain.tid
+            self._tid = self._domain.transport.tid
         self._set_uid()
 
     def _switch_state(self, state, dcvers, service):
@@ -372,8 +372,11 @@ destination address '%(address)s'.") % \
         dbc.close()
 
 
-def getAccountByID(uid, dbh):
+def get_account_by_uid(uid, dbh):
     """Search an Account by its UID.
+
+    This function returns a dict (keys: 'address', 'gid' and 'uid'), if an
+    Account with the given *uid* exists.
 
     Argument:
 
