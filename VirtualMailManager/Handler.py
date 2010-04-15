@@ -28,7 +28,8 @@ from VirtualMailManager.AliasDomain import AliasDomain
 from VirtualMailManager.Config import Config as Cfg
 from VirtualMailManager.Domain import Domain, get_gid
 from VirtualMailManager.EmailAddress import EmailAddress
-from VirtualMailManager.errors import VMMError, AliasError, DomainError
+from VirtualMailManager.errors import VMMError, AliasError, DomainError, \
+     RelocatedError
 from VirtualMailManager.Relocated import Relocated
 from VirtualMailManager.Transport import Transport
 from VirtualMailManager.ext.Postconf import Postconf
@@ -37,6 +38,9 @@ from VirtualMailManager.ext.Postconf import Postconf
 SALTCHARS = './0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 RE_DOMAIN_SEARCH = """^[a-z0-9-\.]+$"""
 RE_MBOX_NAMES = """^[\x20-\x25\x27-\x7E]*$"""
+TYPE_ACCOUNT = 0x1
+TYPE_ALIAS = 0x2
+TYPE_RELOCATED = 0x4
 
 
 class Handler(object):
@@ -143,37 +147,27 @@ class Handler(object):
             except PgSQL.libpq.DatabaseError, e:
                 raise VMMError(str(e), ERR.DATABASE_ERROR)
 
-    def _exists(dbh, query):
-        dbc = dbh.cursor()
-        dbc.execute(query)
-        gid = dbc.fetchone()
-        dbc.close()
-        if gid is None:
-            return False
-        else:
-            return True
-    _exists = staticmethod(_exists)
-
-    def accountExists(dbh, address):
-        sql = "SELECT gid FROM users WHERE gid = (SELECT gid FROM domain_name\
- WHERE domainname = '%s') AND local_part = '%s'" % (address.domainname,
-            address.localpart)
-        return Handler._exists(dbh, sql)
-    accountExists = staticmethod(accountExists)
-
-    def aliasExists(dbh, address):
-        sql = "SELECT DISTINCT gid FROM alias WHERE gid = (SELECT gid FROM\
- domain_name WHERE domainname = '%s') AND address = '%s'" % (
-                address.domainname, address.localpart)
-        return Handler._exists(dbh, sql)
-    aliasExists = staticmethod(aliasExists)
-
-    def relocatedExists(dbh, address):
-        sql = "SELECT gid FROM relocated WHERE gid = (SELECT gid FROM\
- domain_name WHERE domainname = '%s') AND address = '%s'" % (
-                address.domainname, address.localpart)
-        return Handler._exists(dbh, sql)
-    relocatedExists = staticmethod(relocatedExists)
+    def _chk_other_address_types(self, address, exclude):
+        """Checks if the EmailAddress *address* is known as `TYPE_ACCOUNT`,
+        `TYPE_ALIAS` or `TYPE_RELOCATED`, but not as the `TYPE_*` specified
+        by *exclude*.  If the *address* is known as one of the `TYPE_*`s
+        the according `TYPE_*` constant will be returned.  Otherwise 0 will
+        be returned."""
+        assert exclude in (TYPE_ACCOUNT, TYPE_ALIAS, TYPE_RELOCATED) and \
+                isinstance(address, EmailAddress)
+        if exclude is not TYPE_ACCOUNT:
+            account = Account(self._dbh, address)
+            if account.uid > 0:
+                return TYPE_ACCOUNT
+        if exclude is not TYPE_ALIAS:
+            alias = Alias(self._dbh, address)
+            if alias:
+                return TYPE_ALIAS
+        if exclude is not TYPE_RELOCATED:
+            relocated = Relocated(self._dbh, address)
+            if relocated:
+                return TYPE_RELOCATED
+        return 0
 
     def __getAccount(self, address, password=None):
         address = EmailAddress(address)
@@ -597,18 +591,21 @@ The account has been successfully deleted from the database.
         alias = self.__getAlias(aliasaddress)
         try:
             return alias.get_destinations()
-        except AliasError, e:
-            if e.code == ERR.NO_SUCH_ALIAS:
-                if Handler.accountExists(self._dbh, alias._addr):
-                    raise VMMError(
-                        _(u'There is already an account with address “%s”.') %
-                                       aliasaddress, ERR.ACCOUNT_EXISTS)
-                if Handler.relocatedExists(self._dbh, alias._addr):
-                    raise VMMError(_(u'There is already a relocated user \
-with the address “%s”.') %
-                                       aliasaddress, ERR.RELOCATED_EXISTS)
-                raise
-            else:
+        except AliasError, err:
+            if err.code == ERR.NO_SUCH_ALIAS:
+                other = self._chk_other_address_types(alias.address,
+                                                      TYPE_ALIAS)
+                if other is TYPE_ACCOUNT:
+                    raise VMMError(_(u"There is already an account with the \
+address '%s'.") %
+                                   alias.address, ERR.ACCOUNT_EXISTS)
+                elif other is TYPE_RELOCATED:
+                    raise VMMError(_(u"There is already a relocated user \
+with the address '%s'.") %
+                                   alias.address, ERR.RELOCATED_EXISTS)
+                else:  # unknown address
+                    raise
+            else:  # something other went wrong
                 raise
 
     def aliasDelete(self, aliasaddress, targetaddress=None):
@@ -689,7 +686,24 @@ The service name “managesieve” is deprecated and will be removed\n\
         """Returns the target address of the relocated user with the given
         *emailaddress*."""
         relocated = self.__getRelocated(emailaddress)
-        return relocated.get_info()
+        try:
+            return relocated.get_info()
+        except RelocatedError, err:
+            if err.code == ERR.NO_SUCH_RELOCATED:
+                other = self._chk_other_address_types(relocated.address,
+                                                      TYPE_RELOCATED)
+                if other is TYPE_ACCOUNT:
+                    raise VMMError(_(u"There is already an account with the \
+address '%s'.") %
+                                   relocated.address, ERR.ACCOUNT_EXISTS)
+                elif other is TYPE_ALIAS:
+                    raise VMMError(_(u"There is already an alias with the \
+address '%s'.") %
+                                   relocated.address, ERR.ALIAS_EXISTS)
+                else:  # unknown address
+                    raise
+            else:  # something other went wrong
+                raise
 
     def relocatedDelete(self, emailaddress):
         """Deletes the relocated user with the given *emailaddress* from
