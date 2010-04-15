@@ -9,13 +9,18 @@ python-crypto <http://www.amk.ca/python/code/crypto.html>.
 
 
 Configuring PostgreSQL
+(for more details see: http://vmm.localdomain.org/PreparingPostgreSQL)
 
-* /etc/postgresql/8.2/main/pg_hba.conf
+* /etc/postgresql/8.4/main/pg_hba.conf
+  [ if you prefer to connect via TCP/IP ]
     # IPv4 local connections:
     host    mailsys     +mailsys    127.0.0.1/32          md5
+  [ if you want to connect through a local Unix-domain socket ]
+    # "local" is for Unix domain socket connections only
+    local   mailsys     +mailsys                          md5
 
     # reload configuration
-    /etc/init.d/postgresql-8.2 force-reload
+    /etc/init.d/postgresql-8.4 force-reload
 
 * Create a DB user if necessary:
     DB Superuser:
@@ -23,23 +28,24 @@ Configuring PostgreSQL
     DB User:
     createuser -d -E -e -P $USERNAME
 
-* Create Database and db users for Postfix and Dovecot
+* Create Database and db users for vmm, Postfix and Dovecot
     connecting to PostgreSQL:
     psql template1
 
-    # create database
-    CREATE DATABASE mailsys ENCODING 'UTF8';
+    # create users, group and the database
+    CREATE USER vmm ENCRYPTED PASSWORD 'DB PASSWORD for vmm';
+    CREATE USER dovecot ENCRYPTED password 'DB PASSWORD for Dovecot';
+    CREATE USER postfix ENCRYPTED password 'DB PASSWORD for Postfix';
+    CREATE ROLE mailsys WITH USER postfix, dovecot, vmm;
+    CREATE DATABASE mailsys WITH OWNER vmm ENCODING 'UTF8';
+    \q
+
     # connect to the new database
-    \c mailsys
+    psql mailsys vmm -W -h 127.0.0.1
     # either import the database structure for Dovecot v1.0.x/v1.1.x
     \i /path/to/create_tables.pgsql
     # or import the database structure for Dovecot v1.2.x
     \i /path/to/create_tables-dovecot-1.2.x.pgsql
-
-    # create users and group
-    CREATE USER postfix ENCRYPTED password 'DB PASSWORD for Postfix';
-    CREATE USER dovecot ENCRYPTED password 'DB PASSWORD for Dovecot';
-    CREATE ROLE mailsys WITH USER postfix, dovecot;
 
     # set permissions
     GRANT SELECT ON dovecot_password, dovecot_user TO dovecot;
