@@ -134,6 +134,11 @@ class Account(object):
                        NO_SUCH_ACCOUNT)
 
     @property
+    def address(self):
+        """The Account's EmailAddress instance."""
+        return self._addr
+
+    @property
     def domain_directory(self):
         """The directory of the domain the Account belongs to."""
         return self._domain.directory

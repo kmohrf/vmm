@@ -91,6 +91,11 @@ Hint: Delete some destination addresses.""")
         """Returns the number of destinations of the alias."""
         return len(self._dests)
 
+    @property
+    def address(self):
+        """The Alias' EmailAddress instance."""
+        return self._addr
+
     def add_destinations(self, destinations, expansion_limit, warnings=None):
         """Adds the `EmailAddress`es from *destinations* list to the
         destinations of the alias.

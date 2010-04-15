@@ -59,6 +59,11 @@ class Relocated(object):
         if destination:
             self._dest = EmailAddress(destination[0])
 
+    @property
+    def address(self):
+        """The Relocated's EmailAddress instance."""
+        return self._addr
+
     def set_destination(self, destination):
         """Sets/updates the new address of the relocated user."""
         update = False
