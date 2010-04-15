@@ -310,8 +310,11 @@ class Account(object):
             info['address'] = self._addr
             info['home'] = '%s/%s' % (self._domain.directory, info['uid'])
             info['mail_location'] = MailLocation(mid=info['mid']).mail_location
-            info['transport'] = Transport(self._dbh,
-                                          tid=info['transport']).transport
+            if info['transport'] == self._domain.transport.tid:
+                info['transport'] = self._domain.transport.transport
+            else:
+                info['transport'] = Transport(self._dbh,
+                                              tid=info['transport']).transport
             del info['mid']
             return info
         # nearly impossible‽
