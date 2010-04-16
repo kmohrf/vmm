@@ -9,18 +9,21 @@
 """
 
 import os
+import re
+from encodings.idna import ToASCII, ToUnicode
 from random import choice
 
-from VirtualMailManager import check_domainname
 from VirtualMailManager.constants.ERROR import \
      ACCOUNT_AND_ALIAS_PRESENT, ACCOUNT_PRESENT, ALIAS_PRESENT, \
-     DOMAIN_ALIAS_EXISTS, DOMAIN_EXISTS, NO_SUCH_DOMAIN
+     DOMAIN_ALIAS_EXISTS, DOMAIN_EXISTS, DOMAIN_INVALID, DOMAIN_TOO_LONG, \
+     NO_SUCH_DOMAIN
 from VirtualMailManager.errors import DomainError as DomErr
 from VirtualMailManager.Transport import Transport
 
 
 MAILDIR_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz'
-_ = lambda x: x
+RE_DOMAIN = re.compile(r"^(?:[a-z0-9-]{1,63}\.){1,}[a-z]{2,6}$")
+_ = lambda msg: msg
 
 
 class Domain(object):
@@ -318,6 +321,51 @@ class Domain(object):
         return aliasdomains
 
 
+def ace2idna(domainname):
+    """Converts the domain name `domainname` from ACE according to IDNA."""
+    return u'.'.join([ToUnicode(lbl) for lbl in domainname.split('.') if lbl])
+
+
+def check_domainname(domainname):
+    """Returns the validated domain name `domainname`.
+
+    It also converts the name of the domain from IDN to ASCII, if
+    necessary.
+
+    Throws an `DomainError`, if the domain name is too long or doesn't
+    look like a valid domain name (label.label.label).
+
+    """
+    if not RE_DOMAIN.match(domainname):
+        domainname = idn2ascii(domainname)
+    if len(domainname) > 255:
+        raise DomErr(_(u'The domain name is too long'), DOMAIN_TOO_LONG)
+    if not RE_DOMAIN.match(domainname):
+        raise DomErr(_(u"The domain name '%s' is invalid") % domainname,
+                     DOMAIN_INVALID)
+    return domainname
+
+
+def get_gid(dbh, domainname):
+    """Returns the group id of the domain *domainname*.
+
+    If the domain couldn't be found in the database 0 will be returned.
+    """
+    domainname = check_domainname(domainname)
+    dbc = dbh.cursor()
+    dbc.execute('SELECT gid FROM domain_name WHERE domainname=%s', domainname)
+    gid = dbc.fetchone()
+    dbc.close()
+    if gid:
+        return gid[0]
+    return 0
+
+
+def idn2ascii(domainname):
+    """Converts the idn domain name `domainname` into punycode."""
+    return '.'.join([ToASCII(lbl) for lbl in domainname.split('.') if lbl])
+
+
 def search(dbh, pattern=None, like=False):
     """'Search' for domains by *pattern* in the database.
 
@@ -372,21 +420,6 @@ def search(dbh, pattern=None, like=False):
                 gids.append(gid)
                 domains[gid] = [None, domain]
     return gids, domains
-
-
-def get_gid(dbh, domainname):
-    """Returns the group id of the domain *domainname*.
-
-    If the domain couldn't be found in the database 0 will be returned.
-    """
-    domainname = check_domainname(domainname)
-    dbc = dbh.cursor()
-    dbc.execute('SELECT gid FROM domain_name WHERE domainname=%s', domainname)
-    gid = dbc.fetchone()
-    dbc.close()
-    if gid:
-        return gid[0]
-    return 0
 
 
 del _

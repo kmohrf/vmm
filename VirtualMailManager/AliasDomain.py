@@ -8,8 +8,7 @@
     Virtual Mail Manager's AliasDomain class to manage alias domains.
 """
 
-from VirtualMailManager import check_domainname
-from VirtualMailManager.Domain import Domain
+from VirtualMailManager.Domain import Domain, check_domainname
 from VirtualMailManager.constants.ERROR import \
      ALIASDOMAIN_EXISTS, ALIASDOMAIN_ISDOMAIN, ALIASDOMAIN_NO_DOMDEST, \
      NO_SUCH_ALIASDOMAIN, NO_SUCH_DOMAIN

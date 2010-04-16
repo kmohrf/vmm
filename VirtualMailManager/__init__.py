@@ -10,14 +10,11 @@
 
 import gettext
 import os
-import re
 import locale
 
-from encodings.idna import ToASCII, ToUnicode
 
 from VirtualMailManager.constants.ERROR import \
-     DOMAIN_INVALID, DOMAIN_TOO_LONG, NOT_EXECUTABLE, NO_SUCH_BINARY, \
-     NO_SUCH_DIRECTORY
+     NOT_EXECUTABLE, NO_SUCH_BINARY, NO_SUCH_DIRECTORY
 from VirtualMailManager.constants.version import __author__, __date__, \
      __version__
 from VirtualMailManager.errors import VMMError
@@ -27,8 +24,7 @@ __all__ = [
     # version information from VERSION
     '__author__', '__date__', '__version__',
     # defined stuff
-    'ENCODING', 'ace2idna', 'check_domainname', 'exec_ok', 'expand_path',
-    'get_unicode', 'idn2ascii', 'is_dir',
+    'ENCODING', 'exec_ok', 'expand_path', 'get_unicode', 'is_dir',
 ]
 
 
@@ -39,9 +35,6 @@ try:
 except locale.Error:
     locale.setlocale(locale.LC_ALL, 'C')
 ENCODING = locale.nl_langinfo(locale.CODESET)
-
-# there may be many domain and e-mail address checks
-RE_DOMAIN = re.compile(r"^(?:[a-z0-9-]{1,63}\.){1,}[a-z]{2,6}$")
 
 gettext.install('vmm', '/usr/local/share/locale', unicode=1)
 
@@ -90,39 +83,9 @@ def exec_ok(binary):
         raise VMMError(_(u"'%s' is not a file") % get_unicode(binary),
                        NO_SUCH_BINARY)
     if not os.access(binary, os.X_OK):
-        raise VMMError(_(u"File is not executable: '%s'") % 
+        raise VMMError(_(u"File is not executable: '%s'") %
                        get_unicode(binary), NOT_EXECUTABLE)
     return binary
-
-
-def idn2ascii(domainname):
-    """Converts the idn domain name `domainname` into punycode."""
-    return '.'.join([ToASCII(lbl) for lbl in domainname.split('.') if lbl])
-
-
-def ace2idna(domainname):
-    """Converts the domain name `domainname` from ACE according to IDNA."""
-    return u'.'.join([ToUnicode(lbl) for lbl in domainname.split('.') if lbl])
-
-
-def check_domainname(domainname):
-    """Returns the validated domain name `domainname`.
-
-    It also converts the name of the domain from IDN to ASCII, if
-    necessary.
-
-    Throws an `VMMError`, if the domain name is too long or doesn't
-    look like a valid domain name (label.label.label).
-
-    """
-    if not RE_DOMAIN.match(domainname):
-        domainname = idn2ascii(domainname)
-    if len(domainname) > 255:
-        raise VMMError(_(u'The domain name is too long'), DOMAIN_TOO_LONG)
-    if not RE_DOMAIN.match(domainname):
-        raise VMMError(_(u'The domain name %r is invalid') % domainname,
-                       DOMAIN_INVALID)
-    return domainname
 
 
 del _
