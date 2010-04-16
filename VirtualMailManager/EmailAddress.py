@@ -7,13 +7,15 @@
 
     Virtual Mail Manager's EmailAddress class to handle e-mail addresses.
 """
+import re
 
-from VirtualMailManager import check_domainname, check_localpart
+from VirtualMailManager import check_domainname
 from VirtualMailManager.constants.ERROR import \
-     DOMAIN_NO_NAME, INVALID_ADDRESS, LOCALPART_INVALID
+     DOMAIN_NO_NAME, INVALID_ADDRESS, LOCALPART_INVALID, LOCALPART_TOO_LONG
 from VirtualMailManager.errors import EmailAddressError as EAErr
 
 
+RE_LOCALPART = re.compile(r"[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]")
 _ = lambda msg: msg
 
 
@@ -79,6 +81,25 @@ class EmailAddress(object):
                         DOMAIN_NO_NAME)
         self._localpart = check_localpart(parts[0])
         self._domainname = check_domainname(parts[1])
+
+
+def check_localpart(localpart):
+    """Returns the validated local-part `localpart`.
+
+    Throws a `EmailAddressError` if the local-part is too long or contains
+    invalid characters.
+    """
+    if len(localpart) > 64:
+        raise EAErr(_(u"The local-part '%s' is too long") % localpart,
+                    LOCALPART_TOO_LONG)
+    invalid_chars = set(RE_LOCALPART.findall(localpart))
+    if invalid_chars:
+        i_chars = u''.join((u'"%s" ' % c for c in invalid_chars))
+        raise EAErr(_(u"The local-part '%(l_part)s' contains invalid \
+characters: %(i_chars)s") %
+                    {'l_part': localpart, 'i_chars': i_chars},
+                    LOCALPART_INVALID)
+    return localpart
 
 
 del _

@@ -16,8 +16,8 @@ import locale
 from encodings.idna import ToASCII, ToUnicode
 
 from VirtualMailManager.constants.ERROR import \
-     DOMAIN_INVALID, DOMAIN_TOO_LONG, LOCALPART_INVALID, LOCALPART_TOO_LONG, \
-     NOT_EXECUTABLE, NO_SUCH_BINARY, NO_SUCH_DIRECTORY
+     DOMAIN_INVALID, DOMAIN_TOO_LONG, NOT_EXECUTABLE, NO_SUCH_BINARY, \
+     NO_SUCH_DIRECTORY
 from VirtualMailManager.constants.version import __author__, __date__, \
      __version__
 from VirtualMailManager.errors import VMMError
@@ -27,8 +27,8 @@ __all__ = [
     # version information from VERSION
     '__author__', '__date__', '__version__',
     # defined stuff
-    'ENCODING', 'ace2idna', 'check_domainname', 'check_localpart', 'exec_ok',
-    'expand_path', 'get_unicode', 'idn2ascii', 'is_dir',
+    'ENCODING', 'ace2idna', 'check_domainname', 'exec_ok', 'expand_path',
+    'get_unicode', 'idn2ascii', 'is_dir',
 ]
 
 
@@ -42,7 +42,6 @@ ENCODING = locale.nl_langinfo(locale.CODESET)
 
 # there may be many domain and e-mail address checks
 RE_DOMAIN = re.compile(r"^(?:[a-z0-9-]{1,63}\.){1,}[a-z]{2,6}$")
-RE_LOCALPART = re.compile(r"[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]")
 
 gettext.install('vmm', '/usr/local/share/locale', unicode=1)
 
@@ -124,26 +123,6 @@ def check_domainname(domainname):
         raise VMMError(_(u'The domain name %r is invalid') % domainname,
                        DOMAIN_INVALID)
     return domainname
-
-
-def check_localpart(localpart):
-    """Returns the validated local-part `localpart`.
-
-    Throws a `VMMError` if the local-part is too long or contains
-    invalid characters.
-
-    """
-    if len(localpart) > 64:
-        raise VMMError(_(u"The local-part '%s' is too long") % localpart,
-                       LOCALPART_TOO_LONG)
-    invalid_chars = set(RE_LOCALPART.findall(localpart))
-    if invalid_chars:
-        i_chars = u''.join((u'"%s" ' % c for c in invalid_chars))
-        raise VMMError(_(u"The local-part '%(l_part)s' contains invalid \
-characters: %(i_chars)s") %
-                       {'l_part': localpart, 'i_chars': i_chars},
-                       LOCALPART_INVALID)
-    return localpart
 
 
 del _
