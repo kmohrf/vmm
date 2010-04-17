@@ -397,10 +397,14 @@ class Handler(object):
         del self.__warnings[:]
         return ret_val
 
-    def cfgDget(self, option):
+    def cfg_dget(self, option):
+        """Get the configured value of the *option* (section.option).
+        When the option was not configured its default value will be
+        returned."""
         return self._Cfg.dget(option)
 
-    def cfgPget(self, option):
+    def cfg_pget(self, option):
+        """Get the configured value of the *option* (section.option)."""
         return self._Cfg.pget(option)
 
     def domainAdd(self, domainname, transport=None):
@@ -632,10 +636,12 @@ with the address '%s'.") %
             return (info, acc.getAliases())
         return info
 
-    def userByID(self, uid):
-        from VirtualMailManager.Account import getAccountByID
+    def user_by_uid(self, uid):
+        """Search for an Account by its *uid*.
+        Returns a dict (address, uid and gid) if a user could be found."""
+        from VirtualMailManager.Account import get_account_by_uid
         self.__dbConnect()
-        return getAccountByID(uid, self._dbh)
+        return get_account_by_uid(uid, self._dbh)
 
     def userPassword(self, emailaddress, password):
         if password is None or (isinstance(password, basestring) and
