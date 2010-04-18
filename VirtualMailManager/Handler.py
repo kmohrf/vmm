@@ -21,7 +21,7 @@ from subprocess import Popen, PIPE
 from pyPgSQL import PgSQL  # python-pgsql - http://pypgsql.sourceforge.net
 
 import VirtualMailManager.constants.ERROR as ERR
-from VirtualMailManager import ENCODING, exec_ok
+from VirtualMailManager import ENCODING, exec_ok, set_configuration
 from VirtualMailManager.Account import Account
 from VirtualMailManager.Alias import Alias
 from VirtualMailManager.AliasDomain import AliasDomain
@@ -73,8 +73,10 @@ class Handler(object):
         if not skip_some_checks:
             self._Cfg.check()
             self._chkenv()
-            self._scheme = self._Cfg.dget('misc.password_scheme')
-            self._postconf = Postconf(self._Cfg.dget('bin.postconf'))
+            # will be moved to the new password module and Alias
+            #self._scheme = self._Cfg.dget('misc.password_scheme')
+            #self._postconf = Postconf(self._Cfg.dget('bin.postconf'))
+        set_configuration(self._Cfg)
 
     def __findCfgFile(self):
         for path in ['/root', '/usr/local/etc', '/etc']:

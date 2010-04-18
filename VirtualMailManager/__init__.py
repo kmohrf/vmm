@@ -24,7 +24,8 @@ __all__ = [
     # version information from VERSION
     '__author__', '__date__', '__version__',
     # defined stuff
-    'ENCODING', 'exec_ok', 'expand_path', 'get_unicode', 'is_dir',
+    'ENCODING', 'Configuration', 'exec_ok', 'expand_path', 'get_unicode',
+    'is_dir', 'set_configuration',
 ]
 
 
@@ -36,10 +37,21 @@ except locale.Error:
     locale.setlocale(locale.LC_ALL, 'C')
 ENCODING = locale.nl_langinfo(locale.CODESET)
 
+Configuration = None
+
 gettext.install('vmm', '/usr/local/share/locale', unicode=1)
 
 
 _ = lambda msg: msg
+
+
+def set_configuration(cfg_obj):
+    """Assigns the *cfg_obj* to the global `Configuration`.
+    *cfg_obj* has to be a `VirtualMailManager.Config.Config` instance."""
+    from VirtualMailManager.Config import Config
+    assert isinstance(cfg_obj, Config)
+    global Configuration
+    Configuration = cfg_obj
 
 
 def get_unicode(string):
