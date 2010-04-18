@@ -80,6 +80,7 @@ class AliasDomain(object):
                     self._name, self._domain.gid)
         self._dbh.commit()
         dbc.close()
+        self._gid = self._domain.gid
 
     def info(self):
         """Returns a dict (keys: "alias" and "domain") with the names of the
@@ -124,6 +125,7 @@ class AliasDomain(object):
                     self._domain.gid, self._gid, self._name)
         self._dbh.commit()
         dbc.close()
+        self._gid = self._domain.gid
 
     def delete(self):
         """Delete the AliasDomain's record form the database.
@@ -139,6 +141,8 @@ class AliasDomain(object):
                     self._name)
         if dbc.rowcount > 0:
             self._dbh.commit()
+            self._gid = 0
+        dbc.close()
 
 
 del _
