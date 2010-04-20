@@ -2,75 +2,104 @@
 # Copyright (c) 2008 - 2010, Pascal Volk
 # See COPYING for distribution information.
 
-"""Virtual Mail Manager's EmailAddress class to handle e-mail addresses."""
+"""
+    VirtualMailManager.EmailAddress
 
-from __main__ import re, ERR
-from Exceptions import VMMEmailAddressException as VMMEAE
-import VirtualMailManager as VMM
+    Virtual Mail Manager's EmailAddress class to handle e-mail addresses.
+"""
+import re
 
-RE_LOCALPART = """[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]"""
+from VirtualMailManager.Domain import check_domainname
+from VirtualMailManager.constants.ERROR import \
+     DOMAIN_NO_NAME, INVALID_ADDRESS, LOCALPART_INVALID, LOCALPART_TOO_LONG
+from VirtualMailManager.errors import EmailAddressError as EAErr
+
+
+RE_LOCALPART = re.compile(r"[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]")
+_ = lambda msg: msg
+
 
 class EmailAddress(object):
+    """Simple class for validated e-mail addresses."""
     __slots__ = ('_localpart', '_domainname')
+
     def __init__(self, address):
+        """Creates a new instance from the string/unicode ``address``."""
+        assert isinstance(address, basestring)
         self._localpart = None
         self._domainname = None
-        self.__chkAddress(address)
+        self._chk_address(address)
+
+    @property
+    def localpart(self):
+        """The local-part of the address *local-part@domain*"""
+        return self._localpart
+
+    @property
+    def domainname(self):
+        """The domain part of the address *local-part@domain*"""
+        return self._domainname
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self._localpart == other._localpart\
-                    and self._domainname == other._domainname
+            return self._localpart == other.localpart and \
+                    self._domainname == other.domainname
         return NotImplemented
 
     def __ne__(self, other):
         if isinstance(other, self.__class__):
-            return self._localpart != other._localpart\
-                    or self._domainname != other._domainname
+            return self._localpart != other.localpart or \
+                    self._domainname != other.domainname
         return NotImplemented
+
+    def __hash__(self):
+        return hash((self._localpart.lower(), self._domainname.lower()))
 
     def __repr__(self):
         return "EmailAddress('%s@%s')" % (self._localpart, self._domainname)
 
     def __str__(self):
-        return "%s@%s" % (self._localpart, self._domainname)
+        return '%s@%s' % (self._localpart, self._domainname)
 
-    def __chkAddress(self, address):
-        try:
-            localpart, domain = address.split('@')
-        except ValueError:
-            raise VMMEAE(_(u"Missing '@' sign in e-mail address “%s”.") %
-                address, ERR.INVALID_ADDRESS)
-        except AttributeError:
-            raise VMMEAE(_(u"“%s” doesn't look like an e-mail address.") %
-                address, ERR.INVALID_ADDRESS)
-        if len(domain) > 0:
-            domain = VMM.VirtualMailManager.chkDomainname(domain)
-        else:
-            raise VMMEAE(_(u"Missing domain name after “%s@”.") %
-                    localpart, ERR.DOMAIN_NO_NAME)
-        localpart = self.__chkLocalpart(localpart)
-        self._localpart, self._domainname = localpart, domain
+    def _chk_address(self, address):
+        """Checks if the string ``address`` could be used for an e-mail
+        address.  If so, it will assign the corresponding values to the
+        attributes `_localpart` and `_domainname`."""
+        parts = address.split('@')
+        p_len = len(parts)
+        if p_len < 2:
+            raise EAErr(_(u"Missing the '@' sign in address %r") % address,
+                        INVALID_ADDRESS)
+        elif p_len > 2:
+            raise EAErr(_(u"Too many '@' signs in address %r") % address,
+                        INVALID_ADDRESS)
+        if not parts[0]:
+            raise EAErr(_(u'Missing local-part in address %r') % address,
+                        LOCALPART_INVALID)
+        if not parts[1]:
+            raise EAErr(_(u'Missing domain name in address %r') % address,
+                        DOMAIN_NO_NAME)
+        self._localpart = check_localpart(parts[0])
+        self._domainname = check_domainname(parts[1])
 
-    def __chkLocalpart(self, localpart):
-        """Validates the local-part of an e-mail address.
 
-        Arguments:
-        localpart -- local-part of the e-mail address that should be validated (str)
-        """
-        if len(localpart) < 1:
-            raise VMMEAE(_(u'No local-part specified.'),
-                ERR.LOCALPART_INVALID)
-        if len(localpart) > 64:
-            raise VMMEAE(_(u'The local-part “%s” is too long') %
-                localpart, ERR.LOCALPART_TOO_LONG)
-        ic = set(re.findall(RE_LOCALPART, localpart))
-        if len(ic):
-            ichrs = ''
-            for c in ic:
-                ichrs += u"“%s” " % c
-            raise VMMEAE(_(u"The local-part “%(lpart)s” contains invalid\
- characters: %(ichrs)s") % {'lpart': localpart, 'ichrs': ichrs},
-                ERR.LOCALPART_INVALID)
-        return localpart
+def check_localpart(localpart):
+    """Returns the validated local-part `localpart`.
 
+    Throws a `EmailAddressError` if the local-part is too long or contains
+    invalid characters.
+    """
+    if len(localpart) > 64:
+        raise EAErr(_(u"The local-part '%s' is too long") % localpart,
+                    LOCALPART_TOO_LONG)
+    invalid_chars = set(RE_LOCALPART.findall(localpart))
+    if invalid_chars:
+        i_chars = u''.join((u'"%s" ' % c for c in invalid_chars))
+        raise EAErr(_(u"The local-part '%(l_part)s' contains invalid \
+characters: %(i_chars)s") %
+                    {'l_part': localpart, 'i_chars': i_chars},
+                    LOCALPART_INVALID)
+    return localpart
+
+
+del _

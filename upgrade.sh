@@ -29,7 +29,7 @@ if [ $(id -u) -ne 0 ]; then
 fi
 
 # update config file before installing the new files.
-./update_config_0.4.x-0.5.py ${POSTCONF} ${DOVECOT_VERS:-10}
+./update_config.py
 rv=$?
 if [ $rv -eq 2 ]; then
 	echo "please run the install.sh script"
@@ -43,7 +43,7 @@ elif [ $rv -ne 0 ]; then
     exit 1
 fi
 
-python setup.py -q install --prefix ${PREFIX}
+python setup.py -q install --force --prefix ${PREFIX}
 python setup.py clean --all >/dev/null
 
 install -m 0700 ${INSTALL_OPTS} vmm ${PREFIX}/sbin
@@ -58,14 +58,6 @@ for po in $(ls -1 *.po); do
 done
 cd - >/dev/null
 
-# remove misplaced manual pages
-if [ -f /usr/local/share/man/man1/vmm.1 ]; then
-    rm -f /usr/local/share/man/man1/vmm.1
-fi
-if [ -f /usr/local/share/man/man5/vmm.cfg.5 ]; then
-    rm -f /usr/local/share/man/man5/vmm.cfg.5
-fi
-
 # install manual pages
 cd man
 [ -d ${MANDIR}/man1 ] || mkdir -m 0755 -p ${MANDIR}/man1
@@ -74,7 +66,7 @@ install -m 0644 ${INSTALL_OPTS} man1/vmm.1 ${MANDIR}/man1
 [ -d ${MANDIR}/man5 ] || mkdir -m 0755 -p ${MANDIR}/man5
 install -m 0644 ${INSTALL_OPTS} man5/vmm.cfg.5 ${MANDIR}/man5
 
-for l in $(find . -maxdepth 1 -mindepth 1 -type d \! -name man\? \! -name .svn)
+for l in $(find . -maxdepth 1 -mindepth 1 -type d \! -name man\?)
 do
     for s in man1 man5; do
         [ -d ${MANDIR}/${l}/${s} ] || mkdir -m 0755 -p ${MANDIR}/${l}/${s}

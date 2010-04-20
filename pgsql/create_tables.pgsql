@@ -41,7 +41,7 @@ INSERT INTO maillocation(maillocation) VALUES ('Maildir');
 
 CREATE TABLE domain_data (
     gid         bigint NOT NULL DEFAULT nextval('domain_gid'),
-    tid         bigint NOT NULL DEFAULT 1, -- defualt transport
+    tid         bigint NOT NULL DEFAULT 1, -- default transport
     domaindir   varchar(40) NOT NULL, --/srv/mail/$RAND/4294967294
     CONSTRAINT  pkey_domain_data PRIMARY KEY (gid),
     CONSTRAINT  fkey_domain_data_tid_transport FOREIGN KEY (tid)

@@ -1,3 +1,8 @@
+Config
+   cfs - configset sect.opt val
+   cfg - configget sect.opt
+
+   ds - domainservices: smtp pop imap sieve???
 
 - Aliases
     - avoid looping aliases
@@ -8,3 +13,9 @@
         + aliases
         + destinations/alias
         + alias domains
+
+Database:
+   public.users.passwd: increase to "character varying(150)"
+   	why? `doveadm pw -s SSHA512.hex -p 1`
+   public.users.digestmd5: add "character varying(48)"
+	Outlook will love it. (`doveadm pw -s DIGEST-MD5.hex -p 1 -u 0`)

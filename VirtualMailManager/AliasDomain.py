@@ -2,98 +2,147 @@
 # Copyright (c) 2008 - 2010, Pascal Volk
 # See COPYING for distribution information.
 
-"""Virtual Mail Manager's AliasDomain class to manage alias domains."""
+"""
+    VirtualMailManager.AliasDomain
 
-from __main__ import ERR
-from Exceptions import VMMAliasDomainException as VADE
-import VirtualMailManager as VMM
+    Virtual Mail Manager's AliasDomain class to manage alias domains.
+"""
+
+from VirtualMailManager.Domain import Domain, check_domainname
+from VirtualMailManager.constants.ERROR import \
+     ALIASDOMAIN_EXISTS, ALIASDOMAIN_ISDOMAIN, ALIASDOMAIN_NO_DOMDEST, \
+     NO_SUCH_ALIASDOMAIN, NO_SUCH_DOMAIN
+from VirtualMailManager.errors import AliasDomainError as ADErr
+
+
+_ = lambda msg: msg
+
 
 class AliasDomain(object):
     """Class to manage e-mail alias domains."""
-    __slots__ = ('__gid', '__name', '_domain', '_dbh')
-    def __init__(self, dbh, domainname, targetDomain=None):
-        self._dbh = dbh
-        self.__name = VMM.VirtualMailManager.chkDomainname(domainname)
-        self.__gid = 0
-        self._domain = targetDomain
-        self._exists()
+    __slots__ = ('_gid', '_name', '_domain', '_dbh')
 
-    def _exists(self):
+    def __init__(self, dbh, domainname):
+        """Creates a new AliasDomain instance.
+
+        Arguments:
+
+        `dbh` : pyPgSQL.PgSQL.Connection
+          a database connection for the database access
+        `domainname` : basestring
+          the name of the AliasDomain"""
+        self._dbh = dbh
+        self._name = check_domainname(domainname)
+        self._gid = 0
+        self._domain = None
+        self._load()
+
+    def _load(self):
+        """Loads the AliasDomain's GID from the database and checks if the
+        domain name is marked as primary."""
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT gid, is_primary FROM domain_name WHERE domainname\
- = %s', self.__name)
-        alias = dbc.fetchone()
+        dbc.execute(
+            'SELECT gid, is_primary FROM domain_name WHERE domainname = %s',
+                    self._name)
+        result = dbc.fetchone()
         dbc.close()
-        if alias is not None:
-            self.__gid, primary = alias
-            if primary:
-                raise VADE(_(u"The domain “%s” is a primary domain.") %
-                        self.__name, ERR.ALIASDOMAIN_ISDOMAIN)
+        if result:
+            if result[1]:
+                raise ADErr(_(u"The domain '%s' is a primary domain.") %
+                            self._name, ALIASDOMAIN_ISDOMAIN)
+            self._gid = result[0]
+
+    def set_destination(self, dest_domain):
+        """Set the destination of a new AliasDomain or updates the
+        destination of an existing AliasDomain.
+
+        Argument:
+
+        `dest_domain` : VirtualMailManager.Domain.Domain
+          the AliasDomain's destination domain
+        """
+        assert isinstance(dest_domain, Domain)
+        self._domain = dest_domain
 
     def save(self):
-        if self.__gid > 0:
-            raise VADE(_(u'The alias domain “%s” already exists.') %self.__name,
-                    ERR.ALIASDOMAIN_EXISTS)
-        if self._domain is None:
-            raise VADE(_(u'No destination domain specified for alias domain.'),
-                    ERR.ALIASDOMAIN_NO_DOMDEST)
-        if self._domain._id < 1:
-            raise VADE (_(u"The target domain “%s” doesn't exist.") %
-                    self._domain._name, ERR.NO_SUCH_DOMAIN)
+        """Stores information about the new AliasDomain in the database."""
+        if self._gid > 0:
+            raise ADErr(_(u"The alias domain '%s' already exists.") %
+                        self._name, ALIASDOMAIN_EXISTS)
+        if not self._domain:
+            raise ADErr(_(u'No destination domain set for the alias domain.'),
+                        ALIASDOMAIN_NO_DOMDEST)
+        if self._domain.gid < 1:
+            raise ADErr(_(u"The target domain '%s' doesn't exist.") %
+                        self._domain.name, NO_SUCH_DOMAIN)
         dbc = self._dbh.cursor()
-        dbc.execute('INSERT INTO domain_name (domainname, gid, is_primary)\
- VALUES (%s, %s, FALSE)', self.__name, self._domain._id)
+        dbc.execute('INSERT INTO domain_name VALUES (%s, %s, FALSE)',
+                    self._name, self._domain.gid)
         self._dbh.commit()
         dbc.close()
+        self._gid = self._domain.gid
 
     def info(self):
-        if self.__gid > 0:
-            dbc = self._dbh.cursor()
-            dbc.execute('SELECT domainname FROM domain_name WHERE gid = %s\
- AND is_primary', self.__gid)
-            domain = dbc.fetchone()
-            dbc.close()
-            if domain is not None:
-                return {'alias': self.__name, 'domain': domain[0]}
-            else:# an almost unlikely case, isn't it?
-                raise VADE(
-                    _(u'There is no primary domain for the alias domain “%s”.')\
-                            % self.__name, ERR.NO_SUCH_DOMAIN)
-        else:
-            raise VADE(_(u"The alias domain “%s” doesn't exist.") %
-                    self.__name, ERR.NO_SUCH_ALIASDOMAIN)
+        """Returns a dict (keys: "alias" and "domain") with the names of the
+        AliasDomain and its primary domain."""
+        if self._gid < 1:
+            raise ADErr(_(u"The alias domain '%s' doesn't exist.") %
+                        self._name, NO_SUCH_ALIASDOMAIN)
+        dbc = self._dbh.cursor()
+        dbc.execute(
+            'SELECT domainname FROM domain_name WHERE gid = %s AND is_primary',
+                    self._gid)
+        domain = dbc.fetchone()
+        dbc.close()
+        if domain:
+            return {'alias': self._name, 'domain': domain[0]}
+        else:  # an almost unlikely case, isn't it?
+            raise ADErr(
+                   _(u"There is no primary domain for the alias domain '%s'.")\
+                        % self._name, NO_SUCH_DOMAIN)
 
     def switch(self):
-        if self._domain is None:
-            raise VADE(_(u'No destination domain specified for alias domain.'),
-                    ERR.ALIASDOMAIN_NO_DOMDEST)
-        if self._domain._id < 1:
-            raise VADE (_(u"The target domain “%s” doesn't exist.") %
-                    self._domain._name, ERR.NO_SUCH_DOMAIN)
-        if self.__gid < 1:
-            raise VADE(_(u"The alias domain “%s” doesn't exist.") %
-                    self.__name, ERR.NO_SUCH_ALIASDOMAIN)
-        if self.__gid == self._domain._id:
-            raise VADE(_(u"The alias domain “%(alias)s” is already assigned to\
- the domain “%(domain)s”.") %
-                    {'alias': self.__name, 'domain': self._domain._name},
-                    ERR.ALIASDOMAIN_EXISTS)
+        """Switch the destination of the AliasDomain to the new destination,
+        set with the method `set_destination()`.
+        """
+        if not self._domain:
+            raise ADErr(_(u'No destination domain set for the alias domain.'),
+                        ALIASDOMAIN_NO_DOMDEST)
+        if self._domain.gid < 1:
+            raise ADErr(_(u"The target domain '%s' doesn't exist.") %
+                        self._domain.name, NO_SUCH_DOMAIN)
+        if self._gid < 1:
+            raise ADErr(_(u"The alias domain '%s' doesn't exist.") %
+                        self._name, NO_SUCH_ALIASDOMAIN)
+        if self._gid == self._domain.gid:
+            raise ADErr(_(u"The alias domain '%(alias)s' is already assigned\
+ to the domain '%(domain)s'.") %
+                        {'alias': self._name, 'domain': self._domain.name},
+                        ALIASDOMAIN_EXISTS)
         dbc = self._dbh.cursor()
         dbc.execute('UPDATE domain_name SET gid = %s WHERE gid = %s\
  AND domainname = %s AND NOT is_primary',
-                self._domain._id, self.__gid, self.__name)
+                    self._domain.gid, self._gid, self._name)
         self._dbh.commit()
         dbc.close()
+        self._gid = self._domain.gid
 
     def delete(self):
-        if self.__gid > 0:
-            dbc = self._dbh.cursor()
-            dbc.execute('DELETE FROM domain_name WHERE domainname = %s \
- AND NOT is_primary', self.__name)
-            if dbc.rowcount > 0:
-                self._dbh.commit()
-        else:
-            raise VADE(
-                  _(u"The alias domain “%s” doesn't exist.") % self.__name,
-                  ERR.NO_SUCH_ALIASDOMAIN)
+        """Delete the AliasDomain's record form the database.
 
+        Raises an AliasDomainError if the AliasDomain doesn't exist.
+        """
+        if self._gid < 1:
+            raise ADErr(_(u"The alias domain '%s' doesn't exist.") %
+                        self._name, NO_SUCH_ALIASDOMAIN)
+        dbc = self._dbh.cursor()
+        dbc.execute(
+            'DELETE FROM domain_name WHERE domainname = %s AND NOT is_primary',
+                    self._name)
+        if dbc.rowcount > 0:
+            self._dbh.commit()
+            self._gid = 0
+        dbc.close()
+
+
+del _
