@@ -411,7 +411,7 @@ class VirtualMailManager(object):
             return '{%s}%s' % (self.__scheme, self.__pwSHA1(password))
         elif self.__scheme in ['PLAIN-MD5', 'LDAP-MD5', 'DIGEST-MD5']:
             return '{%s}%s' % (self.__scheme, self.__pwMD5(password, user))
-        elif self.__scheme == 'MD4':
+        elif self.__scheme == 'PLAIN-MD4':
             return '{%s}%s' % (self.__scheme, self.__pwMD4(password))
         elif self.__scheme in ['SMD5', 'SSHA', 'CRAM-MD5', 'HMAC-MD5',
                 'LANMAN', 'NTLM', 'RPA']:
