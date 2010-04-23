@@ -16,8 +16,12 @@ administrators/postmasters to manage (alias-)domains, accounts,
 aliases and relocated users.
 It is designed for Dovecot and Postfix with a PostgreSQL backend.
 """
-packages = ['VirtualMailManager', 'VirtualMailManager.ext',
-            'VirtualMailManager.constants']
+packages = [
+    'VirtualMailManager',
+    'VirtualMailManager.constants',
+    'VirtualMailManager.ext',
+    'VirtualMailManager.pycompat',
+]
 classifiers = ['Development Status :: 5 - Production/Stable',
                'Environment :: Console',
                'Intended Audience :: System Administrators',
