@@ -21,10 +21,11 @@ from subprocess import Popen, PIPE
 from pyPgSQL import PgSQL  # python-pgsql - http://pypgsql.sourceforge.net
 
 import VirtualMailManager.constants.ERROR as ERR
-from VirtualMailManager import ENCODING, exec_ok, set_configuration
+from VirtualMailManager import ENCODING, set_configuration
 from VirtualMailManager.Account import Account
 from VirtualMailManager.Alias import Alias
 from VirtualMailManager.AliasDomain import AliasDomain
+from VirtualMailManager.common import exec_ok
 from VirtualMailManager.Config import Config as Cfg
 from VirtualMailManager.Domain import Domain, ace2idna, get_gid
 from VirtualMailManager.EmailAddress import EmailAddress

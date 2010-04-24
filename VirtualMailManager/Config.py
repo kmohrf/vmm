@@ -14,7 +14,7 @@ from ConfigParser import \
      ParsingError, RawConfigParser
 from cStringIO import StringIO# TODO: move interactive stff to cli
 
-from VirtualMailManager import exec_ok, get_unicode, is_dir
+from VirtualMailManager.common import exec_ok, get_unicode, is_dir
 from VirtualMailManager.constants.ERROR import CONF_ERROR
 from VirtualMailManager.errors import ConfigError
 
