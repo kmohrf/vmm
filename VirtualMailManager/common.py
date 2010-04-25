@@ -9,6 +9,7 @@
 """
 
 import os
+import re
 
 from VirtualMailManager import ENCODING
 from VirtualMailManager.constants.ERROR import \
@@ -63,10 +64,25 @@ def exec_ok(binary):
 
 
 def version_hex(version_string):
-    """Convert the version string '1.2.3' to an int.
-    hex(version_hex('1.2.3')) -> '0x10203'
+    """Convert a Dovecot version, e.g.: '1.2.3' or '2.0.beta4', to an int.
+    Returns 0 if the *version_string* has the wrong™ format.
+
+    version_hex('1.2.3') -> 16909296
+    hex(version_hex('1.2.3')) -> '0x10203f0'
     """
-    major, minor, patch = map(int, version_string.split('.'))
-    return (major << 16) + (minor << 8) + patch
+    version = 0
+    version_re = r'^(\d+)\.(\d+)\.(?:(\d+)|(alpha|beta|rc)(\d+))$'
+    version_level = dict(alpha=0xA, beta=0xB, rc=0xC)
+    version_mo = re.match(version_re, version_string)
+    if version_mo:
+        major, minor, patch, level, serial = version_mo.groups()
+        version += int(major) << 24
+        version += int(minor) << 16
+        if patch:
+            version += int(patch) << 8
+        version += version_level.get(level, 0xF) << 4
+        if serial:
+            version += int(serial)
+    return version
 
 del _
