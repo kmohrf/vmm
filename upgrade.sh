@@ -10,7 +10,7 @@ PREFIX=/usr/local
 PF_CONFDIR=$(postconf -h config_directory)
 PF_GID=$(id -g $(postconf -h mail_owner))
 POSTCONF=$(which postconf)
-DOVECOT_VERS=$(dovecot --version | awk -F . '{print $1 $2}')
+DOVECOT_VERS=$(dovecot --version | awk '{print $1}')
 LOCALE_DIR=${PREFIX}/share/locale
 DOC_DIR=${PREFIX}/share/doc/vmm
 if [ ${PREFIX} = "/usr" ]; then
@@ -29,7 +29,7 @@ if [ $(id -u) -ne 0 ]; then
 fi
 
 # update config file before installing the new files.
-./update_config.py
+./update_config.py ${DOVECOT_VERS:-'1.2.11'}
 rv=$?
 if [ $rv -eq 2 ]; then
 	echo "please run the install.sh script"

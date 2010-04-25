@@ -364,12 +364,12 @@ In der **misc**-Sektion werden verschiedene Einstellungen festgelegt.
 
 .. _misc.dovecot_version:
 
-``dovecot_version (Vorgabe: 12)`` : *Int*
-  Die verketteten Major- und Minor-Teile der eingesetzten Dovecot-Version
-  (siehe: **dovecot --version**).
+``dovecot_version (Vorgabe: 1.2.11)`` : *String*
+  Die eingesetzten Dovecot-Version. (siehe: **dovecot --version**).
 
-  Wenn das Kommando **dovecot --version** zum Beispiel *1.1.18* ausgibt, ist
-  dieser Option der Wert **11** zuzuweisen.
+  Wenn das Kommando **dovecot --version** zum Beispiel
+  *2.0.beta4 (8818db00d347)* ausgibt, ist dieser Option der Wert
+  **2.0.beta4** zuzuweisen.
 
 Beispiel::
 
@@ -378,7 +378,7 @@ Beispiel::
   password_scheme = PLAIN
   gid_mail = 8
   transport = dovecot:
-  dovecot_version = 11
+  dovecot_version = 2.0.beta4
 
 
 DATEIEN

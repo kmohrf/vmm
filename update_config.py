@@ -67,6 +67,18 @@ def add_option(cp, dst, val):
         cp.set(ds, do, val)
         sect_opt.append((dst, 'N'))
 
+
+def set_dovecot_version(cp):
+    if len(os.sys.argv) > 1:
+        dovecot_version = os.sys.argv[1].strip()
+        if not dovecot_version:
+            dovecot_version = '1.2.11'
+    else:
+        dovecot_version = '1.2.11'
+    cp.set('misc', 'dovecot_version', dovecot_version)
+    sect_opt.append(('misc.dovecot_version', 'M'))
+
+
 def get_option(cp, src):
     ss, so = src.split('.')
     return cp.get(ss, so)
@@ -95,6 +107,8 @@ def upd_052(cp):
                      ('misc.dovecotvers',  'misc.dovecot_version')):
         move_option(cp, src, dst)
     cp.remove_section('maildir')
+    set_dovecot_version(cp)
+
 
 # def main():
 if __name__ == '__main__':
@@ -108,7 +122,7 @@ if __name__ == '__main__':
         update_cfg_file(cp, cf)
         sect_opt.sort()
         print 'Please have a look at your configuration: %s' %cf
-        print 'This are your Renamed/New settings:'
+        print 'This are your Modified/Renamed/New settings:'
         for s_o, st in sect_opt:
             print '%s   %s = %s' % (st, s_o, get_option(cp, s_o))
     if had_config:

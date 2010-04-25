@@ -26,13 +26,14 @@ MDBOX_NAME = 'mdbox'
 SDBOX_NAME = 'dbox'
 
 _storage = {
-    MAILDIR_ID: dict(dovecot_version=10, postfix=True, prefix='maildir:',
-                     directory=MAILDIR_NAME, mid=MAILDIR_ID),
-    MBOX_ID: dict(dovecot_version=10, postfix=True, prefix='mbox:',
+    MAILDIR_ID: dict(dovecot_version=0x10000f0, postfix=True,
+                     prefix='maildir:', directory=MAILDIR_NAME,
+                     mid=MAILDIR_ID),
+    MBOX_ID: dict(dovecot_version=0x10000f0, postfix=True, prefix='mbox:',
                   directory=MBOX_NAME, mid=MBOX_ID),
-    MDBOX_ID: dict(dovecot_version=20, postfix=False, prefix='mdbox:',
+    MDBOX_ID: dict(dovecot_version=0x20000a1, postfix=False, prefix='mdbox:',
                    directory=MDBOX_NAME, mid=MDBOX_ID),
-    SDBOX_ID: dict(dovecot_version=12, postfix=False, prefix='dbox:',
+    SDBOX_ID: dict(dovecot_version=0x10000f0, postfix=False, prefix='dbox:',
                    directory=SDBOX_NAME, mid=SDBOX_ID),
 }
 

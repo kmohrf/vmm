@@ -8,13 +8,14 @@
     VMM's configuration module for simplified configuration access.
 """
 
+import re
 
 from ConfigParser import \
      Error, MissingSectionHeaderError, NoOptionError, NoSectionError, \
      ParsingError, RawConfigParser
 from cStringIO import StringIO# TODO: move interactive stff to cli
 
-from VirtualMailManager.common import exec_ok, get_unicode, is_dir
+from VirtualMailManager.common import exec_ok, get_unicode, is_dir, version_hex
 from VirtualMailManager.constants.ERROR import CONF_ERROR
 from VirtualMailManager.errors import ConfigError
 
@@ -121,7 +122,7 @@ class LazyConfig(RawConfigParser):
         """
         sect_opt = section_option.lower().split('.')
         # TODO: cache it
-        if len(sect_opt) != 2:# do we need a regexp to check the format?
+        if len(sect_opt) != 2:  # do we need a regexp to check the format?
             raise BadOptionError(
                         _(u"Bad format: '%s' - expected: section.option") %
                                  get_unicode(section_option))
@@ -136,7 +137,7 @@ class LazyConfig(RawConfigParser):
         the given ``section``.
 
         """
-        if section in self._sections:# check if the section was parsed
+        if section in self._sections:  # check if the section was parsed
             sect = self._sections[section]
         elif not section in self._cfg:
             raise NoSectionError(section)
@@ -171,7 +172,7 @@ class LazyConfig(RawConfigParser):
         try:
             return self._cfg[section][option].getter(section, option)
         except (NoSectionError, NoOptionError):
-            if not self._cfg[section][option].default is None:# may be False
+            if not self._cfg[section][option].default is None:  # may be False
                 return self._cfg[section][option].default
             else:
                 raise NoDefaultError(section, option)
@@ -250,7 +251,7 @@ class LazyConfigOption(object):
 
         """
         self.__cls = cls
-        if not default is None:# enforce the type of the default value
+        if not default is None:  # enforce the type of the default value
             self.__default = self.__cls(default)
         else:
             self.__default = default
@@ -342,7 +343,8 @@ class Config(LazyConfig):
             },
             'misc': {
                 'base_directory': LCO(str, '/srv/mail', self.get, is_dir),
-                'dovecot_version': LCO(int, 12, self.getint),
+                'dovecot_version': LCO(str, '1.2.11', self.hexversion,
+                                       check_version_format),
                 'gid_mail': LCO(int, 8, self.getint),
                 'password_scheme': LCO(str, 'CRAM-MD5', self.get,
                                        self.known_scheme),
@@ -369,8 +371,9 @@ class Config(LazyConfig):
     def check(self):
         """Performs a configuration check.
 
-        Raises a ConfigError if the check fails.
-
+        Raises a ConfigError if settings w/o a default value are missed.
+        Or a ConfigValueError if 'misc.dovecot_version' has the wrong
+        format.
         """
         # TODO: There are only two settings w/o defaults.
         #       So there is no need for cStringIO
@@ -384,6 +387,10 @@ class Config(LazyConfig):
                 for option in options:
                     errmsg.write((u'    %s\n') % option)
             raise ConfigError(errmsg.getvalue(), CONF_ERROR)
+        check_version_format(self.get('misc', 'dovecot_version'))
+
+    def hexversion(self, section, option):
+        return version_hex(self.get(section, option))
 
     def known_scheme(self, scheme):
         """Converts `scheme` to upper case and checks if is known by
@@ -422,5 +429,16 @@ class Config(LazyConfig):
                 self.__missing[section] = missing
         return not errors
 
+
+def check_version_format(version_string):
+    """Check if the *version_string* has the proper format, e.g.: '1.2.3'.
+    Returns the validated version string if it has the expected format.
+    Otherwise a `ConfigValueError` will be raised.
+    """
+    version_re = r'^\d+\.\d+\.(?:\d+|(?:alpha|beta|rc)\d+)$'
+    if not re.match(version_re, version_string):
+        raise ConfigValueError(_(u"Not a valid Dovecot version: '%s'") %
+                               get_unicode(version_string))
+    return version_string
 
 del _

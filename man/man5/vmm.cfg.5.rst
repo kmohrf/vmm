@@ -349,12 +349,12 @@ The **misc** section is used to define miscellaneous settings.
 
 .. _misc.dovecot_version:
 
-``dovecot_version (default: 12)`` : *Int*
-  The concatenated major and minor version number of the currently used
-  Dovecot version. (see: **dovecot --version**).
+``dovecot_version (default: 1.2.11)`` : *String*
+  The version number of the currently used Dovecot version.
+  (see: **dovecot --version**).
 
-  When, for example, the command **dovecot --version** prints *1.1.18*, set
-  the value of this option to **11**.
+  When, for example, the command **dovecot --version** prints
+  *2.0.beta4 (8818db00d347)*, set the value of this option to **2.0.beta4**.
 
 Example::
 
@@ -363,7 +363,7 @@ Example::
   password_scheme = PLAIN
   gid_mail = 8
   transport = dovecot:
-  dovecot_version = 11
+  dovecot_version = 2.0.beta4
 
 
 FILES
