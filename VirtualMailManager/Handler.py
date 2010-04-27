@@ -381,7 +381,7 @@ class Handler(object):
                 'LANMAN', 'NTLM', 'RPA']:
             cmd_args = [self._Cfg.dget('bin.dovecotpw'), '-s', self._scheme,
                         '-p', password]
-            if self._Cfg.dget('misc.dovecot_version') >= 0x20000a1:
+            if self._Cfg.dget('misc.dovecot_version') >= 0x20000a01:
                 cmd_args.insert(1, 'pw')
             return Popen(cmd_args, stdout=PIPE).communicate()[0][:-1]
         else:

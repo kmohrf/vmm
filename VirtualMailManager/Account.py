@@ -94,7 +94,7 @@ class Account(object):
         self._chk_state()
         if service not in (None, 'all', 'imap', 'pop3', 'sieve', 'smtp'):
             raise AErr(_(u"Unknown service: '%s'.") % service, UNKNOWN_SERVICE)
-        if dcvers >= 0x10200b2:
+        if dcvers >= 0x10200b02:
             sieve_col = 'sieve'
         else:
             sieve_col = 'managesieve'
@@ -230,7 +230,7 @@ class Account(object):
                        ACCOUNT_MISSING_PASSWORD)
         assert all(isinstance(service, bool) for service in (smtp, pop3, imap,
                                                              sieve))
-        if dcvers >= 0x10200b2:
+        if dcvers >= 0x10200b02:
             sieve_col = 'sieve'
         else:
             sieve_col = 'managesieve'
@@ -291,7 +291,7 @@ class Account(object):
           `dovecot --version`.
         """
         self._chk_state()
-        if dcvers >= 0x10200b2:
+        if dcvers >= 0x10200b02:
             sieve_col = 'sieve'
         else:
             sieve_col = 'managesieve'
