@@ -7,7 +7,7 @@ Konfigurationsdatei für vmm
 ---------------------------
 
 :Author:         Pascal Volk <neverseen@users.sourceforge.net>
-:Date:           2010-03-03
+:Date:           |today|
 :Version:        vmm-0.6.0
 :Manual group:   vmm Manual
 :Manual section: 5
@@ -176,10 +176,20 @@ Binaries angegeben.
 .. _bin.dovecotpw:
 
 ``dovecotpw (Vorgabe: /usr/sbin/dovecotpw)`` : *String*
-  Der absolute Pfad zum dovecotpw Binary. Dieses Binary wird zur
-  Hash-Erzeugung verwendet, wenn |misc.password_scheme|_ einen der
-  nachfolgenden Werte hat: 'SMD5', 'SSHA', 'CRAM-MD5', 'HMAC-MD5', 'LANMAN',
-  'NTLM' oder 'RPA'.
+  Der absolute Pfad zum dovecotpw Binary. Geben Sie den absoluten Pfad zum
+  doveadm Binary an, falls Sie Dovecot v2.0 verwenden. Dieses Binary wird
+  zur Hash-Erzeugung verwendet, wenn |misc.password_scheme|_ einen der
+  nachfolgenden Werte hat: 'CRAM-MD5', 'HMAC-MD5', 'LANMAN', 'OTP' 'RPA'
+  oder 'SKEY'. Dieses Binary wird auch benötigt, wenn Ihre
+  Python-Installation einen der folgenden Hash-Algorithmen nicht
+  unterstützt:
+
+  * md4 (hashlib + OpenSSL oder PyCrypto) verwendet für die
+    Passwort-Schemen: 'PLAIN-MD4' und 'NTLM'
+  * sha256 (hashlib oder PyCrypto >= 2.1.0alpha1) verwendet für die
+    Passwort-Schemen: 'SHA256' und 'SSHA256'
+  * sha512 (hashlib) verwendet für die Passwort-Schemen: 'SHA512' und
+    'SSHA512'
 
 .. _bin.du:
 
@@ -306,7 +316,7 @@ erforderlichen Optionen festgelegt. Die INBOX wird in jedem Fall erstellt.
     ``mbox``
       seit Dovecot v1.0.0
     ``dbox``
-      seit Dovecot v1.2.0
+      seit Dovecot v1.0.0
     ``mdbox``
       seit Dovecot v2.0.0
 
@@ -348,7 +358,9 @@ In der **misc**-Sektion werden verschiedene Einstellungen festgelegt.
 .. _misc.password_scheme:
 
 ``password_scheme (Vorgabe: CRAM-MD5)`` : *String*
-  Das zu verwendende Passwort-Schema (siehe auch: **dovecotpw -l**).
+  Das zu verwendende Passwort-Schema. Um eine Liste aller verfügbaren
+  Passwort-Schemata zu erhalten, für Sie das Kommando **dovecotpw -l**
+  (Dovecot v1.x) oder **doveadm pw -l** (Dovecot v2.0) aus.
 
 .. _misc.gid_mail:
 

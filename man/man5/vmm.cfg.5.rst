@@ -7,7 +7,7 @@ configuration file for vmm
 --------------------------
 
 :Author:         Pascal Volk <neverseen@users.sourceforge.net>
-:Date:           2010-03-03
+:Date:           |today|
 :Version:        vmm-0.6.0
 :Manual group:   vmm Manual
 :Manual section: 5
@@ -167,9 +167,18 @@ by |vmm(1)|_.
 .. _bin.dovecotpw:
 
 ``dovecotpw (default: /usr/sbin/dovecotpw)`` : *String*
-  The absolute path to the dovecotpw binary. This binary is used to
+  The absolute path to the dovecotpw binary. Use the absolute path to the
+  doveadm binary, if you are using Dovecot v2.0. This binary is used to
   generate a password hash, if |misc.password_scheme|_ is set to one of
-  'SMD5', 'SSHA', 'CRAM-MD5', 'HMAC-MD5', 'LANMAN', 'NTLM' or 'RPA'.
+  'CRAM-MD5', 'HMAC-MD5', 'LANMAN', 'OTP', 'RPA' or 'SKEY'. This binary will
+  be also required if your Python installation doesn't support the:
+
+  * md4 hash algorithm (hashlib + OpenSSL or PyCrypto) used for the password
+    schemes: 'PLAIN-MD4' and 'NTLM'
+  * sha256 hash algorithm (hashlib or PyCrypto >= 2.1.0alpha1) used for the
+    password schemes: 'SHA256' and 'SSHA256'
+  * sha512 hash algorithm (hashlib) used for the password schemes 'SHA512'
+    and 'SSHA512'
 
 .. _bin.du:
 
@@ -292,7 +301,7 @@ mailboxes in the users home directories. The INBOX will be created always.
     ``mbox``
       since Dovecot v1.0.0
     ``dbox``
-      since Dovecot v1.2.0
+      since Dovecot v1.0.0
     ``mdbox``
       comes with Dovecot v2.0.0
 
@@ -333,7 +342,9 @@ The **misc** section is used to define miscellaneous settings.
 .. _misc.password_scheme:
 
 ``password_scheme (default: CRAM-MD5)`` : *String*
-  Password scheme to use (see also: **dovecotpw -l**).
+  Password scheme to use. To get a list of all available password schemes
+  execute the command **dovecotpw -l** (Dovecot v1.x) or **doveadm pw -l**
+  (Dovecot v2.0).
 
 .. _misc.gid_mail:
 

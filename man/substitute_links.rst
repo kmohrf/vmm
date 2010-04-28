@@ -15,5 +15,6 @@
 .. |transport(5)| replace:: **transport**\(5)
 .. _transport(5): http://www.postfix.org/transport.5.html
 
+.. |today| date::
 .. #EOF
 
