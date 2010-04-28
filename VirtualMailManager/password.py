@@ -21,7 +21,7 @@ try:
 except ImportError:
     from VirtualMailManager.pycompat import hashlib
 
-from VirtualMailManager import ENCODING, Configuration
+from VirtualMailManager import ENCODING
 from VirtualMailManager.EmailAddress import EmailAddress
 from VirtualMailManager.common import get_unicode, version_str
 from VirtualMailManager.constants.ERROR import VMM_ERROR
@@ -34,6 +34,7 @@ DEFAULT_B64 = (None, 'B64', 'BASE64')
 DEFAULT_HEX = (None, 'HEX')
 
 _ = lambda msg: msg
+cfg_dget = lambda option: None
 _get_salt = lambda s_len: ''.join(choice(SALTCHARS) for x in xrange(s_len))
 
 
@@ -43,9 +44,9 @@ def _dovecotpw(password, scheme, encoding):
     """
     if encoding:
         scheme = '.'.join((scheme, encoding))
-    cmd_args = [Configuration.dget('bin.dovecotpw'), '-s', scheme, '-p',
+    cmd_args = [cfg_dget('bin.dovecotpw'), '-s', scheme, '-p',
                 get_unicode(password)]
-    if Configuration.dget('misc.dovecot_version') >= 0x20000a01:
+    if cfg_dget('misc.dovecot_version') >= 0x20000a01:
         cmd_args.insert(1, 'pw')
     process = Popen(cmd_args, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
@@ -143,7 +144,7 @@ def _md5_hash(password, scheme, encoding, user=None):
         #  versions. See also:
         #       http://dovecot.org/list/dovecot-news/2009-March/000103.html
         #       http://hg.dovecot.org/dovecot-1.1/rev/2b0043ba89ae
-        if Configuration.dget('misc.dovecot_version') >= 0x1010cf00:
+        if cfg_dget('misc.dovecot_version') >= 0x1010cf00:
             md5.update('%s:%s:' % (user.localpart, user.domainname))
         else:
             md5.update('%s::' % user)
@@ -290,7 +291,6 @@ def pwhash(password, scheme=None, user=None):
     be used for the hash generation.  When 'DIGEST-MD5' is used as scheme,
     also an EmailAddress instance must be given as *user* argument.
     """
-    assert Configuration is not None
     if not isinstance(password, basestring):
         raise TypeError('Password is not a string: %r' % password)
     if isinstance(password, unicode):
@@ -299,18 +299,18 @@ def pwhash(password, scheme=None, user=None):
     if not password:
         raise ValueError("Couldn't accept empty password.")
     if scheme is None:
-        scheme = Configuration.dget('misc.password_scheme')
+        scheme = cfg_dget('misc.password_scheme')
     scheme_encoding = scheme.split('.')
     scheme = scheme_encoding[0].upper()
     if not scheme in _scheme_info:
         raise VMMError(_(u"Unsupported password scheme: '%s'") % scheme,
                        VMM_ERROR)
-    if Configuration.dget('misc.dovecot_version') < _scheme_info[scheme][1]:
+    if cfg_dget('misc.dovecot_version') < _scheme_info[scheme][1]:
         raise VMMError(_(u"The scheme '%s' requires Dovecot >= v%s") %
                        (scheme, version_str(_scheme_info[scheme][1])),
                        VMM_ERROR)
     if len(scheme_encoding) > 1:
-        if Configuration.dget('misc.dovecot_version') < 0x10100a01:
+        if cfg_dget('misc.dovecot_version') < 0x10100a01:
             raise VMMError(_(u'Encoding suffixes for password schemes require \
 Dovecot >= v1.1.alpha1'),
                            VMM_ERROR)
@@ -331,12 +331,11 @@ def randompw():
     The length of the password can be configured in the ``vmm.cfg``
     (account.password_length).
     """
-    assert Configuration is not None
     pw_chars = list(PASSWDCHARS)
     shuffle(pw_chars)
-    pw_len = Configuration.dget('account.password_length')
+    pw_len = cfg_dget('account.password_length')
     if pw_len < 8:
         pw_len = 8
     return ''.join(choice(pw_chars) for x in xrange(pw_len))
 
-del _
+del _, cfg_dget

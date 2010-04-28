@@ -389,7 +389,16 @@ class Config(LazyConfig):
         check_version_format(self.get('misc', 'dovecot_version'))
 
     def hexversion(self, section, option):
+        """Converts the version number (e.g.: 1.2.3) from the *option*'s
+        value to an int."""
         return version_hex(self.get(section, option))
+
+    def install(self):
+        """Installs the dget() method as ``cfg_dget`` in the built-in
+        namespace."""
+        import __builtin__
+        assert 'cfg_dget' not in __builtin__.__dict__
+        __builtin__.__dict__['cfg_dget'] = self.dget
 
     def known_scheme(self, scheme):
         """Converts `scheme` to upper case and checks if is known by
