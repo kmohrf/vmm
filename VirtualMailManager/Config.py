@@ -345,7 +345,6 @@ class Config(LazyConfig):
                 'base_directory': LCO(str, '/srv/mail', self.get, is_dir),
                 'dovecot_version': LCO(str, '1.2.11', self.hexversion,
                                        check_version_format),
-                'gid_mail': LCO(int, 8, self.getint),
                 'password_scheme': LCO(str, 'CRAM-MD5', self.get,
                                        self.known_scheme),
                 'transport': LCO(str, 'dovecot:', self.get),

@@ -362,12 +362,6 @@ In der **misc**-Sektion werden verschiedene Einstellungen festgelegt.
   Passwort-Schemata zu erhalten, für Sie das Kommando **dovecotpw -l**
   (Dovecot v1.x) oder **doveadm pw -l** (Dovecot v2.0) aus.
 
-.. _misc.gid_mail:
-
-``gid_mail (Vorgabe: 8)`` : *Int*
-  Die numerische Gruppen-ID der Gruppe mail, bzw. der Gruppe aus
-  `mail_privileged_group` der Datei *dovecot.conf*.
-
 .. _misc.transport:
 
 ``transport (Vorgabe: dovecot:)`` : *String*
@@ -388,7 +382,6 @@ Beispiel::
   [misc]
   base_directory = /srv/mail
   password_scheme = PLAIN
-  gid_mail = 8
   transport = dovecot:
   dovecot_version = 2.0.beta4
 

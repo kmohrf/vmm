@@ -346,12 +346,6 @@ The **misc** section is used to define miscellaneous settings.
   execute the command **dovecotpw -l** (Dovecot v1.x) or **doveadm pw -l**
   (Dovecot v2.0).
 
-.. _misc.gid_mail:
-
-``gid_mail (default: 8)`` : *Int*
-  Numeric group ID of group mail (`mail_privileged_group` from
-  *dovecot.conf*)
-
 .. _misc.transport:
 
 ``transport (default: dovecot:)`` : *String*
@@ -372,7 +366,6 @@ Example::
   [misc]
   base_directory = /srv/mail
   password_scheme = PLAIN
-  gid_mail = 8
   transport = dovecot:
   dovecot_version = 2.0.beta4
 

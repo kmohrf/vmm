@@ -110,7 +110,7 @@ class Handler(object):
         if not os.path.exists(basedir):
             old_umask = os.umask(0006)
             os.makedirs(basedir, 0771)
-            os.chown(basedir, 0, self._Cfg.dget('misc.gid_mail'))
+            os.chown(basedir, 0, 0)
             os.umask(old_umask)
         elif not os.path.isdir(basedir):
             raise VMMError(_(u'“%s” is not a directory.\n\
@@ -230,8 +230,7 @@ class Handler(object):
 
         os.chdir(basedir)
         if not os.path.isdir(domdirdirs[0]):
-            self.__makedir(domdirdirs[0], 489, 0,
-                           self._Cfg.dget('misc.gid_mail'))
+            self.__makedir(domdirdirs[0], 489, 0, 0)
         os.chdir(domdirdirs[0])
         os.umask(0007)
         self.__makedir(domdirdirs[1], self._Cfg.dget('domain.directory_mode'),

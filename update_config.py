@@ -85,8 +85,10 @@ def get_option(cp, src):
 
 def upd_052(cp):
     global had_config
+    global had_gid_mail
 
     had_config = cp.remove_section('config')
+    had_gid_mail = cp.remove_option('misc', 'gid_mail')
     add_sections(cp, ('domain', 'account', 'mailbox'))
     if cp.has_section('domdir'):
         for src, dst in (('domdir.mode',   'domain.directory_mode'),
@@ -114,18 +116,25 @@ def upd_052(cp):
 if __name__ == '__main__':
     sect_opt = []
     had_config = False
+    had_gid_mail = False
     cf = get_config_file()
     cp = get_cfg_parser(cf)
     update(cp)
     if len(sect_opt):
-        had_config = False
         update_cfg_file(cp, cf)
         sect_opt.sort()
         print 'Please have a look at your configuration: %s' %cf
         print 'This are your Modified/Renamed/New settings:'
         for s_o, st in sect_opt:
             print '%s   %s = %s' % (st, s_o, get_option(cp, s_o))
-    if had_config:
+        if had_config:
+            print '\nRemoved section "config" with option "done" (obsolte)'
+        if had_gid_mail:
+            print '\nRemoved option "gid_mail" from section "misc" (obsolte)\n'
+        os.sys.exit(0)
+    if had_config or had_gid_mail:
         update_cfg_file(cp, cf)
-        print 'Removed section "config" with option "done" (obsolte)'
-        print
+        if had_config:
+            print '\nRemoved section "config" with option "done" (obsolte)'
+        if had_gid_mail:
+            print '\nRemoved option "gid_mail" from section "misc" (obsolte)\n'
