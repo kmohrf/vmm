@@ -1,11 +1,25 @@
 Installation Prerequisites
 You should already have installed and configured Postfix, Dovecot and
 PostgreSQL.
-You have to install Python and pyPgSQL* to use the Virtual Mail Manager.
-If you want to store the passwords as PLAIN-MD4 digest you have also to install
-python-crypto <http://www.amk.ca/python/code/crypto.html>.
 
-* = http://pypgsql.sourceforge.net/ (Debian: python-pgsql)
+The Virtual Mail Manager depends on:
+    - Python (>= 2.4.0)
+    - pyPgSQL¹
+
+If you are using Python <= 2.5.0:
+    - if you want to store your users' passwords as PLAIN-MD4 digest in
+      the database, vmm will try to use Crypto.Hash.MD4 from PyCrypto².
+    - if you are using Dovecot >= v1.1.0 and you want to store your users'
+      passwords as SHA256 or SSHA256 hashes, vmm will try to use
+      Crypto.Hash.SHA256 from PyCrypto². For SHA256/SSHA256 you should have
+      at least use PyCrypto in version 2.1.0alpha1.
+
+    When the Crypto.Hash module couldn't be imported, vmm will use
+    dovecotpw/doveadm, if the misc.password_scheme setting in the vmm.cfg
+    is set to PLAIN-MD4, SHA256 or SSHA256
+
+[1] pyPgSQL: <http://pypgsql.sourceforge.net/> (Debian: python-pgsql)
+[2] PyCrypto: <http://www.pycrypto.org/> (Debian: python-crypto)
 
 
 Configuring PostgreSQL
