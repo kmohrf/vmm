@@ -74,7 +74,6 @@ Create directory for your mails
   cd /srv/mail/
   mkdir 0 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n o p q r s t u v w x y z
   chmod 771 /srv/mail
-  chgrp -R mail /srv/mail
   chmod 751 /srv/mail/*
 
 Configuring Dovecot
@@ -83,7 +82,6 @@ Configuring Dovecot
     # all your other settings
     #disable_plaintext_auth = no
     mail_location = maildir:~/Maildir
-    mail_privileged_group = mail
     first_valid_uid = 70000
     first_valid_gid = 70000
     protocol lda {
