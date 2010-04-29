@@ -17,6 +17,8 @@ from VirtualMailManager.cli.Config import CliConfig as Cfg
 from VirtualMailManager.constants.ERROR import INVALID_SECTION
 from VirtualMailManager.ext.Postconf import Postconf
 
+_ = lambda msg: msg
+
 
 class CliHandler(Handler):
     """This class uses a `CliConfig` for configuration stuff, instead of
@@ -28,7 +30,7 @@ class CliHandler(Handler):
     interactive password dialog.
     """
 
-    __slots__ = ()# nothing additional, also no __dict__/__weakref__
+    __slots__ = ()  # nothing additional, also no __dict__/__weakref__
 
     def __init__(self):
         """Creates a new CliHandler instance.
@@ -67,12 +69,18 @@ class CliHandler(Handler):
             raise VMMError(_(u'Invalid section: “%s”') % section,
                            INVALID_SECTION)
 
-    def userAdd(self, emailaddress, password):
+    def user_add(self, emailaddress, password=None):
+        """Prefix the parent user_add() with the interactive password
+        dialog."""
         if password is None:
             password = read_pass()
-        super(CliHandler, self).userAdd(emailaddress, password)
+        super(CliHandler, self).user_add(emailaddress, password)
 
-    def userPassword(self, emailaddress, password):
+    def user_password(self, emailaddress, password=None):
+        """Prefix the parent user_password() with the interactive password
+        dialog."""
         if password is None:
             password = read_pass()
-        super(CliHandler, self).userPassword(emailaddress, password)
+        super(CliHandler, self).user_password(emailaddress, password)
+
+del _

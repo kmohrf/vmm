@@ -42,6 +42,7 @@ RE_MBOX_NAMES = """^[\x20-\x25\x27-\x7E]*$"""
 TYPE_ACCOUNT = 0x1
 TYPE_ALIAS = 0x2
 TYPE_RELOCATED = 0x4
+_ = lambda msg: msg
 
 
 class Handler(object):
@@ -172,12 +173,10 @@ class Handler(object):
                 return TYPE_RELOCATED
         return 0
 
-    def __getAccount(self, address, password=None):
+    def __getAccount(self, address):
         address = EmailAddress(address)
-        if not password is None:
-            password = self.__pwhash(password)
         self.__dbConnect()
-        return Account(self._dbh, address, password)
+        return Account(self._dbh, address)
 
     def __getAlias(self, address):
         address = EmailAddress(address)
@@ -256,6 +255,8 @@ class Handler(object):
         uid -- user id from the account
         gid -- group id from the account
         """
+        #  obsolete -> (mailbox / maillocation)
+        return
         os.umask(0007)
         oldpwd = os.getcwd()
         os.chdir(domdir)
@@ -534,18 +535,13 @@ class Handler(object):
         self.__dbConnect()
         return search(self._dbh, pattern=pattern, like=like)
 
-    def userAdd(self, emailaddress, password):
-        if password is None or (isinstance(password, basestring) and
-                                not len(password)):
-            raise ValueError('could not accept password: %r' % password)
-        acc = self.__getAccount(emailaddress, self.__pwhash(password))
-        acc.save(self._Cfg.dget('maildir.name'),
-                 self._Cfg.dget('misc.dovecot_version'),
-                 self._Cfg.dget('account.smtp'),
-                 self._Cfg.dget('account.pop3'),
-                 self._Cfg.dget('account.imap'),
-                 self._Cfg.dget('account.sieve'))
-        self.__mailDirMake(acc.getDir('domain'), acc.getUID(), acc.getGID())
+    def user_add(self, emailaddress, password):
+        """Wrapper around Account.set_password() and Account.save()."""
+        acc = self.__getAccount(emailaddress)
+        acc.set_password(password)
+        acc.save()
+        #  depends on modules mailbox and maillocation
+        #  self.__mailDirMake(acc.domain_directory, acc.uid, acc.gid)
 
     def aliasAdd(self, aliasaddress, *targetaddresses):
         """Creates a new `Alias` entry for the given *aliasaddress* with
@@ -567,26 +563,32 @@ class Handler(object):
                     _(u"The destination account/alias %r doesn't exist.") %
                                        str(destination))
 
-    def userDelete(self, emailaddress, force=None):
-        if force not in [None, 'delalias']:
-            raise VMMError(_(u"Invalid argument: “%s”") % force,
-                    ERR.INVALID_AGUMENT)
+    def user_delete(self, emailaddress, force=None):
+        """Wrapper around Account.delete(...)"""
+        if force not in (None, 'delalias'):
+            raise VMMError(_(u"Invalid argument: '%s'") % force,
+                           ERR.INVALID_AGUMENT)
         acc = self.__getAccount(emailaddress)
-        uid = acc.getUID()
-        gid = acc.getGID()
-        acc.delete(force)
+        if not acc:
+            raise VMMError(_(u"The account '%s' doesn't exist.") %
+                           acc.address, ERR.NO_SUCH_ACCOUNT)
+        uid = acc.uid
+        gid = acc.gid
+        dom_dir = acc.domain_directory
+        acc_dir = acc.home
+        acc.delete(bool(force))
         if self._Cfg.dget('account.delete_directory'):
             try:
-                self.__userDirDelete(acc.getDir('domain'), uid, gid)
-            except VMMError, e:
-                if e.code in [ERR.FOUND_DOTS_IN_PATH,
-                        ERR.MAILDIR_PERM_MISMATCH, ERR.NO_SUCH_DIRECTORY]:
+                self.__userDirDelete(dom_dir, uid, gid)
+            except VMMError, err:
+                if err.code in (ERR.FOUND_DOTS_IN_PATH,
+                        ERR.MAILDIR_PERM_MISMATCH, ERR.NO_SUCH_DIRECTORY):
                     warning = _(u"""\
 The account has been successfully deleted from the database.
     But an error occurred while deleting the following directory:
     “%(directory)s”
     Reason: %(reason)s""") % \
-                    {'directory': acc.getDir('home'), 'reason': e.msg}
+                                {'directory': acc_dir, 'reason': err.msg}
                     self.__warnings.append(warning)
                 else:
                     raise
@@ -624,18 +626,23 @@ with the address '%s'.") %
         else:
             alias.del_destination(EmailAddress(targetaddress))
 
-    def userInfo(self, emailaddress, details=None):
+    def user_info(self, emailaddress, details=None):
+        """Wrapper around Account.get_info(...)"""
         if details not in (None, 'du', 'aliases', 'full'):
-            raise VMMError(_(u'Invalid argument: “%s”') % details,
-                               ERR.INVALID_AGUMENT)
+            raise VMMError(_(u"Invalid argument: '%s'") % details,
+                           ERR.INVALID_AGUMENT)
         acc = self.__getAccount(emailaddress)
-        info = acc.getInfo(self._Cfg.dget('misc.dovecot_version'))
+        if not acc:
+            raise VMMError(_(u"The account '%s' doesn't exist.") %
+                           acc.address, ERR.NO_SUCH_ACCOUNT)
+        info = acc.get_info()
         if self._Cfg.dget('account.disk_usage') or details in ('du', 'full'):
-            info['disk usage'] = self.__getDiskUsage('%(maildir)s' % info)
+            path = os.path.join(acc.home, info['mail_location'].split('/')[-1])
+            info['disk usage'] = self.__getDiskUsage(path)
             if details in (None, 'du'):
                 return info
         if details in ('aliases', 'full'):
-            return (info, acc.getAliases())
+            return (info, acc.get_aliases())
         return info
 
     def user_by_uid(self, uid):
@@ -645,43 +652,60 @@ with the address '%s'.") %
         self.__dbConnect()
         return get_account_by_uid(uid, self._dbh)
 
-    def userPassword(self, emailaddress, password):
-        if password is None or (isinstance(password, basestring) and
-                                not len(password)):
-            raise ValueError('could not accept password: %r' % password)
+    def user_password(self, emailaddress, password):
+        """Wrapper for Account.modify('password' ...)."""
+        if not isinstance(password, basestring) or not password:
+            raise VMMError(_(u"Could not accept password: '%s'") % password,
+                           ERR.INVALID_AGUMENT)
         acc = self.__getAccount(emailaddress)
-        if acc.getUID() == 0:
-            raise VMMError(_(u"Account doesn't exist"),
-                               ERR.NO_SUCH_ACCOUNT)
-        acc.modify('password', self.__pwhash(password, user=emailaddress))
+        if not acc:
+            raise VMMError(_(u"The account '%s' doesn't exist.") %
+                           acc.address, ERR.NO_SUCH_ACCOUNT)
+        acc.modify('password', password)
 
-    def userName(self, emailaddress, name):
+    def user_name(self, emailaddress, name):
+        """Wrapper for Account.modify('name', ...)."""
+        if not isinstance(name, basestring) or not name:
+            raise VMMError(_(u"Could not accept name: '%s'") % name,
+                           ERR.INVALID_AGUMENT)
         acc = self.__getAccount(emailaddress)
+        if not acc:
+            raise VMMError(_(u"The account '%s' doesn't exist.") %
+                           acc.address, ERR.NO_SUCH_ACCOUNT)
         acc.modify('name', name)
 
-    def userTransport(self, emailaddress, transport):
+    def user_transport(self, emailaddress, transport):
+        """Wrapper for Account.modify('transport', ...)."""
+        if not isinstance(transport, basestring) or not transport:
+            raise VMMError(_(u"Could not accept transport: '%s'") % transport,
+                           ERR.INVALID_AGUMENT)
         acc = self.__getAccount(emailaddress)
+        if not acc:
+            raise VMMError(_(u"The account '%s' doesn't exist.") %
+                           acc.address, ERR.NO_SUCH_ACCOUNT)
         acc.modify('transport', transport)
 
-    def userDisable(self, emailaddress, service=None):
-        if service == 'managesieve':
-            service = 'sieve'
-            self.__warnings.append(_(u'\
-The service name “managesieve” is deprecated and will be removed\n\
-   in a future release.\n\
-   Please use the service name “sieve” instead.'))
+    def user_disable(self, emailaddress, service=None):
+        """Wrapper for Account.disable(service)"""
+        if service not in (None, 'all', 'imap', 'pop3', 'smtp', 'sieve'):
+            raise VMMError(_(u"Could not accept service: '%s'") % service,
+                           ERR.INVALID_AGUMENT)
         acc = self.__getAccount(emailaddress)
-        acc.disable(self._Cfg.dget('misc.dovecot_version'), service)
+        if not acc:
+            raise VMMError(_(u"The account '%s' doesn't exist.") %
+                           acc.address, ERR.NO_SUCH_ACCOUNT)
+        acc.disable(service)
 
-    def userEnable(self, emailaddress, service=None):
-        if service == 'managesieve':
-            service = 'sieve'
-            self.__warnings.append(_(u'\
-The service name “managesieve” is deprecated and will be removed\n\
-   in a future release.\n\
-   Please use the service name “sieve” instead.'))
+    def user_enable(self, emailaddress, service=None):
+        """Wrapper for Account.enable(service)"""
+        if service not in (None, 'all', 'imap', 'pop3', 'smtp', 'sieve'):
+            raise VMMError(_(u"could not accept service: '%s'") % service,
+                           ERR.INVALID_AGUMENT)
         acc = self.__getAccount(emailaddress)
-        acc.enable(self._Cfg.dget('misc.dovecot_version'), service)
+        if not acc:
+            raise VMMError(_(u"The account '%s' doesn't exist.") %
+                           acc.address, ERR.NO_SUCH_ACCOUNT)
+        acc.enable(service)
 
     def relocatedAdd(self, emailaddress, targetaddress):
         """Creates a new `Relocated` entry in the database. If there is
@@ -722,3 +746,5 @@ address '%s'.") %
     def __del__(self):
         if isinstance(self._dbh, PgSQL.Connection) and self._dbh._isOpen:
             self._dbh.close()
+
+del _
