@@ -244,8 +244,9 @@ Dovecot >= v%(version)s") % {'prefix': maillocation.prefix,
         self._prepare(MailLocation(format=cfg_dget('mailbox.format')))
         sql = "INSERT INTO users (local_part, passwd, uid, gid, mid, tid,\
  smtp, pop3, imap, %s) VALUES ('%s', '%s', %d, %d, %d, %d, %s, %s, %s, %s)" % (
-            sieve_col, self._addr.localpart, pwhash(self._passwd), self._uid,
-            self._domain.gid, self._mid, self._transport.tid,
+            sieve_col, self._addr.localpart, pwhash(self._passwd,
+                                                    user=self._addr),
+            self._uid, self._domain.gid, self._mid, self._transport.tid,
             cfg_dget('account.smtp'), cfg_dget('account.pop3'),
             cfg_dget('account.imap'), cfg_dget('account.sieve'))
         dbc = self._dbh.cursor()
@@ -273,7 +274,7 @@ Dovecot >= v%(version)s") % {'prefix': maillocation.prefix,
         dbc = self._dbh.cursor()
         if field == 'password':
             dbc.execute('UPDATE users SET passwd = %s WHERE uid = %s',
-                        pwhash(value), self._uid)
+                        pwhash(value, user=self._addr), self._uid)
         elif field == 'transport':
             if value != self._transport.transport:
                 self._transport = Transport(self._dbh, transport=value)
