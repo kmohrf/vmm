@@ -11,22 +11,24 @@
 from VirtualMailManager.Domain import Domain
 from VirtualMailManager.EmailAddress import EmailAddress
 from VirtualMailManager.Transport import Transport
+from VirtualMailManager.common import version_str
 from VirtualMailManager.constants.ERROR import \
      ACCOUNT_EXISTS, ACCOUNT_MISSING_PASSWORD, ALIAS_PRESENT, \
-     INVALID_AGUMENT, NO_SUCH_ACCOUNT, NO_SUCH_DOMAIN, \
-     UNKNOWN_MAILLOCATION_NAME, UNKNOWN_SERVICE
+     INVALID_AGUMENT, INVALID_MAIL_LOCATION, NO_SUCH_ACCOUNT, NO_SUCH_DOMAIN, \
+     UNKNOWN_SERVICE
 from VirtualMailManager.errors import AccountError as AErr
-from VirtualMailManager.maillocation import MailLocation, known_format
-from VirtualMailManager.pycompat import all
+from VirtualMailManager.maillocation import MailLocation
+from VirtualMailManager.password import pwhash
 
 
 _ = lambda msg: msg
+cfg_dget = lambda option: None
 
 
 class Account(object):
     """Class to manage e-mail accounts."""
-    __slots__ = ('_addr', '_domain', '_mid', '_new', '_passwd', '_tid', '_uid',
-                 '_dbh')
+    __slots__ = ('_addr', '_dbh', '_domain', '_mid', '_new', '_passwd',
+                 '_transport', '_uid')
 
     def __init__(self, dbh, address):
         """Creates a new Account instance.
@@ -38,7 +40,7 @@ class Account(object):
 
         `dbh` : pyPgSQL.PgSQL.Connection
           A database connection for the database access.
-        `address` : basestring
+        `address` : VirtualMailManager.EmailAddress.EmailAddress
           The e-mail address of the (new) Account.
         """
         if not isinstance(address, EmailAddress):
@@ -51,10 +53,14 @@ class Account(object):
                        self._addr.domainname, NO_SUCH_DOMAIN)
         self._uid = 0
         self._mid = 0
-        self._tid = 0
+        self._transport = self._domain.transport
         self._passwd = None
         self._new = True
         self._load()
+
+    def __nonzero__(self):
+        """Returns `True` if the Account is known, `False` if it's new."""
+        return not self._new
 
     def _load(self):
         """Load 'uid', 'mid' and 'tid' from the database and set _new to
@@ -66,7 +72,9 @@ class Account(object):
         result = dbc.fetchone()
         dbc.close()
         if result:
-            self._uid, self._mid, self._tid = result
+            self._uid, self._mid, _tid = result
+            if _tid != self._transport.tid:
+                self._transport = Transport(self._dbh, tid=_tid)
             self._new = False
 
     def _set_uid(self):
@@ -79,22 +87,29 @@ class Account(object):
 
     def _prepare(self, maillocation):
         """Check and set different attributes - before we store the
-        information in the database."""
-        if not known_format(maillocation):
-            raise AErr(_(u'Unknown mail_location mailbox format: %r') %
-                       maillocation, UNKNOWN_MAILLOCATION_NAME)
-        self._mid = MailLocation(format=maillocation).mid
-        if not self._tid:
-            self._tid = self._domain.transport.tid
+        information in the database.
+        """
+        if maillocation.dovecot_version > cfg_dget('misc.dovecot_version'):
+            raise AErr(_("The mail_location prefix '%(prefix)s' requires \
+Dovecot >= v%(version)s") % {'prefix': maillocation.prefix,
+                       'version': version_str(maillocation.dovecot_version)},
+                       INVALID_MAIL_LOCATION)
+        if not maillocation.postfix and \
+          self._transport.transport.lower() in ('virtual:', 'virtual'):
+            raise AErr(_(u"Invalid transport '%(transport)s' for mail_location\
+ prefix '%(prefix)s'") % {'transport': self._transport,
+                       'prefix': maillocation.prefix},
+                       INVALID_MAIL_LOCATION)
+        self._mid = maillocation.mid
         self._set_uid()
 
-    def _switch_state(self, state, dcvers, service):
+    def _switch_state(self, state, service):
         """Switch the state of the Account's services on or off. See
         Account.enable()/Account.disable() for more information."""
         self._chk_state()
         if service not in (None, 'all', 'imap', 'pop3', 'sieve', 'smtp'):
             raise AErr(_(u"Unknown service: '%s'.") % service, UNKNOWN_SERVICE)
-        if dcvers >= 0x10200b02:
+        if cfg_dget('misc.dovecot_version') >= 0x10200b02:
             sieve_col = 'sieve'
         else:
             sieve_col = 'managesieve'
@@ -141,17 +156,23 @@ class Account(object):
     @property
     def domain_directory(self):
         """The directory of the domain the Account belongs to."""
-        return self._domain.directory
+        if self._domain:
+            return self._domain.directory
+        return None
 
     @property
     def gid(self):
         """The Account's group ID."""
-        return self._domain.gid
+        if self._domain:
+            return self._domain.gid
+        return None
 
     @property
     def home(self):
         """The Account's home directory."""
-        return '%s/%s' % (self._domain.directory, self._uid)
+        if not self._new:
+            return '%s/%s' % (self._domain.directory, self._uid)
+        return None
 
     @property
     def uid(self):
@@ -167,7 +188,11 @@ class Account(object):
         Argument:
 
         `password` : basestring
-          The hashed password for the new Account."""
+          The password for the new Account.
+        """
+        if not isinstance(password, basestring) or not password:
+            raise AErr(_(u"Couldn't accept password: '%s'") % password,
+                       ACCOUNT_MISSING_PASSWORD)
         self._passwd = password
 
     def set_transport(self, transport):
@@ -181,9 +206,9 @@ class Account(object):
         `transport` : basestring
           The string representation of the transport, e.g.: 'dovecot:'
         """
-        self._tid = Transport(self._dbh, transport=transport).tid
+        self._transport = Transport(self._dbh, transport=transport)
 
-    def enable(self, dcvers, service=None):
+    def enable(self, service=None):
         """Enable a/all service/s for the Account.
 
         Possible values for the *service* are: 'imap', 'pop3', 'sieve' and
@@ -192,53 +217,37 @@ class Account(object):
 
         Arguments:
 
-        `dcvers` : int
-          The concatenated major and minor version number from
-          `dovecot --version`.
         `service` : basestring
           The name of a service ('imap', 'pop3', 'smtp', 'sieve'), 'all'
           or `None`.
         """
-        self._switch_state(True, dcvers, service)
+        self._switch_state(True, service)
 
-    def disable(self, dcvers, service=None):
+    def disable(self, service=None):
         """Disable a/all service/s for the Account.
 
         For more information see: Account.enable()."""
-        self._switch_state(False, dcvers, service)
+        self._switch_state(False, service)
 
-    def save(self, maillocation, dcvers, smtp, pop3, imap, sieve):
-        """Save the new Account in the database.
-
-        Arguments:
-
-        `maillocation` : basestring
-          The mailbox format of the mail_location: 'maildir', 'mbox',
-          'dbox' or 'mdbox'.
-        `dcvers` : int
-          The concatenated major and minor version number from
-          `dovecot --version`.
-        `smtp, pop3, imap, sieve` : bool
-          Indicates if the user of the Account should be able to use this
-          services.
-        """
+    def save(self):
+        """Save the new Account in the database."""
         if not self._new:
             raise AErr(_(u"The account '%s' already exists.") % self._addr,
                        ACCOUNT_EXISTS)
         if not self._passwd:
             raise AErr(_(u"No password set for '%s'.") % self._addr,
                        ACCOUNT_MISSING_PASSWORD)
-        assert all(isinstance(service, bool) for service in (smtp, pop3, imap,
-                                                             sieve))
-        if dcvers >= 0x10200b02:
+        if cfg_dget('misc.dovecot_version') >= 0x10200b02:
             sieve_col = 'sieve'
         else:
             sieve_col = 'managesieve'
-        self._prepare(maillocation)
+        self._prepare(MailLocation(format=cfg_dget('mailbox.format')))
         sql = "INSERT INTO users (local_part, passwd, uid, gid, mid, tid,\
  smtp, pop3, imap, %s) VALUES ('%s', '%s', %d, %d, %d, %d, %s, %s, %s, %s)" % (
-            sieve_col, self._addr.localpart, self._passwd, self._uid,
-            self._domain.gid, self._mid, self._tid, smtp, pop3, imap, sieve)
+            sieve_col, self._addr.localpart, pwhash(self._passwd), self._uid,
+            self._domain.gid, self._mid, self._transport.tid,
+            cfg_dget('account.smtp'), cfg_dget('account.pop3'),
+            cfg_dget('account.imap'), cfg_dget('account.sieve'))
         dbc = self._dbh.cursor()
         dbc.execute(sql)
         self._dbh.commit()
@@ -248,7 +257,7 @@ class Account(object):
     def modify(self, field, value):
         """Update the Account's *field* to the new *value*.
 
-        Possible values for *filed* are: 'name', 'password' and
+        Possible values for *field* are: 'name', 'password' and
         'transport'.  *value* is the *field*'s new value.
 
         Arguments:
@@ -256,8 +265,7 @@ class Account(object):
         `field` : basestring
           The attribute name: 'name', 'password' or 'transport'
         `value` : basestring
-          The new value of the attribute. The password is expected as a
-          hashed password string.
+          The new value of the attribute.
         """
         if field not in ('name', 'password', 'transport'):
             raise AErr(_(u"Unknown field: '%s'") % field, INVALID_AGUMENT)
@@ -265,11 +273,12 @@ class Account(object):
         dbc = self._dbh.cursor()
         if field == 'password':
             dbc.execute('UPDATE users SET passwd = %s WHERE uid = %s',
-                        value, self._uid)
+                        pwhash(value), self._uid)
         elif field == 'transport':
-            self._tid = Transport(self._dbh, transport=value).tid
-            dbc.execute('UPDATE users SET tid = %s WHERE uid = %s',
-                        self._tid, self._uid)
+            if value != self._transport.transport:
+                self._transport = Transport(self._dbh, transport=value)
+                dbc.execute('UPDATE users SET tid = %s WHERE uid = %s',
+                            self._transport.tid, self._uid)
         else:
             dbc.execute('UPDATE users SET name = %s WHERE uid = %s',
                         value, self._uid)
@@ -277,35 +286,28 @@ class Account(object):
             self._dbh.commit()
         dbc.close()
 
-    def get_info(self, dcvers):
+    def get_info(self):
         """Returns a dict with some information about the Account.
 
         The keys of the dict are: 'address', 'gid', 'home', 'imap'
         'mail_location', 'name', 'pop3', 'sieve', 'smtp', transport' and
         'uid'.
-
-        Argument:
-
-        `dcvers` : int
-          The concatenated major and minor version number from
-          `dovecot --version`.
         """
         self._chk_state()
-        if dcvers >= 0x10200b02:
+        if cfg_dget('misc.dovecot_version') >= 0x10200b02:
             sieve_col = 'sieve'
         else:
             sieve_col = 'managesieve'
-        sql = 'SELECT name, uid, gid, mid, tid, smtp, pop3, imap, %s\
- FROM users WHERE uid = %d' % (sieve_col, self._uid)
+        sql = 'SELECT name, smtp, pop3, imap, %s FROM users WHERE uid = %d' % \
+            (sieve_col, self._uid)
         dbc = self._dbh.cursor()
         dbc.execute(sql)
         info = dbc.fetchone()
         dbc.close()
         if info:
-            keys = ('name', 'uid', 'gid', 'mid', 'transport', 'smtp',
-                    'pop3', 'imap', sieve_col)
+            keys = ('name', 'smtp', 'pop3', 'imap', sieve_col)
             info = dict(zip(keys, info))
-            for service in ('smtp', 'pop3', 'imap', sieve_col):
+            for service in keys[1:]:
                 if info[service]:
                     # TP: A service (pop3/imap) is enabled/usable for a user
                     info[service] = _('enabled')
@@ -313,14 +315,11 @@ class Account(object):
                     # TP: A service (pop3/imap) isn't enabled/usable for a user
                     info[service] = _('disabled')
             info['address'] = self._addr
-            info['home'] = '%s/%s' % (self._domain.directory, info['uid'])
-            info['mail_location'] = MailLocation(mid=info['mid']).mail_location
-            if info['transport'] == self._domain.transport.tid:
-                info['transport'] = self._domain.transport.transport
-            else:
-                info['transport'] = Transport(self._dbh,
-                                              tid=info['transport']).transport
-            del info['mid']
+            info['gid'] = self._domain.gid
+            info['home'] = '%s/%s' % (self._domain.directory, self._uid)
+            info['mail_location'] = MailLocation(mid=self._mid).mail_location
+            info['transport'] = self._transport.transport
+            info['uid'] = self._uid
             return info
         # nearly impossible‽
         raise AErr(_(u"Couldn't fetch information for account: '%s'") \
@@ -341,18 +340,21 @@ class Account(object):
             aliases = [alias[0] for alias in addresses]
         return aliases
 
-    def delete(self, delalias):
+    def delete(self, delalias=False):
         """Delete the Account from the database.
 
         Argument:
 
-        `delalias` : basestring
-          if the values of delalias is 'delalias', all aliases, which
-          points to the Account, will be also deleted."""
+        `delalias` : bool
+          if *delalias* is `True`, all aliases, which points to the Account,
+          will be also deleted.  If there are aliases and *delalias* is
+          `False`, an AccountError will be raised.
+        """
+        assert isinstance(delalias, bool)
         self._chk_state()
         dbc = self._dbh.cursor()
-        if delalias == 'delalias':
-            dbc.execute('DELETE FROM users WHERE uid= %s', self._uid)
+        if delalias:
+            dbc.execute('DELETE FROM users WHERE uid = %s', self._uid)
             # delete also all aliases where the destination address is the same
             # as for this account.
             dbc.execute("DELETE FROM alias WHERE destination = %s",
@@ -360,16 +362,19 @@ class Account(object):
             self._dbh.commit()
         else:  # check first for aliases
             a_count = self._count_aliases()
-            if a_count == 0:
-                dbc.execute('DELETE FROM users WHERE uid = %s', self._uid)
-                self._dbh.commit()
-            else:
+            if a_count > 0:
                 dbc.close()
                 raise AErr(_(u"There are %(count)d aliases with the \
 destination address '%(address)s'.") % \
                            {'count': a_count, 'address': self._addr},
                            ALIAS_PRESENT)
+            dbc.execute('DELETE FROM users WHERE uid = %s', self._uid)
+            self._dbh.commit()
         dbc.close()
+        self._new = True
+        self._uid = self._mid = 0
+        self._addr = self._dbh = self._domain = self._passwd = None
+        self._transport = None
 
 
 def get_account_by_uid(uid, dbh):
@@ -403,5 +408,4 @@ def get_account_by_uid(uid, dbh):
     info = dict(zip(('address', 'uid', 'gid'), info))
     return info
 
-
-del _
+del _, cfg_dget
