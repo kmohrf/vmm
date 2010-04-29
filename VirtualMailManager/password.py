@@ -52,7 +52,11 @@ def _dovecotpw(password, scheme, encoding):
     stdout, stderr = process.communicate()
     if process.returncode:
         raise VMMError(stderr.strip(), VMM_ERROR)
-    return stdout.strip()
+    hashed = stdout.strip()
+    if not hashed.startswith('{%s}' % scheme):
+        raise VMMError('Unexpected result from %s: %s' %
+                       (cfg_dget('bin.dovecotpw'), hashed), VMM_ERROR)
+    return hashed
 
 
 def _md4_new():
