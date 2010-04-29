@@ -48,7 +48,6 @@ class CliHandler(Handler):
         if not skip_some_checks:
             self._Cfg.check()
             self._chkenv()
-            self._scheme = self._Cfg.dget('misc.password_scheme')
             self._postconf = Postconf(self._Cfg.dget('bin.postconf'))
 
     def cfgSet(self, option, value):
