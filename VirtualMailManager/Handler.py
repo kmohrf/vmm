@@ -21,7 +21,6 @@ from subprocess import Popen, PIPE
 from pyPgSQL import PgSQL  # python-pgsql - http://pypgsql.sourceforge.net
 
 import VirtualMailManager.constants.ERROR as ERR
-from VirtualMailManager import ENCODING
 from VirtualMailManager.Account import Account
 from VirtualMailManager.Alias import Alias
 from VirtualMailManager.AliasDomain import AliasDomain
@@ -36,7 +35,6 @@ from VirtualMailManager.Transport import Transport
 from VirtualMailManager.ext.Postconf import Postconf
 
 
-SALTCHARS = './0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 RE_DOMAIN_SEARCH = """^[a-z0-9-\.]+$"""
 RE_MBOX_NAMES = """^[\x20-\x25\x27-\x7E]*$"""
 TYPE_ACCOUNT = 0x1
@@ -48,8 +46,7 @@ _ = lambda msg: msg
 class Handler(object):
     """Wrapper class to simplify the access on all the stuff from
     VirtualMailManager"""
-    __slots__ = ('_Cfg', '_cfgFileName', '_dbh', '_scheme', '__warnings',
-                 '_postconf')
+    __slots__ = ('_Cfg', '_cfgFileName', '_dbh', '_postconf', '__warnings')
 
     def __init__(self, skip_some_checks=False):
         """Creates a new Handler instance.
@@ -75,8 +72,7 @@ class Handler(object):
         if not skip_some_checks:
             self._Cfg.check()
             self._chkenv()
-            # will be moved to the new password module and Alias
-            #self._scheme = self._Cfg.dget('misc.password_scheme')
+            # will be moved to the Alias module
             #self._postconf = Postconf(self._Cfg.dget('bin.postconf'))
         self._Cfg.install()
 
@@ -325,67 +321,6 @@ class Handler(object):
                         u'Detected group mismatch in domain directory.'),
                         ERR.DOMAINDIR_GROUP_MISMATCH)
                 rmtree(domdirdirs[1], ignore_errors=True)
-
-    def __getSalt(self):
-        from random import choice
-        salt = None
-        if self._scheme == 'CRYPT':
-            salt = '%s%s' % (choice(SALTCHARS), choice(SALTCHARS))
-        elif self._scheme in ['MD5', 'MD5-CRYPT']:
-            salt = '$1$%s$' % ''.join([choice(SALTCHARS) for x in xrange(8)])
-        return salt
-
-    def __pwCrypt(self, password):
-        # for: CRYPT, MD5 and MD5-CRYPT
-        from crypt import crypt
-        return crypt(password, self.__getSalt())
-
-    def __pwSHA1(self, password):
-        # for: SHA/SHA1
-        import sha
-        from base64 import standard_b64encode
-        sha1 = sha.new(password)
-        return standard_b64encode(sha1.digest())
-
-    def __pwMD5(self, password, emailaddress=None):
-        import md5
-        _md5 = md5.new(password)
-        if self._scheme == 'LDAP-MD5':
-            from base64 import standard_b64encode
-            return standard_b64encode(_md5.digest())
-        elif self._scheme == 'PLAIN-MD5':
-            return _md5.hexdigest()
-        elif self._scheme == 'DIGEST-MD5' and emailaddress is not None:
-            # use an empty realm - works better with usenames like user@dom
-            _md5 = md5.new('%s::%s' % (emailaddress, password))
-            return _md5.hexdigest()
-
-    def __pwMD4(self, password):
-        # for: PLAIN-MD4
-        from Crypto.Hash import MD4
-        _md4 = MD4.new(password)
-        return _md4.hexdigest()
-
-    def __pwhash(self, password, scheme=None, user=None):
-        if scheme is not None:
-            self._scheme = scheme
-        if self._scheme in ['CRYPT', 'MD5', 'MD5-CRYPT']:
-            return '{%s}%s' % (self._scheme, self.__pwCrypt(password))
-        elif self._scheme in ['SHA', 'SHA1']:
-            return '{%s}%s' % (self._scheme, self.__pwSHA1(password))
-        elif self._scheme in ['PLAIN-MD5', 'LDAP-MD5', 'DIGEST-MD5']:
-            return '{%s}%s' % (self._scheme, self.__pwMD5(password, user))
-        elif self._scheme == 'PLAIN-MD4':
-            return '{%s}%s' % (self._scheme, self.__pwMD4(password))
-        elif self._scheme in ['SMD5', 'SSHA', 'CRAM-MD5', 'HMAC-MD5',
-                'LANMAN', 'NTLM', 'RPA']:
-            cmd_args = [self._Cfg.dget('bin.dovecotpw'), '-s', self._scheme,
-                        '-p', password]
-            if self._Cfg.dget('misc.dovecot_version') >= 0x20000a01:
-                cmd_args.insert(1, 'pw')
-            return Popen(cmd_args, stdout=PIPE).communicate()[0][:-1]
-        else:
-            return '{%s}%s' % (self._scheme, password)
 
     def hasWarnings(self):
         """Checks if warnings are present, returns bool."""
