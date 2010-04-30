@@ -74,7 +74,6 @@ class Handler(object):
             self._chkenv()
             # will be moved to the Alias module
             #self._postconf = Postconf(self._Cfg.dget('bin.postconf'))
-        self._Cfg.install()
 
     def __findCfgFile(self):
         for path in ['/root', '/usr/local/etc', '/etc']:
@@ -344,6 +343,13 @@ class Handler(object):
     def cfg_pget(self, option):
         """Get the configured value of the *option* (section.option)."""
         return self._Cfg.pget(option)
+
+    def cfg_install(self):
+        """Installs the cfg_dget method as ``cfg_dget`` into the built-in
+        namespace."""
+        import __builtin__
+        assert 'cfg_dget' not in __builtin__.__dict__
+        __builtin__.__dict__['cfg_dget'] = self._Cfg.dget
 
     def domainAdd(self, domainname, transport=None):
         dom = self.__getDomain(domainname)
