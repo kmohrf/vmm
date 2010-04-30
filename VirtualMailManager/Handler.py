@@ -32,7 +32,6 @@ from VirtualMailManager.errors import VMMError, AliasError, DomainError, \
      RelocatedError
 from VirtualMailManager.Relocated import Relocated
 from VirtualMailManager.Transport import Transport
-from VirtualMailManager.ext.Postconf import Postconf
 
 
 RE_DOMAIN_SEARCH = """^[a-z0-9-\.]+$"""
@@ -46,7 +45,7 @@ _ = lambda msg: msg
 class Handler(object):
     """Wrapper class to simplify the access on all the stuff from
     VirtualMailManager"""
-    __slots__ = ('_Cfg', '_cfgFileName', '_dbh', '_postconf', '__warnings')
+    __slots__ = ('_Cfg', '_cfgFileName', '_dbh', '__warnings')
 
     def __init__(self, skip_some_checks=False):
         """Creates a new Handler instance.
@@ -72,8 +71,6 @@ class Handler(object):
         if not skip_some_checks:
             self._Cfg.check()
             self._chkenv()
-            # will be moved to the Alias module
-            #self._postconf = Postconf(self._Cfg.dget('bin.postconf'))
 
     def __findCfgFile(self):
         for path in ['/root', '/usr/local/etc', '/etc']:
@@ -490,9 +487,7 @@ class Handler(object):
         alias = self.__getAlias(aliasaddress)
         destinations = [EmailAddress(address) for address in targetaddresses]
         warnings = []
-        destinations = alias.add_destinations(destinations,
-                    long(self._postconf.read('virtual_alias_expansion_limit')),
-                                              warnings)
+        destinations = alias.add_destinations(destinations, warnings)
         if warnings:
             self.__warnings.append(_('Ignored destination addresses:'))
             self.__warnings.extend(('  * %s' % w for w in warnings))

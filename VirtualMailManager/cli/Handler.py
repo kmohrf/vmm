@@ -15,7 +15,6 @@ from VirtualMailManager.Handler import Handler
 from VirtualMailManager.cli import read_pass
 from VirtualMailManager.cli.Config import CliConfig as Cfg
 from VirtualMailManager.constants.ERROR import INVALID_SECTION
-from VirtualMailManager.ext.Postconf import Postconf
 
 _ = lambda msg: msg
 
@@ -48,7 +47,6 @@ class CliHandler(Handler):
         if not skip_some_checks:
             self._Cfg.check()
             self._chkenv()
-            self._postconf = Postconf(self._Cfg.dget('bin.postconf'))
 
     def cfgSet(self, option, value):
         return self._Cfg.set(option, value)

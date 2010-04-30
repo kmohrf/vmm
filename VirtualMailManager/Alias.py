@@ -11,12 +11,14 @@
 from VirtualMailManager.Domain import get_gid
 from VirtualMailManager.EmailAddress import EmailAddress
 from VirtualMailManager.errors import AliasError as AErr
+from VirtualMailManager.ext.Postconf import Postconf
 from VirtualMailManager.pycompat import all
 from VirtualMailManager.constants.ERROR import \
      ALIAS_EXCEEDS_EXPANSION_LIMIT, NO_SUCH_ALIAS, NO_SUCH_DOMAIN
 
 
 _ = lambda msg: msg
+cfg_dget = lambda option: None
 
 
 class Alias(object):
@@ -46,8 +48,10 @@ class Alias(object):
             self._dests.extend(EmailAddress(dest[0]) for dest in dests)
         dbc.close()
 
-    def __check_expansion(self, count_new, limit):
+    def __check_expansion(self, count_new):
         """Checks the current expansion limit of the alias."""
+        postconf = Postconf(cfg_dget('bin.postconf'))
+        limit = long(postconf.read('virtual_alias_expansion_limit'))
         dcount = len(self._dests)
         failed = False
         if dcount == limit or dcount + count_new > limit:
@@ -96,7 +100,7 @@ Hint: Delete some destination addresses.""")
         """The Alias' EmailAddress instance."""
         return self._addr
 
-    def add_destinations(self, destinations, expansion_limit, warnings=None):
+    def add_destinations(self, destinations, warnings=None):
         """Adds the `EmailAddress`es from *destinations* list to the
         destinations of the alias.
 
@@ -120,7 +124,7 @@ Hint: Delete some destination addresses.""")
                 warnings.extend(duplicates)
         if not destinations:
             return destinations
-        self.__check_expansion(len(destinations), expansion_limit)
+        self.__check_expansion(len(destinations))
         dbc = self._dbh.cursor()
         dbc.executemany("INSERT INTO alias VALUES (%d, '%s', %%s)" %
                         (self._gid, self._addr.localpart),
@@ -160,4 +164,4 @@ the alias '%(a)s'.") %
         del self._dests[:]
 
 
-del _
+del _, cfg_dget
