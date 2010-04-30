@@ -492,12 +492,11 @@ class Handler(object):
             self.__warnings.append(_('Ignored destination addresses:'))
             self.__warnings.extend(('  * %s' % w for w in warnings))
         for destination in destinations:
-            gid = get_gid(self._dbh, destination.domainname)
-            if gid and (not Handler.accountExists(self._dbh, destination) and
-                        not Handler.aliasExists(self._dbh, destination)):
+            if get_gid(self._dbh, destination.domainname) and \
+              not self._chk_other_address_types(destination, TYPE_RELOCATED):
                 self.__warnings.append(
-                    _(u"The destination account/alias %r doesn't exist.") %
-                                       str(destination))
+                    _(u"The destination account/alias '%s' doesn't exist.") %
+                                       destination)
 
     def user_delete(self, emailaddress, force=None):
         """Wrapper around Account.delete(...)"""
