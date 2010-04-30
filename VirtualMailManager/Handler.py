@@ -28,18 +28,23 @@ from VirtualMailManager.common import exec_ok
 from VirtualMailManager.Config import Config as Cfg
 from VirtualMailManager.Domain import Domain, ace2idna, get_gid
 from VirtualMailManager.EmailAddress import EmailAddress
-from VirtualMailManager.errors import VMMError, AliasError, DomainError, \
-     RelocatedError
+from VirtualMailManager.errors import VMMError, DomainError
 from VirtualMailManager.Relocated import Relocated
 from VirtualMailManager.Transport import Transport
 
+
+_ = lambda msg: msg
 
 RE_DOMAIN_SEARCH = """^[a-z0-9-\.]+$"""
 RE_MBOX_NAMES = """^[\x20-\x25\x27-\x7E]*$"""
 TYPE_ACCOUNT = 0x1
 TYPE_ALIAS = 0x2
 TYPE_RELOCATED = 0x4
-_ = lambda msg: msg
+OTHER_TYPES = {
+    TYPE_ACCOUNT: (_(u'an account'), ERR.ACCOUNT_EXISTS),
+    TYPE_ALIAS: (_(u'an alias'), ERR.ALIAS_EXISTS),
+    TYPE_RELOCATED: (_(u'a relocated user'), ERR.RELOCATED_EXISTS),
+}
 
 
 class Handler(object):
@@ -153,7 +158,7 @@ class Handler(object):
                 isinstance(address, EmailAddress)
         if exclude is not TYPE_ACCOUNT:
             account = Account(self._dbh, address)
-            if account.uid > 0:
+            if account:
                 return TYPE_ACCOUNT
         if exclude is not TYPE_ALIAS:
             alias = Alias(self._dbh, address)
@@ -164,6 +169,21 @@ class Handler(object):
             if relocated:
                 return TYPE_RELOCATED
         return 0
+
+    def _is_other_address(self, address, exclude):
+        """Checks if *address* is known for an Account (TYPE_ACCOUNT),
+        Alias (TYPE_ALIAS) or Relocated (TYPE_RELOCATED), except for
+        *exclude*.  Returns `False` if the address is not known for other
+        types.
+
+        Raises a `VMMError` if the address is known.
+        """
+        other = self._chk_other_address_types(address, exclude)
+        if not other:
+            return False
+        msg = _(u"There is already %(a_type)s with the address '%(address)s'.")
+        raise VMMError(msg % {'a_type': OTHER_TYPES[other][0],
+                              'address': address}, OTHER_TYPES[other][1])
 
     def __getAccount(self, address):
         address = EmailAddress(address)
@@ -532,24 +552,11 @@ The account has been successfully deleted from the database.
         """Returns an iterator object for all destinations (`EmailAddress`
         instances) for the `Alias` with the given *aliasaddress*."""
         alias = self.__getAlias(aliasaddress)
-        try:
+        if alias:
             return alias.get_destinations()
-        except AliasError, err:
-            if err.code == ERR.NO_SUCH_ALIAS:
-                other = self._chk_other_address_types(alias.address,
-                                                      TYPE_ALIAS)
-                if other is TYPE_ACCOUNT:
-                    raise VMMError(_(u"There is already an account with the \
-address '%s'.") %
-                                   alias.address, ERR.ACCOUNT_EXISTS)
-                elif other is TYPE_RELOCATED:
-                    raise VMMError(_(u"There is already a relocated user \
-with the address '%s'.") %
-                                   alias.address, ERR.RELOCATED_EXISTS)
-                else:  # unknown address
-                    raise
-            else:  # something other went wrong
-                raise
+        if not self._is_other_address(alias.address, TYPE_ALIAS):
+            raise VMMError(_(u"The alias '%s' doesn't exist.") %
+                           alias.address, ERR.NO_SUCH_ALIAS)
 
     def aliasDelete(self, aliasaddress, targetaddress=None):
         """Deletes the `Alias` *aliasaddress* with all its destinations from
@@ -568,8 +575,9 @@ with the address '%s'.") %
                            ERR.INVALID_AGUMENT)
         acc = self.__getAccount(emailaddress)
         if not acc:
-            raise VMMError(_(u"The account '%s' doesn't exist.") %
-                           acc.address, ERR.NO_SUCH_ACCOUNT)
+            if not self._is_other_address(acc.address, TYPE_ACCOUNT):
+                raise VMMError(_(u"The account '%s' doesn't exist.") %
+                               acc.address, ERR.NO_SUCH_ACCOUNT)
         info = acc.get_info()
         if self._Cfg.dget('account.disk_usage') or details in ('du', 'full'):
             path = os.path.join(acc.home, info['mail_location'].split('/')[-1])
@@ -653,24 +661,11 @@ with the address '%s'.") %
         """Returns the target address of the relocated user with the given
         *emailaddress*."""
         relocated = self.__getRelocated(emailaddress)
-        try:
+        if relocated:
             return relocated.get_info()
-        except RelocatedError, err:
-            if err.code == ERR.NO_SUCH_RELOCATED:
-                other = self._chk_other_address_types(relocated.address,
-                                                      TYPE_RELOCATED)
-                if other is TYPE_ACCOUNT:
-                    raise VMMError(_(u"There is already an account with the \
-address '%s'.") %
-                                   relocated.address, ERR.ACCOUNT_EXISTS)
-                elif other is TYPE_ALIAS:
-                    raise VMMError(_(u"There is already an alias with the \
-address '%s'.") %
-                                   relocated.address, ERR.ALIAS_EXISTS)
-                else:  # unknown address
-                    raise
-            else:  # something other went wrong
-                raise
+        if not self._is_other_address(relocated.address, TYPE_RELOCATED):
+            raise VMMError(_(u"The relocated user '%s' doesn't exist.") %
+                           relocated.address, ERR.NO_SUCH_RELOCATED)
 
     def relocatedDelete(self, emailaddress):
         """Deletes the relocated user with the given *emailaddress* from
