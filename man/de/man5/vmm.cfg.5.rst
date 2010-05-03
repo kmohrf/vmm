@@ -412,7 +412,7 @@ In der **misc**-Sektion werden verschiedene Einstellungen festgelegt.
 
 .. _misc.dovecot_version:
 
-``dovecot_version (Vorgabe: 1.2.11)`` : *String*
+``dovecot_version (Vorgabe: Nichts)`` : *String*
   Die eingesetzten Dovecot-Version. (siehe: **dovecot --version**).
 
   Wenn das Kommando **dovecot --version** zum Beispiel

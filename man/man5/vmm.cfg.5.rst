@@ -392,7 +392,7 @@ The **misc** section is used to define miscellaneous settings.
 
 .. _misc.dovecot_version:
 
-``dovecot_version (default: 1.2.11)`` : *String*
+``dovecot_version (default: None)`` : *String*
   The version number of the currently used Dovecot version.
   (see: **dovecot --version**).
 

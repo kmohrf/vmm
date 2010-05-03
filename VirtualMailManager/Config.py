@@ -346,7 +346,7 @@ class Config(LazyConfig):
                 'crypt_blowfish_rounds': LCO(int, 0, self.getint),
                 'crypt_sha256_rounds': LCO(int, 0, self.getint),
                 'crypt_sha512_rounds': LCO(int, 0, self.getint),
-                'dovecot_version': LCO(str, '1.2.11', self.hexversion,
+                'dovecot_version': LCO(str, None, self.hexversion,
                                        check_version_format),
                 'password_scheme': LCO(str, 'CRAM-MD5', self.get,
                                        self.known_scheme),
