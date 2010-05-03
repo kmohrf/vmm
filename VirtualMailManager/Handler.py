@@ -28,7 +28,8 @@ from VirtualMailManager.common import exec_ok
 from VirtualMailManager.Config import Config as Cfg
 from VirtualMailManager.Domain import Domain, ace2idna, get_gid
 from VirtualMailManager.EmailAddress import EmailAddress
-from VirtualMailManager.errors import VMMError, DomainError
+from VirtualMailManager.errors import \
+     DomainError, NotRootError, PermissionError, VMMError
 from VirtualMailManager.Relocated import Relocated
 from VirtualMailManager.Transport import Transport
 
@@ -94,11 +95,11 @@ class Handler(object):
         fstat = os.stat(self._cfgFileName)
         fmode = int(oct(fstat.st_mode & 0777))
         if fmode % 100 and fstat.st_uid != fstat.st_gid or \
-            fmode % 10 and fstat.st_uid == fstat.st_gid:
-                raise PermissionError(_(
-                    u'fix permissions (%(perms)s) for “%(file)s”\n\
-`chmod 0600 %(file)s` would be great.') % {'file':
-                    self._cfgFileName, 'perms': fmode}, ERR.CONF_WRONGPERM)
+           fmode % 10 and fstat.st_uid == fstat.st_gid:
+            raise PermissionError(_(u"wrong permissions for '%(file)s': \
+%(perms)s\n`chmod 0600 %(file)s` would be great.") %
+                                  {'file': self._cfgFileName, 'perms': fmode},
+                                  ERR.CONF_WRONGPERM)
         else:
             return True
 
