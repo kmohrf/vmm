@@ -13,7 +13,7 @@
 """
 
 from crypt import crypt
-from random import choice, shuffle
+from random import SystemRandom
 from subprocess import Popen, PIPE
 
 try:
@@ -35,7 +35,28 @@ DEFAULT_HEX = (None, 'HEX')
 
 _ = lambda msg: msg
 cfg_dget = lambda option: None
-_get_salt = lambda s_len: ''.join(choice(SALTCHARS) for x in xrange(s_len))
+_sys_rand = SystemRandom()
+_get_salt = lambda salt_len: ''.join(_sys_rand.sample(SALTCHARS, salt_len))
+
+
+def _test_crypt_algorithms():
+    """Check for Blowfish/SHA-256/SHA-512 support in crypt.crypt()."""
+    blowfish_ = sha256_ = sha512_ = False
+    _blowfish = '$2a$04$0123456789abcdefABCDE.N.drYX5yIAL1LkTaaZotW3yI0hQhZru'
+    _sha256 = '$5$rounds=1000$0123456789abcdef$K/DksR0DT01hGc8g/kt9McEgrbFMKi\
+9qrb1jehe7hn4'
+    _sha512 = '$6$rounds=1000$0123456789abcdef$ZIAd5WqfyLkpvsVCVUU1GrvqaZTqvh\
+JoouxdSqJO71l9Ld3tVrfOatEjarhghvEYADkq//LpDnTeO90tcbtHR1'
+
+    if crypt('08/15!test~4711', '$2a$04$0123456789abcdefABCDEF$') == _blowfish:
+        blowfish_ = True
+    if crypt('08/15!test~4711', '$5$rounds=1000$0123456789abcdef$') == _sha256:
+        sha256_ = True
+    if crypt('08/15!test~4711', '$6$rounds=1000$0123456789abcdef$') == _sha512:
+        sha512_ = True
+    return blowfish_, sha256_, sha512_
+
+CRYPT_BLOWFISH, CRYPT_SHA256, CRYPT_SHA512 = _test_crypt_algorithms()
 
 
 def _dovecotpw(password, scheme, encoding):
@@ -110,10 +131,44 @@ def _clear_hash(password, scheme, encoding):
     return get_unicode('{%s}%s' % (scheme, password))
 
 
+def _get_crypt_blowfish_salt():
+    """Generates a salt for Blowfish crypt."""
+    rounds = cfg_dget('misc.crypt_blowfish_rounds')
+    if rounds < 4:
+        rounds = 4
+    elif rounds > 31:
+        rounds = 31
+    return '$2a$%02d$%s$' % (rounds, _get_salt(22))
+
+
+def _get_crypt_shaxxx_salt(crypt_id):
+    """Generates a salt for crypt using the SHA-256 or SHA-512 encryption
+    method.
+    *crypt_id* must be either `5` (SHA-256) or `6` (SHA1-512).
+    """
+    assert crypt_id in (5, 6), 'invalid crypt id: %r' % crypt_id
+    if crypt_id is 6:
+        rounds = cfg_dget('misc.crypt_sha512_rounds')
+    else:
+        rounds = cfg_dget('misc.crypt_sha256_rounds')
+    if rounds < 1000:
+        rounds = 1000
+    elif rounds > 999999999:
+        rounds = 999999999
+    return '$%d$rounds=%d$%s$' % (crypt_id, rounds, _get_salt(16))
+
+
 def _crypt_hash(password, scheme, encoding):
     """Generates (encoded) CRYPT/MD5/MD5-CRYPT hashes."""
     if scheme == 'CRYPT':
-        salt = _get_salt(2)
+        if CRYPT_BLOWFISH and cfg_dget('misc.crypt_blowfish_rounds'):
+            salt = _get_crypt_blowfish_salt()
+        elif CRYPT_SHA512 and cfg_dget('misc.crypt_sha512_rounds'):
+            salt = _get_crypt_shaxxx_salt(6)
+        elif CRYPT_SHA256 and cfg_dget('misc.crypt_sha256_rounds'):
+            salt = _get_crypt_shaxxx_salt(5)
+        else:
+            salt = _get_salt(2)
     else:
         salt = '$1$%s$' % _get_salt(8)
     encrypted = crypt(password, salt)
@@ -121,7 +176,7 @@ def _crypt_hash(password, scheme, encoding):
         if encoding == 'HEX':
             encrypted = encrypted.encode('hex')
         else:
-            encrypted = encrypted.encode('base64').rstrip()
+            encrypted = encrypted.encode('base64').replace('\n', '')
     return _format_digest(encrypted, scheme, encoding)
 
 
@@ -335,11 +390,9 @@ def randompw():
     The length of the password can be configured in the ``vmm.cfg``
     (account.password_length).
     """
-    pw_chars = list(PASSWDCHARS)
-    shuffle(pw_chars)
     pw_len = cfg_dget('account.password_length')
     if pw_len < 8:
         pw_len = 8
-    return ''.join(choice(pw_chars) for x in xrange(pw_len))
+    return ''.join(_sys_rand.sample(PASSWDCHARS, pw_len))
 
-del _, cfg_dget
+del _, cfg_dget, _test_crypt_algorithms

@@ -339,6 +339,44 @@ The **misc** section is used to define miscellaneous settings.
 ``base_directory (default: /srv/mail)`` : *String*
   All domain directories will be created inside this directory.
 
+.. _misc.crypt_blowfish_rounds:
+
+``crypt_blowfish_rounds (default: 0)`` : *Int*
+  Number of encryption rounds for Blowfish crypt.
+
+  This setting affects the behavior of the 'CRYPT' password scheme. By
+  default crypt will use the DES algorithm for password encryption.
+  |vmm(1)|_ checks if Blowfish crypt is available. When the Blowfish
+  algorithm is supported and the value of this setting is greater than 0
+  Blowfish will be used for crypt, instead of DES.
+
+  The value must be in range **4** - **31**.
+
+.. _misc.crypt_sha256_rounds:
+
+``crypt_sha256_rounds (default: 0)`` : *Int*
+  Number of encryption rounds for crypt using the SHA-256 encryption method.
+
+  This setting affects the behavior of the 'CRYPT' password scheme. By
+  default crypt will use the DES algorithm for password encryption.
+  |vmm(1)|_ checks if crypt supports the SHA-256 and/or SHA-512 algorithms.
+  When the algorithms are supported and the value of this setting is greater
+  than 0, SHA-256 will be used instead of DES.
+
+  When the value of |misc.crypt_sha512_rounds|_ is greater than 0, the
+  SHA-512 algorithm will be used instead of SHA-256.
+
+  The value must be in range **1000** - **999999999**.
+
+.. _misc.crypt_sha512_rounds:
+
+``crypt_sha512_rounds (default: 0)`` : *Int*
+  Number of encryption rounds for crypt using the SHA-512 encryption method.
+
+  See |misc.crypt_sha256_rounds|_ for details.
+
+  The value must be in range **1000** - **999999999**.
+
 .. _misc.password_scheme:
 
 ``password_scheme (default: CRAM-MD5)`` : *String*
@@ -365,7 +403,8 @@ Example::
 
   [misc]
   base_directory = /srv/mail
-  password_scheme = PLAIN
+  crypt_sha512_rounds = 10000
+  password_scheme = CRYPT
   transport = dovecot:
   dovecot_version = 2.0.beta4
 

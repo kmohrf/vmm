@@ -4,6 +4,10 @@ Config
 
    ds - domainservices: smtp pop imap sieve???
 
+
+subcommand for displaying support crypt algorithms.
+
+
 - Aliases
     - avoid looping aliases
 
@@ -15,7 +19,9 @@ Config
         + alias domains
 
 Database:
-   public.users.passwd: increase to "character varying(150)"
-   	why? `doveadm pw -s SSHA512.hex -p 1`
+   public.users.passwd: increase to "character varying(250)"
+   	why? len(VirtualMailManager.password.pwhash('1', 'crypt.hex')) -> 249
+	     if VirtualMailManager.password.CRYPT_SHA512 is True and
+	     misc.crypt_sha512_rounds > 0
    public.users.digestmd5: add "character varying(48)"
 	Outlook will love it. (`doveadm pw -s DIGEST-MD5.hex -p 1 -u 0`)

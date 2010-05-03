@@ -2,6 +2,8 @@
 
 .. |account.password_length| replace:: **password_length**
 .. |mailbox.format| replace:: **format**
+.. |misc.crypt_sha256_rounds| replace:: **crypt_sha256_rounds**
+.. |misc.crypt_sha512_rounds| replace:: **crypt_sha512_rounds**
 .. |misc.password_scheme| replace:: **misc.password_scheme**
 
 .. |vmm configure| replace:: **vmm configure**
