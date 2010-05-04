@@ -63,6 +63,9 @@ Eine minimale *vmm.cfg* könnte so aussehen::
   user = ich
   pass = xxxxxxxx
 
+  [misc]
+  dovecot_version = 1.2.11
+
 
 SUCHREIHENFOLGE
 ---------------

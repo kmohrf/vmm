@@ -59,6 +59,9 @@ A minimal *vmm.cfg* would be::
   user = me
   pass = xxxxxxxx
 
+  [misc]
+  dovecot_version = 1.2.11
+
 
 SEARCH ORDER
 -------------
