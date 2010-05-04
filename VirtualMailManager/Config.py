@@ -17,7 +17,8 @@ from cStringIO import StringIO# TODO: move interactive stff to cli
 
 from VirtualMailManager.common import exec_ok, get_unicode, is_dir, version_hex
 from VirtualMailManager.constants.ERROR import CONF_ERROR
-from VirtualMailManager.errors import ConfigError
+from VirtualMailManager.errors import ConfigError, VMMError
+from VirtualMailManager.password import verify_scheme as _verify_scheme
 
 
 _ = lambda msg: msg
@@ -349,7 +350,7 @@ class Config(LazyConfig):
                 'dovecot_version': LCO(str, None, self.hexversion,
                                        check_version_format),
                 'password_scheme': LCO(str, 'CRAM-MD5', self.get,
-                                       self.known_scheme),
+                                       verify_scheme),
                 'transport': LCO(str, 'dovecot:', self.get),
             },
         }
@@ -396,22 +397,9 @@ class Config(LazyConfig):
         value to an int."""
         return version_hex(self.get(section, option))
 
-    def known_scheme(self, scheme):
-        """Converts `scheme` to upper case and checks if is known by
-        Dovecot (listed in VirtualMailManager.SCHEMES).
-
-        Throws a `ConfigValueError` if the scheme is not listed in
-        VirtualMailManager.SCHEMES.
-
-        """
-        scheme = scheme.upper()
-        # TODO: VMM.SCHEMES
-
     def unicode(self, section, option):
         """Returns the value of the `option` from `section`, converted
-        to Unicode.
-
-        """
+        to Unicode."""
         return get_unicode(self.get(section, option))
 
     def __chk_cfg(self):
@@ -444,5 +432,18 @@ def check_version_format(version_string):
         raise ConfigValueError(_(u"Not a valid Dovecot version: '%s'") %
                                get_unicode(version_string))
     return version_string
+
+
+def verify_scheme(scheme):
+    """Checks if the password scheme *scheme* can be accepted and returns
+    the verified scheme.
+    """
+    try:
+        scheme, encoding = _verify_scheme(scheme)
+    except VMMError, err:  # 'cast' it
+        raise ConfigValueError(err.msg)
+    if not encoding:
+        return scheme
+    return '%s.%s' % (scheme, encoding)
 
 del _
