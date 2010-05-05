@@ -140,7 +140,7 @@ def _get_crypt_blowfish_salt():
         rounds = 4
     elif rounds > 31:
         rounds = 31
-    return '$2a$%02d$%s$' % (rounds, _get_salt(22))
+    return '$2a$%02d$%s' % (rounds, _get_salt(22))
 
 
 def _get_crypt_shaxxx_salt(crypt_id):
@@ -157,7 +157,7 @@ def _get_crypt_shaxxx_salt(crypt_id):
         rounds = 1000
     elif rounds > 999999999:
         rounds = 999999999
-    return '$%d$rounds=%d$%s$' % (crypt_id, rounds, _get_salt(16))
+    return '$%d$rounds=%d$%s' % (crypt_id, rounds, _get_salt(16))
 
 
 def _crypt_hash(password, scheme, encoding):
@@ -172,7 +172,7 @@ def _crypt_hash(password, scheme, encoding):
         else:
             salt = _get_salt(2)
     else:
-        salt = '$1$%s$' % _get_salt(8)
+        salt = '$1$%s' % _get_salt(8)
     encrypted = crypt(password, salt)
     if encoding:
         if encoding == 'HEX':
