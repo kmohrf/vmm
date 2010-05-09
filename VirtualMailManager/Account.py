@@ -66,9 +66,8 @@ class Account(object):
         """Load 'uid', 'mid' and 'tid' from the database and set _new to
         `False` - if the user could be found. """
         dbc = self._dbh.cursor()
-        dbc.execute(
-            "SELECT uid, mid, tid FROM users WHERE gid=%s AND local_part=%s",
-                    self._domain.gid, self._addr.localpart)
+        dbc.execute('SELECT uid, mid, tid FROM users WHERE gid = %s AND '
+                    'local_part = %s', self._domain.gid, self._addr.localpart)
         result = dbc.fetchone()
         dbc.close()
         if result:
@@ -90,16 +89,17 @@ class Account(object):
         information in the database.
         """
         if maillocation.dovecot_version > cfg_dget('misc.dovecot_version'):
-            raise AErr(_("The mail_location prefix '%(prefix)s' requires \
-Dovecot >= v%(version)s") % {'prefix': maillocation.prefix,
-                       'version': version_str(maillocation.dovecot_version)},
+            raise AErr(_(u"The mail_location prefix '%(prefix)s' requires "
+                         u"Dovecot >= v%(version)s") %
+                       {'prefix': maillocation.prefix,
+                        'version': version_str(maillocation.dovecot_version)},
                        INVALID_MAIL_LOCATION)
         if not maillocation.postfix and \
           self._transport.transport.lower() in ('virtual:', 'virtual'):
-            raise AErr(_(u"Invalid transport '%(transport)s' for mail_location\
- prefix '%(prefix)s'") % {'transport': self._transport,
-                       'prefix': maillocation.prefix},
-                       INVALID_MAIL_LOCATION)
+            raise AErr(_(u"Invalid transport '%(transport)s' for mail_location"
+                         u" prefix '%(prefix)s'") %
+                       {'transport': self._transport,
+                        'prefix': maillocation.prefix}, INVALID_MAIL_LOCATION)
         self._mid = maillocation.mid
         self._set_uid()
 
@@ -323,17 +323,18 @@ Dovecot >= v%(version)s") % {'prefix': maillocation.prefix,
             info['uid'] = self._uid
             return info
         # nearly impossible‽
-        raise AErr(_(u"Couldn't fetch information for account: '%s'") \
-                   % self._addr, NO_SUCH_ACCOUNT)
+        raise AErr(_(u"Couldn't fetch information for account: '%s'") %
+                   self._addr, NO_SUCH_ACCOUNT)
 
     def get_aliases(self):
         """Return a list with all alias e-mail addresses, whose destination
         is the address of the Account."""
         self._chk_state()
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT address ||'@'|| domainname FROM alias, domain_name\
- WHERE destination = %s AND domain_name.gid = alias.gid\
- AND domain_name.is_primary ORDER BY address", str(self._addr))
+        dbc.execute("SELECT address ||'@'|| domainname FROM alias, "
+                    "domain_name WHERE destination = %s AND domain_name.gid = "
+                    "alias.gid AND domain_name.is_primary ORDER BY address",
+                    str(self._addr))
         addresses = dbc.fetchall()
         dbc.close()
         aliases = []
@@ -365,8 +366,8 @@ Dovecot >= v%(version)s") % {'prefix': maillocation.prefix,
             a_count = self._count_aliases()
             if a_count > 0:
                 dbc.close()
-                raise AErr(_(u"There are %(count)d aliases with the \
-destination address '%(address)s'.") % \
+                raise AErr(_(u"There are %(count)d aliases with the "
+                             u"destination address '%(address)s'.") %
                            {'count': a_count, 'address': self._addr},
                            ALIAS_PRESENT)
             dbc.execute('DELETE FROM users WHERE uid = %s', self._uid)
@@ -398,9 +399,10 @@ def get_account_by_uid(uid, dbh):
     if uid < 1:
         raise AErr(_(u'UID must be greater than 0.'), INVALID_AGUMENT)
     dbc = dbh.cursor()
-    dbc.execute("SELECT local_part||'@'|| domain_name.domainname AS address,\
- uid, users.gid FROM users LEFT JOIN domain_name ON (domain_name.gid \
- = users.gid AND is_primary) WHERE uid = %s;", uid)
+    dbc.execute("SELECT local_part||'@'|| domain_name.domainname AS address, "
+                "uid, users.gid FROM users LEFT JOIN domain_name ON "
+                "(domain_name.gid = users.gid AND is_primary) WHERE uid = %s",
+                uid)
     info = dbc.fetchone()
     dbc.close()
     if not info:

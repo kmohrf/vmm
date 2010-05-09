@@ -51,9 +51,8 @@ class Relocated(object):
 
         """
         dbc = self._dbh.cursor()
-        dbc.execute(
-            'SELECT destination FROM relocated WHERE gid=%s AND address=%s',
-                    self._gid, self._addr.localpart)
+        dbc.execute('SELECT destination FROM relocated WHERE gid = %s AND '
+                    'address = %s', self._gid, self._addr.localpart)
         destination = dbc.fetchone()
         dbc.close()
         if destination:
@@ -86,9 +85,9 @@ class Relocated(object):
             dbc.execute('INSERT INTO relocated VALUES (%s, %s, %s)',
                         self._gid, self._addr.localpart, str(self._dest))
         else:
-            dbc.execute('UPDATE relocated SET destination=%s \
-WHERE gid=%s AND address=%s',
-                        str(self._dest), self._gid, self._addr.localpart)
+            dbc.execute('UPDATE relocated SET destination = %s WHERE gid = %s '
+                        'AND address = %s', str(self._dest), self._gid,
+                        self._addr.localpart)
         self._dbh.commit()
         dbc.close()
 
@@ -105,7 +104,7 @@ WHERE gid=%s AND address=%s',
             raise RErr(_(u"The relocated user '%s' doesn't exist.") %
                        self._addr, NO_SUCH_RELOCATED)
         dbc = self._dbh.cursor()
-        dbc.execute("DELETE FROM relocated WHERE gid = %s AND address = %s",
+        dbc.execute('DELETE FROM relocated WHERE gid = %s AND address = %s',
                     self._gid, self._addr.localpart)
         if dbc.rowcount > 0:
             self._dbh.commit()

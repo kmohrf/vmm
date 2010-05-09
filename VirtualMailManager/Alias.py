@@ -40,9 +40,8 @@ class Alias(object):
     def __load_dests(self):
         """Loads all known destination addresses into the _dests list."""
         dbc = self._dbh.cursor()
-        dbc.execute(
-                'SELECT destination FROM alias WHERE gid=%s AND address=%s',
-                    self._gid, self._addr.localpart)
+        dbc.execute('SELECT destination FROM alias WHERE gid = %s AND '
+                    'address = %s', self._gid, self._addr.localpart)
         dests = iter(dbc.fetchall())
         if dbc.rowcount > 0:
             self._dests.extend(EmailAddress(dest[0]) for dest in dests)
@@ -81,12 +80,12 @@ Hint: Delete some destination addresses.""")
         """
         dbc = self._dbh.cursor()
         if not destination:
-            dbc.execute("DELETE FROM alias WHERE gid=%s AND address=%s",
+            dbc.execute('DELETE FROM alias WHERE gid = %s AND address = %s',
                         self._gid, self._addr.localpart)
         else:
-            dbc.execute("DELETE FROM alias WHERE gid=%s AND address=%s AND \
- destination=%s",
-                        self._gid, self._addr.localpart, str(destination))
+            dbc.execute('DELETE FROM alias WHERE gid = %s AND address = %s '
+                        'AND destination = %s', self._gid,
+                        self._addr.localpart, str(destination))
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
@@ -141,10 +140,9 @@ Hint: Delete some destination addresses.""")
             raise AErr(_(u"The alias '%s' doesn't exist.") % self._addr,
                        NO_SUCH_ALIAS)
         if not destination in self._dests:
-            raise AErr(_(u"The address '%(d)s' isn't a destination of \
-the alias '%(a)s'.") %
-                       {'a': self._addr, 'd': destination},
-                       NO_SUCH_ALIAS)
+            raise AErr(_(u"The address '%(addr)s' isn't a destination of "
+                         u"the alias '%(alias)s'.") % {'addr': self._addr,
+                       'alias': destination}, NO_SUCH_ALIAS)
         self.__delete(destination)
         self._dests.remove(destination)
 

@@ -41,9 +41,8 @@ class AliasDomain(object):
         """Loads the AliasDomain's GID from the database and checks if the
         domain name is marked as primary."""
         dbc = self._dbh.cursor()
-        dbc.execute(
-            'SELECT gid, is_primary FROM domain_name WHERE domainname = %s',
-                    self._name)
+        dbc.execute('SELECT gid, is_primary FROM domain_name WHERE '
+                    'domainname = %s', self._name)
         result = dbc.fetchone()
         dbc.close()
         if result:
@@ -89,17 +88,15 @@ class AliasDomain(object):
             raise ADErr(_(u"The alias domain '%s' doesn't exist.") %
                         self._name, NO_SUCH_ALIASDOMAIN)
         dbc = self._dbh.cursor()
-        dbc.execute(
-            'SELECT domainname FROM domain_name WHERE gid = %s AND is_primary',
-                    self._gid)
+        dbc.execute('SELECT domainname FROM domain_name WHERE gid = %s AND '
+                    'is_primary', self._gid)
         domain = dbc.fetchone()
         dbc.close()
         if domain:
             return {'alias': self._name, 'domain': domain[0]}
         else:  # an almost unlikely case, isn't it?
-            raise ADErr(
-                   _(u"There is no primary domain for the alias domain '%s'.")\
-                        % self._name, NO_SUCH_DOMAIN)
+            raise ADErr(_(u'There is no primary domain for the alias domain '
+                          u"'%s'.") % self._name, NO_SUCH_DOMAIN)
 
     def switch(self):
         """Switch the destination of the AliasDomain to the new destination,
@@ -115,14 +112,14 @@ class AliasDomain(object):
             raise ADErr(_(u"The alias domain '%s' doesn't exist.") %
                         self._name, NO_SUCH_ALIASDOMAIN)
         if self._gid == self._domain.gid:
-            raise ADErr(_(u"The alias domain '%(alias)s' is already assigned\
- to the domain '%(domain)s'.") %
+            raise ADErr(_(u"The alias domain '%(alias)s' is already assigned "
+                          u"to the domain '%(domain)s'.") %
                         {'alias': self._name, 'domain': self._domain.name},
                         ALIASDOMAIN_EXISTS)
         dbc = self._dbh.cursor()
-        dbc.execute('UPDATE domain_name SET gid = %s WHERE gid = %s\
- AND domainname = %s AND NOT is_primary',
-                    self._domain.gid, self._gid, self._name)
+        dbc.execute('UPDATE domain_name SET gid = %s WHERE gid = %s AND '
+                    'domainname = %s AND NOT is_primary', self._domain.gid,
+                    self._gid, self._name)
         self._dbh.commit()
         dbc.close()
         self._gid = self._domain.gid
@@ -136,9 +133,8 @@ class AliasDomain(object):
             raise ADErr(_(u"The alias domain '%s' doesn't exist.") %
                         self._name, NO_SUCH_ALIASDOMAIN)
         dbc = self._dbh.cursor()
-        dbc.execute(
-            'DELETE FROM domain_name WHERE domainname = %s AND NOT is_primary',
-                    self._name)
+        dbc.execute('DELETE FROM domain_name WHERE domainname = %s AND NOT '
+                    'is_primary', self._name)
         if dbc.rowcount > 0:
             self._dbh.commit()
             self._gid = 0

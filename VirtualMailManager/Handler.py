@@ -70,7 +70,7 @@ class Handler(object):
 
         if os.geteuid():
             raise NotRootError(_(u"You are not root.\n\tGood bye!\n"),
-                ERR.CONF_NOPERM)
+                               ERR.CONF_NOPERM)
         if self.__chkCfgFile():
             self._Cfg = Cfg(self._cfgFileName)
             self._Cfg.load()
@@ -85,9 +85,8 @@ class Handler(object):
                 self._cfgFileName = tmp
                 break
         if not len(self._cfgFileName):
-            raise VMMError(
-                _(u"No “vmm.cfg” found in: /root:/usr/local/etc:/etc"),
-                ERR.CONF_NOFILE)
+            raise VMMError(_(u"No 'vmm.cfg' found in: "
+                             u"/root:/usr/local/etc:/etc"), ERR.CONF_NOFILE)
 
     def __chkCfgFile(self):
         """Checks the configuration file, returns bool"""
@@ -96,10 +95,10 @@ class Handler(object):
         fmode = int(oct(fstat.st_mode & 0777))
         if fmode % 100 and fstat.st_uid != fstat.st_gid or \
            fmode % 10 and fstat.st_uid == fstat.st_gid:
-            raise PermissionError(_(u"wrong permissions for '%(file)s': \
-%(perms)s\n`chmod 0600 %(file)s` would be great.") %
-                                  {'file': self._cfgFileName, 'perms': fmode},
-                                  ERR.CONF_WRONGPERM)
+            raise PermissionError(_(u"wrong permissions for '%(file)s': "
+                                    u"%(perms)s\n`chmod 0600 %(file)s` would "
+                                    u"be great.") % {'file': self._cfgFileName,
+                                  'perms': fmode}, ERR.CONF_WRONGPERM)
         else:
             return True
 
@@ -112,23 +111,22 @@ class Handler(object):
             os.chown(basedir, 0, 0)
             os.umask(old_umask)
         elif not os.path.isdir(basedir):
-            raise VMMError(_(u'“%s” is not a directory.\n\
-(vmm.cfg: section "misc", option "base_directory")') %
-                                 basedir, ERR.NO_SUCH_DIRECTORY)
+            raise VMMError(_(u"'%s' is not a directory.\n(vmm.cfg: section "
+                             u"'misc', option 'base_directory')") % basedir,
+                           ERR.NO_SUCH_DIRECTORY)
         for opt, val in self._Cfg.items('bin'):
             try:
                 exec_ok(val)
-            except VMMError, e:
-                if e.code is ERR.NO_SUCH_BINARY:
-                    raise VMMError(_(u'“%(binary)s” doesn\'t exist.\n\
-(vmm.cfg: section "bin", option "%(option)s")') %
-                                       {'binary': val, 'option': opt},
-                                       ERR.NO_SUCH_BINARY)
-                elif e.code is ERR.NOT_EXECUTABLE:
-                    raise VMMError(_(u'“%(binary)s” is not executable.\
-\n(vmm.cfg: section "bin", option "%(option)s")') %
-                                       {'binary': val, 'option': opt},
-                                       ERR.NOT_EXECUTABLE)
+            except VMMError, err:
+                if err.code is ERR.NO_SUCH_BINARY:
+                    raise VMMError(_(u"'%(binary)s' doesn't exist.\n(vmm.cfg: "
+                                     u"section 'bin', option '%(option)s')") %
+                                   {'binary': val, 'option': opt}, err.code)
+                elif err.code is ERR.NOT_EXECUTABLE:
+                    raise VMMError(_(u"'%(binary)s' is not executable.\n"
+                                     u"(vmm.cfg: section 'bin', option "
+                                     u"'%(option)s')") % {'binary': val,
+                                   'option': opt}, err.code)
                 else:
                     raise
 
@@ -488,9 +486,8 @@ class Handler(object):
         if pattern and (pattern.startswith('%') or pattern.endswith('%')):
             like = True
             if not re.match(RE_DOMAIN_SEARCH, pattern.strip('%')):
-                raise VMMError(
-                        _(u"The pattern '%s' contains invalid characters.") %
-                               pattern, ERR.DOMAIN_INVALID)
+                raise VMMError(_(u"The pattern '%s' contains invalid "
+                                 u"characters.") % pattern, ERR.DOMAIN_INVALID)
         self.__dbConnect()
         return search(self._dbh, pattern=pattern, like=like)
 
@@ -514,10 +511,9 @@ class Handler(object):
             self.__warnings.extend(('  * %s' % w for w in warnings))
         for destination in destinations:
             if get_gid(self._dbh, destination.domainname) and \
-              not self._chk_other_address_types(destination, TYPE_RELOCATED):
-                self.__warnings.append(
-                    _(u"The destination account/alias '%s' doesn't exist.") %
-                                       destination)
+               not self._chk_other_address_types(destination, TYPE_RELOCATED):
+                self.__warnings.append(_(u"The destination account/alias '%s' "
+                                         u"doesn't exist.") % destination)
 
     def user_delete(self, emailaddress, force=None):
         """Wrapper around Account.delete(...)"""
@@ -643,7 +639,7 @@ The account has been successfully deleted from the database.
     def user_enable(self, emailaddress, service=None):
         """Wrapper for Account.enable(service)"""
         if service not in (None, 'all', 'imap', 'pop3', 'smtp', 'sieve'):
-            raise VMMError(_(u"could not accept service: '%s'") % service,
+            raise VMMError(_(u"Could not accept service: '%s'") % service,
                            ERR.INVALID_AGUMENT)
         acc = self.__getAccount(emailaddress)
         if not acc:

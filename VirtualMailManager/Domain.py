@@ -63,9 +63,9 @@ class Domain(object):
         domain.
         """
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT dd.gid, tid, domaindir, is_primary FROM \
- domain_data dd, domain_name dn WHERE domainname = %s AND dn.gid = dd.gid',
-                    self._name)
+        dbc.execute('SELECT dd.gid, tid, domaindir, is_primary FROM '
+                    'domain_data dd, domain_name dn WHERE domainname = %s AND '
+                    'dn.gid = dd.gid', self._name)
         result = dbc.fetchone()
         dbc.close()
         if result:
@@ -250,12 +250,10 @@ class Domain(object):
     def get_info(self):
         """Returns a dictionary with information about the domain."""
         self._chk_state()
-        sql = """SELECT gid, domainname, transport, domaindir, aliasdomains,
-       accounts, aliases, relocated
-  FROM vmm_domain_info
- WHERE gid = %i""" % self._gid
         dbc = self._dbh.cursor()
-        dbc.execute(sql)
+        dbc.execute('SELECT gid, domainname, transport, domaindir, '
+                    'aliasdomains accounts, aliases, relocated FROM '
+                    'vmm_domain_info WHERE gid = %s', self._gid)
         info = dbc.fetchone()
         dbc.close()
         keys = ('gid', 'domainname', 'transport', 'domaindir', 'aliasdomains',
@@ -266,12 +264,12 @@ class Domain(object):
         """Returns a list with all accounts of the domain."""
         self._chk_state()
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT local_part from users where gid = %s ORDER BY\
- local_part", self._gid)
+        dbc.execute('SELECT local_part from users where gid = %s ORDER BY '
+                    'local_part', self._gid)
         users = dbc.fetchall()
         dbc.close()
         accounts = []
-        if len(users) > 0:
+        if users:
             addr = u'@'.join
             _dom = self._name
             accounts = [addr((account[0], _dom)) for account in users]
@@ -281,8 +279,8 @@ class Domain(object):
         """Returns a list with all aliases e-mail addresses of the domain."""
         self._chk_state()
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT DISTINCT address FROM alias WHERE gid = %s\
- ORDER BY address", self._gid)
+        dbc.execute('SELECT DISTINCT address FROM alias WHERE gid = %s ORDER '
+                    'BY address', self._gid)
         addresses = dbc.fetchall()
         dbc.close()
         aliases = []
@@ -296,8 +294,8 @@ class Domain(object):
         """Returns a list with all addresses of relocated users."""
         self._chk_state()
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT address FROM relocated WHERE gid = %s\
- ORDER BY address", self._gid)
+        dbc.execute('SELECT address FROM relocated WHERE gid = %s ORDER BY '
+                    'address', self._gid)
         addresses = dbc.fetchall()
         dbc.close()
         relocated = []
@@ -311,8 +309,8 @@ class Domain(object):
         """Returns a list with all alias domain names of the domain."""
         self._chk_state()
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT domainname FROM domain_name WHERE gid = %s\
- AND NOT is_primary ORDER BY domainname", self._gid)
+        dbc.execute('SELECT domainname FROM domain_name WHERE gid = %s AND '
+                    'NOT is_primary ORDER BY domainname', self._gid)
         anames = dbc.fetchall()
         dbc.close()
         aliasdomains = []

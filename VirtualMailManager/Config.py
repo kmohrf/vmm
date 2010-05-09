@@ -124,8 +124,8 @@ class LazyConfig(RawConfigParser):
         sect_opt = section_option.lower().split('.')
         # TODO: cache it
         if len(sect_opt) != 2:  # do we need a regexp to check the format?
-            raise BadOptionError(
-                        _(u"Bad format: '%s' - expected: section.option") %
+            raise BadOptionError(_(u"Bad format: '%s' - expected: "
+                                   u"section.option") %
                                  get_unicode(section_option))
         if not sect_opt[0] in self._cfg:
             raise NoSectionError(sect_opt[0])

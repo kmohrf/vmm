@@ -210,8 +210,8 @@ def _md5_hash(password, scheme, encoding, user=None):
         else:
             md5.update('%s::' % user)
     md5.update(password)
-    if (scheme in ('PLAIN-MD5', 'DIGEST-MD5') and encoding in DEFAULT_HEX) \
-      or (scheme == 'LDAP-MD5' and encoding == 'HEX'):
+    if (scheme in ('PLAIN-MD5', 'DIGEST-MD5') and encoding in DEFAULT_HEX) or \
+       (scheme == 'LDAP-MD5' and encoding == 'HEX'):
         digest = md5.hexdigest()
     else:
         digest = md5.digest().encode('base64').rstrip()
@@ -367,16 +367,14 @@ def verify_scheme(scheme):
         raise VMMError(_(u"Unsupported password scheme: '%s'") % scheme,
                        VMM_ERROR)
     if cfg_dget('misc.dovecot_version') < _scheme_info[scheme][1]:
-        raise VMMError(_(u"The password scheme '%(scheme)s' requires Dovecot \
->= v%(version)s") %
-                       {'scheme': scheme,
-                        'version': version_str(_scheme_info[scheme][1])},
+        raise VMMError(_(u"The password scheme '%(scheme)s' requires Dovecot "
+                         u">= v%(version)s") % {'scheme': scheme,
+                       'version': version_str(_scheme_info[scheme][1])},
                        VMM_ERROR)
     if len(scheme_encoding) > 1:
         if cfg_dget('misc.dovecot_version') < 0x10100a01:
-            raise VMMError(_(u'Encoding suffixes for password schemes require \
-Dovecot >= v1.1.alpha1'),
-                           VMM_ERROR)
+            raise VMMError(_(u'Encoding suffixes for password schemes require '
+                             u'Dovecot >= v1.1.alpha1'), VMM_ERROR)
         if scheme_encoding[1] not in ('B64', 'BASE64', 'HEX'):
             raise VMMError(_(u"Unsupported password encoding: '%s'") %
                            scheme_encoding[1], VMM_ERROR)

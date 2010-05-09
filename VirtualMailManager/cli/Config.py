@@ -27,8 +27,8 @@ class CliConfig(Config):
     def configure(self, sections):
         """Interactive method for configuring all options of the given
         iterable ``sections`` object."""
-        input_fmt = _(u'Enter new value for option %(option)s \
-[%(current_value)s]: ')
+        input_fmt = _(u'Enter new value for option %(option)s '
+                      u'[%(current_value)s]: ')
         failures = 0
 
         w_std(_(u'Using configuration file: %s\n') % self._cfg_filename)
@@ -47,8 +47,8 @@ class CliConfig(Config):
                             w_std(_(u'Warning: %s') % e)
                             failures += 1
                             if failures > 2:
-                                raise ConfigError(
-                                    _(u'Too many failures - try again later.'),
+                                raise ConfigError(_(u'Too many failures - try '
+                                                    u'again later.'),
                                                   VMM_TOO_MANY_FAILURES)
                     else:
                         break
