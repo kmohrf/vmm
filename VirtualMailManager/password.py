@@ -41,26 +41,6 @@ _sys_rand = SystemRandom()
 _get_salt = lambda salt_len: ''.join(_sys_rand.sample(SALTCHARS, salt_len))
 
 
-def _test_crypt_algorithms():
-    """Check for Blowfish/SHA-256/SHA-512 support in crypt.crypt()."""
-    blowfish_ = sha256_ = sha512_ = False
-    _blowfish = '$2a$04$0123456789abcdefABCDE.N.drYX5yIAL1LkTaaZotW3yI0hQhZru'
-    _sha256 = '$5$rounds=1000$0123456789abcdef$K/DksR0DT01hGc8g/kt9McEgrbFMKi\
-9qrb1jehe7hn4'
-    _sha512 = '$6$rounds=1000$0123456789abcdef$ZIAd5WqfyLkpvsVCVUU1GrvqaZTqvh\
-JoouxdSqJO71l9Ld3tVrfOatEjarhghvEYADkq//LpDnTeO90tcbtHR1'
-
-    if crypt('08/15!test~4711', '$2a$04$0123456789abcdefABCDEF$') == _blowfish:
-        blowfish_ = True
-    if crypt('08/15!test~4711', '$5$rounds=1000$0123456789abcdef$') == _sha256:
-        sha256_ = True
-    if crypt('08/15!test~4711', '$6$rounds=1000$0123456789abcdef$') == _sha512:
-        sha512_ = True
-    return blowfish_, sha256_, sha512_
-
-CRYPT_BLOWFISH, CRYPT_SHA256, CRYPT_SHA512 = _test_crypt_algorithms()
-
-
 def _dovecotpw(password, scheme, encoding):
     """Communicates with dovecotpw (Dovecot 2.0: `doveadm pw`) and returns
     the hashed password: {scheme[.encoding]}hash
@@ -143,7 +123,7 @@ def _get_crypt_blowfish_salt():
     return '$2a$%02d$%s' % (rounds, _get_salt(22))
 
 
-def _get_crypt_shaxxx_salt(crypt_id):
+def _get_crypt_sha2_salt(crypt_id):
     """Generates a salt for crypt using the SHA-256 or SHA-512 encryption
     method.
     *crypt_id* must be either `5` (SHA-256) or `6` (SHA1-512).
@@ -157,28 +137,32 @@ def _get_crypt_shaxxx_salt(crypt_id):
         rounds = 1000
     elif rounds > 999999999:
         rounds = 999999999
+    if rounds == 5000:
+        return '$%d$%s' % (crypt_id, _get_salt(16))
     return '$%d$rounds=%d$%s' % (crypt_id, rounds, _get_salt(16))
 
 
 def _crypt_hash(password, scheme, encoding):
-    """Generates (encoded) CRYPT/MD5/MD5-CRYPT hashes."""
+    """Generates (encoded) CRYPT/MD5/{BLF,MD5,SHA{256,512}}-CRYPT hashes."""
     if scheme == 'CRYPT':
-        if CRYPT_BLOWFISH and cfg_dget('misc.crypt_blowfish_rounds'):
-            salt = _get_crypt_blowfish_salt()
-        elif CRYPT_SHA512 and cfg_dget('misc.crypt_sha512_rounds'):
-            salt = _get_crypt_shaxxx_salt(6)
-        elif CRYPT_SHA256 and cfg_dget('misc.crypt_sha256_rounds'):
-            salt = _get_crypt_shaxxx_salt(5)
-        else:
-            salt = _get_salt(2)
-    else:
+        salt = _get_salt(2)
+    elif scheme == 'BLF-CRYPT':
+        salt = _get_crypt_blowfish_salt()
+    elif scheme in ('MD5-CRYPT', 'MD5'):
         salt = '$1$%s' % _get_salt(8)
+    elif scheme == 'SHA256-CRYPT':
+        salt = _get_crypt_sha2_salt(5)
+    else:
+        salt = _get_crypt_sha2_salt(6)
     encrypted = crypt(password, salt)
     if encoding:
         if encoding == 'HEX':
             encrypted = encrypted.encode('hex')
         else:
             encrypted = encrypted.encode('base64').replace('\n', '')
+    if scheme in ('BLF-CRYPT', 'SHA256-CRYPT', 'SHA512-CRYPT') and \
+       cfg_dget('misc.dovecot_version') < 0x20000b06:
+        scheme = 'CRYPT'
     return _format_digest(encrypted, scheme, encoding)
 
 
@@ -363,7 +347,7 @@ def verify_scheme(scheme):
     assert isinstance(scheme, basestring), 'Not a str/unicode: %r' % scheme
     scheme_encoding = scheme.upper().split('.')
     scheme = scheme_encoding[0]
-    if not scheme in _scheme_info:
+    if scheme not in _scheme_info:
         raise VMMError(_(u"Unsupported password scheme: '%s'") % scheme,
                        VMM_ERROR)
     if cfg_dget('misc.dovecot_version') < _scheme_info[scheme][1]:
@@ -418,4 +402,21 @@ def randompw():
         pw_len = 8
     return ''.join(_sys_rand.sample(PASSWDCHARS, pw_len))
 
+
+def _test_crypt_algorithms():
+    """Check for Blowfish/SHA-256/SHA-512 support in crypt.crypt()."""
+    _blowfish = '$2a$04$0123456789abcdefABCDE.N.drYX5yIAL1LkTaaZotW3yI0hQhZru'
+    _sha256 = '$5$rounds=1000$0123456789abcdef$K/DksR0DT01hGc8g/kt9McEgrbFMKi\
+9qrb1jehe7hn4'
+    _sha512 = '$6$rounds=1000$0123456789abcdef$ZIAd5WqfyLkpvsVCVUU1GrvqaZTqvh\
+JoouxdSqJO71l9Ld3tVrfOatEjarhghvEYADkq//LpDnTeO90tcbtHR1'
+
+    if crypt('08/15!test~4711', '$2a$04$0123456789abcdefABCDEF$') == _blowfish:
+        _scheme_info['BLF-CRYPT'] = (_crypt_hash, 0x10000f00)
+    if crypt('08/15!test~4711', '$5$rounds=1000$0123456789abcdef$') == _sha256:
+        _scheme_info['SHA256-CRYPT'] = (_crypt_hash, 0x10000f00)
+    if crypt('08/15!test~4711', '$6$rounds=1000$0123456789abcdef$') == _sha512:
+        _scheme_info['SHA512-CRYPT'] = (_crypt_hash, 0x10000f00)
+
+_test_crypt_algorithms()
 del _, cfg_dget, _test_crypt_algorithms

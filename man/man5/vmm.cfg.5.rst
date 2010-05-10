@@ -344,39 +344,22 @@ The **misc** section is used to define miscellaneous settings.
 
 .. _misc.crypt_blowfish_rounds:
 
-``crypt_blowfish_rounds (default: 0)`` : *Int*
-  Number of encryption rounds for Blowfish crypt.
-
-  This setting affects the behavior of the 'CRYPT' password scheme. By
-  default crypt will use the DES algorithm for password encryption.
-  |vmm(1)|_ checks if Blowfish crypt is available. When the Blowfish
-  algorithm is supported and the value of this setting is greater than 0
-  Blowfish will be used for crypt, instead of DES.
+``crypt_blowfish_rounds (default: 5)`` : *Int*
+  Number of encryption rounds for the *password_scheme* **BLF-CRYPT**.
 
   The value must be in range **4** - **31**.
 
 .. _misc.crypt_sha256_rounds:
 
-``crypt_sha256_rounds (default: 0)`` : *Int*
-  Number of encryption rounds for crypt using the SHA-256 encryption method.
-
-  This setting affects the behavior of the 'CRYPT' password scheme. By
-  default crypt will use the DES algorithm for password encryption.
-  |vmm(1)|_ checks if crypt supports the SHA-256 and/or SHA-512 algorithms.
-  When the algorithms are supported and the value of this setting is greater
-  than 0, SHA-256 will be used instead of DES.
-
-  When the value of |misc.crypt_sha512_rounds|_ is greater than 0, the
-  SHA-512 algorithm will be used instead of SHA-256.
+``crypt_sha256_rounds (default: 5000)`` : *Int*
+  Number of encryption rounds for the *password_scheme* **SHA256-CRYPT**.
 
   The value must be in range **1000** - **999999999**.
 
 .. _misc.crypt_sha512_rounds:
 
-``crypt_sha512_rounds (default: 0)`` : *Int*
-  Number of encryption rounds for crypt using the SHA-512 encryption method.
-
-  See |misc.crypt_sha256_rounds|_ for details.
+``crypt_sha512_rounds (default: 5000)`` : *Int*
+  Number of encryption rounds for the *password_scheme* **SHA512-CRYPT**.
 
   The value must be in range **1000** - **999999999**.
 
@@ -407,7 +390,7 @@ Example::
   [misc]
   base_directory = /srv/mail
   crypt_sha512_rounds = 10000
-  password_scheme = CRYPT
+  password_scheme = SHA512-CRYPT
   transport = dovecot:
   dovecot_version = 2.0.beta4
 
