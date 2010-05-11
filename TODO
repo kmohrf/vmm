@@ -19,9 +19,9 @@ subcommand for displaying support crypt algorithms.
         + alias domains
 
 Database:
-   public.users.passwd: increase to "character varying(250)"
-   	why? len(VirtualMailManager.password.pwhash('1', 'crypt.hex')) -> 249
-	     if VirtualMailManager.password.CRYPT_SHA512 is True and
-	     misc.crypt_sha512_rounds > 0
+   public.users.passwd: increase to "character varying(264)"
+   	why? len(VirtualMailManager.password.pwhash('1', 'sha512-crypt.hex')) -> 264
+	     if Dovecot >= v2.0.beta6 || changeset >= 11278:2ead7574bb08 and
+	     misc.crypt_sha512_rounds >= 100000000
    public.users.digestmd5: add "character varying(48)"
 	Outlook will love it. (`doveadm pw -s DIGEST-MD5.hex -p 1 -u 0`)

@@ -34,11 +34,27 @@ SALTCHARS = './0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 PASSWDCHARS = '._-+#*23456789abcdefghikmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ'
 DEFAULT_B64 = (None, 'B64', 'BASE64')
 DEFAULT_HEX = (None, 'HEX')
+CRYPT_ID_MD5 = 1
+CRYPT_ID_BLF = '2a'
+CRYPT_ID_SHA256 = 5
+CRYPT_ID_SHA512 = 6
+CRYPT_SALT_LEN = 2
+CRYPT_BLF_ROUNDS_MIN = 4
+CRYPT_BLF_ROUNDS_MAX = 31
+CRYPT_BLF_SALT_LEN = 22
+CRYPT_MD5_SALT_LEN = 8
+CRYPT_SHA2_ROUNDS_DEFAULT = 5000
+CRYPT_SHA2_ROUNDS_MIN = 1000
+CRYPT_SHA2_ROUNDS_MAX = 999999999
+CRYPT_SHA2_SALT_LEN = 16
+SALTED_ALGO_SALT_LEN = 4
+
 
 _ = lambda msg: msg
 cfg_dget = lambda option: None
 _sys_rand = SystemRandom()
-_get_salt = lambda salt_len: ''.join(_sys_rand.sample(SALTCHARS, salt_len))
+_choice = _sys_rand.choice
+_get_salt = lambda s_len: ''.join(_choice(SALTCHARS) for x in xrange(s_len))
 
 
 def _dovecotpw(password, scheme, encoding):
@@ -116,44 +132,47 @@ def _clear_hash(password, scheme, encoding):
 def _get_crypt_blowfish_salt():
     """Generates a salt for Blowfish crypt."""
     rounds = cfg_dget('misc.crypt_blowfish_rounds')
-    if rounds < 4:
-        rounds = 4
-    elif rounds > 31:
-        rounds = 31
-    return '$2a$%02d$%s' % (rounds, _get_salt(22))
+    if rounds < CRYPT_BLF_ROUNDS_MIN:
+        rounds = CRYPT_BLF_ROUNDS_MIN
+    elif rounds > CRYPT_BLF_ROUNDS_MAX:
+        rounds = CRYPT_BLF_ROUNDS_MAX
+    return '$%s$%02d$%s' % (CRYPT_ID_BLF, rounds,
+                            _get_salt(CRYPT_BLF_SALT_LEN))
 
 
 def _get_crypt_sha2_salt(crypt_id):
     """Generates a salt for crypt using the SHA-256 or SHA-512 encryption
     method.
-    *crypt_id* must be either `5` (SHA-256) or `6` (SHA1-512).
+    *crypt_id* must be either `5` (SHA-256) or `6` (SHA-512).
     """
-    assert crypt_id in (5, 6), 'invalid crypt id: %r' % crypt_id
-    if crypt_id is 6:
+    assert crypt_id in (CRYPT_ID_SHA256, CRYPT_ID_SHA512), 'invalid crypt ' \
+           'id: %r' % crypt_id
+    if crypt_id is CRYPT_ID_SHA512:
         rounds = cfg_dget('misc.crypt_sha512_rounds')
     else:
         rounds = cfg_dget('misc.crypt_sha256_rounds')
-    if rounds < 1000:
-        rounds = 1000
-    elif rounds > 999999999:
-        rounds = 999999999
-    if rounds == 5000:
-        return '$%d$%s' % (crypt_id, _get_salt(16))
-    return '$%d$rounds=%d$%s' % (crypt_id, rounds, _get_salt(16))
+    if rounds < CRYPT_SHA2_ROUNDS_MIN:
+        rounds = CRYPT_SHA2_ROUNDS_MIN
+    elif rounds > CRYPT_SHA2_ROUNDS_MAX:
+        rounds = CRYPT_SHA2_ROUNDS_MAX
+    if rounds == CRYPT_SHA2_ROUNDS_DEFAULT:
+        return '$%d$%s' % (crypt_id, _get_salt(CRYPT_SHA2_SALT_LEN))
+    return '$%d$rounds=%d$%s' % (crypt_id, rounds,
+                                 _get_salt(CRYPT_SHA2_SALT_LEN))
 
 
 def _crypt_hash(password, scheme, encoding):
     """Generates (encoded) CRYPT/MD5/{BLF,MD5,SHA{256,512}}-CRYPT hashes."""
     if scheme == 'CRYPT':
-        salt = _get_salt(2)
+        salt = _get_salt(CRYPT_SALT_LEN)
     elif scheme == 'BLF-CRYPT':
         salt = _get_crypt_blowfish_salt()
     elif scheme in ('MD5-CRYPT', 'MD5'):
-        salt = '$1$%s' % _get_salt(8)
+        salt = '$%d$%s' % (CRYPT_ID_MD5, _get_salt(CRYPT_MD5_SALT_LEN))
     elif scheme == 'SHA256-CRYPT':
-        salt = _get_crypt_sha2_salt(5)
+        salt = _get_crypt_sha2_salt(CRYPT_ID_SHA256)
     else:
-        salt = _get_crypt_sha2_salt(6)
+        salt = _get_crypt_sha2_salt(CRYPT_ID_SHA512)
     encrypted = crypt(password, salt)
     if encoding:
         if encoding == 'HEX':
@@ -253,7 +272,7 @@ def _sha512_hash(password, scheme, encoding):
 def _smd5_hash(password, scheme, encoding):
     """Generates SMD5 (salted PLAIN-MD5) hashes."""
     md5 = hashlib.md5(password)
-    salt = _get_salt(4)
+    salt = _get_salt(SALTED_ALGO_SALT_LEN)
     md5.update(salt)
     if encoding in DEFAULT_B64:
         digest = (md5.digest() + salt).encode('base64').rstrip()
@@ -265,7 +284,7 @@ def _smd5_hash(password, scheme, encoding):
 def _ssha1_hash(password, scheme, encoding):
     """Generates SSHA (salted SHA/SHA1) hashes."""
     sha1 = hashlib.sha1(password)
-    salt = _get_salt(4)
+    salt = _get_salt(SALTED_ALGO_SALT_LEN)
     sha1.update(salt)
     if encoding in DEFAULT_B64:
         digest = (sha1.digest() + salt).encode('base64').rstrip()
@@ -278,7 +297,7 @@ def _ssha256_hash(password, scheme, encoding):
     """Generates SSHA256 (salted SHA256) hashes."""
     sha256 = _sha256_new(password)
     if sha256:
-        salt = _get_salt(4)
+        salt = _get_salt(SALTED_ALGO_SALT_LEN)
         sha256.update(salt)
         if encoding in DEFAULT_B64:
             digest = (sha256.digest() + salt).encode('base64').rstrip()
@@ -291,7 +310,7 @@ def _ssha256_hash(password, scheme, encoding):
 def _ssha512_hash(password, scheme, encoding):
     """Generates SSHA512 (salted SHA512) hashes."""
     if not COMPAT:
-        salt = _get_salt(4)
+        salt = _get_salt(SALTED_ALGO_SALT_LEN)
         sha512 = hashlib.sha512(password + salt)
         if encoding in DEFAULT_B64:
             digest = (sha512.digest() + salt).encode('base64').replace('\n',
