@@ -27,7 +27,7 @@ cfg_dget = lambda option: None
 
 class Account(object):
     """Class to manage e-mail accounts."""
-    __slots__ = ('_addr', '_dbh', '_domain', '_mid', '_new', '_passwd',
+    __slots__ = ('_addr', '_dbh', '_domain', '_mail', '_new', '_passwd',
                  '_transport', '_uid')
 
     def __init__(self, dbh, address):
@@ -52,7 +52,7 @@ class Account(object):
             raise AErr(_(u"The domain '%s' doesn't exist.") %
                        self._addr.domainname, NO_SUCH_DOMAIN)
         self._uid = 0
-        self._mid = 0
+        self._mail = None
         self._transport = self._domain.transport
         self._passwd = None
         self._new = True
@@ -71,9 +71,10 @@ class Account(object):
         result = dbc.fetchone()
         dbc.close()
         if result:
-            self._uid, self._mid, _tid = result
+            self._uid, _mid, _tid = result
             if _tid != self._transport.tid:
                 self._transport = Transport(self._dbh, tid=_tid)
+            self._mail = MailLocation(mid=_mid)
             self._new = False
 
     def _set_uid(self):
@@ -100,7 +101,7 @@ class Account(object):
                          u" prefix '%(prefix)s'") %
                        {'transport': self._transport,
                         'prefix': maillocation.prefix}, INVALID_MAIL_LOCATION)
-        self._mid = maillocation.mid
+        self._mail = maillocation
         self._set_uid()
 
     def _switch_state(self, state, service):
@@ -175,6 +176,11 @@ class Account(object):
         return None
 
     @property
+    def mail_location(self):
+        """The Account's MailLocation."""
+        return self._mail
+
+    @property
     def uid(self):
         """The Account's unique ID."""
         return self._uid
@@ -246,7 +252,7 @@ class Account(object):
  smtp, pop3, imap, %s) VALUES ('%s', '%s', %d, %d, %d, %d, %s, %s, %s, %s)" % (
             sieve_col, self._addr.localpart, pwhash(self._passwd,
                                                     user=self._addr),
-            self._uid, self._domain.gid, self._mid, self._transport.tid,
+            self._uid, self._domain.gid, self._mail.mid, self._transport.tid,
             cfg_dget('account.smtp'), cfg_dget('account.pop3'),
             cfg_dget('account.imap'), cfg_dget('account.sieve'))
         dbc = self._dbh.cursor()
@@ -318,7 +324,7 @@ class Account(object):
             info['address'] = self._addr
             info['gid'] = self._domain.gid
             info['home'] = '%s/%s' % (self._domain.directory, self._uid)
-            info['mail_location'] = MailLocation(mid=self._mid).mail_location
+            info['mail_location'] = self._mail.mail_location
             info['transport'] = self._transport.transport
             info['uid'] = self._uid
             return info
@@ -374,9 +380,9 @@ class Account(object):
             self._dbh.commit()
         dbc.close()
         self._new = True
-        self._uid = self._mid = 0
+        self._uid = 0
         self._addr = self._dbh = self._domain = self._passwd = None
-        self._transport = None
+        self._mail = self._transport = None
 
 
 def get_account_by_uid(uid, dbh):

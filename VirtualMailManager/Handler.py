@@ -577,7 +577,7 @@ The account has been successfully deleted from the database.
                                acc.address, ERR.NO_SUCH_ACCOUNT)
         info = acc.get_info()
         if self._Cfg.dget('account.disk_usage') or details in ('du', 'full'):
-            path = os.path.join(acc.home, info['mail_location'].split('/')[-1])
+            path = os.path.join(acc.home, acc.mail_location.directory)
             info['disk usage'] = self.__getDiskUsage(path)
             if details in (None, 'du'):
                 return info
