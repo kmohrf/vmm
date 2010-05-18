@@ -10,7 +10,6 @@
 
 import os
 import re
-from encodings.idna import ToASCII, ToUnicode
 from random import choice
 
 from VirtualMailManager.constants.ERROR import \
@@ -319,23 +318,15 @@ class Domain(object):
         return aliasdomains
 
 
-def ace2idna(domainname):
-    """Converts the domain name `domainname` from ACE according to IDNA."""
-    return u'.'.join([ToUnicode(lbl) for lbl in domainname.split('.') if lbl])
-
-
 def check_domainname(domainname):
     """Returns the validated domain name `domainname`.
-
-    It also converts the name of the domain from IDN to ASCII, if
-    necessary.
 
     Throws an `DomainError`, if the domain name is too long or doesn't
     look like a valid domain name (label.label.label).
 
     """
     if not RE_DOMAIN.match(domainname):
-        domainname = idn2ascii(domainname)
+        domainname = domainname.encode('idna')
     if len(domainname) > 255:
         raise DomErr(_(u'The domain name is too long'), DOMAIN_TOO_LONG)
     if not RE_DOMAIN.match(domainname):
@@ -357,11 +348,6 @@ def get_gid(dbh, domainname):
     if gid:
         return gid[0]
     return 0
-
-
-def idn2ascii(domainname):
-    """Converts the idn domain name `domainname` into punycode."""
-    return '.'.join([ToASCII(lbl) for lbl in domainname.split('.') if lbl])
 
 
 def search(dbh, pattern=None, like=False):

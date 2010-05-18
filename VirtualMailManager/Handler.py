@@ -26,7 +26,7 @@ from VirtualMailManager.Alias import Alias
 from VirtualMailManager.AliasDomain import AliasDomain
 from VirtualMailManager.common import exec_ok
 from VirtualMailManager.Config import Config as Cfg
-from VirtualMailManager.Domain import Domain, ace2idna, get_gid
+from VirtualMailManager.Domain import Domain, get_gid
 from VirtualMailManager.EmailAddress import EmailAddress
 from VirtualMailManager.errors import \
      DomainError, NotRootError, PermissionError, VMMError
@@ -416,7 +416,8 @@ class Handler(object):
         dom = self.__getDomain(domainname)
         dominfo = dom.get_info()
         if dominfo['domainname'].startswith('xn--'):
-            dominfo['domainname'] += ' (%s)' % ace2idna(dominfo['domainname'])
+            dominfo['domainname'] += ' (%s)' % \
+                                     dominfo['domainname'].decode('idna')
         if details is None:
             return dominfo
         elif details == 'accounts':
