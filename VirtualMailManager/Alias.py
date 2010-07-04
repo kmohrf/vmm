@@ -42,7 +42,7 @@ class Alias(object):
         dbc = self._dbh.cursor()
         dbc.execute('SELECT destination FROM alias WHERE gid = %s AND '
                     'address = %s', self._gid, self._addr.localpart)
-        dests = iter(dbc.fetchall())
+        dests = dbc.fetchall()
         if dbc.rowcount > 0:
             self._dests.extend(EmailAddress(dest[0]) for dest in dests)
         dbc.close()

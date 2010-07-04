@@ -14,34 +14,29 @@ from VirtualMailManager.pycompat import any
 
 
 __all__ = ('MailLocation', 'known_format',
-           'MAILDIR_ID', 'MBOX_ID', 'MDBOX_ID', 'SDBOX_ID')
+           'ID_MAILDIR', 'ID_MBOX', 'ID_MDBOX', 'ID_SDBOX')
 
-MAILDIR_ID = 0x1
-MBOX_ID = 0x2
-MDBOX_ID = 0x3
-SDBOX_ID = 0x4
-MAILDIR_NAME = 'Maildir'
-MBOX_NAME = 'mail'
-MDBOX_NAME = 'mdbox'
-SDBOX_NAME = 'dbox'
+ID_MAILDIR = 0x1
+ID_MBOX = 0x2
+ID_MDBOX = 0x3
+ID_SDBOX = 0x4
 
 _storage = {
-    MAILDIR_ID: dict(dovecot_version=0x10000f00, postfix=True,
-                     prefix='maildir:', directory=MAILDIR_NAME,
-                     mid=MAILDIR_ID),
-    MBOX_ID: dict(dovecot_version=0x10000f00, postfix=True, prefix='mbox:',
-                  directory=MBOX_NAME, mid=MBOX_ID),
-    MDBOX_ID: dict(dovecot_version='0x20000a01', postfix=False,
-                   prefix='mdbox:', directory=MDBOX_NAME, mid=MDBOX_ID),
-    SDBOX_ID: dict(dovecot_version=0x10000f00, postfix=False, prefix='dbox:',
-                   directory=SDBOX_NAME, mid=SDBOX_ID),
+    ID_MAILDIR: dict(dovecot_version=0x10000f00, postfix=True,
+                     prefix='maildir:', directory='Maildir', mid=ID_MAILDIR),
+    ID_MBOX: dict(dovecot_version=0x10000f00, postfix=True, prefix='mbox:',
+                  directory='mail', mid=ID_MBOX),
+    ID_MDBOX: dict(dovecot_version=0x20000a01, postfix=False,
+                   prefix='mdbox:', directory='mdbox', mid=ID_MDBOX),
+    ID_SDBOX: dict(dovecot_version=0x10000f00, postfix=False, prefix='dbox:',
+                   directory='dbox', mid=ID_SDBOX),
 }
 
 _format_id = {
-    'maildir': MAILDIR_ID,
-    'mbox': MBOX_ID,
-    'mdbox': MDBOX_ID,
-    'dbox': SDBOX_ID,
+    'maildir': ID_MAILDIR,
+    'mbox': ID_MBOX,
+    'mdbox': ID_MDBOX,
+    'dbox': ID_SDBOX,
 }
 
 
@@ -56,8 +51,8 @@ class MailLocation(object):
 
         Keyword arguments:
         mid -- the id of a mail_location (int)
-          one of the maillocation constants: `MAILDIR_ID`, `MBOX_ID`,
-          `MDBOX_ID` and `SDBOX_ID`
+          one of the maillocation constants: `ID_MAILDIR`, `ID_MBOX`,
+          `ID_MDBOX` and `ID_SDBOX`
         format -- the mailbox format of the mail_location. One out of:
         ``maildir``, ``mbox``, ``dbox`` and ``mdbox``.
         """
