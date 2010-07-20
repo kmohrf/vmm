@@ -321,7 +321,7 @@ erforderlichen Optionen festgelegt. Die INBOX wird in jedem Fall erstellt.
     ``mdbox``
       seit Dovecot v2.0.beta1
     ``sdbox``
-      seit Dovecot v1.0.rc3
+      seit Dovecot v2.0.rc3
 
 .. _mailbox.root:
 
