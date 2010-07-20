@@ -171,8 +171,8 @@ by |vmm(1)|_.
 
 ``dovecotpw (default: /usr/sbin/dovecotpw)`` : *String*
   The absolute path to the dovecotpw binary. Use the absolute path to the
-  doveadm binary, if you are using Dovecot v2.0. This binary is used to
-  generate a password hash, if |misc.password_scheme|_ is set to one of
+  **doveadm**\(1) binary, if you are using Dovecot v2.0. This binary is used
+  to generate a password hash, if |misc.password_scheme|_ is set to one of
   'CRAM-MD5', 'HMAC-MD5', 'LANMAN', 'OTP', 'RPA' or 'SKEY'. This binary will
   be also required if your Python installation doesn't support the:
 
@@ -284,53 +284,44 @@ mailboxes in the users home directories. The INBOX will be created always.
 .. _mailbox.folders:
 
 ``folders (default: Drafts:Sent:Templates:Trash)`` : *String*
-  A colon separated list of mailboxes that should be created. (Works currently
-  only if the |mailbox.format|_ is either **maildir** or **mbox**. For other
-  formats use Dovecot's autocreate plugin
-  <http://wiki.dovecot.org/Plugins/Autocreate>.) If no additionally mailboxes
-  should be created, set the value of this option to a single colon ('**:**').
+  A colon separated list of mailboxes that should be created. If no
+  additionally mailboxes should be created, set the value of this option to a
+  single colon ('**:**').
 
   If you want to create folders containing one or more subfolders, separate
   them with a single dot ('**.**').
+
+  If you want to use internationalized mailbox names (e.g. 'Wysłane' or
+  'Gelöschte Objekte'), write their names UTF-8 encoded. |vmm(1)|_ will convert
+  internationalized mailbox names to a modified  version of the UTF-7 encoding
+  (see also: :RFC:`3501`, section 5.1.3).
 
 .. _mailbox.format:
 
 ``format (default: maildir)`` : *String*
   The mailbox format to be used for a user's mailbox. Depending on the used
-  Dovecot version there are up to four supported formats:
+  Dovecot version there are up to three supported formats:
 
     ``maildir``
       since Dovecot v1.0.0
-    ``mbox``
-      since Dovecot v1.0.0
-    ``dbox``
-      since Dovecot v1.0.0
     ``mdbox``
-      comes with Dovecot v2.0.0
+      since Dovecot v2.0.beta1
+    ``sdbox``
+      since Dovecot v2.0.rc3
 
+.. _mailbox.root:
+
+``root (default: Maildir)`` : *String*
+  Name of the mailbox root directory in a user's home directory. Commonly used
+  names, depending on the used |mailbox.format|_, are **Maildir**, **mdbox**
+  or **sdbox**.
 
 Example::
 
   [mailbox]
   folders = Drafts:Sent:Templates:Trash:Lists.Dovecot:Lists.Postfix
   format = maildir
-
-.. _imap_uft7:
-
-.. note:: If you want to use internationalized mailbox names in the
-  **folders** setting, you have to specify them in a modified version of the
-  UTF-7 encoding (see :RFC:`3501`, section 5.1.3).
-
-  Dovecot provides a useful utility for mUTF-7 <-> UTF-8 conversion:
-  **imap-utf7**, it's available since Dovecot version 1.2.0.
-..
-
-imap-utf7 example::
-
-  user@host:~$ /usr/local/libexec/dovecot/imap-utf7 -r Wysłane
-  Wys&AUI-ane
-  user@host:~$ /usr/local/libexec/dovecot/imap-utf7 "&AVo-mietnik"
-  Śmietnik
+  root = Maildir
 
 
 MISC
