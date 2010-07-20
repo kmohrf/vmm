@@ -104,6 +104,7 @@ def upd_052(cp):
                      ('maildir.diskusage', 'account.disk_usage'),
                      ('maildir.delete',    'account.delete_directory'),
                      ('maildir.folders',   'mailbox.folders'),
+                     ('maildir.name',      'mailbox.root'),
                      ('misc.forcedel',     'domain.force_deletion'),
                      ('misc.passwdscheme', 'misc.password_scheme'),
                      ('misc.dovecotvers',  'misc.dovecot_version')):

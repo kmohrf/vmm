@@ -341,6 +341,7 @@ class Config(LazyConfig):
             'mailbox': {
                 'folders': LCO(str, 'Drafts:Sent:Templates:Trash', self.get),
                 'format': LCO(str, 'maildir', self.get),
+                'root': LCO(str, 'Maildir', self.get),
             },
             'misc': {
                 'base_directory': LCO(str, '/srv/mail', self.get, is_dir),
