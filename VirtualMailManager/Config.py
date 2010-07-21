@@ -4,6 +4,7 @@
 
 """
     VirtualMailManager.Config
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
 
     VMM's configuration module for simplified configuration access.
 """
@@ -18,6 +19,7 @@ from cStringIO import StringIO# TODO: move interactive stff to cli
 from VirtualMailManager.common import exec_ok, get_unicode, is_dir, version_hex
 from VirtualMailManager.constants.ERROR import CONF_ERROR
 from VirtualMailManager.errors import ConfigError, VMMError
+from VirtualMailManager.maillocation import known_format
 from VirtualMailManager.password import verify_scheme as _verify_scheme
 
 
@@ -340,7 +342,7 @@ class Config(LazyConfig):
             },
             'mailbox': {
                 'folders': LCO(str, 'Drafts:Sent:Templates:Trash', self.get),
-                'format': LCO(str, 'maildir', self.get),
+                'format': LCO(str, 'maildir', self.get, check_mailbox_format),
                 'root': LCO(str, 'Maildir', self.get),
             },
             'misc': {
@@ -421,6 +423,19 @@ class Config(LazyConfig):
             if missing:
                 self.__missing[section] = missing
         return not errors
+
+
+def check_mailbox_format(format):
+    """
+    Check if the mailbox format *format* is supported.  When the *format*
+    is supported it will be returned, otherwise a `ConfigValueError` will
+    be raised.
+    """
+    format = format.lower()
+    if known_format(format):
+        return format
+    raise ConfigValueError(_(u"Unsupported mailbox format: '%s'") %
+                           get_unicode(format))
 
 
 def check_version_format(version_string):
