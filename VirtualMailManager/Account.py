@@ -4,6 +4,7 @@
 
 """
     VirtualMailManager.Account
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Virtual Mail Manager's Account class to manage e-mail accounts.
 """
@@ -247,7 +248,8 @@ class Account(object):
             sieve_col = 'sieve'
         else:
             sieve_col = 'managesieve'
-        self._prepare(MailLocation(format=cfg_dget('mailbox.format')))
+        self._prepare(MailLocation(directory=cfg_dget('mailbox.root'),
+                                   mbfmt=cfg_dget('mailbox.format')))
         sql = "INSERT INTO users (local_part, passwd, uid, gid, mid, tid,\
  smtp, pop3, imap, %s) VALUES ('%s', '%s', %d, %d, %d, %d, %s, %s, %s, %s)" % (
             sieve_col, self._addr.localpart, pwhash(self._passwd,

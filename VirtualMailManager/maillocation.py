@@ -4,90 +4,103 @@
 
 """
     VirtualMailManager.maillocation
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Virtual Mail Manager's maillocation module to handle Dovecot's
     mail_location setting for accounts.
 
 """
 
-from VirtualMailManager.pycompat import any
+from VirtualMailManager.constants.ERROR import \
+     MAILLOCATION_INIT, UNKNOWN_MAILLOCATION_ID
+from VirtualMailManager.errors import MailLocationError as MLErr
+from VirtualMailManager.pycompat import all
 
 
-__all__ = ('MailLocation', 'known_format',
-           'ID_MAILDIR', 'ID_MBOX', 'ID_MDBOX', 'ID_SDBOX')
+__all__ = ('MailLocation', 'known_format')
 
-ID_MAILDIR = 0x1
-ID_MBOX = 0x2
-ID_MDBOX = 0x3
-ID_SDBOX = 0x4
-
-_storage = {
-    ID_MAILDIR: dict(dovecot_version=0x10000f00, postfix=True,
-                     prefix='maildir:', directory='Maildir', mid=ID_MAILDIR),
-    ID_MBOX: dict(dovecot_version=0x10000f00, postfix=True, prefix='mbox:',
-                  directory='mail', mid=ID_MBOX),
-    ID_MDBOX: dict(dovecot_version=0x20000a01, postfix=False,
-                   prefix='mdbox:', directory='mdbox', mid=ID_MDBOX),
-    ID_SDBOX: dict(dovecot_version=0x10000f00, postfix=False, prefix='dbox:',
-                   directory='dbox', mid=ID_SDBOX),
-}
-
-_format_id = {
-    'maildir': ID_MAILDIR,
-    'mbox': ID_MBOX,
-    'mdbox': ID_MDBOX,
-    'dbox': ID_SDBOX,
+_ = lambda msg: msg
+_format_info = {
+    'maildir': dict(dovecot_version=0x10000f00, postfix=True),
+    'mdbox': dict(dovecot_version=0x20000b01, postfix=False),
+    'sdbox': dict(dovecot_version=0x20000c03, postfix=False),
 }
 
 
 class MailLocation(object):
-    """A small class for mail_location relevant information."""
-    __slots__ = ('_info')
+    """Class to handle mail_location relevant information."""
+    __slots__ = ('_directory', '_mbfmt', '_mid', '_dbh')
+    _kwargs = ('mid', 'mbfmt', 'directory')
 
-    def __init__(self, mid=None, format=None):
+    def __init__(self, dbh, **kwargs):
         """Creates a new MailLocation instance.
 
-        Either a mid or the format must be specified.
+        Either the mid keyword or the mbfmt and directory keywords must be
+        specified.
+
+        Arguments:
+
+        `dbh` : pyPgSQL.PgSQL.Connection
+          A database connection for the database access.
 
         Keyword arguments:
-        mid -- the id of a mail_location (int)
-          one of the maillocation constants: `ID_MAILDIR`, `ID_MBOX`,
-          `ID_MDBOX` and `ID_SDBOX`
-        format -- the mailbox format of the mail_location. One out of:
-        ``maildir``, ``mbox``, ``dbox`` and ``mdbox``.
+
+        `mid` : int
+          the id of a mail_location
+        `mbfmt` : str
+          the mailbox format of the mail_location. One out of: ``maildir``,
+          ``sdbox`` and ``mdbox``.
+        `directory` : str
+          name of the mailbox root directory.
         """
-        assert any((mid, format))
+        self._dbh = dbh
+        self._directory = None
+        self._mbfmt = None
+        self._mid = 0
+
+        for key in kwargs.iterkeys():
+            if key not in self.__class__._kwargs:
+                raise ValueError('unrecognized keyword: %r' % key)
+        mid = kwargs.get('mid')
         if mid:
-            assert isinstance(mid, (int, long)) and mid in _storage
-            self._info = _storage[mid]
+            assert isinstance(mid, (int, long))
+            self._load_by_mid(mid)
         else:
-            assert isinstance(format, basestring) and \
-                    format.lower() in _format_id
-            self._info = _storage[_format_id[format.lower()]]
+            args = kwargs.get('mbfmt'), kwargs.get('directory')
+            assert all(isinstance(arg, basestring) for arg in args)
+            if args[0].lower() not in _format_info:
+                raise MLErr(_(u"Unsupported mailbox format: '%s'") % args[0],
+                            MAILLOCATION_INIT)
+            directory = args[1].strip()
+            if not directory:
+                raise MLErr(_(u"Empty directory name"), MAILLOCATION_INIT)
+            if len(directory) > 20:
+                raise MLErr(_(u"Directory name is too long: '%s'") % directory,
+                            MAILLOCATION_INIT)
+            self._load_by_names(args[0].lower(), directory)
 
     def __str__(self):
-        return '%(prefix)s~/%(directory)s' % self._info
+        return u'%s:~/%s' % (self._mbfmt, self._directory)
 
     @property
     def directory(self):
         """The mail_location's directory name."""
-        return self._info['directory']
+        return self._directory
 
     @property
     def dovecot_version(self):
-        """The required Dovecot version (concatenated major and minor
-        parts) for this mailbox format."""
-        return self._info['dovecot_version']
+        """The required Dovecot version for this mailbox format."""
+        return _format_info[self._mbfmt]['dovecot_version']
 
     @property
     def postfix(self):
         """`True` if Postfix supports this mailbox format, else `False`."""
-        return self._info['postfix']
+        return _format_info[self._mbfmt]['postfix']
 
     @property
     def prefix(self):
         """The prefix of the mail_location."""
-        return self._info['prefix']
+        return self._mbfmt + ':'
 
     @property
     def mail_location(self):
@@ -97,9 +110,55 @@ class MailLocation(object):
     @property
     def mid(self):
         """The mail_location's unique ID."""
-        return self._info['mid']
+        return self._mid
+
+    def _load_by_mid(self, mid):
+        """Load mail_location relevant information by *mid*"""
+        dbc = self._dbh.cursor()
+        dbc.execute('SELECT format, directory FROM mailboxformat, '
+                    'maillocation WHERE mid = %u AND '
+                    'maillocation.fid = mailboxformat.fid' % mid)
+        result = dbc.fetchone()
+        dbc.close()
+        if not result:
+            raise MLErr(_(u'Unknown mail_location id: %u') % mid,
+                        UNKNOWN_MAILLOCATION_ID)
+        self._mid = mid
+        self._mbfmt, self._directory = result
+
+    def _load_by_names(self, mbfmt, directory):
+        """Try to load mail_location relevant information by *mbfmt* and
+        *directory* name. If it fails goto _save()."""
+        dbc = self._dbh.cursor()
+        dbc.execute("SELECT mid FROM maillocation WHERE fid = (SELECT fid "
+                    "FROM mailboxformat WHERE format = '%s') AND directory = "
+                    "'%s'" % (mbfmt, directory))
+        result = dbc.fetchone()
+        dbc.close()
+        if not result:
+            self._save(mbfmt, directory)
+        else:
+            self._mid = result[0]
+            self._mbfmt = mbfmt
+            self._directory = directory
+
+    def _save(self, mbfmt, directory):
+        """Save a new mail_location in the database."""
+        dbc = self._dbh.cursor()
+        dbc.execute("SELECT nextval('maillocation_id')")
+        mid = dbc.fetchone()[0]
+        dbc.execute("INSERT INTO maillocation (fid, mid, directory) VALUES ("
+                    "(SELECT fid FROM mailboxformat WHERE format = '%s'), %u, "
+                    "'%s')" % (mbfmt, mid, directory))
+        self._dbh.commit()
+        dbc.close()
+        self._mid = mid
+        self._mbfmt = mbfmt
+        self._directory = directory
 
 
-def known_format(format):
-    """Checks if the mailbox *format* is known, returns bool."""
-    return format.lower() in _format_id
+def known_format(mbfmt):
+    """Checks if the mailbox format *mbfmt* is known, returns bool."""
+    return mbfmt.lower() in _format_info
+
+del _
