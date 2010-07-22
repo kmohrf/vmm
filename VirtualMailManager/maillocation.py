@@ -98,9 +98,9 @@ class MailLocation(object):
         return _format_info[self._mbfmt]['postfix']
 
     @property
-    def prefix(self):
-        """The prefix of the mail_location."""
-        return self._mbfmt + ':'
+    def mbformat(self):
+        """The mail_location's mailbox format."""
+        return self._mbfmt
 
     @property
     def mail_location(self):
