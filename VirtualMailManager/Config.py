@@ -60,7 +60,6 @@ class LazyConfig(RawConfigParser):
     `set()` differs from `RawConfigParser`'s `set()` method. `set()`
     takes the `section` and `option` arguments combined to a single
     string in the form "section.option".
-
     """
 
     def __init__(self):
@@ -98,7 +97,6 @@ class LazyConfig(RawConfigParser):
         'off', 'no', 'false' or False.
         If the option has another value assigned this method will raise
         a ValueError.
-
         """
         # if the setting was modified it may be still a boolean value lets see
         tmp = self.get(section, option)
@@ -121,7 +119,6 @@ class LazyConfig(RawConfigParser):
           * `BadOptionError`
           * `NoSectionError`
           * `NoOptionError`
-
         """
         sect_opt = section_option.lower().split('.')
         # TODO: cache it
@@ -138,7 +135,6 @@ class LazyConfig(RawConfigParser):
     def items(self, section):
         """returns an iterable that returns key, value ``tuples`` from
         the given ``section``.
-
         """
         if section in self._sections:  # check if the section was parsed
             sect = self._sections[section]
@@ -169,7 +165,6 @@ class LazyConfig(RawConfigParser):
 
         Throws a `NoDefaultError`, if no default value was passed to
         `LazyConfigOption.__init__()` for the `option`.
-
         """
         section, option = self._get_section_option(option)
         try:
@@ -190,9 +185,8 @@ class LazyConfig(RawConfigParser):
 
         Throws a `ValueError` if `value` couldn't be converted using
         `LazyConfigOption.cls`.
-
         """
-        # pylint: disable-msg=W0221
+        # pylint: disable=W0221
         # @pylint: _L A Z Y_
         section, option = self._get_section_option(option)
         val = self._cfg[section][option].cls(value)
@@ -210,9 +204,8 @@ class LazyConfig(RawConfigParser):
     def has_option(self, option):
         """Checks if the option (section.option) is a known
         configuration option.
-
         """
-        # pylint: disable-msg=W0221
+        # pylint: disable=W0221
         # @pylint: _L A Z Y_
         try:
             self._get_section_option(option)
@@ -231,7 +224,6 @@ class LazyConfigOption(object):
     `LazyConfigOption` instances are required by `LazyConfig` instances,
     and instances of classes derived from `LazyConfig`, like the
     `Config` class.
-
     """
     __slots__ = ('__cls', '__default', '__getter', '__validate')
 
@@ -251,7 +243,6 @@ class LazyConfigOption(object):
         `validate` : NoneType or a callable
           None or any method, that takes one argument, in order to
           check the value, when `LazyConfig.set()` is called.
-
         """
         self.__cls = cls
         if not default is None:  # enforce the type of the default value
@@ -269,10 +260,7 @@ class LazyConfigOption(object):
 
     @property
     def cls(self):
-        """The class of the option's value e.g. `str`, `unicode` or
-        `bool`.
-
-        """
+        """The class of the option's value e.g. `str`, `unicode` or `bool`."""
         return self.__cls
 
     @property
@@ -301,7 +289,6 @@ class Config(LazyConfig):
 
         `filename` : str
           path to the configuration file
-
         """
         LazyConfig.__init__(self)
         self._cfg_filename = filename
@@ -341,9 +328,10 @@ class Config(LazyConfig):
                 'force_deletion': LCO(bool_t, False, self.getboolean),
             },
             'mailbox': {
-                'folders': LCO(str, 'Drafts:Sent:Templates:Trash', self.get),
+                'folders': LCO(str, 'Drafts:Sent:Templates:Trash',
+                               self.unicode),
                 'format': LCO(str, 'maildir', self.get, check_mailbox_format),
-                'root': LCO(str, 'Maildir', self.get),
+                'root': LCO(str, 'Maildir', self.unicode),
             },
             'misc': {
                 'base_directory': LCO(str, '/srv/mail', self.get, is_dir),
@@ -363,7 +351,6 @@ class Config(LazyConfig):
 
         Raises a ConfigError if the configuration syntax is
         invalid.
-
         """
         try:
             self._cfg_file = open(self._cfg_filename, 'r')
@@ -410,7 +397,6 @@ class Config(LazyConfig):
         value.
 
         Returns `True` if everything is fine, else `False`.
-
         """
         errors = False
         for section in self._cfg.iterkeys():
