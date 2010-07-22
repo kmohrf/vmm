@@ -75,7 +75,7 @@ class Account(object):
             self._uid, _mid, _tid = result
             if _tid != self._transport.tid:
                 self._transport = Transport(self._dbh, tid=_tid)
-            self._mail = MailLocation(mid=_mid)
+            self._mail = MailLocation(self._dbh, mid=_mid)
             self._new = False
 
     def _set_uid(self):
@@ -91,17 +91,16 @@ class Account(object):
         information in the database.
         """
         if maillocation.dovecot_version > cfg_dget('misc.dovecot_version'):
-            raise AErr(_(u"The mail_location prefix '%(prefix)s' requires "
-                         u"Dovecot >= v%(version)s") %
-                       {'prefix': maillocation.prefix,
-                        'version': version_str(maillocation.dovecot_version)},
+            raise AErr(_(u"The mailbox format '%(mbfmt)s' requires Dovecot "
+                         u">= v%(version)s") % {'mbfmt': maillocation.mbformat,
+                       'version': version_str(maillocation.dovecot_version)},
                        INVALID_MAIL_LOCATION)
         if not maillocation.postfix and \
           self._transport.transport.lower() in ('virtual:', 'virtual'):
-            raise AErr(_(u"Invalid transport '%(transport)s' for mail_location"
-                         u" prefix '%(prefix)s'") %
+            raise AErr(_(u"Invalid transport '%(transport)s' for mailbox "
+                         u"format '%(mbfmt)s'") %
                        {'transport': self._transport,
-                        'prefix': maillocation.prefix}, INVALID_MAIL_LOCATION)
+                        'mbfmt': maillocation.mbformat}, INVALID_MAIL_LOCATION)
         self._mail = maillocation
         self._set_uid()
 
@@ -248,8 +247,8 @@ class Account(object):
             sieve_col = 'sieve'
         else:
             sieve_col = 'managesieve'
-        self._prepare(MailLocation(directory=cfg_dget('mailbox.root'),
-                                   mbfmt=cfg_dget('mailbox.format')))
+        self._prepare(MailLocation(self._dbh, mbfmt=cfg_dget('mailbox.format'),
+                                   directory=cfg_dget('mailbox.root')))
         sql = "INSERT INTO users (local_part, passwd, uid, gid, mid, tid,\
  smtp, pop3, imap, %s) VALUES ('%s', '%s', %d, %d, %d, %d, %s, %s, %s, %s)" % (
             sieve_col, self._addr.localpart, pwhash(self._passwd,
