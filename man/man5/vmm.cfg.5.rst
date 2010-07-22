@@ -316,12 +316,21 @@ mailboxes in the users home directories. The INBOX will be created always.
   names, depending on the used |mailbox.format|_, are **Maildir**, **mdbox**
   or **sdbox**.
 
+.. _mailbox.subscribe:
+
+``subscribe (default: true)`` : *Boolean*
+  When this option is set to **true**, the mailboxes from the
+  |mailbox.folders|_ option will be listed in the user's subscriptions file.
+  If you don't want to subscribe the created mailboxes, set this option to
+  **false**.
+
 Example::
 
   [mailbox]
   folders = Drafts:Sent:Templates:Trash:Lists.Dovecot:Lists.Postfix
   format = maildir
   root = Maildir
+  subscribe = false
 
 
 MISC

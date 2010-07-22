@@ -332,6 +332,7 @@ class Config(LazyConfig):
                                self.unicode),
                 'format': LCO(str, 'maildir', self.get, check_mailbox_format),
                 'root': LCO(str, 'Maildir', self.unicode),
+                'subscribe': LCO(bool_t, True, self.getboolean),
             },
             'misc': {
                 'base_directory': LCO(str, '/srv/mail', self.get, is_dir),

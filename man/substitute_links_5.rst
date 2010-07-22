@@ -1,6 +1,7 @@
 .. Substitutions in section 5
 
 .. |account.password_length| replace:: **password_length**
+.. |mailbox.folders| replace:: **folders**
 .. |mailbox.format| replace:: **format**
 .. |misc.crypt_sha256_rounds| replace:: **crypt_sha256_rounds**
 .. |misc.crypt_sha512_rounds| replace:: **crypt_sha512_rounds**

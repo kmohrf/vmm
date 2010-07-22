@@ -330,12 +330,22 @@ erforderlichen Optionen festgelegt. Die INBOX wird in jedem Fall erstellt.
   Benutzers. Übliche Namen, je nach verwendetem |mailbox.format|_, sind:
   **Maildir**, **mdbox** oder **sdbox**.
 
+.. _mailbox.subscribe:
+
+``subscribe (Vorgabe: true)`` : *Boolean*
+  Wenn dieser Option der Wert **true** zugewiesen wurde, werden die, gemäß
+  |mailbox.folders|_, erstellen Mailboxen in der subscriptions-Datei des
+  Benutzers gelistet. Sollen die erstellen Mailboxen nicht nicht in der
+  subscriptions-Datei gelistet werden, weisen Sie dieser Option den Wert
+  **false** zu.
+
 Beispiel::
 
   [mailbox]
   folders = Drafts:Sent:Templates:Trash:Lists.Dovecot:Lists.Postfix
   format = maildir
   root = Maildir
+  subscribe = false
 
 
 MISC
