@@ -4,6 +4,7 @@
 
 """
     VirtualMailManager.Transport
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Virtual Mail Manager's Transport class to manage the transport for
     domains and accounts.
@@ -72,7 +73,7 @@ class Transport(object):
         if result:
             self._transport = result[0]
         else:
-            raise TransportError(_('Unknown tid specified.'),
+            raise TransportError(_(u'Unknown tid specified.'),
                                  UNKNOWN_TRANSPORT_ID)
 
     def _loadByName(self):
