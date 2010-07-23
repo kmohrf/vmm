@@ -222,31 +222,17 @@ class Handler(object):
             self.__warnings.append(_('No such directory: %s') % directory)
         return isdir
 
-    def __makedir(self, directory, mode=None, uid=None, gid=None):
-        if mode is None:
-            mode = self._Cfg.dget('account.directory_mode')
-        if uid is None:
-            uid = 0
-        if gid is None:
-            gid = 0
-        os.makedirs(directory, mode)
-        os.chown(directory, uid, gid)
-
-    def __domDirMake(self, domdir, gid):
-        #TODO: clenaup!
-        os.umask(0006)
-        oldpwd = os.getcwd()
-        basedir = self._Cfg.dget('misc.base_directory')
-        domdirdirs = domdir.replace(basedir + '/', '').split('/')
-
-        os.chdir(basedir)
-        if not os.path.isdir(domdirdirs[0]):
-            self.__makedir(domdirdirs[0], 489, 0, 0)
-        os.chdir(domdirdirs[0])
-        os.umask(0007)
-        self.__makedir(domdirdirs[1], self._Cfg.dget('domain.directory_mode'),
-                       0, gid)
-        os.chdir(oldpwd)
+    def __make_domain_dir(self, domain):
+        cwd = os.getcwd()
+        hashdir, domdir = domain.directory.split(os.path.sep)[-2:]
+        os.chdir(self._Cfg.dget('misc.base_directory'))
+        if not os.path.isdir(hashdir):
+            os.mkdir(hashdir, 0711)
+            os.chown(hashdir, 0, 0)
+        os.mkdir(os.path.join(hashdir, domdir),
+                 self._Cfg.dget('domain.directory_mode'))
+        os.chown(domain.directory, 0, domain.gid)
+        os.chdir(cwd)
 
     def __make_home(self, account):
         """Create a home directory for the new Account *account*."""
@@ -331,7 +317,7 @@ class Handler(object):
             dom.set_transport(Transport(self._dbh, transport=transport))
         dom.set_directory(self._Cfg.dget('misc.base_directory'))
         dom.save()
-        self.__domDirMake(dom.directory, dom.gid)
+        self.__make_domain_dir(dom)
 
     def domainTransport(self, domainname, transport, force=None):
         if force is not None and force != 'force':
