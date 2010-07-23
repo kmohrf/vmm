@@ -30,6 +30,8 @@ from VirtualMailManager.Domain import Domain, get_gid
 from VirtualMailManager.EmailAddress import EmailAddress
 from VirtualMailManager.errors import \
      DomainError, NotRootError, PermissionError, VMMError
+from VirtualMailManager.mailbox import new as new_mailbox
+from VirtualMailManager.pycompat import any
 from VirtualMailManager.Relocated import Relocated
 from VirtualMailManager.Transport import Transport
 
@@ -37,7 +39,6 @@ from VirtualMailManager.Transport import Transport
 _ = lambda msg: msg
 
 RE_DOMAIN_SEARCH = """^[a-z0-9-\.]+$"""
-RE_MBOX_NAMES = """^[\x20-\x25\x27-\x7E]*$"""
 TYPE_ACCOUNT = 0x1
 TYPE_ALIAS = 0x2
 TYPE_RELOCATED = 0x4
@@ -247,58 +248,12 @@ class Handler(object):
                        0, gid)
         os.chdir(oldpwd)
 
-    def __subscribe(self, folderlist, uid, gid):
-        """Creates a subscriptions file with the mailboxes from `folderlist`"""
-        fname = os.path.join(self._Cfg.dget('maildir.name'), 'subscriptions')
-        sf = open(fname, 'w')
-        sf.write('\n'.join(folderlist))
-        sf.write('\n')
-        sf.flush()
-        sf.close()
-        os.chown(fname, uid, gid)
-        os.chmod(fname, 384)
-
-    def __mailDirMake(self, domdir, uid, gid):
-        """Creates maildirs and maildir subfolders.
-
-        Keyword arguments:
-        domdir -- the path to the domain directory
-        uid -- user id from the account
-        gid -- group id from the account
-        """
-        #  obsolete -> (mailbox / maillocation)
-        return
+    def __make_home(self, account):
+        """Create a home directory for the new Account *account*."""
         os.umask(0007)
-        oldpwd = os.getcwd()
-        os.chdir(domdir)
-
-        maildir = self._Cfg.dget('maildir.name')
-        folders = [maildir]
-        append = folders.append
-        for folder in self._Cfg.dget('maildir.folders').split(':'):
-            folder = folder.strip()
-            if len(folder) and not folder.count('..'):
-                if re.match(RE_MBOX_NAMES, folder):
-                    append('%s/.%s' % (maildir, folder))
-                else:
-                    self.__warnings.append(_('Skipped mailbox folder: %r') %
-                                           folder)
-            else:
-                self.__warnings.append(_('Skipped mailbox folder: %r') %
-                                       folder)
-
-        subdirs = ['cur', 'new', 'tmp']
-        mode = self._Cfg.dget('account.directory_mode')
-
-        self.__makedir('%s' % uid, mode, uid, gid)
-        os.chdir('%s' % uid)
-        for folder in folders:
-            self.__makedir(folder, mode, uid, gid)
-            for subdir in subdirs:
-                self.__makedir(os.path.join(folder, subdir), mode, uid, gid)
-        self.__subscribe((f.replace(maildir + '/.', '') for f in folders[1:]),
-                         uid, gid)
-        os.chdir(oldpwd)
+        os.chdir(account.domain_directory)
+        os.mkdir('%s' % account.uid, self._Cfg.dget('account.directory_mode'))
+        os.chown('%s' % account.uid, account.uid, account.gid)
 
     def __userDirDelete(self, domdir, uid, gid):
         if uid > 0 and gid > 0:
@@ -390,10 +345,9 @@ class Handler(object):
             dom.update_transport(trsp, force=True)
 
     def domainDelete(self, domainname, force=None):
-        if not force is None and force not in ['deluser', 'delalias',
-                                               'delall']:
-                raise DomainError(_(u'Invalid argument: “%s”') %
-                                         force, ERR.INVALID_OPTION)
+        if force and force not in ('deluser', 'delalias', 'delall'):
+            raise DomainError(_(u"Invalid argument: '%s'") % force,
+                              ERR.INVALID_OPTION)
         dom = self.__getDomain(domainname)
         gid = dom.gid
         domdir = dom.directory
@@ -497,8 +451,18 @@ class Handler(object):
         acc = self.__getAccount(emailaddress)
         acc.set_password(password)
         acc.save()
-        #  depends on modules mailbox and maillocation
-        #  self.__mailDirMake(acc.domain_directory, acc.uid, acc.gid)
+        oldpwd = os.getcwd()
+        self.__make_home(acc)
+        mailbox = new_mailbox(acc)
+        mailbox.create()
+        folders = self._Cfg.dget('mailbox.folders').split(':')
+        if any(folders):
+            bad = mailbox.add_boxes(folders,
+                                    self._Cfg.dget('mailbox.subscribe'))
+            if bad:
+                self.__warnings.append(_(u"Skipped mailbox folders:") +
+                                       '\n\t- ' + '\n\t- '.join(bad))
+        os.chdir(oldpwd)
 
     def aliasAdd(self, aliasaddress, *targetaddresses):
         """Creates a new `Alias` entry for the given *aliasaddress* with
