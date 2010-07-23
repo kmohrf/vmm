@@ -305,7 +305,7 @@ mailboxes in the users home directories. The INBOX will be created always.
     ``maildir``
       since Dovecot v1.0.0
     ``mdbox``
-      since Dovecot v2.0.beta1
+      since Dovecot v2.0.beta5
     ``sdbox``
       since Dovecot v2.0.rc3
 

@@ -319,7 +319,7 @@ erforderlichen Optionen festgelegt. Die INBOX wird in jedem Fall erstellt.
     ``maildir``
       seit Dovecot v1.0.0
     ``mdbox``
-      seit Dovecot v2.0.beta1
+      seit Dovecot v2.0.beta5
     ``sdbox``
       seit Dovecot v2.0.rc3
 

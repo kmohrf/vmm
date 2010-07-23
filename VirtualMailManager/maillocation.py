@@ -22,7 +22,7 @@ __all__ = ('MailLocation', 'known_format')
 _ = lambda msg: msg
 _format_info = {
     'maildir': dict(dovecot_version=0x10000f00, postfix=True),
-    'mdbox': dict(dovecot_version=0x20000b01, postfix=False),
+    'mdbox': dict(dovecot_version=0x20000b05, postfix=False),
     'sdbox': dict(dovecot_version=0x20000c03, postfix=False),
 }
 
