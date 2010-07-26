@@ -11,7 +11,6 @@
 
 import os
 from array import array
-from cStringIO import StringIO
 from fcntl import ioctl
 from getpass import getpass
 from termios import TIOCGWINSZ
@@ -97,10 +96,5 @@ def read_pass():
             continue
         mismatched = False
     return clear0
-
-
-def string_io():
-    """Returns a new `cStringIO.StringIO` instance."""
-    return StringIO()
 
 del _
