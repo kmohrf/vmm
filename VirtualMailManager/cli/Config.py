@@ -4,6 +4,7 @@
 
 """
     VirtualMailManager.cli.CliConfig
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Adds some interactive stuff to the Config class.
 """
@@ -14,8 +15,10 @@ from shutil import copy2
 from VirtualMailManager import ENCODING
 from VirtualMailManager.Config import Config, ConfigValueError, LazyConfig
 from VirtualMailManager.errors import ConfigError
-from VirtualMailManager.cli import w_std
+from VirtualMailManager.cli import w_err, w_std
 from VirtualMailManager.constants.ERROR import VMM_TOO_MANY_FAILURES
+
+_ = lambda msg: msg
 
 
 class CliConfig(Config):
@@ -32,19 +35,20 @@ class CliConfig(Config):
         failures = 0
 
         w_std(_(u'Using configuration file: %s\n') % self._cfg_filename)
-        for s in sections:
-            w_std(_(u'* Configuration section: %r') % s)
-            for opt, val in self.items(s):
+        for section in sections:
+            w_std(_(u'* Configuration section: %r') % section)
+            for opt, val in self.items(section):
                 failures = 0
                 while True:
                     newval = raw_input(input_fmt.encode(ENCODING, 'replace') %
                                        {'option': opt, 'current_value': val})
                     if newval and newval != val:
                         try:
-                            LazyConfig.set(self, '%s.%s' % (s, opt), newval)
+                            LazyConfig.set(self, '%s.%s' % (section, opt),
+                                           newval)
                             break
-                        except (ValueError, ConfigValueError), e:
-                            w_std(_(u'Warning: %s') % e)
+                        except (ValueError, ConfigValueError), err:
+                            w_err(0, _(u'Warning: %s') % err)
                             failures += 1
                             if failures > 2:
                                 raise ConfigError(_(u'Too many failures - try '
@@ -54,7 +58,7 @@ class CliConfig(Config):
                         break
             print
         if self._modified:
-            self.__saveChanges()
+            self.__save_changes()
 
     def set(self, option, value):
         """Set the value of an option.
@@ -78,11 +82,13 @@ class CliConfig(Config):
         if not RawConfigParser.has_section(self, section):
             self.add_section(section)
         RawConfigParser.set(self, section, option_, val)
-        self.__saveChanges()
+        self.__save_changes()
 
-    def __saveChanges(self):
+    def __save_changes(self):
         """Writes changes to the configuration file."""
         copy2(self._cfg_filename, self._cfg_filename + '.bak')
         self._cfg_file = open(self._cfg_filename, 'w')
         self.write(self._cfg_file)
         self._cfg_file.close()
+
+del _
