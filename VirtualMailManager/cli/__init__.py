@@ -20,7 +20,7 @@ from VirtualMailManager.constants.ERROR import VMM_TOO_MANY_FAILURES
 from VirtualMailManager.errors import VMMError
 
 
-__all__ = ('get_winsize', 'read_pass', 'string_io', 'w_err', 'w_std')
+__all__ = ('get_winsize', 'read_pass', 'w_err', 'w_std')
 
 _ = lambda msg: msg
 _std_write = os.sys.stdout.write
