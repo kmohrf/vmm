@@ -13,10 +13,10 @@ from VirtualMailManager.Domain import Domain
 from VirtualMailManager.EmailAddress import EmailAddress
 from VirtualMailManager.Transport import Transport
 from VirtualMailManager.common import version_str
-from VirtualMailManager.constants.ERROR import \
+from VirtualMailManager.constants import \
      ACCOUNT_EXISTS, ACCOUNT_MISSING_PASSWORD, ALIAS_PRESENT, \
-     INVALID_AGUMENT, INVALID_MAIL_LOCATION, NO_SUCH_ACCOUNT, NO_SUCH_DOMAIN, \
-     UNKNOWN_SERVICE
+     INVALID_ARGUMENT, INVALID_MAIL_LOCATION, NO_SUCH_ACCOUNT, \
+     NO_SUCH_DOMAIN, UNKNOWN_SERVICE
 from VirtualMailManager.errors import AccountError as AErr
 from VirtualMailManager.maillocation import MailLocation
 from VirtualMailManager.password import pwhash
@@ -276,7 +276,7 @@ class Account(object):
           The new value of the attribute.
         """
         if field not in ('name', 'password', 'transport'):
-            raise AErr(_(u"Unknown field: '%s'") % field, INVALID_AGUMENT)
+            raise AErr(_(u"Unknown field: '%s'") % field, INVALID_ARGUMENT)
         self._chk_state()
         dbc = self._dbh.cursor()
         if field == 'password':
@@ -402,9 +402,9 @@ def get_account_by_uid(uid, dbh):
     try:
         uid = long(uid)
     except ValueError:
-        raise AErr(_(u'UID must be an int/long.'), INVALID_AGUMENT)
+        raise AErr(_(u'UID must be an int/long.'), INVALID_ARGUMENT)
     if uid < 1:
-        raise AErr(_(u'UID must be greater than 0.'), INVALID_AGUMENT)
+        raise AErr(_(u'UID must be greater than 0.'), INVALID_ARGUMENT)
     dbc = dbh.cursor()
     dbc.execute("SELECT local_part||'@'|| domain_name.domainname AS address, "
                 "uid, users.gid FROM users LEFT JOIN domain_name ON "

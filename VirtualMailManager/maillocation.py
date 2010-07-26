@@ -11,7 +11,7 @@
 
 """
 
-from VirtualMailManager.constants.ERROR import \
+from VirtualMailManager.constants import \
      MAILLOCATION_INIT, UNKNOWN_MAILLOCATION_ID
 from VirtualMailManager.errors import MailLocationError as MLErr
 from VirtualMailManager.pycompat import all

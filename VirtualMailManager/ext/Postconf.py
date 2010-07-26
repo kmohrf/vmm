@@ -17,7 +17,7 @@ import re
 from subprocess import Popen, PIPE
 
 from VirtualMailManager.errors import VMMError
-from VirtualMailManager.constants.ERROR import VMM_ERROR
+from VirtualMailManager.constants import VMM_ERROR
 
 _ = lambda msg: msg
 

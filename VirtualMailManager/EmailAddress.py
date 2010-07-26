@@ -10,7 +10,7 @@
 import re
 
 from VirtualMailManager.Domain import check_domainname
-from VirtualMailManager.constants.ERROR import \
+from VirtualMailManager.constants import \
      DOMAIN_NO_NAME, INVALID_ADDRESS, LOCALPART_INVALID, LOCALPART_TOO_LONG
 from VirtualMailManager.errors import EmailAddressError as EAErr
 

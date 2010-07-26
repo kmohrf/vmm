@@ -26,7 +26,7 @@ except ImportError:
 from VirtualMailManager import ENCODING
 from VirtualMailManager.EmailAddress import EmailAddress
 from VirtualMailManager.common import get_unicode, version_str
-from VirtualMailManager.constants.ERROR import VMM_ERROR
+from VirtualMailManager.constants import VMM_ERROR
 from VirtualMailManager.errors import VMMError
 
 COMPAT = hasattr(hashlib, 'compat')

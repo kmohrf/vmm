@@ -11,8 +11,7 @@
 import gettext
 import locale
 
-from VirtualMailManager.constants.version import __author__, __date__, \
-     __version__
+from VirtualMailManager.constants import __author__, __date__, __version__
 
 __all__ = [
     # version information from VERSION

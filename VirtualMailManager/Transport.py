@@ -10,7 +10,7 @@
     domains and accounts.
 """
 
-from VirtualMailManager.constants.ERROR import UNKNOWN_TRANSPORT_ID
+from VirtualMailManager.constants import UNKNOWN_TRANSPORT_ID
 from VirtualMailManager.errors import TransportError
 from VirtualMailManager.pycompat import any
 

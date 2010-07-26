@@ -16,7 +16,7 @@ from VirtualMailManager import ENCODING
 from VirtualMailManager.Config import Config, ConfigValueError, LazyConfig
 from VirtualMailManager.errors import ConfigError
 from VirtualMailManager.cli import w_err, w_std
-from VirtualMailManager.constants.ERROR import VMM_TOO_MANY_FAILURES
+from VirtualMailManager.constants import VMM_TOO_MANY_FAILURES
 
 _ = lambda msg: msg
 

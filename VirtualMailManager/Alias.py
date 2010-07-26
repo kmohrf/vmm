@@ -13,7 +13,7 @@ from VirtualMailManager.EmailAddress import EmailAddress
 from VirtualMailManager.errors import AliasError as AErr
 from VirtualMailManager.ext.Postconf import Postconf
 from VirtualMailManager.pycompat import all
-from VirtualMailManager.constants.ERROR import \
+from VirtualMailManager.constants import \
      ALIAS_EXCEEDS_EXPANSION_LIMIT, NO_SUCH_ALIAS, NO_SUCH_DOMAIN
 
 

@@ -16,7 +16,7 @@ from getpass import getpass
 from termios import TIOCGWINSZ
 
 from VirtualMailManager import ENCODING
-from VirtualMailManager.constants.ERROR import VMM_TOO_MANY_FAILURES
+from VirtualMailManager.constants import VMM_TOO_MANY_FAILURES
 from VirtualMailManager.errors import VMMError
 
 

@@ -17,7 +17,7 @@ from ConfigParser import \
 from cStringIO import StringIO# TODO: move interactive stff to cli
 
 from VirtualMailManager.common import exec_ok, get_unicode, is_dir, version_hex
-from VirtualMailManager.constants.ERROR import CONF_ERROR
+from VirtualMailManager.constants import CONF_ERROR
 from VirtualMailManager.errors import ConfigError, VMMError
 from VirtualMailManager.maillocation import known_format
 from VirtualMailManager.password import verify_scheme as _verify_scheme

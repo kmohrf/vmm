@@ -9,7 +9,7 @@
 """
 
 from VirtualMailManager.Domain import Domain, check_domainname
-from VirtualMailManager.constants.ERROR import \
+from VirtualMailManager.constants import \
      ALIASDOMAIN_EXISTS, ALIASDOMAIN_ISDOMAIN, ALIASDOMAIN_NO_DOMDEST, \
      NO_SUCH_ALIASDOMAIN, NO_SUCH_DOMAIN
 from VirtualMailManager.errors import AliasDomainError as ADErr

@@ -12,7 +12,7 @@ import os
 import re
 from random import choice
 
-from VirtualMailManager.constants.ERROR import \
+from VirtualMailManager.constants import \
      ACCOUNT_AND_ALIAS_PRESENT, ACCOUNT_PRESENT, ALIAS_PRESENT, \
      DOMAIN_ALIAS_EXISTS, DOMAIN_EXISTS, DOMAIN_INVALID, DOMAIN_TOO_LONG, \
      NO_SUCH_DOMAIN

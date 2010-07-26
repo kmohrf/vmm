@@ -1,6 +1,35 @@
 # -*- coding: UTF-8 -*-
 # Copyright (c) 2007 - 2010, Pascal Volk
 # See COPYING for distribution information.
+"""
+    VirtualMailManager.constants
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    VirtualMailManager's constants:
+        * version information
+        * exit codes
+        * error codes
+"""
+# version information
+
+__all__ = ['__author__', '__date__', '__version__']
+AUTHOR = 'Pascal Volk <neverseen@users.sourceforge.net>'
+RELDATE = '2009-09-09'
+VERSION = '0.5.2'
+__author__ = AUTHOR
+__date__ = RELDATE
+__version__ = VERSION
+
+
+# exit codes
+
+EX_SUCCESS = 0
+EX_MISSING_ARGS = 1
+EX_UNKNOWN_COMMAND = 2
+EX_USER_INTERRUPT = 3
+
+
+# error codes
 
 ACCOUNT_AND_ALIAS_PRESENT = 20
 ACCOUNT_EXISTS = 21
@@ -27,7 +56,7 @@ DOMAIN_NO_NAME = 40
 DOMAIN_TOO_LONG = 41
 FOUND_DOTS_IN_PATH = 42
 INVALID_ADDRESS = 43
-INVALID_AGUMENT = 44
+INVALID_ARGUMENT = 44
 INVALID_MAIL_LOCATION = 70
 INVALID_OPTION = 45
 INVALID_SECTION = 46

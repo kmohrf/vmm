@@ -11,7 +11,7 @@
 from VirtualMailManager.Domain import get_gid
 from VirtualMailManager.EmailAddress import EmailAddress
 from VirtualMailManager.errors import RelocatedError as RErr
-from VirtualMailManager.constants.ERROR import NO_SUCH_DOMAIN, \
+from VirtualMailManager.constants import NO_SUCH_DOMAIN, \
      NO_SUCH_RELOCATED, RELOCATED_ADDR_DEST_IDENTICAL, RELOCATED_EXISTS
 
 

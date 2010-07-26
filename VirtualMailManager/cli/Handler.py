@@ -14,7 +14,7 @@ from VirtualMailManager.errors import VMMError
 from VirtualMailManager.Handler import Handler
 from VirtualMailManager.cli import read_pass
 from VirtualMailManager.cli.Config import CliConfig as Cfg
-from VirtualMailManager.constants.ERROR import INVALID_SECTION
+from VirtualMailManager.constants import INVALID_SECTION
 
 _ = lambda msg: msg
 
