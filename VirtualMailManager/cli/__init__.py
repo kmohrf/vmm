@@ -4,20 +4,26 @@
 
 """
     VirtualMailManager.cli
+    ~~~~~~~~~~~~~~~~~~~~~~
 
     VirtualMailManager's command line interface.
 """
 
 import os
+from array import array
 from cStringIO import StringIO
+from fcntl import ioctl
 from getpass import getpass
-from textwrap import TextWrapper
+from termios import TIOCGWINSZ
 
 from VirtualMailManager import ENCODING
+from VirtualMailManager.constants.ERROR import VMM_TOO_MANY_FAILURES
+from VirtualMailManager.errors import VMMError
 
 
 __all__ = ('get_winsize', 'read_pass', 'string_io', 'w_err', 'w_std')
 
+_ = lambda msg: msg
 _std_write = os.sys.stdout.write
 _err_write = os.sys.stderr.write
 
@@ -25,23 +31,19 @@ _err_write = os.sys.stderr.write
 def w_std(*args):
     """Writes a line for each arg of *args*, encoded in the current
     ENCODING, to stdout.
-
     """
-    _std_write('\n'.join(arg.encode(ENCODING, 'replace') for arg in args))
-    _std_write('\n')
+    _std_write('\n'.join(a.encode(ENCODING, 'replace') for a in args) + '\n')
 
 
 def w_err(code, *args):
     """Writes a line for each arg of *args*, encoded in the current
     ENCODING, to stderr.
-
-    This function additional interrupts the program execution and uses
-    *code* as the system exit status.
-
+    This function optionally interrupts the program execution if *code*
+    does not equal to 0. *code* will be used as the system exit status.
     """
-    _err_write('\n'.join(arg.encode(ENCODING, 'replace') for arg in args))
-    _err_write('\n')
-    os.sys.exit(code)
+    _err_write('\n'.join(a.encode(ENCODING, 'replace') for a in args) + '\n')
+    if code:
+        os.sys.exit(code)
 
 
 def get_winsize():
@@ -52,7 +54,7 @@ def get_winsize():
         if hasattr(dev, 'fileno') and os.isatty(dev.fileno()):
             fd = dev.fileno()
             break
-    if fd is None:# everything seems to be redirected
+    if fd is None:  # everything seems to be redirected
         # fall back to environment or assume some common defaults
         ws_row, ws_col = 24, 80
         try:
@@ -61,11 +63,6 @@ def get_winsize():
         except ValueError:
             pass
         return ws_row, ws_col
-
-    from array import array
-    from fcntl import ioctl
-    from termios import TIOCGWINSZ
-
     #"struct winsize" with the ``unsigned short int``s ws_{row,col,{x,y}pixel}
     ws = array('H', (0, 0, 0, 0))
     ioctl(fd, TIOCGWINSZ, ws, True)
@@ -76,7 +73,7 @@ def get_winsize():
 def read_pass():
     """Interactive 'password chat', returns the password in plain format.
 
-    Throws a VMMException after the third failure.
+    Throws a VMMError after the third failure.
     """
     # TP: Please preserve the trailing space.
     readp_msg0 = _(u'Enter new password: ').encode(ENCODING, 'replace')
@@ -86,17 +83,17 @@ def read_pass():
     failures = 0
     while mismatched:
         if failures > 2:
-            raise VMMException(_(u'Too many failures - try again later.'),
-                               ERR.VMM_TOO_MANY_FAILURES)
+            raise VMMError(_(u'Too many failures - try again later.'),
+                           VMM_TOO_MANY_FAILURES)
         clear0 = getpass(prompt=readp_msg0)
         clear1 = getpass(prompt=readp_msg1)
         if clear0 != clear1:
             failures += 1
-            w_std(_(u'Sorry, passwords do not match'))
+            w_err(0, _(u'Sorry, passwords do not match'))
             continue
         if not clear0:
             failures += 1
-            w_std(_(u'Sorry, empty passwords are not permitted'))
+            w_err(0, _(u'Sorry, empty passwords are not permitted'))
             continue
         mismatched = False
     return clear0
@@ -105,3 +102,5 @@ def read_pass():
 def string_io():
     """Returns a new `cStringIO.StringIO` instance."""
     return StringIO()
+
+del _
