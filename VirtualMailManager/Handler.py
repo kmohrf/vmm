@@ -43,6 +43,8 @@ from VirtualMailManager.Transport import Transport
 
 _ = lambda msg: msg
 
+CFG_FILE = 'vmm.cfg'
+CFG_PATH = '/root:/usr/local/etc:/etc'
 RE_DOMAIN_SEARCH = """^[a-z0-9-\.]+$"""
 TYPE_ACCOUNT = 0x1
 TYPE_ALIAS = 0x2
@@ -57,7 +59,7 @@ OTHER_TYPES = {
 class Handler(object):
     """Wrapper class to simplify the access on all the stuff from
     VirtualMailManager"""
-    __slots__ = ('_Cfg', '_cfgFileName', '_dbh', '__warnings')
+    __slots__ = ('_cfg', '_cfg_fname', '_dbh', '__warnings')
 
     def __init__(self, skip_some_checks=False):
         """Creates a new Handler instance.
@@ -69,70 +71,80 @@ class Handler(object):
 
         Throws a NotRootError if your uid is greater 0.
         """
-        self._cfgFileName = ''
+        self._cfg_fname = ''
         self.__warnings = []
-        self._Cfg = None
+        self._cfg = None
         self._dbh = None
 
         if os.geteuid():
             raise NotRootError(_(u"You are not root.\n\tGood bye!\n"),
                                CONF_NOPERM)
-        if self.__chkCfgFile():
-            self._Cfg = Cfg(self._cfgFileName)
-            self._Cfg.load()
+        if self.__check_cfg_file():
+            self._cfg = Cfg(self._cfg_fname)
+            self._cfg.load()
         if not skip_some_checks:
-            self._Cfg.check()
+            self._cfg.check()
             self._chkenv()
 
-    def __findCfgFile(self):
-        for path in ['/root', '/usr/local/etc', '/etc']:
-            tmp = os.path.join(path, 'vmm.cfg')
+    def __find_cfg_file(self):
+        """Search the CFG_FILE in CFG_PATH.
+        Raise a VMMError when no vmm.cfg could be found.
+        """
+        for path in CFG_PATH.split(':'):
+            tmp = os.path.join(path, CFG_FILE)
             if os.path.isfile(tmp):
-                self._cfgFileName = tmp
+                self._cfg_fname = tmp
                 break
-        if not len(self._cfgFileName):
-            raise VMMError(_(u"No 'vmm.cfg' found in: "
-                             u"/root:/usr/local/etc:/etc"), CONF_NOFILE)
+        if not self._cfg_fname:
+            raise VMMError(_(u"Could not find '%(cfg_file)s' in: "
+                             u"'%(cfg_path)s'") % {'cfg_file': CFG_FILE,
+                           'cfg_path' : CFG_PATH}, CONF_NOFILE)
 
-    def __chkCfgFile(self):
+    def __check_cfg_file(self):
         """Checks the configuration file, returns bool"""
-        self.__findCfgFile()
-        fstat = os.stat(self._cfgFileName)
+        self.__find_cfg_file()
+        fstat = os.stat(self._cfg_fname)
         fmode = int(oct(fstat.st_mode & 0777))
         if fmode % 100 and fstat.st_uid != fstat.st_gid or \
            fmode % 10 and fstat.st_uid == fstat.st_gid:
             raise PermissionError(_(u"wrong permissions for '%(file)s': "
                                     u"%(perms)s\n`chmod 0600 %(file)s` would "
-                                    u"be great.") % {'file': self._cfgFileName,
+                                    u"be great.") % {'file': self._cfg_fname,
                                   'perms': fmode}, CONF_WRONGPERM)
         else:
             return True
 
     def _chkenv(self):
-        """"""
-        basedir = self._Cfg.dget('misc.base_directory')
+        """Make sure our base_directory is a directory and that all
+        required executables exists and are executable.
+        If not, a VMMError will be raised"""
+        basedir = self._cfg.dget('misc.base_directory')
         if not os.path.exists(basedir):
             old_umask = os.umask(0006)
             os.makedirs(basedir, 0771)
             os.chown(basedir, 0, 0)
             os.umask(old_umask)
         elif not os.path.isdir(basedir):
-            raise VMMError(_(u"'%s' is not a directory.\n(vmm.cfg: section "
-                             u"'misc', option 'base_directory')") % basedir,
+            raise VMMError(_(u"'%(path)s' is not a directory.\n(%(cfg_file)s: "
+                             u"section 'misc', option 'base_directory')") %
+                           {'path': basedir, 'cfg_file': self._cfg_fname},
                            NO_SUCH_DIRECTORY)
-        for opt, val in self._Cfg.items('bin'):
+        for opt, val in self._cfg.items('bin'):
             try:
                 exec_ok(val)
             except VMMError, err:
                 if err.code is NO_SUCH_BINARY:
-                    raise VMMError(_(u"'%(binary)s' doesn't exist.\n(vmm.cfg: "
-                                     u"section 'bin', option '%(option)s')") %
-                                   {'binary': val, 'option': opt}, err.code)
+                    raise VMMError(_(u"'%(binary)s' doesn't exist.\n"
+                                     u"(%(cfg_file)s: section 'bin', option "
+                                     u"'%(option)s')") % {'binary': val,
+                                   'cfg_file': self._cfg_fname, 'option': opt},
+                                   err.code)
                 elif err.code is NOT_EXECUTABLE:
                     raise VMMError(_(u"'%(binary)s' is not executable.\n"
-                                     u"(vmm.cfg: section 'bin', option "
+                                     u"(%(cfg_file)s: section 'bin', option "
                                      u"'%(option)s')") % {'binary': val,
-                                   'option': opt}, err.code)
+                                   'cfg_file': self._cfg_fname, 'option': opt},
+                                   err.code)
                 else:
                     raise
 
@@ -142,10 +154,10 @@ class Handler(object):
                                   not self._dbh._isOpen):
             try:
                 self._dbh = PgSQL.connect(
-                        database=self._Cfg.dget('database.name'),
-                        user=self._Cfg.pget('database.user'),
-                        host=self._Cfg.dget('database.host'),
-                        password=self._Cfg.pget('database.pass'),
+                        database=self._cfg.dget('database.name'),
+                        user=self._cfg.pget('database.user'),
+                        host=self._cfg.dget('database.host'),
+                        password=self._cfg.pget('database.pass'),
                         client_encoding='utf8', unicode_results=True)
                 dbc = self._dbh.cursor()
                 dbc.execute("SET NAMES 'UTF8'")
@@ -216,7 +228,7 @@ class Handler(object):
         directory -- the directory to summarize recursively disk usage for
         """
         if self.__isdir(directory):
-            return Popen([self._Cfg.dget('bin.du'), "-hs", directory],
+            return Popen([self._cfg.dget('bin.du'), "-hs", directory],
                 stdout=PIPE).communicate()[0].split('\t')[0]
         else:
             return 0
@@ -230,12 +242,12 @@ class Handler(object):
     def __make_domain_dir(self, domain):
         cwd = os.getcwd()
         hashdir, domdir = domain.directory.split(os.path.sep)[-2:]
-        os.chdir(self._Cfg.dget('misc.base_directory'))
+        os.chdir(self._cfg.dget('misc.base_directory'))
         if not os.path.isdir(hashdir):
             os.mkdir(hashdir, 0711)
             os.chown(hashdir, 0, 0)
         os.mkdir(os.path.join(hashdir, domdir),
-                 self._Cfg.dget('domain.directory_mode'))
+                 self._cfg.dget('domain.directory_mode'))
         os.chown(domain.directory, 0, domain.gid)
         os.chdir(cwd)
 
@@ -243,7 +255,7 @@ class Handler(object):
         """Create a home directory for the new Account *account*."""
         os.umask(0007)
         os.chdir(account.domain_directory)
-        os.mkdir('%s' % account.uid, self._Cfg.dget('account.directory_mode'))
+        os.mkdir('%s' % account.uid, self._cfg.dget('account.directory_mode'))
         os.chown('%s' % account.uid, account.uid, account.gid)
 
     def __userDirDelete(self, domdir, uid, gid):
@@ -270,7 +282,7 @@ class Handler(object):
         if gid > 0:
             if not self.__isdir(domdir):
                 return
-            basedir = self._Cfg.dget('misc.base_directory')
+            basedir = self._cfg.dget('misc.base_directory')
             domdirdirs = domdir.replace(basedir + '/', '').split('/')
             domdirparent = os.path.join(basedir, domdirdirs[0])
             if basedir.count('..') or domdir.count('..'):
@@ -300,27 +312,27 @@ class Handler(object):
         """Get the configured value of the *option* (section.option).
         When the option was not configured its default value will be
         returned."""
-        return self._Cfg.dget(option)
+        return self._cfg.dget(option)
 
     def cfg_pget(self, option):
         """Get the configured value of the *option* (section.option)."""
-        return self._Cfg.pget(option)
+        return self._cfg.pget(option)
 
     def cfg_install(self):
         """Installs the cfg_dget method as ``cfg_dget`` into the built-in
         namespace."""
         import __builtin__
         assert 'cfg_dget' not in __builtin__.__dict__
-        __builtin__.__dict__['cfg_dget'] = self._Cfg.dget
+        __builtin__.__dict__['cfg_dget'] = self._cfg.dget
 
     def domainAdd(self, domainname, transport=None):
         dom = self.__getDomain(domainname)
         if transport is None:
             dom.set_transport(Transport(self._dbh,
-                              transport=self._Cfg.dget('misc.transport')))
+                              transport=self._cfg.dget('misc.transport')))
         else:
             dom.set_transport(Transport(self._dbh, transport=transport))
-        dom.set_directory(self._Cfg.dget('misc.base_directory'))
+        dom.set_directory(self._cfg.dget('misc.base_directory'))
         dom.save()
         self.__make_domain_dir(dom)
 
@@ -342,7 +354,7 @@ class Handler(object):
         dom = self.__getDomain(domainname)
         gid = dom.gid
         domdir = dom.directory
-        if self._Cfg.dget('domain.force_deletion') or force == 'delall':
+        if self._cfg.dget('domain.force_deletion') or force == 'delall':
             dom.delete(True, True)
         elif force == 'deluser':
             dom.delete(deluser=True)
@@ -350,7 +362,7 @@ class Handler(object):
             dom.delete(delalias=True)
         else:
             dom.delete()
-        if self._Cfg.dget('domain.delete_directory'):
+        if self._cfg.dget('domain.delete_directory'):
             self.__domDirDelete(domdir, gid)
 
     def domainInfo(self, domainname, details=None):
@@ -446,10 +458,10 @@ class Handler(object):
         self.__make_home(acc)
         mailbox = new_mailbox(acc)
         mailbox.create()
-        folders = self._Cfg.dget('mailbox.folders').split(':')
+        folders = self._cfg.dget('mailbox.folders').split(':')
         if any(folders):
             bad = mailbox.add_boxes(folders,
-                                    self._Cfg.dget('mailbox.subscribe'))
+                                    self._cfg.dget('mailbox.subscribe'))
             if bad:
                 self.__warnings.append(_(u"Skipped mailbox folders:") +
                                        '\n\t- ' + '\n\t- '.join(bad))
@@ -485,7 +497,7 @@ class Handler(object):
         dom_dir = acc.domain_directory
         acc_dir = acc.home
         acc.delete(bool(force))
-        if self._Cfg.dget('account.delete_directory'):
+        if self._cfg.dget('account.delete_directory'):
             try:
                 self.__userDirDelete(dom_dir, uid, gid)
             except VMMError, err:
@@ -532,7 +544,7 @@ The account has been successfully deleted from the database.
                 raise VMMError(_(u"The account '%s' doesn't exist.") %
                                acc.address, NO_SUCH_ACCOUNT)
         info = acc.get_info()
-        if self._Cfg.dget('account.disk_usage') or details in ('du', 'full'):
+        if self._cfg.dget('account.disk_usage') or details in ('du', 'full'):
             path = os.path.join(acc.home, acc.mail_location.directory)
             info['disk usage'] = self.__getDiskUsage(path)
             if details in (None, 'du'):

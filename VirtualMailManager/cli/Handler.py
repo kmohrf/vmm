@@ -42,14 +42,14 @@ class CliHandler(Handler):
                                               'v', 'version')
         super(CliHandler, self).__init__(skip_some_checks)
 
-        self._Cfg = Cfg(self._cfgFileName)
-        self._Cfg.load()
+        self._cfg = Cfg(self._cfg_fname)
+        self._cfg.load()
         if not skip_some_checks:
-            self._Cfg.check()
+            self._cfg.check()
             self._chkenv()
 
     def cfgSet(self, option, value):
-        return self._Cfg.set(option, value)
+        return self._cfg.set(option, value)
 
     def configure(self, section=None):
         """Starts the interactive configuration.
@@ -59,9 +59,9 @@ class CliHandler(Handler):
         will be prompted.
         """
         if section is None:
-            self._Cfg.configure(self._Cfg.sections())
-        elif self._Cfg.has_section(section):
-            self._Cfg.configure([section])
+            self._cfg.configure(self._cfg.sections())
+        elif self._cfg.has_section(section):
+            self._cfg.configure([section])
         else:
             raise VMMError(_(u'Invalid section: “%s”') % section,
                            INVALID_SECTION)
