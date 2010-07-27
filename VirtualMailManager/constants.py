@@ -17,6 +17,7 @@ AUTHOR = 'Pascal Volk <neverseen@users.sourceforge.net>'
 RELDATE = '2009-09-09'
 VERSION = '0.5.2'
 __author__ = AUTHOR
+__copyright__ = 'Copyright (c) 2007-2010 %s' % __author__
 __date__ = RELDATE
 __version__ = VERSION
 
