@@ -13,6 +13,8 @@ from VirtualMailManager.constants import UNKNOWN_TRANSPORT_ID
 from VirtualMailManager.errors import TransportError
 from VirtualMailManager.pycompat import any
 
+_ = lambda msg: msg
+
 
 class Transport(object):
     """A wrapper class that provides access to the transport table"""
@@ -35,11 +37,11 @@ class Transport(object):
         if tid:
             assert not isinstance(tid, bool) and isinstance(tid, (int, long))
             self._tid = tid
-            self._loadByID()
+            self._load_by_id()
         else:
             assert isinstance(transport, basestring)
             self._transport = transport
-            self._loadByName()
+            self._load_by_name()
 
     @property
     def tid(self):
@@ -53,18 +55,19 @@ class Transport(object):
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self._tid == other.tid
+            return self._tid == other._tid
         return NotImplemented
 
     def __ne__(self, other):
         if isinstance(other, self.__class__):
-            return self._tid != other.tid
+            return self._tid != other._tid
         return NotImplemented
 
     def __str__(self):
         return self._transport
 
-    def _loadByID(self):
+    def _load_by_id(self):
+        """load a transport by its id from the database"""
         dbc = self._dbh.cursor()
         dbc.execute('SELECT transport FROM transport WHERE tid=%s', self._tid)
         result = dbc.fetchone()
@@ -75,7 +78,8 @@ class Transport(object):
             raise TransportError(_(u'Unknown tid specified.'),
                                  UNKNOWN_TRANSPORT_ID)
 
-    def _loadByName(self):
+    def _load_by_name(self):
+        """Load a transport by its transport name from the database."""
         dbc = self._dbh.cursor()
         dbc.execute('SELECT tid FROM transport WHERE transport = %s',
                     self._transport)
@@ -87,6 +91,7 @@ class Transport(object):
             self._save()
 
     def _save(self):
+        """Save the new transport in the database."""
         dbc = self._dbh.cursor()
         dbc.execute("SELECT nextval('transport_id')")
         self._tid = dbc.fetchone()[0]
@@ -94,3 +99,5 @@ class Transport(object):
                     self._transport)
         self._dbh.commit()
         dbc.close()
+
+del _
