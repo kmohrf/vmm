@@ -249,7 +249,6 @@ class SingleDbox(Mailbox):
         if subscribe:
             cmd_args.append('-s')
         cmd_args.extend(mailboxes)
-        print '\n -> %r\n' % cmd_args
         process = Popen(cmd_args, stdout=PIPE, stderr=PIPE)
         stdout, stderr = process.communicate()
         if process.returncode:
