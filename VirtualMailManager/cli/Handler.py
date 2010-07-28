@@ -48,7 +48,8 @@ class CliHandler(Handler):
             self._cfg.check()
             self._chkenv()
 
-    def cfgSet(self, option, value):
+    def cfg_set(self, option, value):
+        """Set a new value for the given option."""
         return self._cfg.set(option, value)
 
     def configure(self, section=None):
