@@ -1,9 +1,9 @@
 # -*- coding: UTF-8 -*-
 # Copyright (c) 2007 - 2010, Pascal Volk
 # See COPYING for distribution information.
-
 """
-   VirtualMailManager.Handler
+   VirtualMailManager.handler
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
    A wrapper class. It wraps round all other classes and does some
    dependencies checks.
@@ -20,25 +20,25 @@ from subprocess import Popen, PIPE
 
 from pyPgSQL import PgSQL  # python-pgsql - http://pypgsql.sourceforge.net
 
-from VirtualMailManager.Account import Account
-from VirtualMailManager.Alias import Alias
-from VirtualMailManager.AliasDomain import AliasDomain
+from VirtualMailManager.account import Account
+from VirtualMailManager.alias import Alias
+from VirtualMailManager.aliasdomain import AliasDomain
 from VirtualMailManager.common import exec_ok
-from VirtualMailManager.Config import Config as Cfg
+from VirtualMailManager.config import Config as Cfg
 from VirtualMailManager.constants import \
      ACCOUNT_EXISTS, ALIAS_EXISTS, CONF_NOFILE, CONF_NOPERM, CONF_WRONGPERM, \
      DATABASE_ERROR, DOMAINDIR_GROUP_MISMATCH, DOMAIN_INVALID, \
      FOUND_DOTS_IN_PATH, INVALID_ARGUMENT, MAILDIR_PERM_MISMATCH, \
      NOT_EXECUTABLE, NO_SUCH_ACCOUNT, NO_SUCH_ALIAS, NO_SUCH_BINARY, \
      NO_SUCH_DIRECTORY, NO_SUCH_RELOCATED, RELOCATED_EXISTS
-from VirtualMailManager.Domain import Domain, get_gid
-from VirtualMailManager.EmailAddress import EmailAddress
+from VirtualMailManager.domain import Domain, get_gid
+from VirtualMailManager.emailaddress import EmailAddress
 from VirtualMailManager.errors import \
      DomainError, NotRootError, PermissionError, VMMError
 from VirtualMailManager.mailbox import new as new_mailbox
 from VirtualMailManager.pycompat import any
-from VirtualMailManager.Relocated import Relocated
-from VirtualMailManager.Transport import Transport
+from VirtualMailManager.relocated import Relocated
+from VirtualMailManager.transport import Transport
 
 
 _ = lambda msg: msg
@@ -455,7 +455,7 @@ class Handler(object):
 
     def domain_list(self, pattern=None):
         """Wrapper around function search() from module Domain."""
-        from VirtualMailManager.Domain import search
+        from VirtualMailManager.domain import search
         like = False
         if pattern and (pattern.startswith('%') or pattern.endswith('%')):
             like = True
@@ -572,7 +572,7 @@ The account has been successfully deleted from the database.
     def user_by_uid(self, uid):
         """Search for an Account by its *uid*.
         Returns a dict (address, uid and gid) if a user could be found."""
-        from VirtualMailManager.Account import get_account_by_uid
+        from VirtualMailManager.account import get_account_by_uid
         self._db_connect()
         return get_account_by_uid(uid, self._dbh)
 

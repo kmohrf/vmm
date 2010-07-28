@@ -1,9 +1,9 @@
 # -*- coding: UTF-8 -*-
 # Copyright (c) 2007 - 2010, Pascal Volk
 # See COPYING for distribution information.
-
 """
-    VirtualMailManager.Domain
+    VirtualMailManager.domain
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Virtual Mail Manager's Domain class to manage e-mail domains.
 """
@@ -17,7 +17,7 @@ from VirtualMailManager.constants import \
      DOMAIN_ALIAS_EXISTS, DOMAIN_EXISTS, DOMAIN_INVALID, DOMAIN_TOO_LONG, \
      NO_SUCH_DOMAIN
 from VirtualMailManager.errors import DomainError as DomErr
-from VirtualMailManager.Transport import Transport
+from VirtualMailManager.transport import Transport
 
 
 MAILDIR_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz'
@@ -404,6 +404,5 @@ def search(dbh, pattern=None, like=False):
                 gids.append(gid)
                 domains[gid] = [None, domain]
     return gids, domains
-
 
 del _

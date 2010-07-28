@@ -1,10 +1,9 @@
 # -*- coding: UTF-8 -*-
 # Copyright (c) 2010, Pascal Volk
 # See COPYING for distribution information.
-
 """
-    VirtualMailManager.cli.CliConfig
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    VirtualMailManager.cli.config
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Adds some interactive stuff to the Config class.
 """
@@ -13,7 +12,7 @@ from ConfigParser import RawConfigParser
 from shutil import copy2
 
 from VirtualMailManager import ENCODING
-from VirtualMailManager.Config import Config, ConfigValueError, LazyConfig
+from VirtualMailManager.config import Config, ConfigValueError, LazyConfig
 from VirtualMailManager.errors import ConfigError
 from VirtualMailManager.cli import w_err, w_std
 from VirtualMailManager.constants import VMM_TOO_MANY_FAILURES

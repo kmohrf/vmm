@@ -1,9 +1,9 @@
 # -*- coding: UTF-8 -*-
 # Copyright (c) 2010, Pascal Volk
 # See COPYING for distribution information.
-
 """
     VirtualMailManager.password
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     VirtualMailManager's password module to generate password hashes from
     passwords or random passwords. This module provides following
@@ -24,7 +24,7 @@ except ImportError:
     from VirtualMailManager.pycompat import hashlib
 
 from VirtualMailManager import ENCODING
-from VirtualMailManager.EmailAddress import EmailAddress
+from VirtualMailManager.emailaddress import EmailAddress
 from VirtualMailManager.common import get_unicode, version_str
 from VirtualMailManager.constants import VMM_ERROR
 from VirtualMailManager.errors import VMMError

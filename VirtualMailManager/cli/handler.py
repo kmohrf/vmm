@@ -1,9 +1,9 @@
 # -*- coding: UTF-8 -*-
 # Copyright (c) 2010, Pascal Volk
 # See COPYING for distribution information.
-
 """
-    VirtualMailManager.cli.Handler
+    VirtualMailManager.cli.handler
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     A derived Handler class with a few changes/additions for cli use.
 """
@@ -11,9 +11,9 @@
 import os
 
 from VirtualMailManager.errors import VMMError
-from VirtualMailManager.Handler import Handler
+from VirtualMailManager.handler import Handler
 from VirtualMailManager.cli import read_pass
-from VirtualMailManager.cli.Config import CliConfig as Cfg
+from VirtualMailManager.cli.config import CliConfig as Cfg
 from VirtualMailManager.constants import INVALID_SECTION
 
 _ = lambda msg: msg

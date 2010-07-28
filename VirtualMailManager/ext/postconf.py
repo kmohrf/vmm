@@ -2,7 +2,7 @@
 # Copyright (c) 2008 - 2010, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.ext.Postconf
+    VirtualMailManager.ext.postconf
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Wrapper class for Postfix's postconf.

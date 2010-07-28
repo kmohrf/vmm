@@ -1,9 +1,9 @@
 # -*- coding: UTF-8 -*-
 # Copyright (c) 2007 - 2010, Pascal Volk
 # See COPYING for distribution information.
-
 """
     VirtualMailManager.errors
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
 
     VMM's Exception classes
 """
@@ -19,6 +19,7 @@ class VMMError(Exception):
 
     def __repr__(self):
         return '%s(%r, %r)' % (self.__class__.__name__, self.msg, self.code)
+
 
 class ConfigError(VMMError):
     """Exception class for configuration exceptions"""

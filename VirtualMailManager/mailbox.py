@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 # Copyright (c) 2010, Pascal Volk
 # See COPYING for distribution information.
-
 """
     VirtualMailManager.mailbox
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -15,7 +14,7 @@ import re
 from binascii import a2b_base64, b2a_base64
 from subprocess import Popen, PIPE
 
-from VirtualMailManager.Account import Account
+from VirtualMailManager.account import Account
 from VirtualMailManager.common import is_dir
 from VirtualMailManager.errors import VMMError
 from VirtualMailManager.constants import VMM_ERROR

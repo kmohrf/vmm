@@ -1,9 +1,8 @@
 # -*- coding: UTF-8 -*-
 # Copyright (c) 2008 - 2010, Pascal Volk
 # See COPYING for distribution information.
-
 """
-    VirtualMailManager.Transport
+    VirtualMailManager.transport
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Virtual Mail Manager's Transport class to manage the transport for

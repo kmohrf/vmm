@@ -1,15 +1,15 @@
 # -*- coding: UTF-8 -*-
 # Copyright (c) 2008 - 2010, Pascal Volk
 # See COPYING for distribution information.
-
 """
-    VirtualMailManager.Relocated
+    VirtualMailManager.relocated
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Virtual Mail Manager's Relocated class to handle relocated users.
 """
 
-from VirtualMailManager.Domain import get_gid
-from VirtualMailManager.EmailAddress import EmailAddress
+from VirtualMailManager.domain import get_gid
+from VirtualMailManager.emailaddress import EmailAddress
 from VirtualMailManager.errors import RelocatedError as RErr
 from VirtualMailManager.constants import NO_SUCH_DOMAIN, \
      NO_SUCH_RELOCATED, RELOCATED_ADDR_DEST_IDENTICAL, RELOCATED_EXISTS
@@ -110,6 +110,5 @@ class Relocated(object):
             self._dbh.commit()
         dbc.close()
         self._dest = None
-
 
 del _

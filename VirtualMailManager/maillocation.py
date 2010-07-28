@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 # Copyright (c) 2008 - 2010, Pascal Volk
 # See COPYING for distribution information.
-
 """
     VirtualMailManager.maillocation
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

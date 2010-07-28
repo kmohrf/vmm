@@ -1,15 +1,15 @@
 # -*- coding: UTF-8 -*-
 # Copyright (c) 2008 - 2010, Pascal Volk
 # See COPYING for distribution information.
-
 """
-    VirtualMailManager.EmailAddress
+    VirtualMailManager.emailaddress
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Virtual Mail Manager's EmailAddress class to handle e-mail addresses.
 """
 import re
 
-from VirtualMailManager.Domain import check_domainname
+from VirtualMailManager.domain import check_domainname
 from VirtualMailManager.constants import \
      DOMAIN_NO_NAME, INVALID_ADDRESS, LOCALPART_INVALID, LOCALPART_TOO_LONG
 from VirtualMailManager.errors import EmailAddressError as EAErr
@@ -99,6 +99,5 @@ def check_localpart(localpart):
                       u"characters: %(i_chars)s") % {'l_part': localpart,
                     'i_chars': i_chars}, LOCALPART_INVALID)
     return localpart
-
 
 del _

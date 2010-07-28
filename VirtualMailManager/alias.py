@@ -1,17 +1,17 @@
 # -*- coding: UTF-8 -*-
 # Copyright (c) 2007 - 2010, Pascal Volk
 # See COPYING for distribution information.
-
 """
-    VirtualMailManager.Alias
+    VirtualMailManager.alias
+    ~~~~~~~~~~~~~~~~~~~~~~~~
 
     Virtual Mail Manager's Alias class to manage e-mail aliases.
 """
 
-from VirtualMailManager.Domain import get_gid
-from VirtualMailManager.EmailAddress import EmailAddress
+from VirtualMailManager.domain import get_gid
+from VirtualMailManager.emailaddress import EmailAddress
 from VirtualMailManager.errors import AliasError as AErr
-from VirtualMailManager.ext.Postconf import Postconf
+from VirtualMailManager.ext.postconf import Postconf
 from VirtualMailManager.pycompat import all
 from VirtualMailManager.constants import \
      ALIAS_EXCEEDS_EXPANSION_LIMIT, NO_SUCH_ALIAS, NO_SUCH_DOMAIN
@@ -160,6 +160,5 @@ Hint: Delete some destination addresses.""")
                        NO_SUCH_ALIAS)
         self.__delete()
         del self._dests[:]
-
 
 del _, cfg_dget

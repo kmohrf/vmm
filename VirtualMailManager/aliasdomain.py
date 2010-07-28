@@ -1,14 +1,14 @@
 # -*- coding: UTF-8 -*-
 # Copyright (c) 2008 - 2010, Pascal Volk
 # See COPYING for distribution information.
-
 """
-    VirtualMailManager.AliasDomain
+    VirtualMailManager.aliasdomain
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Virtual Mail Manager's AliasDomain class to manage alias domains.
 """
 
-from VirtualMailManager.Domain import Domain, check_domainname
+from VirtualMailManager.domain import Domain, check_domainname
 from VirtualMailManager.constants import \
      ALIASDOMAIN_EXISTS, ALIASDOMAIN_ISDOMAIN, ALIASDOMAIN_NO_DOMDEST, \
      NO_SUCH_ALIASDOMAIN, NO_SUCH_DOMAIN
@@ -139,6 +139,5 @@ class AliasDomain(object):
             self._dbh.commit()
             self._gid = 0
         dbc.close()
-
 
 del _

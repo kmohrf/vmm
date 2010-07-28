@@ -1,17 +1,16 @@
 # -*- coding: UTF-8 -*-
 # Copyright (c) 2007 - 2010, Pascal Volk
 # See COPYING for distribution information.
-
 """
-    VirtualMailManager.Account
+    VirtualMailManager.account
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Virtual Mail Manager's Account class to manage e-mail accounts.
 """
 
-from VirtualMailManager.Domain import Domain
-from VirtualMailManager.EmailAddress import EmailAddress
-from VirtualMailManager.Transport import Transport
+from VirtualMailManager.domain import Domain
+from VirtualMailManager.emailaddress import EmailAddress
+from VirtualMailManager.transport import Transport
 from VirtualMailManager.common import version_str
 from VirtualMailManager.constants import \
      ACCOUNT_EXISTS, ACCOUNT_MISSING_PASSWORD, ALIAS_PRESENT, \
