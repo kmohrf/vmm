@@ -35,9 +35,9 @@ class Alias(object):
                        self._addr.domainname, NO_SUCH_DOMAIN)
         self._dests = []
 
-        self.__load_dests()
+        self._load_dests()
 
-    def __load_dests(self):
+    def _load_dests(self):
         """Loads all known destination addresses into the _dests list."""
         dbc = self._dbh.cursor()
         dbc.execute('SELECT destination FROM alias WHERE gid = %s AND '
@@ -47,7 +47,7 @@ class Alias(object):
             self._dests.extend(EmailAddress(dest[0]) for dest in dests)
         dbc.close()
 
-    def __check_expansion(self, count_new):
+    def _check_expansion(self, count_new):
         """Checks the current expansion limit of the alias."""
         postconf = Postconf(cfg_dget('bin.postconf'))
         limit = long(postconf.read('virtual_alias_expansion_limit'))
@@ -72,7 +72,7 @@ Hint: Delete some destination addresses.""")
                                  'limit': limit, 'count_new': count_new},
                        ALIAS_EXCEEDS_EXPANSION_LIMIT)
 
-    def __delete(self, destination=None):
+    def _delete(self, destination=None):
         """Deletes a destination from the alias, if ``destination`` is
         not ``None``.  If ``destination`` is None, the alias with all
         its destination addresses will be deleted.
@@ -123,7 +123,7 @@ Hint: Delete some destination addresses.""")
                 warnings.extend(duplicates)
         if not destinations:
             return destinations
-        self.__check_expansion(len(destinations))
+        self._check_expansion(len(destinations))
         dbc = self._dbh.cursor()
         dbc.executemany("INSERT INTO alias VALUES (%d, '%s', %%s)" %
                         (self._gid, self._addr.localpart),
@@ -143,7 +143,7 @@ Hint: Delete some destination addresses.""")
             raise AErr(_(u"The address '%(addr)s' isn't a destination of "
                          u"the alias '%(alias)s'.") % {'addr': self._addr,
                        'alias': destination}, NO_SUCH_ALIAS)
-        self.__delete(destination)
+        self._delete(destination)
         self._dests.remove(destination)
 
     def get_destinations(self):
@@ -158,7 +158,7 @@ Hint: Delete some destination addresses.""")
         if not self._dests:
             raise AErr(_(u"The alias '%s' doesn't exist.") % self._addr,
                        NO_SUCH_ALIAS)
-        self.__delete()
+        self._delete()
         del self._dests[:]
 
 del _, cfg_dget

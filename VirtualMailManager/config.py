@@ -370,7 +370,7 @@ class Config(LazyConfig):
         """
         # TODO: There are only two settings w/o defaults.
         #       So there is no need for cStringIO
-        if not self.__chk_cfg():
+        if not self._chk_cfg():
             errmsg = StringIO()
             errmsg.write(_(u'Missing options, which have no default value.\n'))
             errmsg.write(_(u'Using configuration file: %s\n') %
@@ -392,7 +392,7 @@ class Config(LazyConfig):
         to Unicode."""
         return get_unicode(self.get(section, option))
 
-    def __chk_cfg(self):
+    def _chk_cfg(self):
         """Checks all section's options for settings w/o a default
         value.
 

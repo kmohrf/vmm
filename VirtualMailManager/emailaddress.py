@@ -42,14 +42,14 @@ class EmailAddress(object):
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self._localpart == other.localpart and \
-                    self._domainname == other.domainname
+            return self._localpart == other._localpart and \
+                    self._domainname == other._domainname
         return NotImplemented
 
     def __ne__(self, other):
         if isinstance(other, self.__class__):
-            return self._localpart != other.localpart or \
-                    self._domainname != other.domainname
+            return self._localpart != other._localpart or \
+                    self._domainname != other._domainname
         return NotImplemented
 
     def __hash__(self):

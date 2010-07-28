@@ -57,7 +57,7 @@ class CliConfig(Config):
                         break
             print
         if self._modified:
-            self.__save_changes()
+            self._save_changes()
 
     def set(self, option, value):
         """Set the value of an option.
@@ -81,9 +81,9 @@ class CliConfig(Config):
         if not RawConfigParser.has_section(self, section):
             self.add_section(section)
         RawConfigParser.set(self, section, option_, val)
-        self.__save_changes()
+        self._save_changes()
 
-    def __save_changes(self):
+    def _save_changes(self):
         """Writes changes to the configuration file."""
         copy2(self._cfg_filename, self._cfg_filename + '.bak')
         self._cfg_file = open(self._cfg_filename, 'w')

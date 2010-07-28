@@ -275,18 +275,15 @@ class MultiDbox(SingleDbox):
     __slots__ = ()
 
 
-def __get_mailbox_class(mbfmt):
-    if mbfmt == 'maildir':
-        return Maildir
-    elif mbfmt == 'mdbox':
-        return MultiDbox
-    elif mbfmt == 'sdbox':
-        return SingleDbox
-    raise ValueError('unsupported mailbox format: %r' % mbfmt)
-
-
 def new(account):
     """Create a new Mailbox instance for the given Account."""
-    return __get_mailbox_class(account.mail_location.mbformat)(account)
+    mbfmt = account.mail_location.mbformat
+    if mbfmt == 'maildir':
+        return Maildir(account)
+    elif mbfmt == 'mdbox':
+        return MultiDbox(account)
+    elif mbfmt == 'sdbox':
+        return SingleDbox(account)
+    raise ValueError('unsupported mailbox format: %r' % mbfmt)
 
 del cfg_dget

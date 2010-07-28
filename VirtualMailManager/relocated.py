@@ -39,13 +39,13 @@ class Relocated(object):
                        self._addr.domainname, NO_SUCH_DOMAIN)
         self._dest = None
 
-        self.__load()
+        self._load()
 
     def __nonzero__(self):
         """Returns `True` if the Relocated is known, `False` if it's new."""
         return self._dest is not None
 
-    def __load(self):
+    def _load(self):
         """Loads the destination address from the database into the
         `_dest` attribute.
 
