@@ -13,8 +13,7 @@ import re
 import stat
 
 from VirtualMailManager import ENCODING
-from VirtualMailManager.constants import \
-     NOT_EXECUTABLE, NO_SUCH_BINARY, NO_SUCH_DIRECTORY
+from VirtualMailManager.constants import NOT_EXECUTABLE, NO_SUCH_BINARY
 from VirtualMailManager.errors import VMMError
 
 
