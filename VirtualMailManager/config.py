@@ -15,7 +15,8 @@ from ConfigParser import \
      ParsingError, RawConfigParser
 from cStringIO import StringIO# TODO: move interactive stff to cli
 
-from VirtualMailManager.common import exec_ok, get_unicode, is_dir, version_hex
+from VirtualMailManager.common import \
+     exec_ok, expand_path, get_unicode, lisdir, version_hex
 from VirtualMailManager.constants import CONF_ERROR
 from VirtualMailManager.errors import ConfigError, VMMError
 from VirtualMailManager.maillocation import known_format
@@ -409,6 +410,17 @@ class Config(LazyConfig):
             if missing:
                 self.__missing[section] = missing
         return not errors
+
+
+def is_dir(path):
+    """Check if the expanded path is a directory.  When the expanded path
+    is a directory the expanded path will be returned.  Otherwise a
+    ConfigValueError will be raised.
+    """
+    path = expand_path(path)
+    if lisdir(path):
+        return path
+    raise ConfigValueError(_(u"No such directory: %s") % get_unicode(path))
 
 
 def check_mailbox_format(format):

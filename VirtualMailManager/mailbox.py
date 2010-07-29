@@ -15,7 +15,7 @@ from binascii import a2b_base64, b2a_base64
 from subprocess import Popen, PIPE
 
 from VirtualMailManager.account import Account
-from VirtualMailManager.common import is_dir
+from VirtualMailManager.common import lisdir
 from VirtualMailManager.errors import VMMError
 from VirtualMailManager.constants import VMM_ERROR
 
@@ -94,8 +94,7 @@ class Mailbox(object):
         Creates a new mailbox instance.
         Use one of the `Maildir`, `SingleDbox` or `MultiDbox` classes.
         """
-        assert isinstance(account, Account)
-        is_dir(account.home)
+        assert isinstance(account, Account) and lisdir(account.home)
         self._user = account
         self._boxes = []
         self._root = self._user.mail_location.directory

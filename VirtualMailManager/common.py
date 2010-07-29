@@ -10,6 +10,7 @@
 
 import os
 import re
+import stat
 
 from VirtualMailManager import ENCODING
 from VirtualMailManager.constants import \
@@ -39,16 +40,15 @@ def get_unicode(string):
     return unicode(string, ENCODING, 'replace')
 
 
-def is_dir(path):
-    """Checks if `path` is a directory.
-
-    Throws a `VMMError` if `path` is not a directory.
+def lisdir(path):
+    """Checks if `path` is a directory.  Doesn't follow symbolic links.
+    Returns bool.
     """
-    path = expand_path(path)
-    if not os.path.isdir(path):
-        raise VMMError(_(u"'%s' is not a directory") % get_unicode(path),
-                       NO_SUCH_DIRECTORY)
-    return path
+    try:
+        lstat = os.lstat(path)
+    except OSError:
+        return False
+    return stat.S_ISDIR(lstat.st_mode)
 
 
 def exec_ok(binary):
