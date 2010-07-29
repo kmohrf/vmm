@@ -7,6 +7,7 @@
 
     VirtualMailManager's constants:
         * version information
+        * upper and lower limits MIN_* / MAX_*
         * exit codes
         * error codes
 """
@@ -20,6 +21,12 @@ __author__ = AUTHOR
 __copyright__ = 'Copyright (c) 2007-2010 %s' % __author__
 __date__ = RELDATE
 __version__ = VERSION
+
+
+# limits
+
+MIN_GID = 70000
+MIN_UID = 70000
 
 
 # exit codes
