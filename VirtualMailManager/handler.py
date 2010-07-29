@@ -14,7 +14,6 @@
 
 import os
 import re
-import stat
 
 from shutil import rmtree
 from subprocess import Popen, PIPE
@@ -24,7 +23,7 @@ from pyPgSQL import PgSQL  # python-pgsql - http://pypgsql.sourceforge.net
 from VirtualMailManager.account import Account
 from VirtualMailManager.alias import Alias
 from VirtualMailManager.aliasdomain import AliasDomain
-from VirtualMailManager.common import exec_ok
+from VirtualMailManager.common import exec_ok, lisdir
 from VirtualMailManager.config import Config as Cfg
 from VirtualMailManager.constants import MIN_GID, MIN_UID, \
      ACCOUNT_EXISTS, ALIAS_EXISTS, CONF_NOFILE, CONF_NOPERM, CONF_WRONGPERM, \
@@ -119,13 +118,15 @@ class Handler(object):
         """Make sure our base_directory is a directory and that all
         required executables exists and are executable.
         If not, a VMMError will be raised"""
+        dir_created = False
         basedir = self._cfg.dget('misc.base_directory')
         if not os.path.exists(basedir):
             old_umask = os.umask(0006)
             os.makedirs(basedir, 0771)
             os.chown(basedir, 0, 0)
             os.umask(old_umask)
-        elif not os.path.isdir(basedir):
+            dir_created = True
+        if not dir_created and not lisdir(basedir):
             raise VMMError(_(u"'%(path)s' is not a directory.\n(%(cfg_file)s: "
                              u"section 'misc', option 'base_directory')") %
                            {'path': basedir, 'cfg_file': self._cfg_fname},
@@ -234,7 +235,7 @@ class Handler(object):
         `directory` : basestring
           The directory to summarize recursively disk usage for
         """
-        if os.path.isdir(directory):
+        if lisdir(directory):
             return Popen([self._cfg.dget('bin.du'), "-hs", directory],
                          stdout=PIPE).communicate()[0].split('\t')[0]
         else:
@@ -245,10 +246,15 @@ class Handler(object):
         """Create a directory for the `domain` and its accounts."""
         cwd = os.getcwd()
         hashdir, domdir = domain.directory.split(os.path.sep)[-2:]
+        dir_created = False
         os.chdir(self._cfg.dget('misc.base_directory'))
-        if not os.path.isdir(hashdir):
+        if not os.path.exists(hashdir):
             os.mkdir(hashdir, 0711)
             os.chown(hashdir, 0, 0)
+            dir_created = True
+        if not dir_created and not lisdir(hashdir):
+            raise VMMError(_(u"'%s' is not a directory.") % hashdir,
+                           NO_SUCH_DIRECTORY)
         os.mkdir(os.path.join(hashdir, domdir),
                  self._cfg.dget('domain.directory_mode'))
         os.chown(domain.directory, 0, domain.gid)
@@ -256,10 +262,15 @@ class Handler(object):
 
     def _make_home(self, account):
         """Create a home directory for the new Account *account*."""
+        domdir = account.domain_directory
+        if not lisdir(domdir):
+            raise VMMError(_(u"No such directory: %s") % domdir,
+                           NO_SUCH_DIRECTORY)
         os.umask(0007)
-        os.chdir(account.domain_directory)
-        os.mkdir('%s' % account.uid, self._cfg.dget('account.directory_mode'))
-        os.chown('%s' % account.uid, account.uid, account.gid)
+        uid = account.uid
+        os.chdir(domdir)
+        os.mkdir('%s' % uid, self._cfg.dget('account.directory_mode'))
+        os.chown('%s' % uid, uid, account.gid)
 
     def _delete_home(self, domdir, uid, gid):
         """Delete a user's home directory.
@@ -284,12 +295,12 @@ class Handler(object):
         if domdir.count('..'):
             raise VMMError(_(u'Found ".." in domain directory path: %s') %
                            domdir, FOUND_DOTS_IN_PATH)
-        if not os.path.isdir(domdir):
+        if not lisdir(domdir):
             raise VMMError(_(u"No such directory: %s") % domdir,
                            NO_SUCH_DIRECTORY)
         os.chdir(domdir)
         userdir = '%s' % uid
-        if not os.path.isdir(userdir):
+        if not lisdir(userdir):
             self._warnings.append(_(u"No such directory: %s") %
                                   os.path.join(domdir, userdir))
             return
@@ -317,13 +328,10 @@ class Handler(object):
         if domdir.count('..'):
             raise VMMError(_(u'Found ".." in domain directory path: %s') %
                            domdir, FOUND_DOTS_IN_PATH)
-        try:
-            dirst = os.lstat(domdir)
-        except OSError:
-            dirst = None
-        if not dirst or not stat.S_ISDIR(dirst.st_mode):
+        if not lisdir(domdir):
             self._warnings.append(_('No such directory: %s') % domdir)
             return
+        dirst = os.lstat(domdir)
         if dirst.st_gid != gid:
             raise VMMError(_(u'Detected group mismatch in domain directory: '
                              u'%s') % domdir, DOMAINDIR_GROUP_MISMATCH)
