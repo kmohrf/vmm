@@ -183,13 +183,13 @@ DOMAIN SUBCOMMANDS
 
 .. _domaindelete:
 
-``domaindelete (dd) domain [ delalias | deluser | delall ]``
+``domaindelete (dd) domain [ force ]``
   This subcommand deletes the specified *domain*.
 
-  If there are accounts and/or aliases assigned to the given domain, **vmm**
-  will abort the requested operation and show an error message. If you know,
-  what you are doing, you can specify one of the following keywords:
-  **delalias**, **deluser** or **delall**.
+  If there are accounts, aliases and/or relocated users assigned to the given
+  domain, **vmm** will abort the requested operation and show an error
+  message. If you know, what you are doing, you can specify the keyword
+  **force**.
 
   If you really always know what you are doing, edit your *vmm.cfg* and set
   the option |domain.force_deletion|_ to true.

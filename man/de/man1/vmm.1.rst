@@ -194,20 +194,20 @@ DOMAIN UNTERBEFEHLE
 
 .. _domaindelete:
 
-``domaindelete (dd) Domain [ delalias | deluser | delall ]``
+``domaindelete (dd) Domain [ force ]``
   Mit diesem Unterbefehl wird die angegebene *Domain* gelöscht.
 
-  Sollten der *Domain* Konten und/oder Aliase zugeordnet sein, wird **vmm**
-  die Ausführung des Befehls mit einer entsprechenden Fehlermeldung beenden.
+  Sollten der *Domain* Konten, Aliase und/oder relocated User  zugeordnet
+  sein, wird **vmm** die Ausführung des Befehls mit einer entsprechenden
+  Fehlermeldung beenden.
 
-  Sollten Sie sich Ihres Vorhabens sicher sein, so kann optional eines der
-  folgenden Schlüsselwörter angegeben werden: **delalias**, **deluser**
-  oder **delall**.
+  Sollten Sie sich Ihres Vorhabens sicher sein, so kann optional das
+  Schlüsselwort **force** angegeben werden.
 
   Sollten Sie wirklich immer wissen was Sie tun, so editieren Sie Ihre
   *vmm.cfg* und setzen den Wert der Option |domain.force_deletion|_ auf
   true. Dann werden Sie beim Löschen von Domains nicht mehr wegen vorhanden
-  Konten/Aliase gewarnt.
+  Konten, Aliase und/oder relocated User gewarnt.
 
 
 ALIAS-DOMAIN UNTERBEFEHLE
