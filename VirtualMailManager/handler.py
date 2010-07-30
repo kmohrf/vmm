@@ -262,7 +262,7 @@ class Handler(object):
 
     def _make_home(self, account):
         """Create a home directory for the new Account *account*."""
-        domdir = account.domain_directory
+        domdir = account.domain.directory
         if not lisdir(domdir):
             raise VMMError(_(u"No such directory: %s") % domdir,
                            NO_SUCH_DIRECTORY)
@@ -279,7 +279,7 @@ class Handler(object):
 
         `domdir` : basestring
           The directory of the domain the user belongs to
-          (commonly AccountObj.domain_directory)
+          (commonly AccountObj.domain.directory)
         `uid` : int/long
           The user's UID (commonly AccountObj.uid)
         `gid` : int/long
@@ -542,7 +542,7 @@ class Handler(object):
                            acc.address, NO_SUCH_ACCOUNT)
         uid = acc.uid
         gid = acc.gid
-        dom_dir = acc.domain_directory
+        dom_dir = acc.domain.directory
         acc_dir = acc.home
         acc.delete(bool(force))
         if self._cfg.dget('account.delete_directory'):

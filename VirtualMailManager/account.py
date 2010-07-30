@@ -154,10 +154,10 @@ class Account(object):
         return self._addr
 
     @property
-    def domain_directory(self):
-        """The directory of the domain the Account belongs to."""
+    def domain(self):
+        """The Domain to which the Account belongs to."""
         if self._domain:
-            return self._domain.directory
+            return self._domain
         return None
 
     @property
