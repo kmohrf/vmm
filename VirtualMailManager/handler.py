@@ -264,8 +264,7 @@ class Handler(object):
         """Create a home directory for the new Account *account*."""
         domdir = account.domain.directory
         if not lisdir(domdir):
-            raise VMMError(_(u"No such directory: %s") % domdir,
-                           NO_SUCH_DIRECTORY)
+            self._make_domain_dir(account.domain)
         os.umask(0007)
         uid = account.uid
         os.chdir(domdir)
