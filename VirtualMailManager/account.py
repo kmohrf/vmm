@@ -348,20 +348,21 @@ class Account(object):
             aliases = [alias[0] for alias in addresses]
         return aliases
 
-    def delete(self, delalias=False):
+    def delete(self, force=False):
         """Delete the Account from the database.
 
         Argument:
 
-        `delalias` : bool
-          if *delalias* is `True`, all aliases, which points to the Account,
-          will be also deleted.  If there are aliases and *delalias* is
+        `force` : bool
+          if *force* is `True`, all aliases, which points to the Account,
+          will be also deleted.  If there are aliases and *force* is
           `False`, an AccountError will be raised.
         """
-        assert isinstance(delalias, bool)
+        if not isinstance(force, bool):
+            raise TypeError('force must be a bool')
         self._chk_state()
         dbc = self._dbh.cursor()
-        if delalias:
+        if force:
             dbc.execute('DELETE FROM users WHERE uid = %s', self._uid)
             # delete also all aliases where the destination address is the same
             # as for this account.

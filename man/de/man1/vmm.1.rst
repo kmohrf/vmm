@@ -358,14 +358,14 @@ KONTO UNTERBEFEHLE
 
 .. _userdelete:
 
-``userdelete (ud) Adresse [ delalias ]``
+``userdelete (ud) Adresse [ force ]``
   Verwenden Sie diesen Unterbefehl um, das Konto mit der angegebenen
   *Adresse* zu löschen.
 
   Sollte es einen oder mehrere Aliase geben, deren Zieladresse mit der
   *Adresse* des zu löschenden Kontos identisch ist, wird **vmm** die
   Ausführung des Befehls mit einer entsprechenden Fehlermeldung beenden. Um
-  dieses zu umgehen, kann das optionale Schlüsselwort **delalias**
+  dieses zu umgehen, kann das optionale Schlüsselwort **force**
   angegebenen werden.
 
 

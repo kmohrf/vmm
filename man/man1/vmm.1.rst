@@ -334,12 +334,12 @@ ACCOUNT SUBCOMMANDS
 
 .. _userdelete:
 
-``userdelete (ud) address [ delalias ]``
+``userdelete (ud) address [ force ]``
   Use this subcommand to delete the account with the given *address*.
 
   If there are one or more aliases with an identical destination *address*,
   **vmm** will abort the requested operation and show an error message. To
-  prevent this, specify the optional keyword **delalias**.
+  prevent this, specify the optional keyword **force**.
 
 
 ALIAS SUBCOMMANDS

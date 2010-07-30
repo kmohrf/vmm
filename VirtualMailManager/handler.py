@@ -525,11 +525,10 @@ class Handler(object):
                 self._warnings.append(_(u"The destination account/alias '%s' "
                                         u"doesn't exist.") % destination)
 
-    def user_delete(self, emailaddress, force=None):
+    def user_delete(self, emailaddress, force=False):
         """Wrapper around Account.delete(...)"""
-        if force not in (None, 'delalias'):
-            raise VMMError(_(u"Invalid argument: '%s'") % force,
-                           INVALID_ARGUMENT)
+        if not isinstance(force, bool):
+            raise TypeError('force must be a bool')
         acc = self._get_account(emailaddress)
         if not acc:
             raise VMMError(_(u"The account '%s' doesn't exist.") %
@@ -538,7 +537,7 @@ class Handler(object):
         gid = acc.gid
         dom_dir = acc.domain.directory
         acc_dir = acc.home
-        acc.delete(bool(force))
+        acc.delete(force)
         if self._cfg.dget('account.delete_directory'):
             try:
                 self._delete_home(dom_dir, uid, gid)
@@ -548,9 +547,8 @@ class Handler(object):
                     warning = _(u"""\
 The account has been successfully deleted from the database.
     But an error occurred while deleting the following directory:
-    “%(directory)s”
-    Reason: %(reason)s""") % \
-                                {'directory': acc_dir, 'reason': err.msg}
+    '%(directory)s'
+    Reason: %(reason)s""") % {'directory': acc_dir, 'reason': err.msg}
                     self._warnings.append(warning)
                 else:
                     raise
