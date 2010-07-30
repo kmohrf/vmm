@@ -13,10 +13,10 @@ import re
 from random import choice
 
 from VirtualMailManager.constants import \
-     ACCOUNT_AND_ALIAS_PRESENT, ACCOUNT_PRESENT, ALIAS_PRESENT, \
-     DOMAIN_ALIAS_EXISTS, DOMAIN_EXISTS, DOMAIN_INVALID, DOMAIN_TOO_LONG, \
-     NO_SUCH_DOMAIN
+     ACCOUNT_AND_ALIAS_PRESENT, DOMAIN_ALIAS_EXISTS, DOMAIN_EXISTS, \
+     DOMAIN_INVALID, DOMAIN_TOO_LONG, NO_SUCH_DOMAIN
 from VirtualMailManager.errors import DomainError as DomErr
+from VirtualMailManager.pycompat import any
 from VirtualMailManager.transport import Transport
 
 
@@ -83,49 +83,24 @@ class Domain(object):
         self._gid = dbc.fetchone()[0]
         dbc.close()
 
-    def _has(self, what):
-        """Checks if aliases or accounts are assigned to the domain.
-
-        If there are assigned accounts or aliases True will be returned,
-        otherwise False will be returned.
-
-        Argument:
-
-        `what` : basestring
-            "alias" or "users"
+    def _check_for_addresses(self):
+        """Checks dependencies for deletion. Raises a DomainError if there
+        are accounts, aliases and/or relocated users.
         """
-        assert what in ('alias', 'users')
         dbc = self._dbh.cursor()
-        if what == 'users':
-            dbc.execute("SELECT count(gid) FROM users WHERE gid=%s", self._gid)
-        else:
-            dbc.execute("SELECT count(gid) FROM alias WHERE gid=%s", self._gid)
-        count = dbc.fetchone()
+        dbc.execute('SELECT count(gid) FROM users WHERE gid = %(gid)u '
+                    'UNION SELECT count(gid) FROM alias WHERE gid = %(gid)u '
+                    'UNION SELECT count(gid) FROM relocated WHERE gid = '
+                    '%(gid)u' % {'gid': self._gid})
+        result = dbc.fetchall()
         dbc.close()
-        return count[0] > 0
-
-    def _chk_delete(self, deluser, delalias):
-        """Checks dependencies for deletion.
-
-        Arguments:
-        deluser -- ignore available accounts (bool)
-        delalias -- ignore available aliases (bool)
-        """
-        if not deluser:
-            hasuser = self._has('users')
-        else:
-            hasuser = False
-        if not delalias:
-            hasalias = self._has('alias')
-        else:
-            hasalias = False
-        if hasuser and hasalias:
-            raise DomErr(_(u'There are accounts and aliases.'),
+        result = [count[0] for count in result]
+        if any(result):
+            keys = ('account_count', 'alias_count', 'relocated_count')
+            raise DomErr(_(u'There are %(account_count)u accounts, '
+                           u'%(alias_count)u aliases and %(relocated_count)u '
+                           u'relocated users.') % dict(zip(keys, result)),
                          ACCOUNT_AND_ALIAS_PRESENT)
-        elif hasuser:
-            raise DomErr(_(u'There are accounts.'), ACCOUNT_PRESENT)
-        elif hasalias:
-            raise DomErr(_(u'There are aliases.'), ALIAS_PRESENT)
 
     def _chk_state(self):
         """Throws a DomainError if the Domain is new - not saved in the
@@ -193,22 +168,26 @@ class Domain(object):
         dbc.close()
         self._new = False
 
-    def delete(self, deluser=False, delalias=False):
+    def delete(self, force=False):
         """Deletes the domain.
 
         Arguments:
 
-        `deluser` : bool
-          force deletion of all available accounts, default `False`
-        `delalias` : bool
-          force deletion of all available aliases, default `False`
+        `force` : bool
+          force the deletion of all available accounts, aliases and
+          relocated users.  When *force* is `False` and there are accounts,
+          aliases and/or relocated users a DomainError will be raised.
+          Default `False`
         """
+        if not isinstance(force, bool):
+            raise TypeError('force must be a bool')
         self._chk_state()
-        self._chk_delete(deluser, delalias)
+        if not force:
+            self._check_for_addresses()
         dbc = self._dbh.cursor()
         for tbl in ('alias', 'users', 'relocated', 'domain_name',
                     'domain_data'):
-            dbc.execute("DELETE FROM %s WHERE gid = %d" % (tbl, self._gid))
+            dbc.execute("DELETE FROM %s WHERE gid = %u" % (tbl, self._gid))
         self._dbh.commit()
         dbc.close()
         self._gid = 0

@@ -389,22 +389,17 @@ class Handler(object):
         else:
             dom.update_transport(trsp, force=True)
 
-    def domain_delete(self, domainname, force=None):
+    def domain_delete(self, domainname, force=False):
         """Wrapper around Domain.delete()"""
-        if force and force not in ('deluser', 'delalias', 'delall'):
-            raise DomainError(_(u"Invalid argument: '%s'") % force,
-                              INVALID_ARGUMENT)
+        if not isinstance(force, bool):
+            raise TypeError('force must be a bool')
         dom = self._get_domain(domainname)
         gid = dom.gid
         domdir = dom.directory
-        if self._cfg.dget('domain.force_deletion') or force == 'delall':
-            dom.delete(True, True)
-        elif force == 'deluser':
-            dom.delete(deluser=True)
-        elif force == 'delalias':
-            dom.delete(delalias=True)
+        if self._cfg.dget('domain.force_deletion') or force:
+            dom.delete(True)
         else:
-            dom.delete()
+            dom.delete(False)
         if self._cfg.dget('domain.delete_directory'):
             self._delete_domain_dir(domdir, gid)
 
