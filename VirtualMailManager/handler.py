@@ -633,27 +633,29 @@ The account has been successfully deleted from the database.
                            acc.address, NO_SUCH_ACCOUNT)
         acc.modify('transport', transport)
 
-    def user_disable(self, emailaddress, service=None):
-        """Wrapper for Account.disable(service)"""
-        if service not in (None, 'all', 'imap', 'pop3', 'smtp', 'sieve'):
-            raise VMMError(_(u"Could not accept service: '%s'") % service,
-                           INVALID_ARGUMENT)
+    def user_disable(self, emailaddress, services=None):
+        """Wrapper for Account.disable(*services)"""
+        if services is None:
+            services = []
+        else:
+            assert isinstance(services, list)
         acc = self._get_account(emailaddress)
         if not acc:
-            raise VMMError(_(u"The account '%s' doesn't exist.") %
-                           acc.address, NO_SUCH_ACCOUNT)
-        acc.disable(service)
+            raise VMMError(_(u"The account '%s' doesn't exist.") % acc.address,
+                           NO_SUCH_ACCOUNT)
+        acc.disable(*services)
 
-    def user_enable(self, emailaddress, service=None):
-        """Wrapper for Account.enable(service)"""
-        if service not in (None, 'all', 'imap', 'pop3', 'smtp', 'sieve'):
-            raise VMMError(_(u"Could not accept service: '%s'") % service,
-                           INVALID_ARGUMENT)
+    def user_enable(self, emailaddress, services=None):
+        """Wrapper for Account.enable(*services)"""
+        if services is None:
+            services = []
+        else:
+            assert isinstance(services, list)
         acc = self._get_account(emailaddress)
         if not acc:
-            raise VMMError(_(u"The account '%s' doesn't exist.") %
-                           acc.address, NO_SUCH_ACCOUNT)
-        acc.enable(service)
+            raise VMMError(_(u"The account '%s' doesn't exist.") % acc.address,
+                           NO_SUCH_ACCOUNT)
+        acc.enable(*services)
 
     def relocated_add(self, emailaddress, targetaddress):
         """Creates a new `Relocated` entry in the database. If there is

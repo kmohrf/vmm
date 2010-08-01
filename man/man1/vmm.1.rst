@@ -7,7 +7,7 @@ command line tool to manage email domains/accounts/aliases
 ----------------------------------------------------------
 
 :Author:         Pascal Volk <neverseen@users.sourceforge.net>
-:Date:           2010-01-30
+:Date:           2010-08-01
 :Version:        vmm-0.6.0
 :Manual group:   vmm Manual
 :Manual section: 1
@@ -308,29 +308,27 @@ ACCOUNT SUBCOMMANDS
 
 .. _userdisable:
 
-``userdisable (u0) address [ service ]``
-  If a user shouldn't have access to one or all services you can restrict
+``userdisable (u0) address [ service ... ]``
+  If a user shouldn't have access to one or more services you can restrict
   the access with this subcommand.
 
-  If neither a *service* nor the keyword **all** is given all services
-  (**smtp**, **pop3**, **imap**, and **sieve**) will be disabled for the
-  account with the specified *address*. Otherwise only the specified
-  *service* will be restricted.
+  If no *service* was given all services  (**smtp**, **pop3**, **imap**, and
+  **sieve**) will be disabled for the account with the specified *address*.
+  Otherwise only the specified *service*/s will be restricted.
 
   Examples::
 
-    vmm u0 b.user@example.com imap
+    vmm u0 b.user@example.com imap pop3
     vmm userdisable c.user@example.com
 
 .. _userenable:
 
-``userenable (u1) address [ service ]``
-  To allow access to one or all restricted services use this subcommand.
+``userenable (u1) address [ service ... ]``
+  To allow access to one or more restricted services use this subcommand.
 
-  If neither a *service* nor the keyword **all** is given all services
-  (**smtp**, **pop3**, **imap**, and **sieve**) will be enabled for the
-  account with the specified *address*. Otherwise only the specified
-  *service* will be enabled.
+  If no *service* was given all services (**smtp**, **pop3**, **imap**, and
+  **sieve**) will be enabled for the account with the specified *address*.
+  Otherwise only the specified *service*/s will be enabled.
 
 .. _userdelete:
 

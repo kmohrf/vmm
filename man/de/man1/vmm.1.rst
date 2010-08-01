@@ -7,7 +7,7 @@ Kommandozeilenprogramm zur Verwaltung von E-Mail-Domains, -Konten und -Aliase
 -----------------------------------------------------------------------------
 
 :Author:         Pascal Volk <neverseen@users.sourceforge.net>
-:Date:           2010-01-30
+:Date:           2010-08-01
 :Version:        vmm-0.6.0
 :Manual group:   vmm Manual
 :Manual section: 1
@@ -329,32 +329,34 @@ KONTO UNTERBEFEHLE
 
 .. _userdisable:
 
-``userdisable (u0) Adresse [ Service ]``
-  Soll ein Anwender keinen Zugriff auf einen oder alle Service haben, kann
+``userdisable (u0) Adresse [ Service ... ]``
+  Soll ein Anwender keinen Zugriff auf bestimmte oder alle Service haben, kann
   der Zugriff mit diesem Unterbefehl beschränkt werden.
 
-  Wurde weder ein *Service* noch das Schlüsselwort **all** angegeben, werden
-  alle Services (**smtp**, **pop3**, **imap**, und **sieve**) für das Konto
-  mit der angegebenen *Adresse* deaktiviert.
+  Wurde kein *Service* angegeben, werden alle Services (**smtp**, **pop3**,
+  **imap**, und **sieve**) für das Konto mit der angegebenen *Adresse*
+  deaktiviert.
 
-  Andernfalls wird nur der Zugriff auf den angegeben *Service* gesperrt.
+  Andernfalls wird nur der Zugriff auf den/die angegebenen *Service*/s
+  gesperrt.
 
   Beispiele::
 
-    vmm u0 b.user@example.com imap
+    vmm u0 b.user@example.com imap pop3
     vmm userdisable c.user@example.com
 
 .. _userenable:
 
-``userenable (u1) Adresse [ Service ]``
+``userenable (u1) Adresse [ Service ... ]``
   Um den Zugriff auf bestimmte oder alle gesperrten Service zu gewähren,
   wird dieser Unterbefehl verwendet.
 
-  Wurde weder ein *Service* noch das Schlüsselwort **all** angegeben, werden
-  alle Services (**smtp**, **pop3**, **imap**, und **sieve**) für das Konto
-  mit der angegebenen  *Adresse* aktiviert.
+  Wurde kein *Service* angegeben, werden alle Services (**smtp**, **pop3**,
+  **imap**, und **sieve**) für das Konto mit der angegebenen  *Adresse*
+  aktiviert.
 
-  Andernfalls wird nur der Zugriff auf den angegeben *Service* gestattet.
+  Andernfalls wird nur der Zugriff auf den/die angegebenen *Service*/s
+  aktiviert.
 
 .. _userdelete:
 
