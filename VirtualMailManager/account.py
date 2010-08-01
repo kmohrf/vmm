@@ -29,6 +29,7 @@ class Account(object):
     """Class to manage e-mail accounts."""
     __slots__ = ('_addr', '_dbh', '_domain', '_mail', '_new', '_passwd',
                  '_transport', '_uid')
+    _services = ('imap', 'pop3', 'smtp', 'sieve')
 
     def __init__(self, dbh, address):
         """Creates a new Account instance.
@@ -103,27 +104,33 @@ class Account(object):
         self._mail = maillocation
         self._set_uid()
 
-    def _switch_state(self, state, service):
-        """Switch the state of the Account's services on or off. See
-        Account.enable()/Account.disable() for more information."""
+    def _update_services(self, activate, *services):
+        """Activate or deactivate the Account's services.
+
+        Arguments:
+
+        `activate`: bool
+          When `True` the Account's user will be able to login to the
+          services, otherwise the login will fail.
+        `*services`
+          No or one or more of the services: imap, pop3, smtp and sieve
+        """
         self._chk_state()
-        if service not in (None, 'all', 'imap', 'pop3', 'sieve', 'smtp'):
-            raise AErr(_(u"Unknown service: '%s'.") % service, UNKNOWN_SERVICE)
-        if cfg_dget('misc.dovecot_version') >= 0x10200b02:
-            sieve_col = 'sieve'
+        if services:
+            services = set(services)
+            for service in services:
+                if service not in self.__class__._services:
+                    raise AErr(_(u"Unknown service: '%s'.") % service,
+                               UNKNOWN_SERVICE)
         else:
-            sieve_col = 'managesieve'
-        if service in ('smtp', 'pop3', 'imap'):
-            sql = 'UPDATE users SET %s = %s WHERE uid = %d' % (service, state,
-                                                               self._uid)
-        elif service == 'sieve':
-            sql = 'UPDATE users SET %s = %s WHERE uid = %d' % (sieve_col,
-                                                               state,
-                                                               self._uid)
-        else:
-            sql = 'UPDATE users SET smtp = %(s)s, pop3 = %(s)s, imap = %(s)s,\
- %(col)s = %(s)s WHERE uid = %(uid)d' % \
-                {'s': state, 'col': sieve_col, 'uid': self._uid}
+            services = self.__class__._services
+        state = ('FALSE', 'TRUE')[activate]
+        sql = 'UPDATE users SET %s WHERE uid = %u' % (
+                    (' = %(s)s, '.join(services) + ' = %(s)s') % {'s': state},
+                    self._uid)
+        if 'sieve' in services and \
+           cfg_dget('misc.dovecot_version') < 0x10200b02:
+            sql = sql.replace('sieve', 'managesieve')
         dbc = self._dbh.cursor()
         dbc.execute(sql)
         if dbc.rowcount > 0:
@@ -213,26 +220,25 @@ class Account(object):
         """
         self._transport = Transport(self._dbh, transport=transport)
 
-    def enable(self, service=None):
-        """Enable a/all service/s for the Account.
+    def enable(self, *services):
+        """Enable all or the given service/s for the Account.
 
-        Possible values for the *service* are: 'imap', 'pop3', 'sieve' and
-        'smtp'. When all services should be enabled, use 'all' or the
-        default value `None`.
+        Possible *services* are: 'imap', 'pop3', 'sieve' and 'smtp'.
+        When all services should be enabled, give no service name.
 
         Arguments:
 
-        `service` : basestring
-          The name of a service ('imap', 'pop3', 'smtp', 'sieve'), 'all'
-          or `None`.
+        `*services` : basestring
+          No or one or more of the services 'imap', 'pop3', 'smtp', and
+          'sieve'.
         """
-        self._switch_state(True, service)
+        self._update_services(True, *services)
 
-    def disable(self, service=None):
-        """Disable a/all service/s for the Account.
+    def disable(self, *services):
+        """Disable all or the given service/s for the Account.
 
         For more information see: Account.enable()."""
-        self._switch_state(False, service)
+        self._update_services(False, *services)
 
     def save(self):
         """Save the new Account in the database."""
