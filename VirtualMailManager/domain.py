@@ -230,7 +230,7 @@ class Domain(object):
         self._chk_state()
         dbc = self._dbh.cursor()
         dbc.execute('SELECT gid, domainname, transport, domaindir, '
-                    'aliasdomains accounts, aliases, relocated FROM '
+                    'aliasdomains, accounts, aliases, relocated FROM '
                     'vmm_domain_info WHERE gid = %s', self._gid)
         info = dbc.fetchone()
         dbc.close()
