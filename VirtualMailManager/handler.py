@@ -271,6 +271,21 @@ class Handler(object):
         os.mkdir('%s' % uid, self._cfg.dget('account.directory_mode'))
         os.chown('%s' % uid, uid, account.gid)
 
+    def _make_account_dirs(self, account):
+        """Create all necessary directories for the account."""
+        oldpwd = os.getcwd()
+        self._make_home(account)
+        mailbox = new_mailbox(account)
+        mailbox.create()
+        folders = self._cfg.dget('mailbox.folders').split(':')
+        if any(folders):
+            bad = mailbox.add_boxes(folders,
+                                    self._cfg.dget('mailbox.subscribe'))
+            if bad:
+                self._warnings.append(_(u"Skipped mailbox folders:") +
+                                      '\n\t- ' + '\n\t- '.join(bad))
+        os.chdir(oldpwd)
+
     def _delete_home(self, domdir, uid, gid):
         """Delete a user's home directory.
 
@@ -494,20 +509,12 @@ class Handler(object):
     def user_add(self, emailaddress, password):
         """Wrapper around Account.set_password() and Account.save()."""
         acc = self._get_account(emailaddress)
+        if acc:
+            raise VMMError(_(u"The account '%s' already exists.") %
+                           acc.address, ACCOUNT_EXISTS)
         acc.set_password(password)
         acc.save()
-        oldpwd = os.getcwd()
-        self._make_home(acc)
-        mailbox = new_mailbox(acc)
-        mailbox.create()
-        folders = self._cfg.dget('mailbox.folders').split(':')
-        if any(folders):
-            bad = mailbox.add_boxes(folders,
-                                    self._cfg.dget('mailbox.subscribe'))
-            if bad:
-                self._warnings.append(_(u"Skipped mailbox folders:") +
-                                      '\n\t- ' + '\n\t- '.join(bad))
-        os.chdir(oldpwd)
+        self._make_account_dirs(acc)
 
     def alias_add(self, aliasaddress, *targetaddresses):
         """Creates a new `Alias` entry for the given *aliasaddress* with
