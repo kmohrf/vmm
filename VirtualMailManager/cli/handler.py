@@ -14,7 +14,8 @@ from VirtualMailManager.errors import VMMError
 from VirtualMailManager.handler import Handler
 from VirtualMailManager.cli import read_pass
 from VirtualMailManager.cli.config import CliConfig as Cfg
-from VirtualMailManager.constants import ACCOUNT_EXISTS, INVALID_SECTION
+from VirtualMailManager.constants import ACCOUNT_EXISTS, INVALID_SECTION, \
+     NO_SUCH_ACCOUNT
 
 _ = lambda msg: msg
 
@@ -81,10 +82,14 @@ class CliHandler(Handler):
         self._make_account_dirs(acc)
 
     def user_password(self, emailaddress, password=None):
-        """Prefix the parent user_password() with the interactive password
-        dialog."""
-        if password is None:
+        """Override the parent user_password() - add the interactive
+        password dialog."""
+        acc = self._get_account(emailaddress)
+        if not acc:
+            raise VMMError(_(u"The account '%s' doesn't exist.") %
+                           acc.address, NO_SUCH_ACCOUNT)
+        if not isinstance(password, basestring) or not password:
             password = read_pass()
-        super(CliHandler, self).user_password(emailaddress, password)
+        acc.modify('password', password)
 
 del _
