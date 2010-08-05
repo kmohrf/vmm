@@ -20,6 +20,9 @@ from VirtualMailManager.errors import AccountError as AErr
 from VirtualMailManager.maillocation import MailLocation
 from VirtualMailManager.password import pwhash
 
+__all__ = ('SERVICES', 'Account', 'get_account_by_uid')
+
+SERVICES = ('imap', 'pop3', 'smtp', 'sieve')
 
 _ = lambda msg: msg
 cfg_dget = lambda option: None
@@ -29,7 +32,6 @@ class Account(object):
     """Class to manage e-mail accounts."""
     __slots__ = ('_addr', '_dbh', '_domain', '_mail', '_new', '_passwd',
                  '_transport', '_uid')
-    _services = ('imap', 'pop3', 'smtp', 'sieve')
 
     def __init__(self, dbh, address):
         """Creates a new Account instance.
@@ -119,11 +121,11 @@ class Account(object):
         if services:
             services = set(services)
             for service in services:
-                if service not in self.__class__._services:
+                if service not in SERVICES:
                     raise AErr(_(u"Unknown service: '%s'.") % service,
                                UNKNOWN_SERVICE)
         else:
-            services = self.__class__._services
+            services = SERVICES
         state = ('FALSE', 'TRUE')[activate]
         sql = 'UPDATE users SET %s WHERE uid = %u' % (
                     (' = %(s)s, '.join(services) + ' = %(s)s') % {'s': state},
