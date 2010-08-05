@@ -200,6 +200,8 @@ class Handler(object):
         other = self._chk_other_address_types(address, exclude)
         if not other:
             return False
+        # TP: %(a_type)s will be one of: 'an account', 'an alias' or
+        # 'a relocated user'
         msg = _(u"There is already %(a_type)s with the address '%(address)s'.")
         raise VMMError(msg % {'a_type': OTHER_TYPES[other][0],
                               'address': address}, OTHER_TYPES[other][1])
@@ -424,7 +426,7 @@ class Handler(object):
         Domain.get_relocated."""
         if details not in [None, 'accounts', 'aliasdomains', 'aliases', 'full',
                            'relocated']:
-            raise VMMError(_(u'Invalid argument: “%s”') % details,
+            raise VMMError(_(u"Invalid argument: '%s'") % details,
                            INVALID_ARGUMENT)
         dom = self._get_domain(domainname)
         dominfo = dom.get_info()

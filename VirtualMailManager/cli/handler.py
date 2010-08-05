@@ -65,7 +65,7 @@ class CliHandler(Handler):
         elif self._cfg.has_section(section):
             self._cfg.configure([section])
         else:
-            raise VMMError(_(u'Invalid section: “%s”') % section,
+            raise VMMError(_(u"Invalid section: '%s'") % section,
                            INVALID_SECTION)
 
     def user_add(self, emailaddress, password=None):

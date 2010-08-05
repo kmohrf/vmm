@@ -35,7 +35,7 @@ class Relocated(object):
         self._dbh = dbh
         self._gid = get_gid(self._dbh, self._addr.domainname)
         if not self._gid:
-            raise RErr(_(u"The domain %r doesn't exist.") %
+            raise RErr(_(u"The domain '%s' doesn't exist.") %
                        self._addr.domainname, NO_SUCH_DOMAIN)
         self._dest = None
 

@@ -35,7 +35,7 @@ class CliConfig(Config):
 
         w_std(_(u'Using configuration file: %s\n') % self._cfg_filename)
         for section in sections:
-            w_std(_(u'* Configuration section: %r') % section)
+            w_std(_(u"* Configuration section: '%s'") % section)
             for opt, val in self.items(section):
                 failures = 0
                 while True:

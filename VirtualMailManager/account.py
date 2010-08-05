@@ -52,6 +52,9 @@ class Account(object):
         self._dbh = dbh
         self._domain = Domain(self._dbh, self._addr.domainname)
         if not self._domain.gid:
+            # TP: Hm, what “quotation marks” should be used?
+            # If you are unsure have a look at:
+            # http://en.wikipedia.org/wiki/Quotation_mark,_non-English_usage
             raise AErr(_(u"The domain '%s' doesn't exist.") %
                        self._addr.domainname, NO_SUCH_DOMAIN)
         self._uid = 0
@@ -122,7 +125,7 @@ class Account(object):
             services = set(services)
             for service in services:
                 if service not in SERVICES:
-                    raise AErr(_(u"Unknown service: '%s'.") % service,
+                    raise AErr(_(u"Unknown service: '%s'") % service,
                                UNKNOWN_SERVICE)
         else:
             services = SERVICES
@@ -205,7 +208,7 @@ class Account(object):
           The password for the new Account.
         """
         if not isinstance(password, basestring) or not password:
-            raise AErr(_(u"Couldn't accept password: '%s'") % password,
+            raise AErr(_(u"Could not accept password: '%s'") % password,
                        ACCOUNT_MISSING_PASSWORD)
         self._passwd = password
 
@@ -337,7 +340,7 @@ class Account(object):
             info['uid'] = self._uid
             return info
         # nearly impossible‽
-        raise AErr(_(u"Couldn't fetch information for account: '%s'") %
+        raise AErr(_(u"Could not fetch information for account: '%s'") %
                    self._addr, NO_SUCH_ACCOUNT)
 
     def get_aliases(self):
