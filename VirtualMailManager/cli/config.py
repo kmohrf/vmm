@@ -15,7 +15,7 @@ from VirtualMailManager import ENCODING
 from VirtualMailManager.config import Config, ConfigValueError, LazyConfig
 from VirtualMailManager.errors import ConfigError
 from VirtualMailManager.cli import w_err, w_std
-from VirtualMailManager.constants import VMM_TOO_MANY_FAILURES
+from VirtualMailManager.constants import CONF_ERROR, VMM_TOO_MANY_FAILURES
 
 _ = lambda msg: msg
 
@@ -65,12 +65,15 @@ class CliConfig(Config):
         If the new `value` has been set, the configuration file will be
         immediately updated.
 
-        Throws a ``ValueError`` if `value` couldn't be converted to
-        ``LazyConfigOption.cls``"""
+        Throws a ``ConfigError`` if `value` couldn't be converted to
+        ``LazyConfigOption.cls`` or ``LazyConfigOption.validate`` fails."""
         section, option_ = self._get_section_option(option)
-        val = self._cfg[section][option_].cls(value)
-        if self._cfg[section][option_].validate:
-            val = self._cfg[section][option_].validate(val)
+        try:
+            val = self._cfg[section][option_].cls(value)
+            if self._cfg[section][option_].validate:
+                val = self._cfg[section][option_].validate(val)
+        except (ValueError, ConfigValueError), err:
+            raise ConfigError(str(err), CONF_ERROR)
         # Do not write default values also skip identical values
         if not self._cfg[section][option_].default is None:
             old_val = self.dget(option)
