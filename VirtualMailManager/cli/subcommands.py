@@ -17,6 +17,7 @@ from time import strftime, strptime
 from VirtualMailManager import ENCODING
 from VirtualMailManager.account import SERVICES
 from VirtualMailManager.cli import get_winsize, prog, w_err, w_std
+from VirtualMailManager.common import version_str
 from VirtualMailManager.constants import __copyright__, __date__, \
      __version__, ACCOUNT_EXISTS, ALIAS_EXISTS, ALIASDOMAIN_ISDOMAIN, \
      DOMAIN_ALIAS_EXISTS, INVALID_ARGUMENT, EX_MISSING_ARGS, RELOCATED_EXISTS
@@ -25,11 +26,11 @@ from VirtualMailManager.errors import VMMError
 __all__ = (
     'Command', 'RunContext', 'cmd_map', 'usage', 'alias_add', 'alias_delete',
     'alias_info', 'aliasdomain_add', 'aliasdomain_delete', 'aliasdomain_info',
-    'aliasdomain_switch', 'configure', 'domain_add', 'domain_delete',
-    'domain_info', 'domain_transport', 'get_user', 'help_', 'list_domains',
-    'relocated_add', 'relocated_delete', 'relocated_info', 'user_add',
-    'user_delete', 'user_disable', 'user_enable', 'user_info', 'user_name',
-    'user_password', 'user_transport', 'version',
+    'aliasdomain_switch', 'config_get', 'config_set', 'configure',
+    'domain_add', 'domain_delete',  'domain_info', 'domain_transport',
+    'get_user', 'help_', 'list_domains', 'relocated_add', 'relocated_delete',
+    'relocated_info', 'user_add', 'user_delete', 'user_disable', 'user_enable',
+    'user_info', 'user_name', 'user_password', 'user_transport', 'version',
 )
 
 _ = lambda msg: msg
@@ -167,6 +168,27 @@ def aliasdomain_switch(ctx):
         usage(EX_MISSING_ARGS, _(u'Missing destination domain name.'),
               ctx.scmd)
     ctx.hdlr.aliasdomain_switch(ctx.args[2].lower(), ctx.args[3].lower())
+
+
+def config_get(ctx):
+    """show the actual value of the configuration option"""
+    if ctx.argc < 3:
+        usage(EX_MISSING_ARGS, _(u"Missing option name."), ctx.scmd)
+    option = ctx.args[2].lower()
+    if option != 'misc.dovecot_version':
+        w_std('%s = %s' % (option, ctx.cget(option)))
+    else:
+        w_std('%s = %s' % (option, version_str(ctx.cget(option))))
+
+
+def config_set(ctx):
+    """set a new value for the configuration option"""
+    if ctx.argc < 3:
+        usage(EX_MISSING_ARGS, _(u'Missing option and new value.'), ctx.scmd)
+    if ctx.argc < 4:
+        usage(EX_MISSING_ARGS, _(u'Missing new configuration value.'),
+              ctx.scmd)
+    ctx.hdlr.cfg_set(ctx.args[2].lower(), ctx.args[3])
 
 
 def configure(ctx):
@@ -577,6 +599,10 @@ cmd_map = {  # {{{
     'relocatedinfo': cmd('relocatedinfo', 'ri', relocated_info, 'address',
                          _(u'print information about a relocated user')),
     # cli commands
+    'configget': cmd('configget', 'cg', config_get, 'option',
+                     _('show the actual value of the configuration option')),
+    'configset': cmd('configset', 'cs', config_set, 'option value',
+                      _('set a new value for the configuration option')),
     'configure': cmd('configure', 'cf', configure, '[section]',
                      _(u'start interactive configuration modus')),
     'help': cmd('help', 'h', help_, '[subcommand]',

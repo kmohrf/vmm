@@ -36,6 +36,28 @@ enclosed in parentheses. Both forms are case sensitive.
 
 GENERAL SUBCOMMANDS
 -------------------
+.. _configget:
+
+``configget (cg) option``
+  This subcommand is used to display the actual value of the given
+  configuration *option*. The option has to be written as
+  *section*\ **.**\ *option*, e.g. **misc.transport**.
+
+.. _configset:
+
+``configset (cs) option value``
+  Use this subcommand to set/update a single configuration option. *option*
+  is the configuration option, written as *section*\ **.**\ *option*. *value*
+  is the *option*'s new value.
+
+  Example::
+
+    vmm configget misc.transport
+    misc.transport = dovecot:
+    vmm configset misc.transport lmtp:unix:private/dovecot-lmtp
+    vmm cg misc.transport
+    misc.transport = lmtp:unix:private/dovecot-lmtp
+
 .. _configure:
 
 ``configure (cf) [ section ]``

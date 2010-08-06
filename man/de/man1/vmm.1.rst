@@ -38,6 +38,28 @@ Groß-/Kleinschreibung zu berücksichtigen.
 
 ALLGEMEINE UNTERBEFEHLE
 -----------------------
+.. _configget:
+
+``configget (cg) Option``
+ Dieser Unterbefehl wird verwendet, um den aktuellen Wert der übergebenen
+ *Option* anzuzeigen. Die *Option* wird in der Form *Sektion*\ **.**\ *Option*
+ angegeben. Zum Beispiel: **misc.transport**.
+
+.. _configset:
+
+``configset (cs) Option Wert``
+  Verwenden Sie diesen Unterbefehl, um einer einzelnen Konfigurations-*Option*
+  einen neuen *Wert* zuzuweisen. Die *Option* wird dabei in der Form
+  *Sektion*\ **.**\ *Option* angegeben. *Wert* ist der neue Wert der *Option*.
+
+  Beispiel::
+
+    vmm configget misc.transport
+    misc.transport = dovecot:
+    vmm configset misc.transport lmtp:unix:private/dovecot-lmtp
+    vmm cg misc.transport
+    misc.transport = lmtp:unix:private/dovecot-lmtp
+
 .. _configure:
 
 ``configure (cf) [ Sektion ]``
