@@ -122,7 +122,7 @@ class LazyConfig(RawConfigParser):
         """
         sect_opt = section_option.lower().split('.')
         # TODO: cache it
-        if len(sect_opt) != 2:  # do we need a regexp to check the format?
+        if len(sect_opt) != 2 or not sect_opt[0] or not sect_opt[1]:
             raise BadOptionError(_(u"Bad format: '%s' - expected: "
                                    u"section.option") %
                                  get_unicode(section_option))
