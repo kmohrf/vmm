@@ -45,9 +45,6 @@ class CliHandler(Handler):
 
         self._cfg = Cfg(self._cfg_fname)
         self._cfg.load()
-        if not skip_some_checks:
-            self._cfg.check()
-            self._chkenv()
 
     def cfg_set(self, option, value):
         """Set a new value for the given option."""
