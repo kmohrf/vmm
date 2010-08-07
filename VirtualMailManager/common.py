@@ -59,7 +59,7 @@ def exec_ok(binary):
     """
     binary = expand_path(binary)
     if not os.path.isfile(binary):
-        raise VMMError(_(u"'%s' is not a file") % get_unicode(binary),
+        raise VMMError(_(u"No such file: '%s'") % get_unicode(binary),
                        NO_SUCH_BINARY)
     if not os.access(binary, os.X_OK):
         raise VMMError(_(u"File is not executable: '%s'") %
