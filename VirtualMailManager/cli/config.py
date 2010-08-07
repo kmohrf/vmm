@@ -13,7 +13,7 @@ from shutil import copy2
 
 from VirtualMailManager import ENCODING
 from VirtualMailManager.config import Config, ConfigValueError, LazyConfig
-from VirtualMailManager.errors import ConfigError
+from VirtualMailManager.errors import ConfigError, VMMError
 from VirtualMailManager.cli import w_err, w_std
 from VirtualMailManager.constants import CONF_ERROR, VMM_TOO_MANY_FAILURES
 
@@ -46,7 +46,7 @@ class CliConfig(Config):
                             LazyConfig.set(self, '%s.%s' % (section, opt),
                                            newval)
                             break
-                        except (ValueError, ConfigValueError), err:
+                        except (ValueError, ConfigValueError, VMMError), err:
                             w_err(0, _(u'Warning: %s') % err)
                             failures += 1
                             if failures > 2:
