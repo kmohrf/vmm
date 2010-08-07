@@ -135,18 +135,11 @@ class Handler(object):
             try:
                 exec_ok(val)
             except VMMError, err:
-                if err.code is NO_SUCH_BINARY:
-                    raise VMMError(_(u"'%(binary)s' doesn't exist.\n"
-                                     u"(%(cfg_file)s: section 'bin', option "
-                                     u"'%(option)s')") % {'binary': val,
-                                   'cfg_file': self._cfg_fname, 'option': opt},
-                                   err.code)
-                elif err.code is NOT_EXECUTABLE:
-                    raise VMMError(_(u"'%(binary)s' is not executable.\n"
-                                     u"(%(cfg_file)s: section 'bin', option "
-                                     u"'%(option)s')") % {'binary': val,
-                                   'cfg_file': self._cfg_fname, 'option': opt},
-                                   err.code)
+                if err.code in (NO_SUCH_BINARY, NOT_EXECUTABLE):
+                    raise VMMError(err.msg + _(u"\n(%(cfg_file)s: section "
+                                   u"'bin', option '%(option)s')") %
+                                   {'cfg_file': self._cfg_fname,
+                                    'option': opt}, err.code)
                 else:
                     raise
 
