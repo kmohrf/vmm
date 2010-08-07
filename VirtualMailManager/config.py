@@ -8,14 +8,12 @@
     VMM's configuration module for simplified configuration access.
 """
 
-import re
-
 from ConfigParser import \
      Error, MissingSectionHeaderError, NoOptionError, NoSectionError, \
      ParsingError, RawConfigParser
 from cStringIO import StringIO# TODO: move interactive stff to cli
 
-from VirtualMailManager.common import \
+from VirtualMailManager.common import VERSION_RE, \
      exec_ok, expand_path, get_unicode, lisdir, version_hex
 from VirtualMailManager.constants import CONF_ERROR
 from VirtualMailManager.errors import ConfigError, VMMError
@@ -441,8 +439,7 @@ def check_version_format(version_string):
     Returns the validated version string if it has the expected format.
     Otherwise a `ConfigValueError` will be raised.
     """
-    version_re = r'^\d+\.\d+\.(?:\d+|(?:alpha|beta|rc)\d+)$'
-    if not re.match(version_re, version_string):
+    if not VERSION_RE.match(version_string):
         raise ConfigValueError(_(u"Not a valid Dovecot version: '%s'") %
                                get_unicode(version_string))
     return version_string
