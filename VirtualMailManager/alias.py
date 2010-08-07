@@ -41,7 +41,7 @@ class Alias(object):
         """Loads all known destination addresses into the _dests list."""
         dbc = self._dbh.cursor()
         dbc.execute('SELECT destination FROM alias WHERE gid = %s AND '
-                    'address = %s', self._gid, self._addr.localpart)
+                    'address = %s', (self._gid, self._addr.localpart))
         dests = dbc.fetchall()
         if dbc.rowcount > 0:
             self._dests.extend(EmailAddress(dest[0]) for dest in dests)
@@ -81,11 +81,11 @@ Hint: Delete some destination addresses.""")
         dbc = self._dbh.cursor()
         if not destination:
             dbc.execute('DELETE FROM alias WHERE gid = %s AND address = %s',
-                        self._gid, self._addr.localpart)
+                        (self._gid, self._addr.localpart))
         else:
             dbc.execute('DELETE FROM alias WHERE gid = %s AND address = %s '
-                        'AND destination = %s', self._gid,
-                        self._addr.localpart, str(destination))
+                        'AND destination = %s',
+                        (self._gid, self._addr.localpart, str(destination)))
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()

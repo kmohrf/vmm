@@ -130,8 +130,8 @@ class MailLocation(object):
         *directory* name. If it fails goto _save()."""
         dbc = self._dbh.cursor()
         dbc.execute("SELECT mid FROM maillocation WHERE fid = (SELECT fid "
-                    "FROM mailboxformat WHERE format = '%s') AND directory = "
-                    "'%s'" % (mbfmt, directory))
+                    "FROM mailboxformat WHERE format = %s) AND directory = %s",
+                    (mbfmt, directory))
         result = dbc.fetchone()
         dbc.close()
         if not result:
@@ -147,8 +147,8 @@ class MailLocation(object):
         dbc.execute("SELECT nextval('maillocation_id')")
         mid = dbc.fetchone()[0]
         dbc.execute("INSERT INTO maillocation (fid, mid, directory) VALUES ("
-                    "(SELECT fid FROM mailboxformat WHERE format = '%s'), %u, "
-                    "'%s')" % (mbfmt, mid, directory))
+                    "(SELECT fid FROM mailboxformat WHERE format = %s), %s, "
+                    "%s)",  (mbfmt, mid, directory))
         self._dbh.commit()
         dbc.close()
         self._mid = mid

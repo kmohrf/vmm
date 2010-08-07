@@ -64,7 +64,7 @@ class Domain(object):
         dbc = self._dbh.cursor()
         dbc.execute('SELECT dd.gid, tid, domaindir, is_primary FROM '
                     'domain_data dd, domain_name dn WHERE domainname = %s AND '
-                    'dn.gid = dd.gid', self._name)
+                    'dn.gid = dd.gid', (self._name,))
         result = dbc.fetchone()
         dbc.close()
         if result:
@@ -160,10 +160,10 @@ class Domain(object):
                          DOMAIN_EXISTS)
         assert self._directory is not None and self._transport is not None
         dbc = self._dbh.cursor()
-        dbc.execute("INSERT INTO domain_data VALUES (%s, %s, %s)", self._gid,
-                    self._transport.tid, self._directory)
-        dbc.execute("INSERT INTO domain_name VALUES (%s, %s, %s)", self._name,
-                    self._gid, True)
+        dbc.execute("INSERT INTO domain_data VALUES (%s, %s, %s)", (self._gid,
+                    self._transport.tid, self._directory))
+        dbc.execute("INSERT INTO domain_name VALUES (%s, %s, %s)", (self._name,
+                    self._gid, True))
         self._dbh.commit()
         dbc.close()
         self._new = False
@@ -214,12 +214,12 @@ class Domain(object):
             return
         dbc = self._dbh.cursor()
         dbc.execute("UPDATE domain_data SET tid = %s WHERE gid = %s",
-                    transport.tid, self._gid)
+                    (transport.tid, self._gid))
         if dbc.rowcount > 0:
             self._dbh.commit()
         if force:
             dbc.execute("UPDATE users SET tid = %s WHERE gid = %s",
-                        transport.tid, self._gid)
+                        (transport.tid, self._gid))
             if dbc.rowcount > 0:
                 self._dbh.commit()
         dbc.close()
@@ -231,7 +231,7 @@ class Domain(object):
         dbc = self._dbh.cursor()
         dbc.execute('SELECT gid, domainname, transport, domaindir, '
                     'aliasdomains, accounts, aliases, relocated FROM '
-                    'vmm_domain_info WHERE gid = %s', self._gid)
+                    'vmm_domain_info WHERE gid = %s', (self._gid,))
         info = dbc.fetchone()
         dbc.close()
         keys = ('gid', 'domainname', 'transport', 'domaindir', 'aliasdomains',
@@ -243,7 +243,7 @@ class Domain(object):
         self._chk_state()
         dbc = self._dbh.cursor()
         dbc.execute('SELECT local_part from users where gid = %s ORDER BY '
-                    'local_part', self._gid)
+                    'local_part', (self._gid,))
         users = dbc.fetchall()
         dbc.close()
         accounts = []
@@ -258,7 +258,7 @@ class Domain(object):
         self._chk_state()
         dbc = self._dbh.cursor()
         dbc.execute('SELECT DISTINCT address FROM alias WHERE gid = %s ORDER '
-                    'BY address', self._gid)
+                    'BY address', (self._gid,))
         addresses = dbc.fetchall()
         dbc.close()
         aliases = []
@@ -273,7 +273,7 @@ class Domain(object):
         self._chk_state()
         dbc = self._dbh.cursor()
         dbc.execute('SELECT address FROM relocated WHERE gid = %s ORDER BY '
-                    'address', self._gid)
+                    'address', (self._gid,))
         addresses = dbc.fetchall()
         dbc.close()
         relocated = []
@@ -288,7 +288,7 @@ class Domain(object):
         self._chk_state()
         dbc = self._dbh.cursor()
         dbc.execute('SELECT domainname FROM domain_name WHERE gid = %s AND '
-                    'NOT is_primary ORDER BY domainname', self._gid)
+                    'NOT is_primary ORDER BY domainname', (self._gid,))
         anames = dbc.fetchall()
         dbc.close()
         aliasdomains = []
@@ -321,7 +321,8 @@ def get_gid(dbh, domainname):
     """
     domainname = check_domainname(domainname)
     dbc = dbh.cursor()
-    dbc.execute('SELECT gid FROM domain_name WHERE domainname=%s', domainname)
+    dbc.execute('SELECT gid FROM domain_name WHERE domainname = %s',
+                (domainname,))
     gid = dbc.fetchone()
     dbc.close()
     if gid:

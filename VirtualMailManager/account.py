@@ -73,7 +73,7 @@ class Account(object):
         `False` - if the user could be found. """
         dbc = self._dbh.cursor()
         dbc.execute('SELECT uid, mid, tid FROM users WHERE gid = %s AND '
-                    'local_part = %s', self._domain.gid, self._addr.localpart)
+                    'local_part=%s', (self._domain.gid, self._addr.localpart))
         result = dbc.fetchone()
         dbc.close()
         if result:
@@ -146,9 +146,8 @@ class Account(object):
         """Count all alias addresses where the destination address is the
         address of the Account."""
         dbc = self._dbh.cursor()
-        sql = "SELECT COUNT(destination) FROM alias WHERE destination = '%s'"\
-                % self._addr
-        dbc.execute(sql)
+        dbc.execute('SELECT COUNT(destination) FROM alias WHERE destination '
+                    '= %s', (self._addr,))
         a_count = dbc.fetchone()[0]
         dbc.close()
         return a_count
@@ -259,15 +258,15 @@ class Account(object):
             sieve_col = 'managesieve'
         self._prepare(MailLocation(self._dbh, mbfmt=cfg_dget('mailbox.format'),
                                    directory=cfg_dget('mailbox.root')))
-        sql = "INSERT INTO users (local_part, passwd, uid, gid, mid, tid,\
- smtp, pop3, imap, %s) VALUES ('%s', '%s', %d, %d, %d, %d, %s, %s, %s, %s)" % (
-            sieve_col, self._addr.localpart, pwhash(self._passwd,
-                                                    user=self._addr),
-            self._uid, self._domain.gid, self._mail.mid, self._transport.tid,
-            cfg_dget('account.smtp'), cfg_dget('account.pop3'),
-            cfg_dget('account.imap'), cfg_dget('account.sieve'))
         dbc = self._dbh.cursor()
-        dbc.execute(sql)
+        dbc.execute('INSERT INTO users (local_part, passwd, uid, gid, mid, '
+                    'tid, smtp, pop3, imap, %s) VALUES' % (sieve_col,) + \
+                    '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
+                    (self._addr.localpart,
+                     pwhash(self._passwd, user=self._addr), self._uid,
+                     self._domain.gid, self._mail.mid, self._transport.tid,
+                     cfg_dget('account.smtp'), cfg_dget('account.pop3'),
+                     cfg_dget('account.imap'), cfg_dget('account.sieve')))
         self._dbh.commit()
         dbc.close()
         self._new = False
@@ -291,15 +290,15 @@ class Account(object):
         dbc = self._dbh.cursor()
         if field == 'password':
             dbc.execute('UPDATE users SET passwd = %s WHERE uid = %s',
-                        pwhash(value, user=self._addr), self._uid)
+                        (pwhash(value, user=self._addr), self._uid))
         elif field == 'transport':
             if value != self._transport.transport:
                 self._transport = Transport(self._dbh, transport=value)
                 dbc.execute('UPDATE users SET tid = %s WHERE uid = %s',
-                            self._transport.tid, self._uid)
+                            (self._transport.tid, self._uid))
         else:
             dbc.execute('UPDATE users SET name = %s WHERE uid = %s',
-                        value, self._uid)
+                        (value, self._uid))
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
@@ -351,7 +350,7 @@ class Account(object):
         dbc.execute("SELECT address ||'@'|| domainname FROM alias, "
                     "domain_name WHERE destination = %s AND domain_name.gid = "
                     "alias.gid AND domain_name.is_primary ORDER BY address",
-                    str(self._addr))
+                    (str(self._addr),))
         addresses = dbc.fetchall()
         dbc.close()
         aliases = []
@@ -374,11 +373,11 @@ class Account(object):
         self._chk_state()
         dbc = self._dbh.cursor()
         if force:
-            dbc.execute('DELETE FROM users WHERE uid = %s', self._uid)
+            dbc.execute('DELETE FROM users WHERE uid = %s', (self._uid),)
             # delete also all aliases where the destination address is the same
             # as for this account.
             dbc.execute("DELETE FROM alias WHERE destination = %s",
-                        str(self._addr))
+                        (str(self._addr),))
             self._dbh.commit()
         else:  # check first for aliases
             a_count = self._count_aliases()
@@ -388,7 +387,7 @@ class Account(object):
                              u"destination address '%(address)s'.") %
                            {'count': a_count, 'address': self._addr},
                            ALIAS_PRESENT)
-            dbc.execute('DELETE FROM users WHERE uid = %s', self._uid)
+            dbc.execute('DELETE FROM users WHERE uid = %s', (self._uid,))
             self._dbh.commit()
         dbc.close()
         self._new = True
@@ -420,7 +419,7 @@ def get_account_by_uid(uid, dbh):
     dbc.execute("SELECT local_part||'@'|| domain_name.domainname AS address, "
                 "uid, users.gid FROM users LEFT JOIN domain_name ON "
                 "(domain_name.gid = users.gid AND is_primary) WHERE uid = %s",
-                uid)
+                (uid,))
     info = dbc.fetchone()
     dbc.close()
     if not info:
