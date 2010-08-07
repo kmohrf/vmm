@@ -17,7 +17,8 @@ from VirtualMailManager.constants import NOT_EXECUTABLE, NO_SUCH_BINARY
 from VirtualMailManager.errors import VMMError
 
 
-_version_re = re.compile(r'^(\d+)\.(\d+)\.(?:(\d+)|(alpha|beta|rc)(\d+))$')
+VERSION_RE = re.compile(r'^(\d+)\.(\d+)\.(?:(\d+)|(alpha|beta|rc)(\d+))$')
+
 _version_level = dict(alpha=0xA, beta=0xB, rc=0xC)
 _version_cache = {}
 _ = lambda msg: msg
@@ -73,11 +74,11 @@ def version_hex(version_string):
     version_hex('1.2.3') -> 270548736
     hex(version_hex('1.2.3')) -> '0x10203f00'
     """
-    global _version_cache, _version_level, _version_re
+    global _version_cache
     if version_string in _version_cache:
         return _version_cache[version_string]
     version = 0
-    version_mo = _version_re.match(version_string)
+    version_mo = VERSION_RE.match(version_string)
     if not version_mo:
         raise ValueError('Invalid version string: %r' % version_string)
     major, minor, patch, level, serial = version_mo.groups()
@@ -110,7 +111,7 @@ def version_str(version):
     Raises a `TypeError` if *version* is not an int/long.
     Raises a `ValueError` if *version* is an incorrect int version.
     """
-    global _version_cache, _version_level
+    global _version_cache
     if version in _version_cache:
         return _version_cache[version]
     if not isinstance(version, (int, long)):
