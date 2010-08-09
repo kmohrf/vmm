@@ -76,7 +76,7 @@ class Transport(object):
         if result:
             self._transport = result[0]
         else:
-            raise TransportError(_(u'Unknown tid specified.'),
+            raise TransportError(_(u'Unknown transport id specified.'),
                                  UNKNOWN_TRANSPORT_ID)
 
     def _load_by_name(self):
