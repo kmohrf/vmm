@@ -223,7 +223,13 @@ benötigten Optionen festzulegen.
 .. _database.host:
 
 ``host (Vorgabe: localhost)`` : *String*
-  Der Hostname oder die IP-Adresse des Datenbank-Servers.
+  Der Hostname oder die IP-Adresse des Datenbankservers.
+
+.. _database.module:
+
+``module (Vorgabe: psycopg2)`` : *String*
+  Das für den Datenbankzugriff zu verwendende Python PostgreSQL Adapter
+  Module. Unterstützte Module sind **psycopg2** und **pyPgSQL**.
 
 .. _database.name:
 
@@ -235,6 +241,22 @@ benötigten Optionen festzulegen.
 ``pass (Vorgabe: Nichts)`` : *String*
   Das Passwort des Datenbank-Benutzers.
 
+.. _database.port:
+
+``port (Vorgabe: 5432)`` : *Int*
+  Der TCP-Port, auf dem der Datenbankserver Verbindungen annimmt.
+
+.. _database.sslmode:
+
+``sslmode (Vorgabe: prefer)`` : *String*
+  Bestimmt, ob und mit welcher Priorität eine SSL-Verbindung mit dem
+  Datenbankserver ausgehandelt wird. Mögliche Werte sind: **disabled**,
+  **allow**, **prefer**, **require**, **verify-ca**, and **verify-full**.
+  Die Modi **verify-ca** und **verify-full** stehen seit PostgreSQL 8.4 zur
+  Verfügung.
+
+  Diese Option wird ignoriert, wenn das *modul* pyPgSQL verwendet wird.
+
 .. _database.user:
 
 ``user (Vorgabe: Nichts)`` : *String*
@@ -243,7 +265,9 @@ benötigten Optionen festzulegen.
 Beispiel::
 
   [database]
-  host = localhost
+  host = dbsrv8.example.net
+  port 5433
+  sslmode = require
   user = vmm
   pass = PY_SRJ}L/0p-oOk
   name = mailsys

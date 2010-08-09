@@ -214,6 +214,12 @@ connect to the database.
 ``host (default: localhost)`` : *String*
   Hostname or IP address of the database server.
 
+.. _database.module:
+
+``module (default: psycopg2)`` : *String*
+  The Python PostgreSQL database adapter module to be used. Supported modules
+  are **psycopg2** and **pyPgSQL**.
+
 .. _database.name:
 
 ``name (default: mailsys)`` : *String*
@@ -224,6 +230,22 @@ connect to the database.
 ``pass (default: None)`` : *String*
   Database password.
 
+.. _database.port:
+
+``port (default: 5432)`` : *Int*
+  The TCP port, on which the database server is listening for connections.
+
+.. _database.sslmode:
+
+``sslmode (default: prefer)`` : *String*
+  Determines whether and with what priority an SSL connection will be
+  negotiated with the database server. Possible values are: **disabled**,
+  **allow**, **prefer**, **require**, **verify-ca**, and **verify-full**.
+  The modes **verify-ca** and **verify-full** are available since PostgreSQL
+  8.4.
+
+  This setting will be ignored when the pyPgSQL *module* is used.
+
 .. _database.user:
 
 ``user (default: None)`` : *String*
@@ -232,7 +254,9 @@ connect to the database.
 Example::
 
   [database]
-  host = localhost
+  host = dbsrv8.example.net
+  port 5433
+  sslmode = require
   user = vmm
   pass = PY_SRJ}L/0p-oOk
   name = mailsys
