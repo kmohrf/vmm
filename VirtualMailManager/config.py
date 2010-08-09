@@ -431,6 +431,7 @@ class Config(LazyConfig):
             if not VERSION_RE.match(value):
                 self._missing['misc'] = ['version: ' +\
                         _(u"Not a valid Dovecot version: '%s'") % value]
+        # section database
         db_err = []
         value = self.dget('database.module').lower()
         if value not in DB_MUDULES:
@@ -443,6 +444,11 @@ class Config(LazyConfig):
                               _(u"Unknown pgsql SSL mode: '%s'") % value)
         if db_err:
             self._missing['database'] = db_err
+        # section mailbox
+        value = self.dget('mailbox.format')
+        if not known_format(value):
+            self._missing['mailbox'] = ['format: ' +\
+                              _(u"Unsupported mailbox format: '%s'") % value]
 
 
 def is_dir(path):
