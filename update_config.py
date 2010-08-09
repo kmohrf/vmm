@@ -110,6 +110,7 @@ def upd_052(cp):
                      ('misc.dovecotvers',  'misc.dovecot_version')):
         move_option(cp, src, dst)
     cp.remove_section('maildir')
+    add_option(cp, 'database.module', 'pyPgSQL')
     set_dovecot_version(cp)
 
 
