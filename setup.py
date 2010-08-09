@@ -18,10 +18,11 @@ It is designed for Dovecot and Postfix with a PostgreSQL backend.
 """
 packages = [
     'VirtualMailManager',
-    'VirtualMailManager.constants',
+    'VirtualMailManager.cli',
     'VirtualMailManager.ext',
     'VirtualMailManager.pycompat',
 ]
+# http://pypi.python.org/pypi?%3Aaction=list_classifiers
 classifiers = ['Development Status :: 5 - Production/Stable',
                'Environment :: Console',
                'Intended Audience :: System Administrators',
@@ -35,6 +36,7 @@ classifiers = ['Development Status :: 5 - Production/Stable',
                'Operating System :: POSIX :: Linux',
                'Operating System :: POSIX :: Other',
                'Programming Language :: Python',
+               'Programming Language :: Python :: 2',
                'Topic :: Communications :: Email',
                'Topic :: System :: Systems Administration',
                'Topic :: Utilities']
@@ -60,6 +62,6 @@ setup_args = {'name': 'VirtualMailManager',
               'classifiers': classifiers}
 
 if 'requires' in DistributionMetadata._METHOD_BASENAMES:
-    setup_args['requires'] = ['pyPgSQL']
+    setup_args['requires'] = ['psycopg2>=2.0', 'pyPgSQL>=2.5.1']
 
 setup(**setup_args)
