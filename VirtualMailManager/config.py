@@ -11,7 +11,7 @@
 from ConfigParser import \
      Error, MissingSectionHeaderError, NoOptionError, NoSectionError, \
      ParsingError, RawConfigParser
-from cStringIO import StringIO# TODO: move interactive stff to cli
+from cStringIO import StringIO
 
 from VirtualMailManager.common import VERSION_RE, \
      exec_ok, expand_path, get_unicode, lisdir, version_hex
@@ -20,6 +20,9 @@ from VirtualMailManager.errors import ConfigError, VMMError
 from VirtualMailManager.maillocation import known_format
 from VirtualMailManager.password import verify_scheme as _verify_scheme
 
+DB_MUDULES = ('psycopg2', 'pypgsql')
+DB_SSL_MODES = ('allow', 'disabled', 'prefer', 'require', 'verify-ca',
+                'verify-full')
 
 _ = lambda msg: msg
 
@@ -291,7 +294,7 @@ class Config(LazyConfig):
         LazyConfig.__init__(self)
         self._cfg_filename = filename
         self._cfg_file = None
-        self.__missing = {}
+        self._missing = {}
 
         LCO = LazyConfigOption
         bool_t = self.bool_new
@@ -315,8 +318,11 @@ class Config(LazyConfig):
             },
             'database': {
                 'host': LCO(str, 'localhost', self.get),
+                'module': LCO(str, 'psycopg2', self.get, check_db_module),
                 'name': LCO(str, 'mailsys', self.get),
                 'pass': LCO(str, None, self.get),
+                'port': LCO(int, 5432, self.getint),
+                'sslmode': LCO(str, 'prefer', self.get, check_db_ssl_mode),
                 'user': LCO(str, None, self.get),
             },
             'domain': {
@@ -364,22 +370,36 @@ class Config(LazyConfig):
         """Performs a configuration check.
 
         Raises a ConfigError if settings w/o a default value are missed.
-        Or a ConfigValueError if 'misc.dovecot_version' has the wrong
-        format.
+        Or some settings have a invalid value.
         """
-        # TODO: There are only two settings w/o defaults.
-        #       So there is no need for cStringIO
-        if not self._chk_cfg():
-            errmsg = StringIO()
-            errmsg.write(_(u'Missing options, which have no default value.\n'))
-            errmsg.write(_(u'Using configuration file: %s\n') %
-                         self._cfg_filename)
-            for section, options in self.__missing.iteritems():
+        def iter_dict():
+            for section, options in self._missing.iteritems():
                 errmsg.write(_(u'* Section: %s\n') % section)
-                for option in options:
-                    errmsg.write((u'    %s\n') % option)
+                errmsg.writelines(u'    %s\n' % option for option in options)
+            self._missing.clear()
+
+        errmsg = None
+        self._chk_non_default()
+        miss_vers = 'misc' in self._missing and \
+                    'dovecot_version' in self._missing['misc']
+        if self._missing:
+            errmsg = StringIO()
+            errmsg.write(_(u'Check of configuration file %s failed.\n') %
+                         self._cfg_filename)
+            errmsg.write(_(u'Missing options, which have no default value.\n'))
+            iter_dict()
+        self._chk_possible_values(miss_vers)
+        if self._missing:
+            if not errmsg:
+                errmsg = StringIO()
+                errmsg.write(_(u'Check of configuration file %s failed.\n') %
+                             self._cfg_filename)
+                errmsg.write(_(u'Invalid configuration values.\n'))
+            else:
+                errmsg.write('\n' + _(u'Invalid configuration values.\n'))
+            iter_dict()
+        if errmsg:
             raise ConfigError(errmsg.getvalue(), CONF_ERROR)
-        check_version_format(self.get('misc', 'dovecot_version'))
 
     def hexversion(self, section, option):
         """Converts the version number (e.g.: 1.2.3) from the *option*'s
@@ -391,23 +411,38 @@ class Config(LazyConfig):
         to Unicode."""
         return get_unicode(self.get(section, option))
 
-    def _chk_cfg(self):
+    def _chk_non_default(self):
         """Checks all section's options for settings w/o a default
-        value.
-
-        Returns `True` if everything is fine, else `False`.
+        value. Missing items will be stored in _missing.
         """
-        errors = False
         for section in self._cfg.iterkeys():
             missing = []
             for option, value in self._cfg[section].iteritems():
                 if (value.default is None and
                     not RawConfigParser.has_option(self, section, option)):
                     missing.append(option)
-                    errors = True
             if missing:
-                self.__missing[section] = missing
-        return not errors
+                self._missing[section] = missing
+
+    def _chk_possible_values(self, miss_vers):
+        """Check settings for which the possible values are known."""
+        if not miss_vers:
+            value = self.get('misc', 'dovecot_version')
+            if not VERSION_RE.match(value):
+                self._missing['misc'] = ['version: ' +\
+                        _(u"Not a valid Dovecot version: '%s'") % value]
+        db_err = []
+        value = self.dget('database.module').lower()
+        if value not in DB_MUDULES:
+            db_err.append('module: ' + \
+                          _(u"Unsupported database module: '%s'") % value)
+        if value == 'psycopg2':
+            value = self.dget('database.sslmode')
+            if value not in DB_SSL_MODES:
+                db_err.append('sslmode: ' + \
+                              _(u"Unknown pgsql SSL mode: '%s'") % value)
+        if db_err:
+            self._missing['database'] = db_err
 
 
 def is_dir(path):
@@ -419,6 +454,22 @@ def is_dir(path):
     if lisdir(path):
         return path
     raise ConfigValueError(_(u"No such directory: %s") % get_unicode(path))
+
+
+def check_db_module(module):
+    """Check if the *module* is a supported pgsql module."""
+    if module.lower() in DB_MUDULES:
+        return module
+    raise ConfigValueError(_(u"Unsupported database module: '%s'") %
+                           get_unicode(module))
+
+
+def check_db_ssl_mode(ssl_mode):
+    """Check if the *ssl_mode* is one of the SSL modes, known by pgsql."""
+    if ssl_mode in DB_SSL_MODES:
+        return ssl_mode
+    raise ConfigValueError(_(u"Unknown pgsql SSL mode: '%s'") %
+                           get_unicode(ssl_mode))
 
 
 def check_mailbox_format(format):
