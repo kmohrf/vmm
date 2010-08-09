@@ -14,9 +14,8 @@ from VirtualMailManager import ENCODING, errors
 from VirtualMailManager.config import BadOptionError, ConfigValueError
 from VirtualMailManager.cli import w_err
 from VirtualMailManager.cli.handler import CliHandler
-from VirtualMailManager.constants import CONF_ERROR, DATABASE_ERROR, \
-     EX_MISSING_ARGS, EX_SUCCESS, EX_UNKNOWN_COMMAND, EX_USER_INTERRUPT, \
-     INVALID_ARGUMENT
+from VirtualMailManager.constants import DATABASE_ERROR, EX_MISSING_ARGS, \
+     EX_SUCCESS, EX_UNKNOWN_COMMAND, EX_USER_INTERRUPT, INVALID_ARGUMENT
 from VirtualMailManager.cli.subcommands import RunContext, cmd_map, usage
 
 
@@ -27,13 +26,11 @@ def _get_handler():
     """Try to get a CliHandler. Exit the program when an error occurs."""
     try:
         handler = CliHandler()
-        handler.cfg_install()
     except (errors.NotRootError, errors.PermissionError, errors.VMMError,
             errors.ConfigError), err:
         w_err(err.code, _(u'Error: %s') % err.msg)
-    except ConfigValueError, err:
-        w_err(CONF_ERROR, _(u'Error: %s') % err)
     else:
+        handler.cfg_install()
         return handler
 
 
