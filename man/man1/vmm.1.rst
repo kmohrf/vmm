@@ -7,7 +7,7 @@ command line tool to manage email domains/accounts/aliases
 ----------------------------------------------------------
 
 :Author:         Pascal Volk <neverseen@users.sourceforge.net>
-:Date:           2010-08-01
+:Date:           |today|
 :Version:        vmm-0.6.0
 :Manual group:   vmm Manual
 :Manual section: 1
@@ -270,7 +270,9 @@ ACCOUNT SUBCOMMANDS
   Use this subcommand to create a new email account for the given *address*.
 
   If the *password* is not provided, **vmm** will prompt for it
-  interactively.
+  interactively. When no *password* is provided and |account.random_password|_
+  is set to **true**, **vmm** will generate a random password and print it to
+  stdout after the account has been created.
 
   Examples::
 

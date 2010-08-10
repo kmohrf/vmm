@@ -2,6 +2,8 @@
 
 .. |account.disk_usage| replace:: `account.disk_usage`
 .. _account.disk_usage: vmm.cfg.5#account-disk-usage
+.. |account.random_password| replace:: `account.random_password`
+.. _account.random_password: vmm.cfg.5#account-random-password
 
 .. |domain.force_deletion| replace:: `domain.force_deletion`
 .. _domain.force_deletion: vmm.cfg.5#domain-force-deletion

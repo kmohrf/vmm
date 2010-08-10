@@ -16,6 +16,7 @@ from VirtualMailManager.cli import read_pass
 from VirtualMailManager.cli.config import CliConfig as Cfg
 from VirtualMailManager.constants import ACCOUNT_EXISTS, INVALID_SECTION, \
      NO_SUCH_ACCOUNT
+from VirtualMailManager.password import randompw
 
 _ = lambda msg: msg
 
@@ -67,16 +68,21 @@ class CliHandler(Handler):
 
     def user_add(self, emailaddress, password=None):
         """Override the parent user_add() - add the interactive password
-        dialog."""
+        dialog.
+
+        Returns the generated password, if account.random_password == True.
+        """
         acc = self._get_account(emailaddress)
         if acc:
             raise VMMError(_(u"The account '%s' already exists.") %
                            acc.address, ACCOUNT_EXISTS)
+        rand_pass = self._cfg.dget('account.random_password')
         if password is None:
-            password = read_pass()
+            password = (read_pass, randompw)[rand_pass]()
         acc.set_password(password)
         acc.save()
         self._make_account_dirs(acc)
+        return (None, password)[rand_pass]
 
     def user_password(self, emailaddress, password=None):
         """Override the parent user_password() - add the interactive

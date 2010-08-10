@@ -380,7 +380,9 @@ def user_add(ctx):
         password = None
     else:
         password = ctx.args[3]
-    ctx.hdlr.user_add(ctx.args[2].lower(), password)
+    gen_pass = ctx.hdlr.user_add(ctx.args[2].lower(), password)
+    if gen_pass:
+        w_std(_(u"Generated password: %s") % gen_pass)
 
 
 def user_delete(ctx):

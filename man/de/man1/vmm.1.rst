@@ -7,7 +7,7 @@ Kommandozeilenprogramm zur Verwaltung von E-Mail-Domains, -Konten und -Aliase
 -----------------------------------------------------------------------------
 
 :Author:         Pascal Volk <neverseen@users.sourceforge.net>
-:Date:           2010-08-01
+:Date:           |today|
 :Version:        vmm-0.6.0
 :Manual group:   vmm Manual
 :Manual section: 1
@@ -288,7 +288,10 @@ KONTO UNTERBEFEHLE
   angelegt.
 
   Wurde kein *Passwort* angegeben wird **vmm** dieses im interaktiven Modus
-  erfragen.
+  erfragen. Falls kein *Passwort* angegeben wurde und
+  |account.random_password|_ den Wert **true** hat, wird **vmm** ein
+  zufälliges Passwort generieren und auf stdout ausgeben, nachdem das Konto
+  angelegt wurde.
 
   Beispiele::
 
