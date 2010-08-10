@@ -150,6 +150,9 @@ DOMAIN SUBCOMMANDS
   *transport* will be the default transport for all new accounts in this
   domain.
 
+  When |domain.auto_postmaster|_ is set to **true**, **vmm** will also create
+  an account for **postmaster@**\ *domain*.
+
   Examples::
 
     vmm domainadd support.example.com smtp:mx1.example.com

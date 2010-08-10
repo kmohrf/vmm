@@ -5,6 +5,8 @@
 .. |account.random_password| replace:: `account.random_password`
 .. _account.random_password: vmm.cfg.5#account-random-password
 
+.. |domain.auto_postmaster| replace:: `domain.auto_postmaster`
+.. _domain.auto_postmaster: vmm.cfg.5#domain-auto-postmaster
 .. |domain.force_deletion| replace:: `domain.force_deletion`
 .. _domain.force_deletion: vmm.cfg.5#domain-force-deletion
 

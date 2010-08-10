@@ -158,6 +158,9 @@ DOMAIN UNTERBEFEHLE
   *Transport* ist gleichzeitig der Vorgabe-Transport für alle neuen Konten,
   die unter dieser Domain eingerichtet werden.
 
+  Wenn der Wert der Konfigurations-Option |domain.auto_postmaster|_ **true**
+  ist, wird **vmm** auch ein Konto für **postmaster@**\ *Domain* erstellen.
+
   Beispiele::
 
     vmm domainadd support.example.com smtp:mx1.example.com

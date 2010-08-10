@@ -207,6 +207,12 @@ def domain_add(ctx):
         ctx.hdlr.domain_add(ctx.args[2].lower())
     else:
         ctx.hdlr.domain_add(ctx.args[2].lower(), ctx.args[3])
+    if not ctx.cget('domain.auto_postmaster'):
+        return
+    ctx.scmd = 'useradd'
+    ctx.args = [prog, ctx.scmd, u'postmaster@' + ctx.args[2].lower()]
+    ctx.argc = 3
+    user_add(ctx)
 
 
 def domain_delete(ctx):
