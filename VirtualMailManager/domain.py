@@ -132,7 +132,10 @@ class Domain(object):
         `basedir` : basestring
           The base directory of all domains
         """
-        assert self._new and self._directory is None
+        if not self._new:
+            raise DomErr(_(u"The domain '%s' already exists.") % self._name,
+                         DOMAIN_EXISTS)
+        assert self._directory is None
         self._set_gid()
         self._directory = os.path.join(basedir, choice(MAILDIR_CHARS),
                                        str(self._gid))
@@ -150,7 +153,10 @@ class Domain(object):
         `transport` : VirtualMailManager.Transport
           The transport of the new Domain
         """
-        assert self._new and isinstance(transport, Transport)
+        if not self._new:
+            raise DomErr(_(u"The domain '%s' already exists.") % self._name,
+                         DOMAIN_EXISTS)
+        assert isinstance(transport, Transport)
         self._transport = transport
 
     def save(self):
