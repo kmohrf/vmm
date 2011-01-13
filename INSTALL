@@ -1,21 +1,41 @@
 Installation Prerequisites
 You should already have installed and configured Postfix, Dovecot and
 PostgreSQL.
-You have to install Python and pyPgSQL* to use the Virtual Mail Manager.
-If you want to store the passwords as PLAIN-MD4 digest you have also to install
-python-crypto <http://www.amk.ca/python/code/crypto.html>.
 
-* = http://pypgsql.sourceforge.net/ (Debian: python-pgsql)
+The Virtual Mail Manager depends on:
+    - Python (>= 2.4.0)
+    - Psycopg 2¹ or pyPgSQL²
+
+If you are using Python <= 2.5.0:
+    - if you want to store your users' passwords as PLAIN-MD4 digest in
+      the database, vmm will try to use Crypto.Hash.MD4 from PyCrypto³.
+    - if you are using Dovecot >= v1.1.0 and you want to store your users'
+      passwords as SHA256 or SSHA256 hashes, vmm will try to use
+      Crypto.Hash.SHA256 from PyCrypto². For SHA256/SSHA256 you should have
+      at least use PyCrypto in version 2.1.0alpha1.
+
+    When the Crypto.Hash module couldn't be imported, vmm will use
+    dovecotpw/doveadm, if the misc.password_scheme setting in the vmm.cfg
+    is set to PLAIN-MD4, SHA256 or SSHA256
+
+[1] Psycopg: <http://initd.org/psycopg/> (Debian: python-psycopg2)
+[2] pyPgSQL: <http://pypgsql.sourceforge.net/> (Debian: python-pgsql)
+[3] PyCrypto: <http://www.pycrypto.org/> (Debian: python-crypto)
 
 
 Configuring PostgreSQL
+(for more details see: http://vmm.localdomain.org/PreparingPostgreSQL)
 
-* /etc/postgresql/8.2/main/pg_hba.conf
+* /etc/postgresql/8.4/main/pg_hba.conf
+  [ if you prefer to connect via TCP/IP ]
     # IPv4 local connections:
     host    mailsys     +mailsys    127.0.0.1/32          md5
+  [ if you want to connect through a local Unix-domain socket ]
+    # "local" is for Unix domain socket connections only
+    local   mailsys     +mailsys                          md5
 
     # reload configuration
-    /etc/init.d/postgresql-8.2 force-reload
+    /etc/init.d/postgresql-8.4 force-reload
 
 * Create a DB user if necessary:
     DB Superuser:
@@ -23,23 +43,24 @@ Configuring PostgreSQL
     DB User:
     createuser -d -E -e -P $USERNAME
 
-* Create Database and db users for Postfix and Dovecot
+* Create Database and db users for vmm, Postfix and Dovecot
     connecting to PostgreSQL:
     psql template1
 
-    # create database
-    CREATE DATABASE mailsys ENCODING 'UTF8';
+    # create users, group and the database
+    CREATE USER vmm ENCRYPTED PASSWORD 'DB PASSWORD for vmm';
+    CREATE USER dovecot ENCRYPTED password 'DB PASSWORD for Dovecot';
+    CREATE USER postfix ENCRYPTED password 'DB PASSWORD for Postfix';
+    CREATE ROLE mailsys WITH USER postfix, dovecot, vmm;
+    CREATE DATABASE mailsys WITH OWNER vmm ENCODING 'UTF8';
+    \q
+
     # connect to the new database
-    \c mailsys
+    psql mailsys vmm -W -h 127.0.0.1
     # either import the database structure for Dovecot v1.0.x/v1.1.x
     \i /path/to/create_tables.pgsql
     # or import the database structure for Dovecot v1.2.x
     \i /path/to/create_tables-dovecot-1.2.x.pgsql
-
-    # create users and group
-    CREATE USER postfix ENCRYPTED password 'DB PASSWORD for Postfix';
-    CREATE USER dovecot ENCRYPTED password 'DB PASSWORD for Dovecot';
-    CREATE ROLE mailsys WITH USER postfix, dovecot;
 
     # set permissions
     GRANT SELECT ON dovecot_password, dovecot_user TO dovecot;
@@ -54,7 +75,6 @@ Create directory for your mails
   cd /srv/mail/
   mkdir 0 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n o p q r s t u v w x y z
   chmod 771 /srv/mail
-  chgrp -R mail /srv/mail
   chmod 751 /srv/mail/*
 
 Configuring Dovecot
@@ -63,7 +83,6 @@ Configuring Dovecot
     # all your other settings
     #disable_plaintext_auth = no
     mail_location = maildir:~/Maildir
-    mail_privileged_group = mail
     first_valid_uid = 70000
     first_valid_gid = 70000
     protocol lda {
@@ -159,9 +178,9 @@ Configuring Postfix's main.cf
 
 Installing the Virtual Mail Manager and configure the rest
 
-    Installing from SVN or vmm-x.y.z.tar.bz2
-    after checking out from svn or extracting the archive change into the new
-    directory and type:
+    Installing from Mercurial or vmm-x.y.z.tar.bz2
+    after cloning from the hg repo or extracting the archive change into the
+    new directory and type:
         ./install.sh
     edit all the pgsql-*.cf files in /etc/postfix
 

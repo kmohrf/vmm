@@ -4,6 +4,8 @@ SET client_min_messages = warning;
 
 CREATE SEQUENCE transport_id;
 
+CREATE SEQUENCE mailboxformat_id;
+
 CREATE SEQUENCE maillocation_id;
 
 CREATE SEQUENCE domain_gid
@@ -30,18 +32,32 @@ CREATE TABLE transport (
 -- Insert default transport
 INSERT INTO transport(transport) VALUES ('dovecot:');
 
-CREATE TABLE maillocation(
-    mid     bigint NOT NULL DEFAULT nextval('maillocation_id'),
-    maillocation varchar(20) NOT NULL,
+CREATE TABLE mailboxformat (
+    fid         bigint NOT NULL DEFAULT nextval('mailboxformat_id'),
+    format      varchar(20) NOT NULL,
+    CONSTRAINT  pkey_mailboxformat PRIMARY KEY (fid),
+    CONSTRAINT  ukey_mailboxformat UNIQUE (format)
+);
+-- Insert supported mailbox formats
+INSERT INTO mailboxformat(format) VALUES ('maildir');
+INSERT INTO mailboxformat(format) VALUES ('mdbox');
+INSERT INTO mailboxformat(format) VALUES ('sdbox');
+
+CREATE TABLE maillocation (
+    mid         bigint NOT NULL DEFAULT nextval('maillocation_id'),
+    fid         bigint NOT NULL DEFAULT 1,
+    directory   varchar(20) NOT NULL,
+    extra       varchar(1024),
     CONSTRAINT  pkey_maillocation PRIMARY KEY (mid),
-    CONSTRAINT  ukey_maillocation UNIQUE (maillocation)
+    CONSTRAINT  fkey_maillocation_fid_mailboxformat FOREIGN KEY (fid)
+        REFERENCES mailboxformat (fid);
 );
 -- Insert default Maildir-folder name
-INSERT INTO maillocation(maillocation) VALUES ('Maildir');
+INSERT INTO maillocation(directory) VALUES ('Maildir');
 
 CREATE TABLE domain_data (
     gid         bigint NOT NULL DEFAULT nextval('domain_gid'),
-    tid         bigint NOT NULL DEFAULT 1, -- defualt transport
+    tid         bigint NOT NULL DEFAULT 1, -- default transport
     domaindir   varchar(40) NOT NULL, --/srv/mail/$RAND/4294967294
     CONSTRAINT  pkey_domain_data PRIMARY KEY (gid),
     CONSTRAINT  fkey_domain_data_tid_transport FOREIGN KEY (tid)
@@ -59,7 +75,7 @@ CREATE TABLE domain_name (
 
 CREATE TABLE users (
     local_part  varchar(64) NOT NULL,-- only localpart w/o '@'
-    passwd      varchar(74) NOT NULL,-- {CRAM-MD5}+64hex numbers
+    passwd      varchar(270) NOT NULL,
     name        varchar(128) NULL,
     uid         bigint NOT NULL DEFAULT nextval('users_uid'),
     gid         bigint NOT NULL,
@@ -106,11 +122,12 @@ CREATE OR REPLACE VIEW dovecot_password AS
 CREATE OR REPLACE VIEW dovecot_user AS
     SELECT local_part || '@' || domain_name.domainname AS userid,
            uid, gid, domain_data.domaindir || '/' || uid AS home,
-           '~/' || maillocation.maillocation AS mail
+           mailboxformat.format || ':~/' || maillocation.directory AS mail
       FROM users
            LEFT JOIN domain_data USING (gid)
            LEFT JOIN domain_name USING (gid)
-           LEFT JOIN maillocation USING (mid);
+           LEFT JOIN maillocation USING (mid)
+           LEFT JOIN mailboxformat USING (fid);
 
 CREATE OR REPLACE VIEW postfix_gid AS
     SELECT gid, domainname
@@ -123,7 +140,7 @@ CREATE OR REPLACE VIEW postfix_uid AS
 
 CREATE OR REPLACE VIEW postfix_maildir AS
     SELECT local_part || '@' || domain_name.domainname AS address,
-           domain_data.domaindir||'/'||uid||'/'||maillocation.maillocation||'/'
+           domain_data.domaindir||'/'||uid||'/'||maillocation.directory||'/'
            AS maildir
       FROM users
            LEFT JOIN domain_data USING (gid)
