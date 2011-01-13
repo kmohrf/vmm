@@ -96,8 +96,8 @@ Configuring Dovecot
     driver = pgsql
     connect = host=localhost dbname=mailsys user=dovecot password=$Dovecot_PASS
     default_pass_scheme = PLAIN
-    password_query = SELECT "user", password FROM dovecot_password WHERE "user"='%u' AND %Ls
-    user_query = SELECT home, uid, gid, 'maildir:'||mail AS mail FROM dovecot_user WHERE userid = '%u'
+    password_query = SELECT "user", password FROM dovecot_password WHERE "user"='%Lu' AND %Ls
+    user_query = SELECT home, uid, gid, 'maildir:'||mail AS mail FROM dovecot_user WHERE userid = '%Lu'
 
 Provide a root SETUID copy of Dovecot's deliver agent for Postfix
 
