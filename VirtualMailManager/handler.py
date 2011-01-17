@@ -711,8 +711,12 @@ The account has been successfully deleted from the database.
         already a relocated user with the given *emailaddress*, only the
         *targetaddress* for the relocated user will be updated."""
         relocated = self._get_relocated(emailaddress)
-        relocated.set_destination(DestinationEmailAddress(targetaddress,
-                                                          self._dbh))
+        destination = DestinationEmailAddress(targetaddress, self._dbh)
+        relocated.set_destination(destination)
+        if destination.gid and \
+           not self._chk_other_address_types(destination, TYPE_RELOCATED):
+            self._warnings.append(_(u"The destination account/alias '%s' "
+                                    u"doesn't exist.") % destination)
 
     def relocated_info(self, emailaddress):
         """Returns the target address of the relocated user with the given
