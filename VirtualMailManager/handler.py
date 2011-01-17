@@ -30,7 +30,8 @@ from VirtualMailManager.constants import MIN_GID, MIN_UID, \
      NOT_EXECUTABLE, NO_SUCH_ACCOUNT, NO_SUCH_ALIAS, NO_SUCH_BINARY, \
      NO_SUCH_DIRECTORY, NO_SUCH_RELOCATED, RELOCATED_EXISTS, VMM_ERROR
 from VirtualMailManager.domain import Domain, get_gid
-from VirtualMailManager.emailaddress import EmailAddress
+from VirtualMailManager.emailaddress import DestinationEmailAddress, \
+     EmailAddress
 from VirtualMailManager.errors import \
      DomainError, NotRootError, PermissionError, VMMError
 from VirtualMailManager.mailbox import new as new_mailbox
@@ -557,14 +558,15 @@ class Handler(object):
         """Creates a new `Alias` entry for the given *aliasaddress* with
         the given *targetaddresses*."""
         alias = self._get_alias(aliasaddress)
-        destinations = [EmailAddress(address) for address in targetaddresses]
+        destinations = [DestinationEmailAddress(addr, self._dbh) \
+                for addr in targetaddresses]
         warnings = []
         destinations = alias.add_destinations(destinations, warnings)
         if warnings:
             self._warnings.append(_('Ignored destination addresses:'))
             self._warnings.extend(('  * %s' % w for w in warnings))
         for destination in destinations:
-            if get_gid(self._dbh, destination.domainname) and \
+            if destination.gid and \
                not self._chk_other_address_types(destination, TYPE_RELOCATED):
                 self._warnings.append(_(u"The destination account/alias '%s' "
                                         u"doesn't exist.") % destination)
@@ -706,7 +708,8 @@ The account has been successfully deleted from the database.
         already a relocated user with the given *emailaddress*, only the
         *targetaddress* for the relocated user will be updated."""
         relocated = self._get_relocated(emailaddress)
-        relocated.set_destination(EmailAddress(targetaddress))
+        relocated.set_destination(DestinationEmailAddress(targetaddress,
+                                                          self._dbh))
 
     def relocated_info(self, emailaddress):
         """Returns the target address of the relocated user with the given
