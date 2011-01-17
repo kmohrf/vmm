@@ -246,18 +246,21 @@ class Handler(object):
         """Return an Account instances for the given address (str)."""
         address = EmailAddress(address)
         self._db_connect()
+        self._is_other_address(address, TYPE_ACCOUNT)
         return Account(self._dbh, address)
 
     def _get_alias(self, address):
         """Return an Alias instances for the given address (str)."""
         address = EmailAddress(address)
         self._db_connect()
+        self._is_other_address(address, TYPE_ALIAS)
         return Alias(self._dbh, address)
 
     def _get_relocated(self, address):
         """Return a Relocated instances for the given address (str)."""
         address = EmailAddress(address)
         self._db_connect()
+        self._is_other_address(address, TYPE_RELOCATED)
         return Relocated(self._dbh, address)
 
     def _get_domain(self, domainname):
