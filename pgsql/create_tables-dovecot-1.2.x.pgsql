@@ -50,7 +50,7 @@ CREATE TABLE maillocation (
     extra       varchar(1024),
     CONSTRAINT  pkey_maillocation PRIMARY KEY (mid),
     CONSTRAINT  fkey_maillocation_fid_mailboxformat FOREIGN KEY (fid)
-        REFERENCES mailboxformat (fid);
+        REFERENCES mailboxformat (fid)
 );
 -- Insert default Maildir-folder name
 INSERT INTO maillocation(directory) VALUES ('Maildir');
