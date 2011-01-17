@@ -127,7 +127,7 @@ Hint: Delete some destination addresses.""")
         dbc = self._dbh.cursor()
         dbc.executemany("INSERT INTO alias VALUES (%d, '%s', %%s)" %
                         (self._gid, self._addr.localpart),
-                        (str(destination) for destination in destinations))
+                        ((str(destination),) for destination in destinations))
         self._dbh.commit()
         dbc.close()
         self._dests.extend(destinations)
