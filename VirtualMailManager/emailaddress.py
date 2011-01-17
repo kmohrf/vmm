@@ -9,7 +9,7 @@
 """
 import re
 
-from VirtualMailManager.domain import check_domainname
+from VirtualMailManager.domain import check_domainname, get_gid
 from VirtualMailManager.constants import \
      DOMAIN_NO_NAME, INVALID_ADDRESS, LOCALPART_INVALID, LOCALPART_TOO_LONG
 from VirtualMailManager.errors import EmailAddressError as EAErr
@@ -81,6 +81,37 @@ class EmailAddress(object):
                         DOMAIN_NO_NAME)
         self._localpart = check_localpart(parts[0])
         self._domainname = check_domainname(parts[1])
+
+
+class DestinationEmailAddress(EmailAddress):
+    """Provides additionally the domains group ID - when the domain is known
+    in the database."""
+    __slots__ = ('_gid')
+
+    def __init__(self, address, dbh):
+        """Creates a new DestinationEmailAddress instance
+
+        Arguments:
+
+        `address`: string/unicode
+          a e-mail address like user@example.com
+        `dbh`: pyPgSQL.PgSQL.Connection/pyPgSQL.PgSQL.connection
+          a database connection for the database access
+        """
+        super(DestinationEmailAddress, self).__init__(address)
+        self._gid = 0
+        self._find_domain(dbh)
+
+    def _find_domain(self, dbh):
+        """Checks if the domain is known"""
+        self._gid = get_gid(dbh, self._domainname)
+        if self._gid:
+            self._localpart = self._localpart.lower()
+
+    @property
+    def gid(self):
+        """The domains group ID. 0 if the domain is not known."""
+        return self._gid
 
 
 def check_localpart(localpart):
