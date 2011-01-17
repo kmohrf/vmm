@@ -62,6 +62,6 @@ setup_args = {'name': 'VirtualMailManager',
               'classifiers': classifiers}
 
 if 'requires' in DistributionMetadata._METHOD_BASENAMES:
-    setup_args['requires'] = ['psycopg2>=2.0', 'pyPgSQL>=2.5.1']
+    setup_args['requires'] = ['psycopg2 (>=2.0)', 'pyPgSQL (>=2.5.1)']
 
 setup(**setup_args)
