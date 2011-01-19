@@ -147,7 +147,7 @@ class Account(object):
         address of the Account."""
         dbc = self._dbh.cursor()
         dbc.execute('SELECT COUNT(destination) FROM alias WHERE destination '
-                    '= %s', (self._addr,))
+                    '= %s', (str(self._addr),))
         a_count = dbc.fetchone()[0]
         dbc.close()
         return a_count
