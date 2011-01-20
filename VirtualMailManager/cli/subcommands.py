@@ -114,12 +114,12 @@ def alias_info(ctx):
         if err.code is ACCOUNT_EXISTS:
             w_err(0, ctx.plan_a_b % {'subcommand': u'userinfo',
                   'object': address})
-            ctx.args[1] = 'userinfo'
+            ctx.scmd = ctx.args[1] = 'userinfo'
             user_info(ctx)
         elif err.code is RELOCATED_EXISTS:
             w_std(0, ctx.plan_a_b % {'subcommand': u'relocatedinfo',
                   'object': address})
-            ctx.args[1] = 'relocatedinfo'
+            ctx.scmd = ctx.args[1] = 'relocatedinfo'
             relocated_info(ctx)
         else:
             raise
@@ -367,12 +367,12 @@ def relocated_info(ctx):
         if err.code is ACCOUNT_EXISTS:
             w_err(0, ctx.plan_a_b % {'subcommand': u'userinfo',
                   'object': relocated})
-            ctx.args[1] = 'userinfoi'
+            ctx.scmd = ctx.args[1] = 'userinfoi'
             user_info(ctx)
         elif err.code is ALIAS_EXISTS:
             w_err(0, ctx.plan_a_b % {'subcommand': u'aliasinfo',
                   'object': relocated})
-            ctx.args[1] = 'aliasinfo'
+            ctx.scmd = ctx.args[1] = 'aliasinfo'
             alias_info(ctx)
         else:
             raise
@@ -451,12 +451,12 @@ def user_info(ctx):
         if err.code is ALIAS_EXISTS:
             w_err(0, ctx.plan_a_b % {'subcommand': u'aliasinfo',
                   'object': ctx.args[2].lower()})
-            ctx.args[1] = 'aliasinfo'
+            ctx.scmd = ctx.args[1] = 'aliasinfo'
             alias_info(ctx)
         elif err.code is RELOCATED_EXISTS:
             w_err(0, ctx.plan_a_b % {'subcommand': u'relocatedinfo',
                   'object': ctx.args[2].lower()})
-            ctx.args[1] = 'relocatedinfo'
+            ctx.scmd = ctx.args[1] = 'relocatedinfo'
             relocated_info(ctx)
         else:
             raise
