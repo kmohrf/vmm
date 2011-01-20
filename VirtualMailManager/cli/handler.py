@@ -11,7 +11,7 @@
 import os
 
 from VirtualMailManager.errors import VMMError
-from VirtualMailManager.handler import Handler
+from VirtualMailManager.handler import Handler, TYPE_ACCOUNT
 from VirtualMailManager.cli import read_pass
 from VirtualMailManager.cli.config import CliConfig as Cfg
 from VirtualMailManager.constants import ACCOUNT_EXISTS, INVALID_SECTION, \
@@ -76,6 +76,7 @@ class CliHandler(Handler):
         if acc:
             raise VMMError(_(u"The account '%s' already exists.") %
                            acc.address, ACCOUNT_EXISTS)
+        other = self._is_other_address(acc.address, TYPE_ACCOUNT)
         rand_pass = self._cfg.dget('account.random_password')
         if password is None:
             password = (read_pass, randompw)[rand_pass]()

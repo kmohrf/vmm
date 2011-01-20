@@ -246,21 +246,18 @@ class Handler(object):
         """Return an Account instances for the given address (str)."""
         address = EmailAddress(address)
         self._db_connect()
-        self._is_other_address(address, TYPE_ACCOUNT)
         return Account(self._dbh, address)
 
     def _get_alias(self, address):
         """Return an Alias instances for the given address (str)."""
         address = EmailAddress(address)
         self._db_connect()
-        self._is_other_address(address, TYPE_ALIAS)
         return Alias(self._dbh, address)
 
     def _get_relocated(self, address):
         """Return a Relocated instances for the given address (str)."""
         address = EmailAddress(address)
         self._db_connect()
-        self._is_other_address(address, TYPE_RELOCATED)
         return Relocated(self._dbh, address)
 
     def _get_domain(self, domainname):
@@ -553,6 +550,7 @@ class Handler(object):
         if acc:
             raise VMMError(_(u"The account '%s' already exists.") %
                            acc.address, ACCOUNT_EXISTS)
+        other = self._is_other_address(acc.address, TYPE_ACCOUNT)
         acc.set_password(password)
         acc.save()
         self._make_account_dirs(acc)
@@ -561,6 +559,8 @@ class Handler(object):
         """Creates a new `Alias` entry for the given *aliasaddress* with
         the given *targetaddresses*."""
         alias = self._get_alias(aliasaddress)
+        if not alias:
+            self._is_other_address(alias.address, TYPE_ALIAS)
         destinations = [DestinationEmailAddress(addr, self._dbh) \
                 for addr in targetaddresses]
         warnings = []
@@ -711,6 +711,8 @@ The account has been successfully deleted from the database.
         already a relocated user with the given *emailaddress*, only the
         *targetaddress* for the relocated user will be updated."""
         relocated = self._get_relocated(emailaddress)
+        if not relocated:
+            self._is_other_address(relocated.address, TYPE_RELOCATED)
         destination = DestinationEmailAddress(targetaddress, self._dbh)
         relocated.set_destination(destination)
         if destination.gid and \
