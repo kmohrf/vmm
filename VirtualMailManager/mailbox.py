@@ -251,7 +251,8 @@ class SingleDbox(Mailbox):
         process = Popen(cmd_args, stdout=PIPE, stderr=PIPE)
         stdout, stderr = process.communicate()
         if process.returncode:
-            raise VMMError(stderr.strip(), VMM_ERROR)
+            e_msg = _(u'Failed to create mailboxes: %r\n') % mailboxes
+            raise VMMError(e_msg + stderr.strip(), VMM_ERROR)
 
     def create(self):
         """Create a dbox INBOX"""
