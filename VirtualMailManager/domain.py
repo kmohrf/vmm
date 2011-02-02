@@ -166,10 +166,11 @@ class Domain(object):
                          DOMAIN_EXISTS)
         assert self._directory is not None and self._transport is not None
         dbc = self._dbh.cursor()
-        dbc.execute("INSERT INTO domain_data VALUES (%s, %s, %s)", (self._gid,
-                    self._transport.tid, self._directory))
-        dbc.execute("INSERT INTO domain_name VALUES (%s, %s, %s)", (self._name,
-                    self._gid, True))
+        dbc.execute('INSERT INTO domain_data (gid, tid, domaindir) VALUES '
+                    '(%s, %s, %s)', (self._gid, self._transport.tid,
+                                     self._directory))
+        dbc.execute('INSERT INTO domain_name (domainname, gid, is_primary) '
+                    'VALUES (%s, %s, TRUE)', (self._name, self._gid))
         self._dbh.commit()
         dbc.close()
         self._new = False

@@ -75,8 +75,8 @@ class AliasDomain(object):
             raise ADErr(_(u"The target domain '%s' doesn't exist.") %
                         self._domain.name, NO_SUCH_DOMAIN)
         dbc = self._dbh.cursor()
-        dbc.execute('INSERT INTO domain_name VALUES (%s, %s, FALSE)',
-                    (self._name, self._domain.gid))
+        dbc.execute('INSERT INTO domain_name (domainname, gid, is_primary) '
+                    'VALUES (%s, %s, FALSE)', (self._name, self._domain.gid))
         self._dbh.commit()
         dbc.close()
         self._gid = self._domain.gid

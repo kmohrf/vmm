@@ -96,8 +96,8 @@ class Transport(object):
         dbc = self._dbh.cursor()
         dbc.execute("SELECT nextval('transport_id')")
         self._tid = dbc.fetchone()[0]
-        dbc.execute('INSERT INTO transport VALUES (%s, %s)', (self._tid,
-                    self._transport))
+        dbc.execute('INSERT INTO transport (tid, transport) VALUES (%s, %s)',
+                    (self._tid, self._transport))
         self._dbh.commit()
         dbc.close()
 

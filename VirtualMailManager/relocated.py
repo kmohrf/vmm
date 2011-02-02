@@ -82,7 +82,8 @@ class Relocated(object):
 
         dbc = self._dbh.cursor()
         if not update:
-            dbc.execute('INSERT INTO relocated VALUES (%s, %s, %s)',
+            dbc.execute('INSERT INTO relocated (gid, address, destination) '
+                        'VALUES (%s, %s, %s)',
                         (self._gid, self._addr.localpart, str(self._dest)))
         else:
             dbc.execute('UPDATE relocated SET destination = %s WHERE gid = %s '
