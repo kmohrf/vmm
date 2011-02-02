@@ -293,6 +293,9 @@ class Handler(object):
         if not dir_created and not lisdir(hashdir):
             raise VMMError(_(u"'%s' is not a directory.") % hashdir,
                            NO_SUCH_DIRECTORY)
+        if os.path.exists(domain.directory):
+            raise VMMError(_(u"The file/directory '%s' already exists.") %
+                           domdir.directory, VMM_ERROR)
         os.mkdir(os.path.join(hashdir, domdir),
                  self._cfg.dget('domain.directory_mode'))
         os.chown(domain.directory, 0, domain.gid)
