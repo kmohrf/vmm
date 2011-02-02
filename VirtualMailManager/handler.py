@@ -295,7 +295,7 @@ class Handler(object):
                            NO_SUCH_DIRECTORY)
         if os.path.exists(domain.directory):
             raise VMMError(_(u"The file/directory '%s' already exists.") %
-                           domdir.directory, VMM_ERROR)
+                           domain.directory, VMM_ERROR)
         os.mkdir(os.path.join(hashdir, domdir),
                  self._cfg.dget('domain.directory_mode'))
         os.chown(domain.directory, 0, domain.gid)
