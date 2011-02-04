@@ -67,6 +67,36 @@ def exec_ok(binary):
     return binary
 
 
+def size_in_bytes(size):
+    """Converts the string `size` to a long (size in bytes).
+
+    The string `size` can be suffixed with *b* (bytes), *k* (kilobytes),
+    *M* (megabytes) or *G* (gigabytes).
+    """
+    if not isinstance(size, basestring) or not size:
+        raise TypeError('size must be a non empty string.')
+    if size[-1].upper() in ('B', 'K', 'M', 'G'):
+        try:
+            num = int(size[:-1])
+        except ValueError:
+            raise ValueError('Not a valid integer value: %r' % size[:-1])
+        unit = size[-1].upper()
+        if unit == 'B':
+            return num
+        elif unit == 'K':
+            return num << 10L
+        elif unit == 'M':
+            return num << 20L
+        else:
+            return num << 30L
+    else:
+        try:
+            num = int(size)
+        except ValueError:
+            raise ValueError('Not a valid size value: %r' % size)
+        return num
+
+
 def version_hex(version_string):
     """Converts a Dovecot version, e.g.: '1.2.3' or '2.0.beta4', to an int.
     Raises a `ValueError` if the *version_string* has the wrong™ format.
