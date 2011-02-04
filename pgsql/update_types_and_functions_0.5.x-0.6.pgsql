@@ -121,3 +121,51 @@ AS $$
 $$ LANGUAGE plpgsql STABLE
 RETURNS NULL ON NULL INPUT
 EXTERNAL SECURITY INVOKER;
+-- ---
+-- Data type for function dovecotquotauser(varchar, varchar)
+-- ---
+CREATE TYPE dovecotquotauser AS (
+    userid      varchar(320),
+    uid         bigint,
+    gid         bigint,
+    home        text,
+    mail        text,
+    quota_rule  text
+);
+-- ---
+-- Nearly the same as function dovecotuser above. It returns additionally the
+-- field quota_rule.
+--
+-- Required access privileges for your dovecot database user:
+--      GRANT SELECT
+--          ON users, domain_data, domain_name, maillocation, mailboxformat,
+--             quotalimit
+--          TO dovecot;
+-- ---
+CREATE OR REPLACE FUNCTION dovecotquotauser(
+    IN localpart varchar, IN the_domain varchar) RETURNS SETOF dovecotquotauser
+AS $$
+    DECLARE
+        record dovecotquotauser;
+        userid varchar(320) := localpart || '@' || the_domain;
+        did bigint := (SELECT gid FROM domain_name WHERE domainname=the_domain);
+    BEGIN
+        FOR record IN
+            SELECT userid, uid, did, domaindir || '/' || uid AS home,
+                   format || ':~/' || directory AS mail, '*:bytes=' ||
+                   bytes || ':messages=' || messages AS quota_rule
+              FROM users, domain_data, mailboxformat, maillocation, quotalimit
+             WHERE users.gid = did
+               AND users.local_part = localpart
+               AND maillocation.mid = users.mid
+               AND mailboxformat.fid = maillocation.fid
+               AND domain_data.gid = did
+               AND quotalimit.qid = users.qid
+            LOOP
+                RETURN NEXT record;
+            END LOOP;
+        RETURN;
+    END;
+$$ LANGUAGE plpgsql STABLE
+RETURNS NULL ON NULL INPUT
+EXTERNAL SECURITY INVOKER;

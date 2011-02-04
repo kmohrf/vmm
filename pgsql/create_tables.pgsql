@@ -6,6 +6,8 @@ CREATE SEQUENCE transport_id;
 
 CREATE SEQUENCE mailboxformat_id;
 
+CREATE SEQUENCE quotalimit_id;
+
 CREATE SEQUENCE maillocation_id;
 
 CREATE SEQUENCE domain_gid
@@ -55,13 +57,26 @@ CREATE TABLE maillocation (
 -- Insert default Maildir-folder name
 INSERT INTO maillocation(directory) VALUES ('Maildir');
 
+CREATE TABLE quotalimit (
+    qid         bigint NOT NULL DEFAULT nextval('quotalimit_id'),
+    bytes       bigint NOT NULL,
+    messages    integer NOT NULL DEFAULT 0,
+    CONSTRAINT  pkey_quotalimit PRIMARY KEY (qid),
+    CONSTRAINT  ukey_quotalimit UNIQUE (bytes, messages)
+);
+-- Insert default (non) quota limit
+INSERT INTO quotalimit(bytes, messages) VALUES (0, 0);
+
 CREATE TABLE domain_data (
     gid         bigint NOT NULL DEFAULT nextval('domain_gid'),
     tid         bigint NOT NULL DEFAULT 1, -- default transport
+    qid         bigint NOT NULL DEFAULT 1, -- default quota limit
     domaindir   varchar(40) NOT NULL, --/srv/mail/$RAND/4294967294
     CONSTRAINT  pkey_domain_data PRIMARY KEY (gid),
     CONSTRAINT  fkey_domain_data_tid_transport FOREIGN KEY (tid)
-        REFERENCES transport (tid)
+        REFERENCES transport (tid),
+    CONSTRAINT  fkey_domain_data_qid_quotalimit FOREIGN KEY (qid)
+        REFERENCES quotalimit (qid)
 );
 
 CREATE TABLE domain_name (
@@ -81,6 +96,7 @@ CREATE TABLE users (
     gid         bigint NOT NULL,
     mid         bigint NOT NULL DEFAULT 1,
     tid         bigint NOT NULL DEFAULT 1,
+    qid         bigint NOT NULL DEFAULT 1,
     smtp        boolean NOT NULL DEFAULT TRUE,
     pop3        boolean NOT NULL DEFAULT TRUE,
     imap        boolean NOT NULL DEFAULT TRUE,
@@ -92,7 +108,18 @@ CREATE TABLE users (
     CONSTRAINT  fkey_users_mid_maillocation FOREIGN KEY (mid)
         REFERENCES maillocation (mid),
     CONSTRAINT  fkey_users_tid_transport FOREIGN KEY (tid)
-        REFERENCES transport (tid)
+        REFERENCES transport (tid),
+    CONSTRAINT  fkey_users_qid_quotalimit FOREIGN KEY (qid)
+        REFERENCES quotalimit (qid)
+);
+
+CREATE TABLE userquota_11 (
+    uid         bigint NOT NULL,
+    path        varchar(16) NOT NULL,
+    current     bigint NOT NULL DEFAULT 0,
+    CONSTRAINT  pkey_userquota_11 PRIMARY KEY (uid, path),
+    CONSTRAINT  fkey_userquota_11_uid_users FOREIGN KEY (uid)
+        REFERENCES users (uid)
 );
 
 CREATE TABLE alias (
@@ -211,3 +238,20 @@ CREATE TRIGGER primary_count_ins BEFORE INSERT ON domain_name
 
 CREATE TRIGGER primary_count_upd AFTER UPDATE ON domain_name
     FOR EACH ROW EXECUTE PROCEDURE domain_primary_trigger();
+
+
+CREATE OR REPLACE FUNCTION merge_userquota_11() RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE userquota_11
+       SET current = current + NEW.current
+     WHERE uid = NEW.uid AND path = NEW.path;
+    IF found THEN
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER mergeuserquota_11 BEFORE INSERT ON userquota_11
+    FOR EACH ROW EXECUTE PROCEDURE merge_userquota_11();

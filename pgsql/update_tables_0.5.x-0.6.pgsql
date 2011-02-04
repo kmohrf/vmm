@@ -22,6 +22,7 @@ DROP VIEW dovecot_user;
 DROP VIEW postfix_maildir;
 
 CREATE SEQUENCE mailboxformat_id;
+CREATE SEQUENCE quotalimit_id;
 
 CREATE TABLE mailboxformat (
     fid         bigint NOT NULL DEFAULT nextval('mailboxformat_id'),
@@ -44,6 +45,56 @@ ALTER TABLE maillocation ADD CONSTRAINT fkey_maillocation_fid_mailboxformat
     FOREIGN KEY (fid) REFERENCES mailboxformat (fid);
 
 
+-- ---
+-- Add quota stuff
+-- ---
+CREATE TABLE quotalimit (
+    qid         bigint NOT NULL DEFAULT nextval('quotalimit_id'),
+    bytes       bigint NOT NULL,
+    messages    integer NOT NULL DEFAULT 0,
+    CONSTRAINT  pkey_quotalimit PRIMARY KEY (qid),
+    CONSTRAINT  ukey_quotalimit UNIQUE (bytes, messages)
+);
+-- Insert default (non) quota limit
+INSERT INTO quotalimit(bytes, messages) VALUES (0, 0);
+
+-- Adjust tables …
+ALTER TABLE domain_data ADD COLUMN qid bigint NOT NULL DEFAULT 1;
+ALTER TABLE domain_data ADD CONSTRAINT fkey_domain_data_qid_quotalimit
+    FOREIGN KEY (qid) REFERENCES quotalimit (qid);
+
+ALTER TABLE users ADD COLUMN qid bigint NOT NULL DEFAULT 1;
+ALTER TABLE users ADD CONSTRAINT fkey_users_qid_quotalimit
+    FOREIGN KEY (qid) REFERENCES quotalimit (qid);
+
+CREATE TABLE userquota_11 (
+    uid         bigint NOT NULL,
+    path        varchar(16) NOT NULL,
+    current     bigint NOT NULL DEFAULT 0,
+    CONSTRAINT  pkey_userquota_11 PRIMARY KEY (uid, path),
+    CONSTRAINT  fkey_userquota_11_uid_users FOREIGN KEY (uid)
+        REFERENCES users (uid)
+);
+
+CREATE OR REPLACE FUNCTION merge_userquota_11() RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE userquota_11
+       SET current = current + NEW.current
+     WHERE uid = NEW.uid AND path = NEW.path;
+    IF found THEN
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER mergeuserquota_11 BEFORE INSERT ON userquota_11
+    FOR EACH ROW EXECUTE PROCEDURE merge_userquota_11();
+
+-- ---
+-- Restore views
+-- ---
 CREATE VIEW dovecot_user AS
     SELECT local_part || '@' || domain_name.domainname AS userid,
            uid, gid, domain_data.domaindir || '/' || uid AS home,
