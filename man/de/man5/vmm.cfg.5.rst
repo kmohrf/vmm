@@ -413,6 +413,24 @@ In der **misc**-Sektion werden verschiedene Einstellungen festgelegt.
   Passwort-Schemata zu erhalten, für Sie das Kommando **dovecotpw -l**
   (Dovecot v1.x) oder **doveadm pw -l** (Dovecot v2.0) aus.
 
+.. _misc.quota_bytes:
+
+``quota_bytes (Vorgabe: 0)`` : *String*
+  Quota Limit in Bytes. 0 bedeutet unbegrenzt. Dieses Limit wird bei allen
+  neu angelegten Domains angewendet.
+
+  Der Wert dieser Option kann als Integer-Wert, zum Beispiel **20480**
+  geschrieben werden. Es ist auch möglich dem Wert eines der folgenden
+  Suffixe anzuhängen: **b** (Bytes), **k** (Kilobytes), **M** (Megabytes)
+  oder **G** (Gigabytes).
+  **1024** entspricht **1024b** oder **1k**.
+
+.. _misc.quota_messages:
+
+``quota_messages (Vorgabe: 0)`` : *Int*
+  Quota Limit als Anzahl von Nachrichten. 0 bedeutet unbegrenzt. Dieses
+  Limit wird bei allen neu angelegten Domains angewendet.
+
 .. _misc.transport:
 
 ``transport (Vorgabe: dovecot:)`` : *String*
@@ -436,6 +454,8 @@ Beispiel::
   password_scheme = SHA512-CRYPT
   transport = dovecot:
   dovecot_version = 2.0.beta4
+  quota_bytes = 100M
+  quota_messages = 10000
 
 
 DATEIEN

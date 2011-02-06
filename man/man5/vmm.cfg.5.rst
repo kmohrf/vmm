@@ -394,6 +394,23 @@ The **misc** section is used to define miscellaneous settings.
   execute the command **dovecotpw -l** (Dovecot v1.x) or **doveadm pw -l**
   (Dovecot v2.0).
 
+.. _misc.quota_bytes:
+
+``quota_bytes (default: 0)`` : *String*
+  Quota limit in bytes. 0 means unlimited. This limit will be applied to
+  all newly created domains.
+
+  The option's value can be written as an integer value, e.g.: **20480**.
+  Its also possible to append one of the following suffixes to the limit:
+  **b** (bytes), **k** (kilobytes), **M** (megabytes) or **G** (gigabytes).
+  **1024** is the same as **1024b** or **1k**.
+
+.. _misc.quota_messages:
+
+``quota_messages (default: 0)`` : *Int*
+  Quota limit in number of messages. 0 means unlimited. This limit will be
+  applied to all newly created domains.
+
 .. _misc.transport:
 
 ``transport (default: dovecot:)`` : *String*
@@ -417,6 +434,8 @@ Example::
   password_scheme = SHA512-CRYPT
   transport = dovecot:
   dovecot_version = 2.0.beta4
+  quota_bytes = 100M
+  quota_messages = 10000
 
 
 FILES

@@ -14,7 +14,7 @@ from ConfigParser import \
 from cStringIO import StringIO
 
 from VirtualMailManager.common import VERSION_RE, \
-     exec_ok, expand_path, get_unicode, lisdir, version_hex
+     exec_ok, expand_path, get_unicode, lisdir, size_in_bytes, version_hex
 from VirtualMailManager.constants import CONF_ERROR
 from VirtualMailManager.errors import ConfigError, VMMError
 from VirtualMailManager.maillocation import known_format
@@ -347,6 +347,9 @@ class Config(LazyConfig):
                                        check_version_format),
                 'password_scheme': LCO(str, 'CRAM-MD5', self.get,
                                        verify_scheme),
+                'quota_bytes': LCO(str, '0', self.get_in_bytes,
+                                   check_size_value),
+                'quota_messages': LCO(int, 0, self.getint),
                 'transport': LCO(str, 'dovecot:', self.get),
             },
         }
@@ -406,6 +409,11 @@ class Config(LazyConfig):
         value to an int."""
         return version_hex(self.get(section, option))
 
+    def get_in_bytes(self, section, option):
+        """Converts the size value (e.g.: 1024k) from the *option*'s
+        value to a long"""
+        return size_in_bytes(self.get(section, option))
+
     def unicode(self, section, option):
         """Returns the value of the `option` from `section`, converted
         to Unicode."""
@@ -449,6 +457,11 @@ class Config(LazyConfig):
         if not known_format(value):
             self._missing['mailbox'] = ['format: ' +\
                               _(u"Unsupported mailbox format: '%s'") % value]
+        # section misc
+        try:
+            value = self.dget('misc.quota_bytes')
+        except (ValueError, TypeError), err:
+            self._missing['misc'] = [u'quota_bytes: ' + str(err)]
 
 
 def is_dir(path):
@@ -489,6 +502,18 @@ def check_mailbox_format(format):
         return format
     raise ConfigValueError(_(u"Unsupported mailbox format: '%s'") %
                            get_unicode(format))
+
+
+def check_size_value(value):
+    """Check if the size value *value* has the proper format, e.g.: 1024k.
+    Returns the validated value string if it has the expected format.
+    Otherwise a `ConfigValueError` will be raised."""
+    try:
+        tmp = size_in_bytes(value)
+    except (TypeError, ValueError), err:
+        raise ConfigValueError(_(u"Not a valid size value: '%s'") %
+                               get_unicode(value))
+    return value
 
 
 def check_version_format(version_string):
