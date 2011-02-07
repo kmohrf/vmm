@@ -23,6 +23,7 @@ from VirtualMailManager.constants import VMM_ERROR
 __all__ = ('new', 'Maildir', 'SingleDbox', 'MultiDbox',
            'utf8_to_mutf7', 'mutf7_to_utf8')
 
+_ = lambda msg: msg
 cfg_dget = lambda option: None
 
 
@@ -102,6 +103,9 @@ class Mailbox(object):
         os.chdir(self._user.home)
 
     def _add_boxes(self, mailboxes, subscribe):
+        """Create all mailboxes from the `mailboxes` list.
+        If `subscribe` is *True*, the mailboxes will be listed in the
+        subscriptions file."""
         raise NotImplementedError
 
     def _validate_box_name(self, name, good, bad):
@@ -285,4 +289,4 @@ def new(account):
         return SingleDbox(account)
     raise ValueError('unsupported mailbox format: %r' % mbfmt)
 
-del cfg_dget
+del _, cfg_dget
