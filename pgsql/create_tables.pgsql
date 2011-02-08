@@ -203,13 +203,15 @@ CREATE OR REPLACE VIEW vmm_domain_info AS
            (SELECT count(gid)
               FROM domain_name
              WHERE domain_name.gid = domain_data.gid
-               AND NOT domain_name.is_primary) AS aliasdomains
+               AND NOT domain_name.is_primary) AS aliasdomains,
+           bytes, messages
       FROM domain_data
            LEFT JOIN domain_name USING (gid)
+           LEFT JOIN quotalimit USING (qid)
            LEFT JOIN transport USING (tid)
            LEFT JOIN users USING (gid)
      WHERE domain_name.is_primary
-  GROUP BY gid, domainname, transport, domaindir;
+  GROUP BY gid, domainname, transport, domaindir, bytes, messages;
 
 
 CREATE LANGUAGE plpgsql;

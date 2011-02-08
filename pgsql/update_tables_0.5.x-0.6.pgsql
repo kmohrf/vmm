@@ -113,3 +113,25 @@ CREATE VIEW postfix_maildir AS
            LEFT JOIN domain_data USING (gid)
            LEFT JOIN domain_name USING (gid)
            LEFT JOIN maillocation USING (mid);
+
+CREATE OR REPLACE VIEW vmm_domain_info AS
+    SELECT gid, domainname, transport, domaindir,
+           count(uid) AS accounts,
+           (SELECT count(DISTINCT address)
+              FROM alias
+             WHERE alias.gid = domain_data.gid) AS aliases,
+           (SELECT count(gid)
+              FROM relocated
+             WHERE relocated.gid = domain_data.gid) AS relocated,
+           (SELECT count(gid)
+              FROM domain_name
+             WHERE domain_name.gid = domain_data.gid
+               AND NOT domain_name.is_primary) AS aliasdomains,
+           bytes, messages
+      FROM domain_data
+           LEFT JOIN domain_name USING (gid)
+           LEFT JOIN quotalimit USING (qid)
+           LEFT JOIN transport USING (tid)
+           LEFT JOIN users USING (gid)
+     WHERE domain_name.is_primary
+  GROUP BY gid, domainname, transport, domaindir, bytes, messages;
