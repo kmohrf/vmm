@@ -119,7 +119,7 @@ CREATE TABLE userquota (
     messages    integer NOT NULL DEFAULT 0,
     CONSTRAINT  pkey_userquota PRIMARY KEY (uid),
     CONSTRAINT  fkey_userquota_uid_users FOREIGN KEY (uid)
-        REFERENCES users (uid)
+        REFERENCES users (uid) ON DELETE CASCADE
 );
 
 CREATE TABLE alias (

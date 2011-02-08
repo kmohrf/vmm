@@ -119,7 +119,7 @@ CREATE TABLE userquota_11 (
     current     bigint NOT NULL DEFAULT 0,
     CONSTRAINT  pkey_userquota_11 PRIMARY KEY (uid, path),
     CONSTRAINT  fkey_userquota_11_uid_users FOREIGN KEY (uid)
-        REFERENCES users (uid)
+        REFERENCES users (uid) ON DELETE CASCADE
 );
 
 CREATE TABLE alias (
