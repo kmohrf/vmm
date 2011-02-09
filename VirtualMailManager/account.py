@@ -211,19 +211,6 @@ class Account(object):
                        ACCOUNT_MISSING_PASSWORD)
         self._passwd = password
 
-    def set_transport(self, transport):
-        """Set the transport for the new Account.
-
-        If you want to update the transport of an existing Account use
-        Account.modify().
-
-        Argument:
-
-        `transport` : basestring
-          The string representation of the transport, e.g.: 'dovecot:'
-        """
-        self._transport = Transport(self._dbh, transport=transport)
-
     def enable(self, *services):
         """Enable all or the given service/s for the Account.
 
