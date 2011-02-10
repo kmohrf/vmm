@@ -192,8 +192,7 @@ CREATE OR REPLACE VIEW postfix_transport AS
            LEFT JOIN domain_name USING (gid);
 
 CREATE OR REPLACE VIEW vmm_domain_info AS
-    SELECT gid, domainname, transport, domaindir,
-           count(uid) AS accounts,
+    SELECT gid, count(uid) AS accounts,
            (SELECT count(DISTINCT address)
               FROM alias
              WHERE alias.gid = domain_data.gid) AS aliases,
@@ -203,15 +202,12 @@ CREATE OR REPLACE VIEW vmm_domain_info AS
            (SELECT count(gid)
               FROM domain_name
              WHERE domain_name.gid = domain_data.gid
-               AND NOT domain_name.is_primary) AS aliasdomains,
-           bytes, messages
+               AND NOT domain_name.is_primary) AS aliasdomains
       FROM domain_data
            LEFT JOIN domain_name USING (gid)
-           LEFT JOIN quotalimit USING (qid)
-           LEFT JOIN transport USING (tid)
            LEFT JOIN users USING (gid)
      WHERE domain_name.is_primary
-  GROUP BY gid, domainname, transport, domaindir, bytes, messages;
+  GROUP BY gid;
 
 
 CREATE LANGUAGE plpgsql;

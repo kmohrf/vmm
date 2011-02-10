@@ -20,6 +20,7 @@ CREATE VIEW dovecot_password AS
 -- ---
 DROP VIEW dovecot_user;
 DROP VIEW postfix_maildir;
+DROP VIEW vmm_domain_info;
 
 CREATE SEQUENCE mailboxformat_id;
 CREATE SEQUENCE quotalimit_id;
@@ -136,9 +137,8 @@ CREATE VIEW postfix_maildir AS
            LEFT JOIN domain_name USING (gid)
            LEFT JOIN maillocation USING (mid);
 
-CREATE OR REPLACE VIEW vmm_domain_info AS
-    SELECT gid, domainname, transport, domaindir,
-           count(uid) AS accounts,
+CREATE VIEW vmm_domain_info AS
+    SELECT gid, count(uid) AS accounts,
            (SELECT count(DISTINCT address)
               FROM alias
              WHERE alias.gid = domain_data.gid) AS aliases,
@@ -148,12 +148,9 @@ CREATE OR REPLACE VIEW vmm_domain_info AS
            (SELECT count(gid)
               FROM domain_name
              WHERE domain_name.gid = domain_data.gid
-               AND NOT domain_name.is_primary) AS aliasdomains,
-           bytes, messages
+               AND NOT domain_name.is_primary) AS aliasdomains
       FROM domain_data
            LEFT JOIN domain_name USING (gid)
-           LEFT JOIN quotalimit USING (qid)
-           LEFT JOIN transport USING (tid)
            LEFT JOIN users USING (gid)
      WHERE domain_name.is_primary
-  GROUP BY gid, domainname, transport, domaindir, bytes, messages;
+  GROUP BY gid;
