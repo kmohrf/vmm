@@ -36,6 +36,7 @@ from VirtualMailManager.errors import \
      DomainError, NotRootError, PermissionError, VMMError
 from VirtualMailManager.mailbox import new as new_mailbox
 from VirtualMailManager.pycompat import all, any
+from VirtualMailManager.quotalimit import QuotaLimit
 from VirtualMailManager.relocated import Relocated
 from VirtualMailManager.transport import Transport
 
@@ -422,16 +423,34 @@ class Handler(object):
         __builtin__.__dict__['cfg_dget'] = self._cfg.dget
 
     def domain_add(self, domainname, transport=None):
-        """Wrapper around Domain.set_transport() and Domain.save()"""
+        """Wrapper around Domain's set_quotalimit, set_transport and save."""
         dom = self._get_domain(domainname)
         if transport is None:
             dom.set_transport(Transport(self._dbh,
                               transport=self._cfg.dget('misc.transport')))
         else:
             dom.set_transport(Transport(self._dbh, transport=transport))
+        dom.set_quotalimit(QuotaLimit(self._dbh,
+                           bytes=self._cfg.dget('misc.quota_bytes'),
+                           messages=self._cfg.dget('misc.quota_messages')))
         dom.set_directory(self._cfg.dget('misc.base_directory'))
         dom.save()
         self._make_domain_dir(dom)
+
+    def domain_quotalimit(self, domainname, bytes_, messages=0, force=None):
+        """Wrapper around Domain.update_quotalimit()."""
+        if not all(isinstance(i, (int, long)) for i in (bytes_, messages)):
+            raise TypeError("'bytes_' and 'messages' have to be "
+                            "integers or longs.")
+        if force is not None and force != 'force':
+            raise DomainError(_(u"Invalid argument: '%s'") % force,
+                              INVALID_ARGUMENT)
+        dom = self._get_domain(domainname)
+        quotalimit = QuotaLimit(self._dbh, bytes=bytes_, messages=messages)
+        if force is None:
+            dom.update_quotalimit(quotalimit)
+        else:
+            dom.update_quotalimit(quotalimit, force=True)
 
     def domain_transport(self, domainname, transport, force=None):
         """Wrapper around Domain.update_transport()"""
@@ -674,8 +693,20 @@ The account has been successfully deleted from the database.
                            acc.address, NO_SUCH_ACCOUNT)
         acc.modify('name', name)
 
+    def user_quotalimit(self, emailaddress, bytes_, messages=0):
+        """Wrapper for Account.update_quotalimit(QuotaLimit)."""
+        if not all(isinstance(i, (int, long)) for i in (bytes_, messages)):
+            raise TypeError("'bytes_' and 'messages' have to be "
+                            "integers or longs.")
+        acc = self._get_account(emailaddress)
+        if not acc:
+            raise VMMError(_(u"The account '%s' doesn't exist.") %
+                           acc.address, NO_SUCH_ACCOUNT)
+        acc.update_quotalimit(QuotaLimit(self._dbh, bytes=bytes_,
+                                         messages=messages))
+
     def user_transport(self, emailaddress, transport):
-        """Wrapper for Account.modify('transport', ...)."""
+        """Wrapper for Account.update_transport(Transport)."""
         if not isinstance(transport, basestring) or not transport:
             raise VMMError(_(u"Could not accept transport: '%s'") % transport,
                            INVALID_ARGUMENT)
@@ -683,7 +714,7 @@ The account has been successfully deleted from the database.
         if not acc:
             raise VMMError(_(u"The account '%s' doesn't exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
-        acc.modify('transport', transport)
+        acc.update_transport(Transport(self._dbh, transport=transport))
 
     def user_disable(self, emailaddress, services=None):
         """Wrapper for Account.disable(*services)"""

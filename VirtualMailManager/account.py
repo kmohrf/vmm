@@ -10,6 +10,7 @@
 
 from VirtualMailManager.domain import Domain
 from VirtualMailManager.emailaddress import EmailAddress
+from VirtualMailManager.quotalimit import QuotaLimit
 from VirtualMailManager.transport import Transport
 from VirtualMailManager.common import version_str
 from VirtualMailManager.constants import \
@@ -31,7 +32,7 @@ cfg_dget = lambda option: None
 class Account(object):
     """Class to manage e-mail accounts."""
     __slots__ = ('_addr', '_dbh', '_domain', '_mail', '_new', '_passwd',
-                 '_transport', '_uid')
+                 '_qlimit', '_transport', '_uid')
 
     def __init__(self, dbh, address):
         """Creates a new Account instance.
@@ -59,6 +60,7 @@ class Account(object):
                        self._addr.domainname, NO_SUCH_DOMAIN)
         self._uid = 0
         self._mail = None
+        self._qlimit = self._domain.quotalimit
         self._transport = self._domain.transport
         self._passwd = None
         self._new = True
@@ -69,15 +71,17 @@ class Account(object):
         return not self._new
 
     def _load(self):
-        """Load 'uid', 'mid' and 'tid' from the database and set _new to
-        `False` - if the user could be found. """
+        """Load 'uid', 'mid', 'qid' and 'tid' from the database and set
+        _new to `False` - if the user could be found. """
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT uid, mid, tid FROM users WHERE gid = %s AND '
+        dbc.execute('SELECT uid, mid, qid, tid FROM users WHERE gid = %s AND '
                     'local_part=%s', (self._domain.gid, self._addr.localpart))
         result = dbc.fetchone()
         dbc.close()
         if result:
-            self._uid, _mid, _tid = result
+            self._uid, _mid, _qid, _tid = result
+            if _qid != self._qlimit.qid:
+                self._qlimit = QuotaLimit(self._dbh, qid=_qid)
             if _tid != self._transport.tid:
                 self._transport = Transport(self._dbh, tid=_tid)
             self._mail = MailLocation(self._dbh, mid=_mid)
@@ -138,6 +142,25 @@ class Account(object):
             sql = sql.replace('sieve', 'managesieve')
         dbc = self._dbh.cursor()
         dbc.execute(sql)
+        if dbc.rowcount > 0:
+            self._dbh.commit()
+        dbc.close()
+
+    def _update_tables(self, column, value):
+        """Update various columns in the users table.
+
+        Arguments:
+
+        `column` : basestring
+          Name of the table column. Currently: qid and tid
+        `value` : long
+          The referenced key
+        """
+        if column not in ('qid', 'tid'):
+            raise ValueError('Unknown column: %r' % column)
+        dbc = self._dbh.cursor()
+        dbc.execute('UPDATE users SET %s = %%s WHERE uid = %%s' % column,
+                    (value, self._uid))
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
@@ -206,6 +229,9 @@ class Account(object):
         `password` : basestring
           The password for the new Account.
         """
+        if not self._new:
+            raise AErr(_(u"The account '%s' already exists.") % self._addr,
+                       ACCOUNT_EXISTS)
         if not isinstance(password, basestring) or not password:
             raise AErr(_(u"Could not accept password: '%s'") % password,
                        ACCOUNT_MISSING_PASSWORD)
@@ -247,13 +273,14 @@ class Account(object):
                                    directory=cfg_dget('mailbox.root')))
         dbc = self._dbh.cursor()
         dbc.execute('INSERT INTO users (local_part, passwd, uid, gid, mid, '
-                    'tid, smtp, pop3, imap, %s) VALUES' % (sieve_col,) + \
-                    '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
+                    'qid, tid, smtp, pop3, imap, %s) VALUES' % (sieve_col,) + \
+                    '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
                     (self._addr.localpart,
                      pwhash(self._passwd, user=self._addr), self._uid,
-                     self._domain.gid, self._mail.mid, self._transport.tid,
-                     cfg_dget('account.smtp'), cfg_dget('account.pop3'),
-                     cfg_dget('account.imap'), cfg_dget('account.sieve')))
+                     self._domain.gid, self._mail.mid, self._qlimit.qid,
+                     self._transport.tid, cfg_dget('account.smtp'),
+                     cfg_dget('account.pop3'), cfg_dget('account.imap'),
+                     cfg_dget('account.sieve')))
         self._dbh.commit()
         dbc.close()
         self._new = False
@@ -261,28 +288,22 @@ class Account(object):
     def modify(self, field, value):
         """Update the Account's *field* to the new *value*.
 
-        Possible values for *field* are: 'name', 'password' and
-        'transport'.  *value* is the *field*'s new value.
+        Possible values for *field* are: 'name', 'password'.
 
         Arguments:
 
         `field` : basestring
-          The attribute name: 'name', 'password' or 'transport'
+          The attribute name: 'name' or 'password'
         `value` : basestring
           The new value of the attribute.
         """
-        if field not in ('name', 'password', 'transport'):
+        if field not in ('name', 'password'):
             raise AErr(_(u"Unknown field: '%s'") % field, INVALID_ARGUMENT)
         self._chk_state()
         dbc = self._dbh.cursor()
         if field == 'password':
             dbc.execute('UPDATE users SET passwd = %s WHERE uid = %s',
                         (pwhash(value, user=self._addr), self._uid))
-        elif field == 'transport':
-            if value != self._transport.transport:
-                self._transport = Transport(self._dbh, transport=value)
-                dbc.execute('UPDATE users SET tid = %s WHERE uid = %s',
-                            (self._transport.tid, self._uid))
         else:
             dbc.execute('UPDATE users SET name = %s WHERE uid = %s',
                         (value, self._uid))
@@ -290,28 +311,67 @@ class Account(object):
             self._dbh.commit()
         dbc.close()
 
+    def update_quotalimit(self, quotalimit):
+        """Update the user's quota limit.
+
+        Arguments:
+
+        `quotalimit` : VirtualMailManager.quotalimit.QuotaLimit
+          the new quota limit of the domain.
+        """
+        self._chk_state()
+        assert isinstance(quotalimit, QuotaLimit)
+        if quotalimit == self._qlimit:
+            return
+        self._update_tables('qid', quotalimit.qid)
+        self._qlimit = quotalimit
+
+    def update_transport(self, transport):
+        """Sets a new transport for the Account.
+
+        Arguments:
+
+        `transport` : VirtualMailManager.transport.Transport
+          the new transport
+        """
+        self._chk_state()
+        assert isinstance(transport, Transport)
+        if transport == self._transport:
+            return
+        if transport.transport.lower() in ('virtual', 'virtual:') and \
+           not self._mail.postfix:
+            raise AErr(_(u"Invalid transport '%(transport)s' for mailbox "
+                         u"format '%(mbfmt)s'") %
+                       {'transport': transport, 'mbfmt': self._mail.mbformat},
+                       INVALID_MAIL_LOCATION)
+        self._update_tables('tid', transport.tid)
+        self._transport = transport
+
     def get_info(self):
         """Returns a dict with some information about the Account.
 
         The keys of the dict are: 'address', 'gid', 'home', 'imap'
-        'mail_location', 'name', 'pop3', 'sieve', 'smtp', transport' and
-        'uid'.
+        'mail_location', 'name', 'pop3', 'sieve', 'smtp', transport', 'uid',
+        'uq_bytes', 'uq_messages', 'ql_bytes', and 'ql_messages'.
         """
         self._chk_state()
         if cfg_dget('misc.dovecot_version') >= 0x10200b02:
             sieve_col = 'sieve'
         else:
             sieve_col = 'managesieve'
-        sql = 'SELECT name, smtp, pop3, imap, %s FROM users WHERE uid = %d' % \
-            (sieve_col, self._uid)
         dbc = self._dbh.cursor()
-        dbc.execute(sql)
+        dbc.execute('SELECT name, smtp, pop3, imap, %s, CASE WHEN bytes IS '
+                    'NULL THEN 0 ELSE bytes END, CASE WHEN messages IS NULL '
+                    'THEN 0 ELSE messages END FROM users LEFT JOIN userquota '
+                    'USING (uid) WHERE users.uid = %u' % (sieve_col,
+                        self._uid))
         info = dbc.fetchone()
         dbc.close()
         if info:
-            keys = ('name', 'smtp', 'pop3', 'imap', sieve_col)
+            keys = ('name', 'smtp', 'pop3', 'imap', sieve_col, 'uq_bytes',
+                    'uq_messages')
             info = dict(zip(keys, info))
-            for service in keys[1:]:
+            for service in keys[1:5]:
                 if info[service]:
                     # TP: A service (pop3/imap) is enabled/usable for a user
                     info[service] = _('enabled')
@@ -322,6 +382,8 @@ class Account(object):
             info['gid'] = self._domain.gid
             info['home'] = '%s/%s' % (self._domain.directory, self._uid)
             info['mail_location'] = self._mail.mail_location
+            info['ql_bytes'] = self._qlimit.bytes
+            info['ql_messages'] = self._qlimit.messages
             info['transport'] = self._transport.transport
             info['uid'] = self._uid
             return info
@@ -380,7 +442,7 @@ class Account(object):
         self._new = True
         self._uid = 0
         self._addr = self._dbh = self._domain = self._passwd = None
-        self._mail = self._transport = None
+        self._mail = self._qlimit = self._transport = None
 
 
 def get_account_by_uid(uid, dbh):

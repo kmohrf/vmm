@@ -16,7 +16,8 @@ from VirtualMailManager.constants import \
      ACCOUNT_AND_ALIAS_PRESENT, DOMAIN_ALIAS_EXISTS, DOMAIN_EXISTS, \
      DOMAIN_INVALID, DOMAIN_TOO_LONG, NO_SUCH_DOMAIN
 from VirtualMailManager.errors import DomainError as DomErr
-from VirtualMailManager.pycompat import any
+from VirtualMailManager.pycompat import all, any
+from VirtualMailManager.quotalimit import QuotaLimit
 from VirtualMailManager.transport import Transport
 
 
@@ -27,7 +28,8 @@ _ = lambda msg: msg
 
 class Domain(object):
     """Class to manage e-mail domains."""
-    __slots__ = ('_directory', '_gid', '_name', '_transport', '_dbh', '_new')
+    __slots__ = ('_directory', '_gid', '_name', '_qlimit', '_transport',
+                 '_dbh', '_new')
 
     def __init__(self, dbh, domainname):
         """Creates a new Domain instance.
@@ -49,6 +51,7 @@ class Domain(object):
         self._name = check_domainname(domainname)
         self._dbh = dbh
         self._gid = 0
+        self._qlimit = None
         self._transport = None
         self._directory = None
         self._new = True
@@ -62,17 +65,18 @@ class Domain(object):
         domain.
         """
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT dd.gid, tid, domaindir, is_primary FROM '
+        dbc.execute('SELECT dd.gid, qid, tid, domaindir, is_primary FROM '
                     'domain_data dd, domain_name dn WHERE domainname = %s AND '
                     'dn.gid = dd.gid', (self._name,))
         result = dbc.fetchone()
         dbc.close()
         if result:
-            if not result[3]:
+            if not result[4]:
                 raise DomErr(_(u"The domain '%s' is an alias domain.") %
                              self._name, DOMAIN_ALIAS_EXISTS)
-            self._gid, self._directory = result[0], result[2]
-            self._transport = Transport(self._dbh, tid=result[1])
+            self._gid, self._directory = result[0], result[3]
+            self._qlimit = QuotaLimit(self._dbh, qid=result[1])
+            self._transport = Transport(self._dbh, tid=result[2])
             self._new = False
 
     def _set_gid(self):
@@ -109,6 +113,34 @@ class Domain(object):
             raise DomErr(_(u"The domain '%s' doesn't exist.") % self._name,
                          NO_SUCH_DOMAIN)
 
+    def _update_tables(self, column, value, force=False):
+        """Update various columns in the domain_data table. When *force* is
+        `True` also the corresponding column in the users table will be
+        updated.
+
+        Arguments:
+
+        `column` : basestring
+          Name of the table column. Currently: qid and tid
+        `value` : long
+          The referenced key
+        `force` : bool
+          enforce the new setting also for existing users. Default: `False`
+        """
+        if column not in ('qid', 'tid'):
+            raise ValueError('Unknown column: %r' % column)
+        dbc = self._dbh.cursor()
+        dbc.execute('UPDATE domain_data SET %s = %%s WHERE gid = %%s' % column,
+                    (value, self._gid))
+        if dbc.rowcount > 0:
+            self._dbh.commit()
+        if force:
+            dbc.execute('UPDATE users SET %s = %%s WHERE gid = %%s' % column,
+                        (value, self._gid))
+            if dbc.rowcount > 0:
+                self._dbh.commit()
+        dbc.close()
+
     @property
     def gid(self):
         """The GID of the Domain."""
@@ -123,6 +155,16 @@ class Domain(object):
     def directory(self):
         """The Domain's directory."""
         return self._directory
+
+    @property
+    def quotalimit(self):
+        """The Domain's quota limit."""
+        return self._qlimit
+
+    @property
+    def transport(self):
+        """The Domain's transport."""
+        return self._transport
 
     def set_directory(self, basedir):
         """Set the path value of the Domain's directory, inside *basedir*.
@@ -140,10 +182,19 @@ class Domain(object):
         self._directory = os.path.join(basedir, choice(MAILDIR_CHARS),
                                        str(self._gid))
 
-    @property
-    def transport(self):
-        """The Domain's transport."""
-        return self._transport
+    def set_quotalimit(self, quotalimit):
+        """Set the quota limit for the new Domain.
+
+        Argument:
+
+        `quotalimit` : VirtualMailManager.quotalimit.QuotaLimit
+          The quota limit of the new Domain.
+        """
+        if not self._new:
+            raise DomErr(_(u"The domain '%s' already exists.") % self._name,
+                         DOMAIN_EXISTS)
+        assert isinstance(quotalimit, QuotaLimit)
+        self._qlimit = quotalimit
 
     def set_transport(self, transport):
         """Set the transport for the new Domain.
@@ -164,11 +215,11 @@ class Domain(object):
         if not self._new:
             raise DomErr(_(u"The domain '%s' already exists.") % self._name,
                          DOMAIN_EXISTS)
-        assert self._directory is not None and self._transport is not None
+        assert all((self._directory, self._qlimit, self._transport))
         dbc = self._dbh.cursor()
-        dbc.execute('INSERT INTO domain_data (gid, tid, domaindir) VALUES '
-                    '(%s, %s, %s)', (self._gid, self._transport.tid,
-                                     self._directory))
+        dbc.execute('INSERT INTO domain_data (gid, qid, tid, domaindir) '
+                    'VALUES (%s, %s, %s, %s)', (self._gid, self._qlimit.qid,
+                    self._transport.tid, self._directory))
         dbc.execute('INSERT INTO domain_name (domainname, gid, is_primary) '
                     'VALUES (%s, %s, TRUE)', (self._name, self._gid))
         self._dbh.commit()
@@ -198,8 +249,29 @@ class Domain(object):
         self._dbh.commit()
         dbc.close()
         self._gid = 0
-        self._directory = self._transport = None
+        self._directory = self._qlimit = self._transport = None
         self._new = True
+
+    def update_quotalimit(self, quotalimit, force=False):
+        """Update the quota limit of the Domain.
+
+        If *force* is `True` the new *quotalimit* will be applied to
+        all existing accounts of the domain. Otherwise the *quotalimit*
+        will be only applied to accounts created from now on.
+
+        Arguments:
+
+        `quotalimit` : VirtualMailManager.quotalimit.QuotaLimit
+          the new quota limit of the domain.
+        `force` : bool
+          enforce new quota limit for all accounts, default `False`
+        """
+        self._chk_state()
+        assert isinstance(quotalimit, QuotaLimit)
+        if quotalimit == self._qlimit:
+            return
+        self._update_tables('qid', quotalimit.qid, force)
+        self._qlimit = quotalimit
 
     def update_transport(self, transport, force=False):
         """Sets a new transport for the Domain.
@@ -219,17 +291,7 @@ class Domain(object):
         assert isinstance(transport, Transport)
         if transport == self._transport:
             return
-        dbc = self._dbh.cursor()
-        dbc.execute("UPDATE domain_data SET tid = %s WHERE gid = %s",
-                    (transport.tid, self._gid))
-        if dbc.rowcount > 0:
-            self._dbh.commit()
-        if force:
-            dbc.execute("UPDATE users SET tid = %s WHERE gid = %s",
-                        (transport.tid, self._gid))
-            if dbc.rowcount > 0:
-                self._dbh.commit()
-        dbc.close()
+        self._update_tables('tid', transport.tid, force)
         self._transport = transport
 
     def get_info(self):
@@ -237,12 +299,13 @@ class Domain(object):
         self._chk_state()
         dbc = self._dbh.cursor()
         dbc.execute('SELECT gid, domainname, transport, domaindir, '
-                    'aliasdomains, accounts, aliases, relocated FROM '
-                    'vmm_domain_info WHERE gid = %s', (self._gid,))
+                    'aliasdomains, accounts, aliases, relocated, bytes, '
+                    'messages FROM vmm_domain_info WHERE gid = %s',
+                    (self._gid,))
         info = dbc.fetchone()
         dbc.close()
         keys = ('gid', 'domainname', 'transport', 'domaindir', 'aliasdomains',
-                'accounts', 'aliases', 'relocated')
+                'accounts', 'aliases', 'relocated', 'bytes', 'messages')
         return dict(zip(keys, info))
 
     def get_accounts(self):
