@@ -78,7 +78,7 @@ def human_size(size):
             if unit != 'b':
                 return '%.2f%s' % (size / float(limit), unit)
             else:
-                return '%u%s' % (size / limit, unit)
+                return '%ub' % size
 
 
 def size_in_bytes(size):
