@@ -17,7 +17,7 @@ from time import strftime, strptime
 from VirtualMailManager import ENCODING
 from VirtualMailManager.account import SERVICES
 from VirtualMailManager.cli import get_winsize, prog, w_err, w_std
-from VirtualMailManager.common import version_str
+from VirtualMailManager.common import human_size, version_str
 from VirtualMailManager.constants import __copyright__, __date__, \
      __version__, ACCOUNT_EXISTS, ALIAS_EXISTS, ALIASDOMAIN_ISDOMAIN, \
      DOMAIN_ALIAS_EXISTS, INVALID_ARGUMENT, EX_MISSING_ARGS, RELOCATED_EXISTS
@@ -174,11 +174,16 @@ def config_get(ctx):
     """show the actual value of the configuration option"""
     if ctx.argc < 3:
         usage(EX_MISSING_ARGS, _(u"Missing option name."), ctx.scmd)
+
+    noop = lambda option: option
+    opt_formater = {
+        'misc.dovecot_version': version_str,
+        'misc.quota_bytes': human_size,
+    }
+
     option = ctx.args[2].lower()
-    if option != 'misc.dovecot_version':
-        w_std('%s = %s' % (option, ctx.cget(option)))
-    else:
-        w_std('%s = %s' % (option, version_str(ctx.cget(option))))
+    w_std('%s = %s' % (option, opt_formater.get(option,
+                       noop)(ctx.cget(option))))
 
 
 def config_set(ctx):
