@@ -69,8 +69,13 @@ def exec_ok(binary):
 
 def human_size(size):
     """Converts the `size` in bytes in human readable format."""
-    if not isinstance(size, (long, int)) or size < 0:
-        raise TypeError("'size' must be a positive long or int.")
+    if not isinstance(size, (long, int)):
+        try:
+            size = long(size)
+        except ValueError:
+            raise TypeError("'size' must be a positive long or int.")
+    if size < 0:
+        raise ValueError("'size' must be a positive long or int.")
     if not size:
         return '0b'
     unit_limit = (('T', 1 << 40), ('G', 1 << 30), ('M', 1 << 20),
