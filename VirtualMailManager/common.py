@@ -67,6 +67,20 @@ def exec_ok(binary):
     return binary
 
 
+def human_size(size):
+    """Converts the `size` in bytes in human readable format."""
+    if not isinstance(size, (long, int)) or size < 1:
+        raise TypeError("'size' must be a long or int and greater than 0.")
+    unit_limit = (('T', 1 << 40), ('G', 1 << 30), ('M', 1 << 20),
+                  ('k', 1 << 10), ('b', 1))
+    for unit, limit in unit_limit:
+        if size >= limit:
+            if unit != 'b':
+                return '%.2f%s' % (size / float(limit), unit)
+            else:
+                return '%u%s' % (size / limit, unit)
+
+
 def size_in_bytes(size):
     """Converts the string `size` to a long (size in bytes).
 
