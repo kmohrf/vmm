@@ -471,13 +471,16 @@ def user_info(ctx):
             raise
     else:
         if details in (None, 'du'):
-            info['quota usage'] = _format_quota_usage(info['ql_bytes'],
-                    info['ql_messages'], info['uq_bytes'], info['uq_messages'])
+            info['quota storage'] = _format_quota_usage(info['ql_bytes'],
+                    info['uq_bytes'], True)
+            info['quota messages'] = _format_quota_usage(info['ql_messages'],
+                    info['uq_messages'])
             _print_info(ctx, info, _(u'Account'))
         else:
-            info[0]['quota usage'] = _format_quota_usage(info[0]['ql_bytes'],
-                    info[0]['ql_messages'], info[0]['uq_bytes'],
-                    info[0]['uq_messages'])
+            info[0]['quota storage'] = _format_quota_usage(info[0]['ql_bytes'],
+                    info['uq_bytes'], True)
+            info[0]['quota messages'] = _format_quota_usage(
+                    info[0]['ql_messages'], info[0]['uq_messages'])
             _print_info(ctx, info[0], _(u'Account'))
             _print_list(info[1], _(u'alias addresses'))
 
@@ -649,12 +652,13 @@ def _get_order(ctx):
            ctx.cget('account.disk_usage'):
             order = ((u'address', 0), (u'name', 0), (u'uid', 1), (u'gid', 1),
                      (u'home', 0), (u'mail_location', 0),
-                     (u'quota usage', 0), (u'disk usage', 0),
-                     (u'transport', 0), (u'smtp', 1), (u'pop3', 1),
-                     (u'imap', 1), (sieve, 1))
+                     (u'quota storage', 0), (u'quota messages', 0),
+                     (u'disk usage', 0), (u'transport', 0), (u'smtp', 1),
+                     (u'pop3', 1), (u'imap', 1), (sieve, 1))
         else:
             order = ((u'address', 0), (u'name', 0), (u'uid', 1), (u'gid', 1),
-                     (u'home', 0), (u'mail_location', 0), (u'quota usage', 0),
+                     (u'home', 0), (u'mail_location', 0),
+                     (u'quota storage', 0), (u'quota messages', 0),
                      (u'transport', 0), (u'smtp', 1), (u'pop3', 1),
                      (u'imap', 1), (sieve, 1))
     elif ctx.scmd == 'getuser':
@@ -662,29 +666,23 @@ def _get_order(ctx):
     return order
 
 
-def _format_quota_usage(ql_bytes, ql_messages, qu_bytes, qu_messages):
-    """Put quota limits / usage / percentage in a formatted string."""
-    q_usage = {
-        'bytes_used': human_size(qu_bytes),
-        'bytes_limit': human_size(ql_bytes),
-        'msgs_used': qu_messages,
-        'msgs_limit': ql_messages,
-    }
-    if ql_bytes:
-        q_usage['bytes_percent'] = 100. / ql_bytes * qu_bytes
+def _format_quota_usage(limit, used, human=False):
+    """Put quota's limit / usage / percentage in a formatted string."""
+    if human:
+        q_usage = {
+            'used': human_size(used),
+            'limit': human_size(limit),
+        }
     else:
-        q_usage['bytes_percent'] = 0.
-    if ql_messages:
-        q_usage['msgs_percent'] =  100. / ql_messages * qu_messages
+        q_usage = {
+            'used': used,
+            'limit': limit,
+        }
+    if limit:
+        q_usage['percent'] = 100. / limit * used
     else:
-        q_usage['msgs_percent'] =  0.
-
-    # TP: example of quota usage message:
-    # XXX file in  XXX
-    txt = _(u'Storage: %(bytes_used)s/%(bytes_limit)s (%(bytes_percent).2f%%) '
-           'Messages: %(msgs_used)u/%(msgs_limit)u (%(msgs_percent).2f%%)') \
-              % q_usage
-    return txt
+        q_usage['percent'] = 0.
+    return _(u'[%(percent)6.2f%%] %(used)s/%(limit)s') % q_usage
 
 
 def _print_info(ctx, info, title):
