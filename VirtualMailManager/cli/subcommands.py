@@ -257,8 +257,12 @@ def domain_info(ctx):
             raise
     else:
         if not details:
+            info['quota limit'] = _(u'Storage: %s Messages %u') % (
+                    human_size(info['bytes']), info['messages'])
             _print_info(ctx, info, _(u'Domain'))
         else:
+            info[0]['quota limit'] = _(u'Storage: %s Messages %u') % (
+                    human_size(info[0]['bytes']), info[0]['messages'])
             _print_info(ctx, info[0], _(u'Domain'))
             if details == u'accounts':
                 _print_list(info[1], _(u'accounts'))
@@ -467,8 +471,13 @@ def user_info(ctx):
             raise
     else:
         if details in (None, 'du'):
+            info['quota usage'] = _format_quota_usage(info['ql_bytes'],
+                    info['ql_messages'], info['uq_bytes'], info['uq_messages'])
             _print_info(ctx, info, _(u'Account'))
         else:
+            info[0]['quota usage'] = _format_quota_usage(info[0]['ql_bytes'],
+                    info[0]['ql_messages'], info[0]['uq_bytes'],
+                    info[0]['uq_messages'])
             _print_info(ctx, info[0], _(u'Account'))
             _print_list(info[1], _(u'alias addresses'))
 
@@ -631,24 +640,51 @@ def _get_order(ctx):
     order = ()
     if ctx.scmd == 'domaininfo':
         order = ((u'domainname', 0), (u'gid', 1), (u'transport', 0),
-                 (u'domaindir', 0), (u'aliasdomains', 0), (u'accounts', 0),
-                 (u'aliases', 0), (u'relocated', 0))
+                 (u'domaindir', 0), (u'quota limit', 0), (u'aliasdomains', 0),
+                 (u'accounts', 0), (u'aliases', 0), (u'relocated', 0))
     elif ctx.scmd == 'userinfo':
         dc12 = ctx.cget('misc.dovecot_version') >= 0x10200b02
         sieve = (u'managesieve', u'sieve')[dc12]
         if ctx.argc == 4 and ctx.args[3] != u'aliases' or \
            ctx.cget('account.disk_usage'):
             order = ((u'address', 0), (u'name', 0), (u'uid', 1), (u'gid', 1),
-                     (u'home', 0), (u'mail_location', 0), (u'disk usage', 0),
+                     (u'home', 0), (u'mail_location', 0),
+                     (u'quota usage', 0), (u'disk usage', 0),
                      (u'transport', 0), (u'smtp', 1), (u'pop3', 1),
                      (u'imap', 1), (sieve, 1))
         else:
             order = ((u'address', 0), (u'name', 0), (u'uid', 1), (u'gid', 1),
-                     (u'home', 0), (u'mail_location', 0), (u'transport', 0),
-                     (u'smtp', 1), (u'pop3', 1), (u'imap', 1), (sieve, 1))
+                     (u'home', 0), (u'mail_location', 0), (u'quota usage', 0),
+                     (u'transport', 0), (u'smtp', 1), (u'pop3', 1),
+                     (u'imap', 1), (sieve, 1))
     elif ctx.scmd == 'getuser':
         order = ((u'uid', 1), (u'gid', 1), (u'address', 0))
     return order
+
+
+def _format_quota_usage(ql_bytes, ql_messages, qu_bytes, qu_messages):
+    """Put quota limits / usage / percentage in a formatted string."""
+    q_usage = {
+        'bytes_used': human_size(qu_bytes),
+        'bytes_limit': human_size(ql_bytes),
+        'msgs_used': qu_messages,
+        'msgs_limit': ql_messages,
+    }
+    if ql_bytes:
+        q_usage['bytes_percent'] = 100. / ql_bytes * qu_bytes
+    else:
+        q_usage['bytes_percent'] = 0.
+    if ql_messages:
+        q_usage['msgs_percent'] =  100. / ql_messages * qu_messages
+    else:
+        q_usage['msgs_percent'] =  0.
+
+    # TP: example of quota usage message:
+    # XXX file in  XXX
+    txt = _(u'Storage: %(bytes_used)s/%(bytes_limit)s (%(bytes_percent).2f%%) '
+           'Messages: %(msgs_used)u/%(msgs_limit)u (%(msgs_percent).2f%%)') \
+              % q_usage
+    return txt
 
 
 def _print_info(ctx, info, title):
