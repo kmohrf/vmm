@@ -76,16 +76,16 @@ def human_size(size):
             raise TypeError("'size' must be a positive long or int.")
     if size < 0:
         raise ValueError("'size' must be a positive long or int.")
-    if not size:
-        return '0b'
-    unit_limit = (('T', 1 << 40), ('G', 1 << 30), ('M', 1 << 20),
-                  ('k', 1 << 10), ('b', 1))
-    for unit, limit in unit_limit:
-        if size >= limit:
-            if unit != 'b':
-                return '%.2f%s' % (size / float(limit), unit)
-            else:
-                return '%ub' % size
+    if size < 1024:
+        return str(size)
+    prefix_multiply = ((_(u'TiB'), 1 << 40), (_(u'GiB'), 1 << 30),
+                       (_(u'MiB'), 1 << 20), (_(u'KiB'), 1 << 10))
+    for prefix, multiply in prefix_multiply:
+        if size >= multiply:
+            # TP: e.g.: '%(size).2f %(prefix)s' -> '118.30 MiB'
+            return _(u'%(size).2f %(prefix)s') % {
+                    'size': float(size) / multiply,
+                    'prefix': prefix}
 
 
 def size_in_bytes(size):
