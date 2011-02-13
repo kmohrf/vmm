@@ -16,8 +16,8 @@ from VirtualMailManager.common import version_str
 from VirtualMailManager.constants import \
      ACCOUNT_EXISTS, ACCOUNT_MISSING_PASSWORD, ALIAS_PRESENT, \
      INVALID_ARGUMENT, INVALID_MAIL_LOCATION, NO_SUCH_ACCOUNT, \
-     NO_SUCH_DOMAIN, UNKNOWN_SERVICE
-from VirtualMailManager.errors import AccountError as AErr
+     NO_SUCH_DOMAIN, UNKNOWN_SERVICE, VMM_ERROR
+from VirtualMailManager.errors import VMMError, AccountError as AErr
 from VirtualMailManager.maillocation import MailLocation
 from VirtualMailManager.password import pwhash
 
@@ -319,6 +319,9 @@ class Account(object):
         `quotalimit` : VirtualMailManager.quotalimit.QuotaLimit
           the new quota limit of the domain.
         """
+        if cfg_dget('misc.dovecot_version') < 0x10102f00:
+            raise VMMError(_(u'PostgreSQL-based dictionary quota requires '
+                             u'Dovecot >= v1.1.2'), VMM_ERROR)
         self._chk_state()
         assert isinstance(quotalimit, QuotaLimit)
         if quotalimit == self._qlimit:

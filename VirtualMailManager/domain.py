@@ -14,8 +14,8 @@ from random import choice
 
 from VirtualMailManager.constants import \
      ACCOUNT_AND_ALIAS_PRESENT, DOMAIN_ALIAS_EXISTS, DOMAIN_EXISTS, \
-     DOMAIN_INVALID, DOMAIN_TOO_LONG, NO_SUCH_DOMAIN
-from VirtualMailManager.errors import DomainError as DomErr
+     DOMAIN_INVALID, DOMAIN_TOO_LONG, NO_SUCH_DOMAIN, VMM_ERROR
+from VirtualMailManager.errors import VMMError, DomainError as DomErr
 from VirtualMailManager.pycompat import all, any
 from VirtualMailManager.quotalimit import QuotaLimit
 from VirtualMailManager.transport import Transport
@@ -24,6 +24,7 @@ from VirtualMailManager.transport import Transport
 MAILDIR_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz'
 RE_DOMAIN = re.compile(r"^(?:[a-z0-9-]{1,63}\.){1,}[a-z]{2,6}$")
 _ = lambda msg: msg
+cfg_dget = lambda option: None
 
 
 class Domain(object):
@@ -266,6 +267,9 @@ class Domain(object):
         `force` : bool
           enforce new quota limit for all accounts, default `False`
         """
+        if cfg_dget('misc.dovecot_version') < 0x10102f00:
+            raise VMMError(_(u'PostgreSQL-based dictionary quota requires '
+                             u'Dovecot >= v1.1.2'), VMM_ERROR)
         self._chk_state()
         assert isinstance(quotalimit, QuotaLimit)
         if not force and quotalimit == self._qlimit:
@@ -459,4 +463,4 @@ def search(dbh, pattern=None, like=False):
                 domains[gid] = [None, domain]
     return gids, domains
 
-del _
+del _, cfg_dget
