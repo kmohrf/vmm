@@ -268,7 +268,7 @@ class Domain(object):
         """
         self._chk_state()
         assert isinstance(quotalimit, QuotaLimit)
-        if quotalimit == self._qlimit:
+        if not force and quotalimit == self._qlimit:
             return
         self._update_tables('qid', quotalimit.qid, force)
         self._qlimit = quotalimit
@@ -289,7 +289,7 @@ class Domain(object):
         """
         self._chk_state()
         assert isinstance(transport, Transport)
-        if transport == self._transport:
+        if not force and transport == self._transport:
             return
         self._update_tables('tid', transport.tid, force)
         self._transport = transport
