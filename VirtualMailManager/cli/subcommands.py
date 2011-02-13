@@ -17,7 +17,7 @@ from time import strftime, strptime
 from VirtualMailManager import ENCODING
 from VirtualMailManager.account import SERVICES
 from VirtualMailManager.cli import get_winsize, prog, w_err, w_std
-from VirtualMailManager.common import human_size, version_str
+from VirtualMailManager.common import human_size, size_in_bytes, version_str
 from VirtualMailManager.constants import __copyright__, __date__, \
      __version__, ACCOUNT_EXISTS, ALIAS_EXISTS, ALIASDOMAIN_ISDOMAIN, \
      DOMAIN_ALIAS_EXISTS, INVALID_ARGUMENT, EX_MISSING_ARGS, RELOCATED_EXISTS
@@ -27,10 +27,11 @@ __all__ = (
     'Command', 'RunContext', 'cmd_map', 'usage', 'alias_add', 'alias_delete',
     'alias_info', 'aliasdomain_add', 'aliasdomain_delete', 'aliasdomain_info',
     'aliasdomain_switch', 'config_get', 'config_set', 'configure',
-    'domain_add', 'domain_delete',  'domain_info', 'domain_transport',
-    'get_user', 'help_', 'list_domains', 'relocated_add', 'relocated_delete',
-    'relocated_info', 'user_add', 'user_delete', 'user_disable', 'user_enable',
-    'user_info', 'user_name', 'user_password', 'user_transport', 'version',
+    'domain_add', 'domain_delete',  'domain_info', 'domain_quota',
+    'domain_transport', 'get_user', 'help_', 'list_domains', 'relocated_add',
+    'relocated_delete', 'relocated_info', 'user_add', 'user_delete',
+    'user_disable', 'user_enable', 'user_info', 'user_name', 'user_password',
+    'user_quota', 'user_transport', 'version',
 )
 
 _ = lambda msg: msg
@@ -279,6 +280,45 @@ def domain_info(ctx):
                 _print_list(info[4], _(u'relocated users'))
 
 
+def domain_quota(ctx):
+    """update the quota limit of the specified domain"""
+    if ctx.argc < 3:
+        usage(EX_MISSING_ARGS, _(u'Missing domain name and storage value.'),
+              ctx.scmd)
+    if ctx.argc < 4:
+        usage(EX_MISSING_ARGS, _(u'Missing storage value.'), ctx.scmd)
+    messages = 0
+    force = None
+    try:
+        bytes_ = size_in_bytes(ctx.args[3])
+    except (ValueError, TypeError):
+        usage(INVALID_ARGUMENT, _(u"Invalid storage value: '%s'") %
+              ctx.args[3], ctx.scmd)
+    if ctx.argc < 5:
+        pass
+    elif ctx.argc < 6:
+        try:
+            messages = int(ctx.args[4])
+        except ValueError:
+            if ctx.args[4].lower() != 'force':
+                usage(INVALID_ARGUMENT,
+                      _(u"Neither a valid number of messages nor the keyword "
+                        u"'force': '%s'") % ctx.args[4], ctx.scmd)
+            force = 'force'
+    else:
+        try:
+            messages = int(ctx.args[4])
+        except ValueError:
+            usage(INVALID_ARGUMENT,
+                  _(u"Not a valid number of messages: '%s'") % ctx.args[4],
+                  ctx.scmd)
+        if ctx.args[5].lower() != 'force':
+            usage(INVALID_ARGUMENT, _(u"Invalid argument: '%s'") % ctx.args[5],
+                  ctx.scmd)
+        force = 'force'
+    ctx.hdlr.domain_quotalimit(ctx.args[2].lower(), bytes_, messages, force)
+
+
 def domain_transport(ctx):
     """update the transport of the specified domain"""
     if ctx.argc < 3:
@@ -304,7 +344,7 @@ def get_user(ctx):
 
 
 def help_(ctx):
-    """print help messgaes."""
+    """print help messages."""
     if ctx.argc > 2:
         hlptpc = ctx.args[2].lower()
         if hlptpc in cmd_map:
@@ -506,6 +546,30 @@ def user_password(ctx):
     ctx.hdlr.user_password(ctx.args[2].lower(), password)
 
 
+def user_quota(ctx):
+    """update the quota limit for the given address"""
+    if ctx.argc < 3:
+        usage(EX_MISSING_ARGS, _(u'Missing e-mail address and storage value.'),
+              ctx.scmd)
+    elif ctx.argc < 4:
+        usage(EX_MISSING_ARGS, _(u'Missing storage value.'), ctx.scmd)
+    try:
+        bytes_ = size_in_bytes(ctx.args[3])
+    except (ValueError, TypeError):
+        usage(INVALID_ARGUMENT, _(u"Invalid storage value: '%s'") %
+              ctx.args[3], ctx.scmd)
+    if ctx.argc < 5:
+        messages = 0
+    else:
+        try:
+            messages = int(ctx.args[4])
+        except ValueError:
+            usage(INVALID_ARGUMENT,
+                  _(u"Not a valid number of messages: '%s'") % ctx.args[4],
+                  ctx.scmd)
+    ctx.hdlr.user_quotalimit(ctx.args[2].lower(), bytes_, messages)
+
+
 def user_transport(ctx):
     """update the transport of the given address"""
     if ctx.argc < 3:
@@ -579,6 +643,9 @@ cmd_map = {  # {{{
     'userpassword': cmd('userpassword', 'up', user_password,
                         'address [password]',
                         _(u'update the password for the given address')),
+    'userquota': cmd('userquota', 'uq', user_quota,
+                     'address storage [messages]',
+                     _(u'update the quota limit for the given address')),
     'usertransport': cmd('usertransport', 'ut', user_transport,
                          'address transport',
                          _(u'update the transport of the given address')),
@@ -609,6 +676,9 @@ cmd_map = {  # {{{
                       _(u'delete the given domain and all its alias domains')),
     'domaininfo': cmd('domaininfo', 'di', domain_info, 'fqdn [details]',
                       _(u'display information about the given domain')),
+    'domainquota': cmd('domainquota', 'dq', domain_quota,
+                       'fqdn storage [messages] [force]',
+                       _(u'update the quota limit of the specified domain')),
     'domaintransport': cmd('domaintransport', 'dt', domain_transport,
                            'fqdn transport [force]',
                            _(u'update the transport of the specified domain')),
