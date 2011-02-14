@@ -192,6 +192,31 @@ DOMAIN SUBCOMMANDS
             Aliases........: 0
             Relocated......: 0
 
+.. _domainquota:
+
+``domainquota (dq) domain storage [messages] [force]``
+  This subcommand is used to configure a new quota limit for the accounts
+  of *domain* - not for the *domain* itself.
+
+  The default quota limit for accounts is defined in the *vmm.cfg*
+  (|misc.quota_bytes|_ and |misc.quota_messages|_). The new quota limit
+  will be applied to all newly created accounts. If you want to apply the
+  new quota limit also to existing accounts, you have to give the optional
+  keyword **force**.
+
+  ``storage``
+    specifies the quota limit in bytes. One of the prefixes can be appended
+    to the integer value: **b** (bytes), **k** (kilobytes), **M**
+    (megabytes) or **G** (gigabytes). **0** means unlimited - no quota limit.
+  ``messages``
+    this optional argument specifies the quota limit in number of messages.
+    When it was omitted the messages limit will be set to 0. **0** means
+    unlimited - no quota limit.
+
+  Example::
+
+    vmm domainquota example.com 1g force
+
 .. _domaintransport:
 
 ``domaintransport (dt) domain transport [ force ]``
@@ -323,6 +348,24 @@ ACCOUNT SUBCOMMANDS
 
     vmm up d.user@example.com 'A |\\/|0r3 5ecur3 P4s5\\/\\/0rd?'
 
+.. _userquota:
+
+``userquota (uq) address storage [messages]``
+  This subcommand is used to set a new quota limit for the given account.
+
+  ``storage``
+    specifies the quota limit in bytes. One of the prefixes can be appended
+    to the integer value: **b** (bytes), **k** (kilobytes), **M**
+    (megabytes) or **G** (gigabytes). **0** means unlimited - no quota limit.
+  ``messages``
+    this optional argument specifies the quota limit in number of messages.
+    When it was omitted the messages limit will be set to 0. **0** means
+    unlimited - no quota limit.
+
+  Example::
+
+    vmm userquota d.user@example.com 750m
+
 .. _usertransport:
 
 ``usertransport (ut) address transport``
@@ -371,14 +414,14 @@ ALIAS SUBCOMMANDS
 -----------------
 .. _aliasadd:
 
-``aliasadd (aa) alias target``
-  This subcommand is used to create a new alias.
+``aliasadd (aa) alias target ...``
+  This subcommand is used to create a new alias with one or more *target*
+  addresses.
 
   Examples::
 
     vmm aliasadd john.doe@example.com d.user@example.com
-    vmm aa support@example.com d.user@example.com
-    vmm aa support@example.com e.user@example.com
+    vmm aa support@example.com d.user@example.com e.user@example.com
 
 .. _aliasinfo:
 

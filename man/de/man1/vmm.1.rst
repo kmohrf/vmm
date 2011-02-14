@@ -200,6 +200,32 @@ DOMAIN UNTERBEFEHLE
             Aliases........: 0
             Relocated......: 0
 
+.. _domainquota:
+
+``domainquota (dq) Domain Speicher [Nachrichten] [force]``
+  Dieser Unterbefehl wird verwendet, um für die Konten der *Domain* ein
+  neues Quota-Limit festzulegen.
+
+  Standardmäßig gilt für Konten das Quota-Limit der *vmm.cfg*
+  (|misc.quota_bytes|_ und |misc.quota_messages|_). Das neue Quota-Limit
+  wird für alle zukünftig angelegte Konten gelten. Soll das neue Quota
+  Limit auch auf bestehende Konten der *Domain* angewendet werden, ist das
+  optionale Schlüsselwort **force** anzugeben.
+
+  ``Speicher``
+    Bestimmt das Quota-Limit in Bytes. Eines der Präfixe **b** (Bytes),
+    **k** (Kilobytes), **M** (Megabytes), oder **G** (Gigabytes) kann an das
+    ganzzahlige Limit angehängt werden. **0** steht für unbegrenzt - kein
+    Quota-Limit in Bytes.
+  ``Nachrichten``
+    Legt das Quota-Limit als Anzahl von Nachrichten fest. Wurde dieses
+    optionale Argument ausgelassen, wird das Nachrichten Limit auf 0 gesetzt.
+    **0** steht für unbegrenzt - kein Quota-Limit als Anzahl von Nachrichten.
+
+  Beispiel::
+
+    vmm domainquota example.com 1g force
+
 .. _domaintransport:
 
 ``domaintransport (dt) Domain Transport [ force ]``
@@ -345,6 +371,26 @@ KONTO UNTERBEFEHLE
 
     vmm up d.user@example.com 'A |\\/|0r3 5ecur3 P4s5\\/\\/0rd?'
 
+.. _userquota:
+
+``userquota (uq) Adresse Speicher [Nachrichten]``
+  Um ein neues Quota-Limit für das Konto mit der angegebenen *Adresse*
+  festzulegen wird dieser Unterbefehl verwendet.
+
+  ``Speicher``
+    Bestimmt das Quota-Limit in Bytes. Eines der Präfixe **b** (Bytes),
+    **k** (Kilobytes), **M** (Megabytes), oder **G** (Gigabytes) kann an das
+    ganzzahlige Limit angehängt werden. **0** steht für unbegrenzt - kein
+    Quota-Limit in Bytes.
+  ``Nachrichten``
+    Legt das Quota-Limit als Anzahl von Nachrichten fest. Wurde dieses
+    optionale Argument ausgelassen, wird das Nachrichten Limit auf 0 gesetzt.
+    **0** steht für unbegrenzt - kein Quota-Limit als Anzahl von Nachrichten.
+
+  Beispiel::
+
+    vmm userquota d.user@example.com 750m
+
 .. _usertransport:
 
 ``usertransport (ut) Adresse Transport``
@@ -403,14 +449,14 @@ ALIAS UNTERBEFEHLE
 ------------------
 .. _aliasadd:
 
-``aliasadd (aa) Alias Ziel``
-  Mit diesem Unterbefehl werden neue Aliase erstellt.
+``aliasadd (aa) Alias Ziel ...``
+  Mit diesem Unterbefehl werden neue *Alias*\ -Adressen, mit einer oder
+  mehren  *Ziel*\ -Adressen, erstellt.
 
   Beispiele::
 
     vmm aliasadd john.doe@example.com d.user@example.com
-    vmm aa support@example.com d.user@example.com
-    vmm aa support@example.com e.user@example.com
+    vmm aa support@example.com d.user@example.com e.user@example.com
 
 .. _aliasinfo:
 
