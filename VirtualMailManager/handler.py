@@ -431,7 +431,7 @@ class Handler(object):
         else:
             dom.set_transport(Transport(self._dbh, transport=transport))
         dom.set_quotalimit(QuotaLimit(self._dbh,
-                           bytes=self._cfg.dget('misc.quota_bytes'),
+                           bytes=long(self._cfg.dget('misc.quota_bytes')),
                            messages=self._cfg.dget('misc.quota_messages')))
         dom.set_directory(self._cfg.dget('misc.base_directory'))
         dom.save()

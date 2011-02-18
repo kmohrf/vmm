@@ -55,8 +55,6 @@ class QuotaLimit(object):
             self._load_by_qid(qid)
         else:
             bytes_, msgs = kwargs.get('bytes'), kwargs.get('messages')
-            if bytes_ == '0':  # default from Config
-                bytes_ = 0
             assert all(isinstance(i, (int, long)) for i in (bytes_, msgs))
             if bytes_ < 0:
                 self._bytes = -bytes_
