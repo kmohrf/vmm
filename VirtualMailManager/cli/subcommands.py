@@ -154,7 +154,7 @@ def aliasdomain_info(ctx):
         if err.code is ALIASDOMAIN_ISDOMAIN:
             w_err(0, ctx.plan_a_b % {'subcommand': u'domaininfo',
                   'object': ctx.args[2].lower()})
-            ctx.args[1] = 'domaininfo'
+            ctx.scmd = ctx.args[1] = 'domaininfo'
             domain_info(ctx)
         else:
             raise
@@ -252,7 +252,7 @@ def domain_info(ctx):
         if err.code is DOMAIN_ALIAS_EXISTS:
             w_err(0, ctx.plan_a_b % {'subcommand': u'aliasdomaininfo',
                   'object': ctx.args[2].lower()})
-            ctx.args[1] = 'aliasdomaininfo'
+            ctx.scmd = ctx.args[1] = 'aliasdomaininfo'
             aliasdomain_info(ctx)
         else:
             raise
