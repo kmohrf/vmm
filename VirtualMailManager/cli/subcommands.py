@@ -257,13 +257,14 @@ def domain_info(ctx):
         else:
             raise
     else:
+        q_limit = u'Storage: %(bytes)s Messages %(messages)u'
         if not details:
-            info['quota limit'] = _(u'Storage: %s Messages %u') % (
-                    human_size(info['bytes']), info['messages'])
+            info['bytes'] = human_size(info['bytes'])
+            info['quota limit'] = q_limit % info
             _print_info(ctx, info, _(u'Domain'))
         else:
-            info[0]['quota limit'] = _(u'Storage: %s Messages %u') % (
-                    human_size(info[0]['bytes']), info[0]['messages'])
+            info[0]['bytes'] = human_size(info[0]['bytes'])
+            info[0]['quota limit'] = q_limit % info[0]
             _print_info(ctx, info[0], _(u'Domain'))
             if details == u'accounts':
                 _print_list(info[1], _(u'accounts'))
