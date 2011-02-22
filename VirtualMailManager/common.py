@@ -8,6 +8,7 @@
     Some common functions
 """
 
+import locale
 import os
 import re
 import stat
@@ -82,9 +83,10 @@ def human_size(size):
                        (_(u'MiB'), 1 << 20), (_(u'KiB'), 1 << 10))
     for prefix, multiply in prefix_multiply:
         if size >= multiply:
-            # TP: e.g.: '%(size).2f %(prefix)s' -> '118.30 MiB'
-            return _(u'%(size).2f %(prefix)s') % {
-                    'size': float(size) / multiply,
+            # TP: e.g.: '%(size)s %(prefix)s' -> '118.30 MiB'
+            return _(u'%(size)s %(prefix)s') % {
+                    'size': locale.format('%.2f', float(size) / multiply,
+                                          True),
                     'prefix': prefix}
 
 
