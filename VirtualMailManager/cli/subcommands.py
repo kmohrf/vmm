@@ -257,7 +257,7 @@ def domain_info(ctx):
         else:
             raise
     else:
-        q_limit = u'Storage: %(bytes)s Messages %(messages)u'
+        q_limit = u'Storage: %(bytes)s; Messages: %(messages)u'
         if not details:
             info['bytes'] = human_size(info['bytes'])
             info['quota limit'] = q_limit % info
