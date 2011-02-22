@@ -128,7 +128,7 @@ class Mailbox(object):
                name.startswith('../'):
                 bad.append(name)
                 return
-        if '/' in name or '..' in name:
+        elif '/' in name or '..' in name:
             bad.append(name)
             return
         if not self.__class__._box_name_re.match(name):
@@ -155,6 +155,8 @@ class Mailbox(object):
         good = set()
         bad = []
         for box in mailboxes:
+            if self._sep == '/':
+                box = box.replace('.', self._sep)
             self._validate_box_name(box, good, bad)
         self._add_boxes(good, subscribe)
         return bad
