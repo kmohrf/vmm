@@ -371,13 +371,13 @@ def verify_scheme(scheme):
                        VMM_ERROR)
     if cfg_dget('misc.dovecot_version') < _scheme_info[scheme][1]:
         raise VMMError(_(u"The password scheme '%(scheme)s' requires Dovecot "
-                         u">= v%(version)s") % {'scheme': scheme,
+                         u">= v%(version)s.") % {'scheme': scheme,
                        'version': version_str(_scheme_info[scheme][1])},
                        VMM_ERROR)
     if len(scheme_encoding) > 1:
         if cfg_dget('misc.dovecot_version') < 0x10100a01:
             raise VMMError(_(u'Encoding suffixes for password schemes require '
-                             u'Dovecot >= v1.1.alpha1'), VMM_ERROR)
+                             u'Dovecot >= v1.1.alpha1.'), VMM_ERROR)
         if scheme_encoding[1] not in ('B64', 'BASE64', 'HEX'):
             raise VMMError(_(u"Unsupported password encoding: '%s'") %
                            scheme_encoding[1], VMM_ERROR)
@@ -400,7 +400,7 @@ def pwhash(password, scheme=None, user=None):
         password = password.encode(ENCODING)
     password = password.strip()
     if not password:
-        raise ValueError("Couldn't accept empty password.")
+        raise ValueError("Could not accept empty password.")
     if scheme is None:
         scheme = cfg_dget('misc.password_scheme')
     scheme, encoding = verify_scheme(scheme)

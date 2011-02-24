@@ -153,14 +153,14 @@ class Handler(object):
             try:
                 _db_mod = __import__('psycopg2')
             except ImportError:
-                raise VMMError(_(u"Unable to import database module '%s'") %
+                raise VMMError(_(u"Unable to import database module '%s'.") %
                                'psycopg2', VMM_ERROR)
             self._db_connect = self._psycopg2_connect
         else:
             try:
                 tmp = __import__('pyPgSQL', globals(), locals(), ['PgSQL'])
             except ImportError:
-                raise VMMError(_(u"Unable to import database module '%s'") %
+                raise VMMError(_(u"Unable to import database module '%s'.") %
                                'pyPgSQL', VMM_ERROR)
             _db_mod = tmp.PgSQL
             self._db_connect = self._pypgsql_connect
@@ -594,7 +594,7 @@ class Handler(object):
             if destination.gid and \
                not self._chk_other_address_types(destination, TYPE_RELOCATED):
                 self._warnings.append(_(u"The destination account/alias '%s' "
-                                        u"doesn't exist.") % destination)
+                                        u"does not exist.") % destination)
 
     def user_delete(self, emailaddress, force=False):
         """Wrapper around Account.delete(...)"""
@@ -602,7 +602,7 @@ class Handler(object):
             raise TypeError('force must be a bool')
         acc = self._get_account(emailaddress)
         if not acc:
-            raise VMMError(_(u"The account '%s' doesn't exist.") %
+            raise VMMError(_(u"The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
         uid = acc.uid
         gid = acc.gid
@@ -631,7 +631,7 @@ The account has been successfully deleted from the database.
         if alias:
             return alias.get_destinations()
         if not self._is_other_address(alias.address, TYPE_ALIAS):
-            raise VMMError(_(u"The alias '%s' doesn't exist.") %
+            raise VMMError(_(u"The alias '%s' does not exist.") %
                            alias.address, NO_SUCH_ALIAS)
 
     def alias_delete(self, aliasaddress, targetaddress=None):
@@ -652,7 +652,7 @@ The account has been successfully deleted from the database.
         acc = self._get_account(emailaddress)
         if not acc:
             if not self._is_other_address(acc.address, TYPE_ACCOUNT):
-                raise VMMError(_(u"The account '%s' doesn't exist.") %
+                raise VMMError(_(u"The account '%s' does not exist.") %
                                acc.address, NO_SUCH_ACCOUNT)
         info = acc.get_info()
         if self._cfg.dget('account.disk_usage') or details in ('du', 'full'):
@@ -678,7 +678,7 @@ The account has been successfully deleted from the database.
                            INVALID_ARGUMENT)
         acc = self._get_account(emailaddress)
         if not acc:
-            raise VMMError(_(u"The account '%s' doesn't exist.") %
+            raise VMMError(_(u"The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
         acc.modify('password', password)
 
@@ -689,7 +689,7 @@ The account has been successfully deleted from the database.
                            INVALID_ARGUMENT)
         acc = self._get_account(emailaddress)
         if not acc:
-            raise VMMError(_(u"The account '%s' doesn't exist.") %
+            raise VMMError(_(u"The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
         acc.modify('name', name)
 
@@ -700,7 +700,7 @@ The account has been successfully deleted from the database.
                             "integers or longs.")
         acc = self._get_account(emailaddress)
         if not acc:
-            raise VMMError(_(u"The account '%s' doesn't exist.") %
+            raise VMMError(_(u"The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
         acc.update_quotalimit(QuotaLimit(self._dbh, bytes=bytes_,
                                          messages=messages))
@@ -712,7 +712,7 @@ The account has been successfully deleted from the database.
                            INVALID_ARGUMENT)
         acc = self._get_account(emailaddress)
         if not acc:
-            raise VMMError(_(u"The account '%s' doesn't exist.") %
+            raise VMMError(_(u"The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
         acc.update_transport(Transport(self._dbh, transport=transport))
 
@@ -724,8 +724,8 @@ The account has been successfully deleted from the database.
             assert isinstance(services, list)
         acc = self._get_account(emailaddress)
         if not acc:
-            raise VMMError(_(u"The account '%s' doesn't exist.") % acc.address,
-                           NO_SUCH_ACCOUNT)
+            raise VMMError(_(u"The account '%s' does not exist.") %
+                           acc.address, NO_SUCH_ACCOUNT)
         acc.disable(*services)
 
     def user_enable(self, emailaddress, services=None):
@@ -736,8 +736,8 @@ The account has been successfully deleted from the database.
             assert isinstance(services, list)
         acc = self._get_account(emailaddress)
         if not acc:
-            raise VMMError(_(u"The account '%s' doesn't exist.") % acc.address,
-                           NO_SUCH_ACCOUNT)
+            raise VMMError(_(u"The account '%s' does not exist.") %
+                           acc.address, NO_SUCH_ACCOUNT)
         acc.enable(*services)
 
     def relocated_add(self, emailaddress, targetaddress):
@@ -752,7 +752,7 @@ The account has been successfully deleted from the database.
         if destination.gid and \
            not self._chk_other_address_types(destination, TYPE_RELOCATED):
             self._warnings.append(_(u"The destination account/alias '%s' "
-                                    u"doesn't exist.") % destination)
+                                    u"does not exist.") % destination)
 
     def relocated_info(self, emailaddress):
         """Returns the target address of the relocated user with the given
@@ -761,7 +761,7 @@ The account has been successfully deleted from the database.
         if relocated:
             return relocated.get_info()
         if not self._is_other_address(relocated.address, TYPE_RELOCATED):
-            raise VMMError(_(u"The relocated user '%s' doesn't exist.") %
+            raise VMMError(_(u"The relocated user '%s' does not exist.") %
                            relocated.address, NO_SUCH_RELOCATED)
 
     def relocated_delete(self, emailaddress):

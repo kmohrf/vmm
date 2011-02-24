@@ -90,7 +90,7 @@ class CliHandler(Handler):
         password dialog."""
         acc = self._get_account(emailaddress)
         if not acc:
-            raise VMMError(_(u"The account '%s' doesn't exist.") %
+            raise VMMError(_(u"The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
         if not isinstance(password, basestring) or not password:
             password = read_pass()

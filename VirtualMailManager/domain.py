@@ -111,7 +111,7 @@ class Domain(object):
         """Throws a DomainError if the Domain is new - not saved in the
         database."""
         if self._new:
-            raise DomErr(_(u"The domain '%s' doesn't exist.") % self._name,
+            raise DomErr(_(u"The domain '%s' does not exist.") % self._name,
                          NO_SUCH_DOMAIN)
 
     def _update_tables(self, column, value, force=False):
@@ -269,7 +269,7 @@ class Domain(object):
         """
         if cfg_dget('misc.dovecot_version') < 0x10102f00:
             raise VMMError(_(u'PostgreSQL-based dictionary quota requires '
-                             u'Dovecot >= v1.1.2'), VMM_ERROR)
+                             u'Dovecot >= v1.1.2.'), VMM_ERROR)
         self._chk_state()
         assert isinstance(quotalimit, QuotaLimit)
         if not force and quotalimit == self._qlimit:

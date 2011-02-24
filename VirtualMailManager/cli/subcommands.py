@@ -343,7 +343,7 @@ def domain_transport(ctx):
 def get_user(ctx):
     """get the address of the user with the given UID"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing userid.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _(u'Missing UID.'), ctx.scmd)
     _print_info(ctx, ctx.hdlr.user_by_uid(ctx.args[2]), _(u'Account'))
 
 

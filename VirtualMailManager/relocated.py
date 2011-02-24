@@ -35,7 +35,7 @@ class Relocated(object):
         self._dbh = dbh
         self._gid = get_gid(self._dbh, self._addr.domainname)
         if not self._gid:
-            raise RErr(_(u"The domain '%s' doesn't exist.") %
+            raise RErr(_(u"The domain '%s' does not exist.") %
                        self._addr.domainname, NO_SUCH_DOMAIN)
         self._dest = None
 
@@ -95,14 +95,14 @@ class Relocated(object):
     def get_info(self):
         """Returns the address to which mails should be sent."""
         if not self._dest:
-            raise RErr(_(u"The relocated user '%s' doesn't exist.") %
+            raise RErr(_(u"The relocated user '%s' does not exist.") %
                        self._addr, NO_SUCH_RELOCATED)
         return self._dest
 
     def delete(self):
         """Deletes the relocated entry from the database."""
         if not self._dest:
-            raise RErr(_(u"The relocated user '%s' doesn't exist.") %
+            raise RErr(_(u"The relocated user '%s' does not exist.") %
                        self._addr, NO_SUCH_RELOCATED)
         dbc = self._dbh.cursor()
         dbc.execute('DELETE FROM relocated WHERE gid = %s AND address = %s',

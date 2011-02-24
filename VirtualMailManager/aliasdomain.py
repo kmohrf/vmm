@@ -72,7 +72,7 @@ class AliasDomain(object):
             raise ADErr(_(u'No destination domain set for the alias domain.'),
                         ALIASDOMAIN_NO_DOMDEST)
         if self._domain.gid < 1:
-            raise ADErr(_(u"The target domain '%s' doesn't exist.") %
+            raise ADErr(_(u"The target domain '%s' does not exist.") %
                         self._domain.name, NO_SUCH_DOMAIN)
         dbc = self._dbh.cursor()
         dbc.execute('INSERT INTO domain_name (domainname, gid, is_primary) '
@@ -85,7 +85,7 @@ class AliasDomain(object):
         """Returns a dict (keys: "alias" and "domain") with the names of the
         AliasDomain and its primary domain."""
         if self._gid < 1:
-            raise ADErr(_(u"The alias domain '%s' doesn't exist.") %
+            raise ADErr(_(u"The alias domain '%s' does not exist.") %
                         self._name, NO_SUCH_ALIASDOMAIN)
         dbc = self._dbh.cursor()
         dbc.execute('SELECT domainname FROM domain_name WHERE gid = %s AND '
@@ -106,10 +106,10 @@ class AliasDomain(object):
             raise ADErr(_(u'No destination domain set for the alias domain.'),
                         ALIASDOMAIN_NO_DOMDEST)
         if self._domain.gid < 1:
-            raise ADErr(_(u"The target domain '%s' doesn't exist.") %
+            raise ADErr(_(u"The target domain '%s' does not exist.") %
                         self._domain.name, NO_SUCH_DOMAIN)
         if self._gid < 1:
-            raise ADErr(_(u"The alias domain '%s' doesn't exist.") %
+            raise ADErr(_(u"The alias domain '%s' does not exist.") %
                         self._name, NO_SUCH_ALIASDOMAIN)
         if self._gid == self._domain.gid:
             raise ADErr(_(u"The alias domain '%(alias)s' is already assigned "
@@ -130,7 +130,7 @@ class AliasDomain(object):
         Raises an AliasDomainError if the AliasDomain doesn't exist.
         """
         if self._gid < 1:
-            raise ADErr(_(u"The alias domain '%s' doesn't exist.") %
+            raise ADErr(_(u"The alias domain '%s' does not exist.") %
                         self._name, NO_SUCH_ALIASDOMAIN)
         dbc = self._dbh.cursor()
         dbc.execute('DELETE FROM domain_name WHERE domainname = %s AND NOT '

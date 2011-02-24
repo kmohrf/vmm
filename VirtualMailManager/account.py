@@ -56,7 +56,7 @@ class Account(object):
             # TP: Hm, what “quotation marks” should be used?
             # If you are unsure have a look at:
             # http://en.wikipedia.org/wiki/Quotation_mark,_non-English_usage
-            raise AErr(_(u"The domain '%s' doesn't exist.") %
+            raise AErr(_(u"The domain '%s' does not exist.") %
                        self._addr.domainname, NO_SUCH_DOMAIN)
         self._uid = 0
         self._mail = None
@@ -101,13 +101,14 @@ class Account(object):
         """
         if maillocation.dovecot_version > cfg_dget('misc.dovecot_version'):
             raise AErr(_(u"The mailbox format '%(mbfmt)s' requires Dovecot "
-                         u">= v%(version)s") % {'mbfmt': maillocation.mbformat,
+                         u">= v%(version)s.") % {
+                       'mbfmt': maillocation.mbformat,
                        'version': version_str(maillocation.dovecot_version)},
                        INVALID_MAIL_LOCATION)
         if not maillocation.postfix and \
           self._transport.transport.lower() in ('virtual:', 'virtual'):
             raise AErr(_(u"Invalid transport '%(transport)s' for mailbox "
-                         u"format '%(mbfmt)s'") %
+                         u"format '%(mbfmt)s'.") %
                        {'transport': self._transport,
                         'mbfmt': maillocation.mbformat}, INVALID_MAIL_LOCATION)
         self._mail = maillocation
@@ -179,7 +180,7 @@ class Account(object):
         """Raise an AccountError if the Account is new - not yet saved in the
         database."""
         if self._new:
-            raise AErr(_(u"The account '%s' doesn't exist.") % self._addr,
+            raise AErr(_(u"The account '%s' does not exist.") % self._addr,
                        NO_SUCH_ACCOUNT)
 
     @property
@@ -263,7 +264,7 @@ class Account(object):
             raise AErr(_(u"The account '%s' already exists.") % self._addr,
                        ACCOUNT_EXISTS)
         if not self._passwd:
-            raise AErr(_(u"No password set for '%s'.") % self._addr,
+            raise AErr(_(u"No password set for account: '%s'") % self._addr,
                        ACCOUNT_MISSING_PASSWORD)
         if cfg_dget('misc.dovecot_version') >= 0x10200b02:
             sieve_col = 'sieve'
@@ -321,7 +322,7 @@ class Account(object):
         """
         if cfg_dget('misc.dovecot_version') < 0x10102f00:
             raise VMMError(_(u'PostgreSQL-based dictionary quota requires '
-                             u'Dovecot >= v1.1.2'), VMM_ERROR)
+                             u'Dovecot >= v1.1.2.'), VMM_ERROR)
         self._chk_state()
         assert isinstance(quotalimit, QuotaLimit)
         if quotalimit == self._qlimit:
@@ -344,7 +345,7 @@ class Account(object):
         if transport.transport.lower() in ('virtual', 'virtual:') and \
            not self._mail.postfix:
             raise AErr(_(u"Invalid transport '%(transport)s' for mailbox "
-                         u"format '%(mbfmt)s'") %
+                         u"format '%(mbfmt)s'.") %
                        {'transport': transport, 'mbfmt': self._mail.mbformat},
                        INVALID_MAIL_LOCATION)
         self._update_tables('tid', transport.tid)
@@ -475,7 +476,7 @@ def get_account_by_uid(uid, dbh):
     info = dbc.fetchone()
     dbc.close()
     if not info:
-        raise AErr(_(u"There is no account with the UID '%d'.") % uid,
+        raise AErr(_(u"There is no account with the UID: '%d'") % uid,
                    NO_SUCH_ACCOUNT)
     info = dict(zip(('address', 'uid', 'gid'), info))
     return info

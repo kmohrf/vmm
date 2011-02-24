@@ -36,7 +36,7 @@ def _get_handler():
 
 def run(argv):
     if len(argv) < 2:
-        usage(EX_MISSING_ARGS, _(u"You must specify a subcommand at least"))
+        usage(EX_MISSING_ARGS, _(u"You must specify a subcommand at least."))
 
     sub_cmd = argv[1].lower()
     if sub_cmd in cmd_map:
@@ -65,7 +65,8 @@ def run(argv):
     except (BadOptionError, ConfigValueError), err:
         w_err(INVALID_ARGUMENT, _(u'Error: %s') % err)
     except NoSectionError, err:
-        w_err(INVALID_ARGUMENT, _(u"Error: No section '%s'") % err.section)
+        w_err(INVALID_ARGUMENT,
+              _(u"Error: Unknown section: '%s'") % err.section)
     except NoOptionError, err:
         w_err(INVALID_ARGUMENT,
               _(u"Error: No option '%(option)s' in section: '%(section)s'") %

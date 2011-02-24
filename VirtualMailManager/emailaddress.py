@@ -68,16 +68,16 @@ class EmailAddress(object):
         parts = address.split('@')
         p_len = len(parts)
         if p_len < 2:
-            raise EAErr(_(u"Missing the '@' sign in address '%s'") % address,
+            raise EAErr(_(u"Missing the '@' sign in address: '%s'") % address,
                         INVALID_ADDRESS)
         elif p_len > 2:
-            raise EAErr(_(u"Too many '@' signs in address '%s'") % address,
+            raise EAErr(_(u"Too many '@' signs in address: '%s'") % address,
                         INVALID_ADDRESS)
         if not parts[0]:
-            raise EAErr(_(u"Missing local-part in address '%s'") % address,
+            raise EAErr(_(u"Missing local-part in address: '%s'") % address,
                         LOCALPART_INVALID)
         if not parts[1]:
-            raise EAErr(_(u"Missing domain name in address '%s'") % address,
+            raise EAErr(_(u"Missing domain name in address: '%s'") % address,
                         DOMAIN_NO_NAME)
         self._localpart = check_localpart(parts[0])
         self._domainname = check_domainname(parts[1])
@@ -121,7 +121,7 @@ def check_localpart(localpart):
     invalid characters.
     """
     if len(localpart) > 64:
-        raise EAErr(_(u"The local-part '%s' is too long") % localpart,
+        raise EAErr(_(u"The local-part '%s' is too long.") % localpart,
                     LOCALPART_TOO_LONG)
     invalid_chars = set(RE_LOCALPART.findall(localpart))
     if invalid_chars:

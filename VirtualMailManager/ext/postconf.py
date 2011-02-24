@@ -81,7 +81,7 @@ class Postconf(object):
         """Check that the `parameter` looks like a configuration parameter.
         If not, a VMMError will be raised."""
         if not self.__class__._parameter_re.match(parameter):
-            raise VMMError(_(u"The value '%s' doesn't look like a valid "
+            raise VMMError(_(u"The value '%s' does not look like a valid "
                              u"postfix configuration parameter name.") %
                            parameter, VMM_ERROR)
 

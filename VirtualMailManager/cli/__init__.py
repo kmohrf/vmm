@@ -88,11 +88,11 @@ def read_pass():
         clear1 = getpass(prompt=readp_msg1)
         if clear0 != clear1:
             failures += 1
-            w_err(0, _(u'Sorry, passwords do not match'))
+            w_err(0, _(u'Sorry, passwords do not match.'))
             continue
         if not clear0:
             failures += 1
-            w_err(0, _(u'Sorry, empty passwords are not permitted'))
+            w_err(0, _(u'Sorry, empty passwords are not permitted.'))
             continue
         mismatched = False
     return clear0

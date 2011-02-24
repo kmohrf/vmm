@@ -31,7 +31,7 @@ class Alias(object):
         self._dbh = dbh
         self._gid = get_gid(self._dbh, self._addr.domainname)
         if not self._gid:
-            raise AErr(_(u"The domain '%s' doesn't exist.") %
+            raise AErr(_(u"The domain '%s' does not exist.") %
                        self._addr.domainname, NO_SUCH_DOMAIN)
         self._dests = []
 
@@ -56,14 +56,14 @@ class Alias(object):
         if dcount == limit or dcount + count_new > limit:
             failed = True
             errmsg = _(
-u"""Can't add %(count_new)i new destination(s) to alias '%(address)s'.
+u"""Cannot add %(count_new)i new destination(s) to alias '%(address)s'.
 Currently this alias expands into %(count)i/%(limit)i recipients.
 %(count_new)i additional destination(s) will render this alias unusable.
 Hint: Increase Postfix' virtual_alias_expansion_limit""")
         elif dcount > limit:
             failed = True
             errmsg = _(
-u"""Can't add %(count_new)i new destination(s) to alias '%(address)s'.
+u"""Cannot add %(count_new)i new destination(s) to alias '%(address)s'.
 This alias already exceeds its expansion limit (%(count)i/%(limit)i).
 So its unusable, all messages addressed to this alias will be bounced.
 Hint: Delete some destination addresses.""")
@@ -138,10 +138,10 @@ Hint: Delete some destination addresses.""")
         """Deletes the specified ``destination`` address from the alias."""
         assert isinstance(destination, EmailAddress)
         if not self._dests:
-            raise AErr(_(u"The alias '%s' doesn't exist.") % self._addr,
+            raise AErr(_(u"The alias '%s' does not exist.") % self._addr,
                        NO_SUCH_ALIAS)
         if not destination in self._dests:
-            raise AErr(_(u"The address '%(addr)s' isn't a destination of "
+            raise AErr(_(u"The address '%(addr)s' is not a destination of "
                          u"the alias '%(alias)s'.") % {'addr': self._addr,
                        'alias': destination}, NO_SUCH_ALIAS)
         self._delete(destination)
@@ -150,14 +150,14 @@ Hint: Delete some destination addresses.""")
     def get_destinations(self):
         """Returns an iterator for all destinations of the alias."""
         if not self._dests:
-            raise AErr(_(u"The alias '%s' doesn't exist.") % self._addr,
+            raise AErr(_(u"The alias '%s' does not exist.") % self._addr,
                        NO_SUCH_ALIAS)
         return iter(self._dests)
 
     def delete(self):
         """Deletes the alias with all its destinations."""
         if not self._dests:
-            raise AErr(_(u"The alias '%s' doesn't exist.") % self._addr,
+            raise AErr(_(u"The alias '%s' does not exist.") % self._addr,
                        NO_SUCH_ALIAS)
         self._delete()
         del self._dests[:]
