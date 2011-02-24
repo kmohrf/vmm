@@ -1,4 +1,4 @@
-.TH "VMM" "1" "2011-02-22" "vmm 0.6" "vmm"
+.TH "VMM" "1" "2011-02-24" "vmm 0.6" "vmm"
 .SH NAME
 vmm \- command line tool to manage email domains/accounts/aliases
 .\" -----------------------------------------------------------------------
@@ -13,7 +13,7 @@ administrators and postmasters to manage (alias) domains, accounts, aliases
 and relocated users.
 It allows you to simply and quickly administer your mail server.
 .br
-It\(aqs designed for Dovecot and Postfix with a PostgreSQL backend.
+It's designed for Dovecot and Postfix with a PostgreSQL backend.
 .PP
 Each
 .I subcommand
@@ -110,13 +110,12 @@ misc.crypt_sha512_rounds = 5000
 .B vmm configset
 .I option value
 .PP
-Use this subcommand to set or update a single configuration option\(aqs
-value.
+Use this subcommand to set or update a single configuration option's value.
 .I option
 is the configuration option,
 .I value
 is the
-.IR option \(aqs
+.IR option 's
 new value.
 .IP Note:
 This subcommand will create a new
@@ -188,7 +187,7 @@ Example:
 .B vmm configure mailbox
 Using configuration file: /usr/local/etc/vmm.cfg
 
-* Configuration section: \(aqmailbox\(aq
+* Configuration section: `mailbox'
 Enter new value for option folders [Drafts:Sent:Templates:Trash]:
 Enter new value for option format [maildir]: mdbox
 Enter new value for option subscribe [True]:
@@ -202,7 +201,7 @@ If only the
 .I uid
 is available, for example from process list, the subcommand
 .B getuser
-will show the user\(aqs address.
+will show the user's address.
 .PP
 Example:
 .PP
@@ -234,8 +233,8 @@ exits.
 .RI [ pattern ]
 .PP
 This subcommand lists all available domains.
-All domain names will be prefixed either with `[+]\(aq, if the domain is a
-primary domain, or with `[-]\(aq, if it is an alias domain name.
+All domain names will be prefixed either with `[+]', if the domain is a
+primary domain, or with `[-]', if it is an alias domain name.
 The output can be limited with an optional
 .IR pattern .
 .PP
@@ -260,7 +259,7 @@ Matching domains
 .B vmm version
 .PP
 Prints
-.BR vmm \(aqs
+.BR vmm 's
 version and copyright information to stdout.
 After this
 .B vmm
@@ -368,10 +367,10 @@ Example:
 Domain information
 ------------------
         Domainname.....: sales.example.com
-        GID............: 70693
+        GID............: 70698
         Transport......: dovecot:
-        Domaindir......: /home/mail/v/70693
-        Quota Limit....: Storage: 0 Messages 0
+        Domaindir......: /srv/mail/k/70698
+        Quota Limit....: Storage: 0; Messages: 0
         Aliasdomains...: 0
         Accounts.......: 1
         Aliases........: 0
@@ -527,7 +526,7 @@ has been created.
 Examples:
 .PP
 .nf
-.B vmm ua d.user@example.com \(aqA 5ecR3t P4s5\(rs/\(rs/0rd\(aq
+.B vmm ua d.user@example.com \(dqA 5ecR3t P4s5\(rs/\(rs/0rd\(dq
 .B vmm useradd e.user@example.com
 Enter new password:
 Retype new password:
@@ -551,7 +550,7 @@ To prevent this, specify the optional keyword
 .RI [ "service ..." ]
 .PP
 If a user should not be able to access one or more services you can
-restrict the user\(aqs access with this subcommand.
+restrict the user's access with this subcommand.
 .PP
 If no
 .I service
@@ -608,7 +607,7 @@ to list all alias addresses with the destination
 .I address
 .TP
 .B du
-to display the disk usage of the user\(aqs mail directory.
+to display the disk usage of the user's mail directory.
 In order to summarize the disk usage each time the this subcommand is
 executed automatically, set
 .I account.disk_usage
@@ -644,7 +643,7 @@ Account information
 .SS username (un)
 .BI "vmm username" " address name"
 .PP
-The user\(aqs real
+The user's real
 .I name
 can be set/updated with this subcommand.
 .PP
@@ -669,7 +668,7 @@ will prompt for it interactively.
 Example:
 .PP
 .nf
-.B vmm up d.user@example.com \(aqA |\(rs/|0r3 5ecur3 P4s5\(rs/\(rs/0rd?\(aq
+.B vmm up d.user@example.com \(dqA |\(rs/|0r3 5ecur3 P4s5\(rs/\(rs/0rd?\(dq
 .fi
 .\" ------------------------------------
 .SS userquota (uq)
@@ -699,14 +698,14 @@ for an account can be specified with this subcommand.
 .PP
 Example:
 .br
-Assumed you want to use Dovecot\(aqs
+Assumed you want to use Dovecot's
 .BR dsync (1)
-to convert a user\(aqs mailbox from Maildir format to mdbox format, you
+to convert a user's mailbox from Maildir format to mdbox format, you
 can tell Postfix to retry later.
 .PP
 .nf
 .B vmm ut d.user@example.com \(dqretry:4.0.0 Mailbox being migrated\(dq
-# convert the mailbox ... then set the transport to Dovecot\(aqs lmtp
+# convert the mailbox ... then set the transport to Dovecot's lmtp
 .B vmm ut d.user@example.com lmtp:unix:private/dovecot\-lmtp
 .fi
 .\" -----------------------------------------------------------------------
@@ -769,7 +768,7 @@ Alias information
 A new relocated user can be created with this subcommand.
 .PP
 .I address
-is the user\(aqs ex\-email address, for example b.user@example.com, and
+is the user's ex\-email address, for example b.user@example.com, and
 .I newaddress
 points to the new email address where the user can be reached.
 .PP
@@ -791,7 +790,7 @@ Example:
 .B vmm relocatedinfo b.user@example.com
 Relocated information
 ---------------------
-        User \(aqb.user@example.com\(aq has moved to \(aqb\-user@company.tld\(aq
+        User `b.user@example.com' has moved to `b\-user@company.tld'
 .fi
 .\" ------------------------------------
 .SS relocateddelete (rd)
@@ -812,7 +811,7 @@ Example:
 will be used when found.
 .TP
 .I /usr/local/etc/vmm.cfg
-will be used when the above file doesn\(aqt exist.
+will be used when the above file doesn't exist.
 .TP
 .I /etc/vmm.cfg
 will be used when none of the both above mentioned files exists.
@@ -834,7 +833,5 @@ Bug tracker
 http://sf.net/tracker/?group_id=213727&atid=1026862
 .\" -----------------------------------------------------------------------
 .SH COPYING
-.B vmm
-and its man pages were written by Pascal Volk
-.RI < neverseen@users.sourceforge.net >
-and are licensed under the terms of the BSD License.
+vmm and its manual pages were written by Pascal Volk <neverseen AT
+users.sourceforge.net> and are licensed under the terms of the BSD License.
