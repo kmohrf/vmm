@@ -16,7 +16,8 @@ from VirtualMailManager.cli import w_err
 from VirtualMailManager.cli.handler import CliHandler
 from VirtualMailManager.constants import DATABASE_ERROR, EX_MISSING_ARGS, \
      EX_SUCCESS, EX_UNKNOWN_COMMAND, EX_USER_INTERRUPT, INVALID_ARGUMENT
-from VirtualMailManager.cli.subcommands import RunContext, cmd_map, usage
+from VirtualMailManager.cli.subcommands import RunContext, cmd_map, \
+     update_cmd_map, usage
 
 
 _ = lambda msg: msg
@@ -35,6 +36,7 @@ def _get_handler():
 
 
 def run(argv):
+    update_cmd_map()
     if len(argv) < 2:
         usage(EX_MISSING_ARGS, _(u"You must specify a subcommand at least."))
 

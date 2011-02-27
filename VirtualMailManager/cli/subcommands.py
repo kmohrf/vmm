@@ -36,6 +36,7 @@ __all__ = (
 
 _ = lambda msg: msg
 txt_wrpr = TextWrapper(width=get_winsize()[1] - 1)
+cmd_map = {}
 
 
 class Command(object):
@@ -626,15 +627,18 @@ def version(ctx):
         __copyright__, prog,
         _(u'is free software and comes with ABSOLUTELY NO WARRANTY.')))
 
-cmd = Command
-cmd_map = {  # {{{
+
+def update_cmd_map():
+    """Update the cmd_map, after gettext's _ was installed."""
+    cmd = Command
+    cmd_map.update({
     # Account commands
     'getuser': cmd('getuser', 'gu', get_user, _(u'uid'),
                    _(u'get the address of the user with the given UID')),
     'useradd': cmd('useradd', 'ua', user_add, _(u'address [password]'),
                    _(u'create a new e-mail user with the given address')),
     'userdelete': cmd('userdelete', 'ud', user_delete,
-                      _(u'address') + ' [force]', 
+                      _(u'address') + ' [force]',
                       _(u'delete the specified user')),
     'userdisable': cmd('userdisable', 'u0', user_disable,
                        _(u'address [service ...]'),
@@ -714,7 +718,7 @@ cmd_map = {  # {{{
                 _(u'show a help overview or help for the given subcommand')),
     'version': cmd('version', 'v', version, '',
                    _(u'show version and copyright information')),
-}  # }}}
+    })
 
 
 def _get_order(ctx):
