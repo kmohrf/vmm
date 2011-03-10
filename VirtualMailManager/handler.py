@@ -572,7 +572,7 @@ class Handler(object):
         if acc:
             raise VMMError(_(u"The account '%s' already exists.") %
                            acc.address, ACCOUNT_EXISTS)
-        other = self._is_other_address(acc.address, TYPE_ACCOUNT)
+        self._is_other_address(acc.address, TYPE_ACCOUNT)
         acc.set_password(password)
         acc.save()
         self._make_account_dirs(acc)

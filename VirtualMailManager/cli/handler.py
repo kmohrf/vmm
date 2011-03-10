@@ -76,7 +76,7 @@ class CliHandler(Handler):
         if acc:
             raise VMMError(_(u"The account '%s' already exists.") %
                            acc.address, ACCOUNT_EXISTS)
-        other = self._is_other_address(acc.address, TYPE_ACCOUNT)
+        self._is_other_address(acc.address, TYPE_ACCOUNT)
         rand_pass = self._cfg.dget('account.random_password')
         if password is None:
             password = (read_pass, randompw)[rand_pass]()

@@ -254,8 +254,8 @@ class SingleDbox(Mailbox):
         if subscribe:
             cmd_args.append('-s')
         cmd_args.extend(mailboxes)
-        process = Popen(cmd_args, stdout=PIPE, stderr=PIPE)
-        stdout, stderr = process.communicate()
+        process = Popen(cmd_args, stderr=PIPE)
+        stderr = process.communicate()[1]
         if process.returncode:
             e_msg = _(u'Failed to create mailboxes: %r\n') % mailboxes
             raise VMMError(e_msg + stderr.strip(), VMM_ERROR)

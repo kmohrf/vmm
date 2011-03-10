@@ -50,8 +50,8 @@ class Postconf(object):
           the parameter's new value.
         """
         self._check_parameter(parameter)
-        stdout, stderr = Popen((self._bin, '-e', parameter + '=' + str(value)),
-                               stderr=PIPE).communicate()
+        stderr = Popen((self._bin, '-e', parameter + '=' + str(value)),
+                       stderr=PIPE).communicate()[1]
         if stderr:
             raise VMMError(stderr.strip(), VMM_ERROR)
 
