@@ -441,7 +441,7 @@ def user_add(ctx):
     else:
         password = ctx.args[3]
     gen_pass = ctx.hdlr.user_add(ctx.args[2].lower(), password)
-    if gen_pass:
+    if ctx.argc < 4 and gen_pass:
         w_std(_(u"Generated password: %s") % gen_pass)
 
 
