@@ -143,8 +143,8 @@ Hint: Delete some destination addresses.""")
                        NO_SUCH_ALIAS)
         if not destination in self._dests:
             raise AErr(_(u"The address '%(addr)s' is not a destination of "
-                         u"the alias '%(alias)s'.") % {'addr': self._addr,
-                       'alias': destination}, NO_SUCH_ALIAS)
+                         u"the alias '%(alias)s'.") % {'addr': destination,
+                       'alias': self._addr}, NO_SUCH_ALIAS)
         self._delete(destination)
         self._dests.remove(destination)
 
