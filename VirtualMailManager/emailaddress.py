@@ -11,8 +11,9 @@ import re
 
 from VirtualMailManager.domain import check_domainname, get_gid
 from VirtualMailManager.constants import \
-     DOMAIN_NO_NAME, INVALID_ADDRESS, LOCALPART_INVALID, LOCALPART_TOO_LONG
-from VirtualMailManager.errors import EmailAddressError as EAErr
+     DOMAIN_NO_NAME, INVALID_ADDRESS, LOCALPART_INVALID, LOCALPART_TOO_LONG, \
+     DOMAIN_INVALID
+from VirtualMailManager.errors import DomainError, EmailAddressError as EAErr
 
 
 RE_LOCALPART = re.compile(r"[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]")
@@ -23,12 +24,13 @@ class EmailAddress(object):
     """Simple class for validated e-mail addresses."""
     __slots__ = ('_localpart', '_domainname')
 
-    def __init__(self, address):
+    def __init__(self, address, _validate=True):
         """Creates a new instance from the string/unicode ``address``."""
         assert isinstance(address, basestring)
         self._localpart = None
         self._domainname = None
-        self._chk_address(address)
+        if _validate:
+            self._chk_address(address)
 
     @property
     def localpart(self):
@@ -86,9 +88,9 @@ class EmailAddress(object):
 class DestinationEmailAddress(EmailAddress):
     """Provides additionally the domains group ID - when the domain is known
     in the database."""
-    __slots__ = ('_gid')
+    __slots__ = ('_gid', '_localhost')
 
-    def __init__(self, address, dbh):
+    def __init__(self, address, dbh, _validate=False):
         """Creates a new DestinationEmailAddress instance
 
         Arguments:
@@ -98,15 +100,34 @@ class DestinationEmailAddress(EmailAddress):
         `dbh`: pyPgSQL.PgSQL.Connection/pyPgSQL.PgSQL.connection
           a database connection for the database access
         """
-        super(DestinationEmailAddress, self).__init__(address)
+        super(DestinationEmailAddress, self).__init__(address, _validate)
+        self._localhost = False
+        if not _validate:
+            try:
+                self._chk_address(address)
+            except DomainError, err:
+                if err.code is DOMAIN_INVALID and \
+                   address.split('@')[1] == 'localhost':
+                    self._localhost = True
+                    self._domainname = 'localhost'
+                else:
+                    raise
         self._gid = 0
-        self._find_domain(dbh)
+        if not self._localhost:
+            self._find_domain(dbh)
+        else:
+            self._localpart = self._localpart.lower()
 
     def _find_domain(self, dbh):
         """Checks if the domain is known"""
         self._gid = get_gid(dbh, self._domainname)
         if self._gid:
             self._localpart = self._localpart.lower()
+
+    @property
+    def at_localhost(self):
+        """True when the address is something@localhost."""
+        return self._localhost
 
     @property
     def gid(self):
