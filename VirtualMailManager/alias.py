@@ -9,7 +9,8 @@
 """
 
 from VirtualMailManager.domain import get_gid
-from VirtualMailManager.emailaddress import EmailAddress
+from VirtualMailManager.emailaddress import \
+     EmailAddress, DestinationEmailAddress as DestAddr
 from VirtualMailManager.errors import AliasError as AErr
 from VirtualMailManager.ext.postconf import Postconf
 from VirtualMailManager.pycompat import all
@@ -44,7 +45,7 @@ class Alias(object):
                     'address = %s', (self._gid, self._addr.localpart))
         dests = dbc.fetchall()
         if dbc.rowcount > 0:
-            self._dests.extend(EmailAddress(dest[0]) for dest in dests)
+            self._dests.extend(DestAddr(dest[0], self._dbh) for dest in dests)
         dbc.close()
 
     def _check_expansion(self, count_new):
