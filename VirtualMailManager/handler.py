@@ -642,7 +642,8 @@ The account has been successfully deleted from the database.
         if targetaddress is None:
             alias.delete()
         else:
-            alias.del_destination(EmailAddress(targetaddress))
+            alias.del_destination(DestinationEmailAddress(targetaddress,
+                                                          self._dbh))
 
     def user_info(self, emailaddress, details=None):
         """Wrapper around Account.get_info(...)"""
