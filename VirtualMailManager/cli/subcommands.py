@@ -784,8 +784,8 @@ def _print_info(ctx, info, title):
 
 def _print_list(alist, title):
     """Print a list."""
-    # TP: used in e.g. 'Available alias addresses' or 'Available accounts'
-    msg = u'%s %s' % (_(u'Available'), title)
+    # TP: used in e.g. 'Existing alias addresses' or 'Existing accounts'
+    msg = u'%s %s' % (_(u'Existing'), title)
     w_std(msg, u'-' * len(msg))
     if alist:
         if title != _(u'alias domains'):
@@ -831,7 +831,7 @@ def _print_domain_list(dids, domains, matching):
     if matching:
         title = _(u'Matching domains')
     else:
-        title = _(u'Available domains')
+        title = _(u'Existing domains')
     w_std(title, '-' * len(title))
     if domains:
         for did in dids:

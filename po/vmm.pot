@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vmm 0.6.0\n"
 "Report-Msgid-Bugs-To: neverseen@users.sourceforge.net\n"
-"POT-Creation-Date: 2011-10-16 17:00+0200\n"
+"POT-Creation-Date: 2011-10-16 18:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -722,9 +722,9 @@ msgstr ""
 msgid "information"
 msgstr ""
 
-#. TP: used in e.g. 'Available alias addresses' or 'Available accounts'
+#. TP: used in e.g. 'Existing alias addresses' or 'Existing accounts'
 #: VirtualMailManager/cli/subcommands.py:788
-msgid "Available"
+msgid "Existing"
 msgstr ""
 
 #: VirtualMailManager/cli/subcommands.py:801
@@ -755,7 +755,7 @@ msgid "Matching domains"
 msgstr ""
 
 #: VirtualMailManager/cli/subcommands.py:834
-msgid "Available domains"
+msgid "Existing domains"
 msgstr ""
 
 #: VirtualMailManager/cli/subcommands.py:849
