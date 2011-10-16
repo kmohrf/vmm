@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: vmm 0.6.0\n"
 "Report-Msgid-Bugs-To: neverseen@users.sourceforge.net\n"
 "POT-Creation-Date: 2011-10-16 18:44+0200\n"
-"PO-Revision-Date: 2011-10-16 20:12+0200\n"
+"PO-Revision-Date: 2011-10-17 01:50+0200\n"
 "Last-Translator: Pascal Volk <neverseen@users.sourceforge.net>\n"
 "Language-Team: German\n"
 "Language: de\n"
@@ -943,7 +943,7 @@ msgstr "Der local-part „%s“ ist zu lang"
 #: VirtualMailManager/emailaddress.py:150
 #, python-format
 msgid "The local-part '%(l_part)s' contains invalid characters: %(i_chars)s"
-msgstr "Der local-part „%(l_part)s“ enthält ungültige Zeichen: %(i_chrs)s"
+msgstr "Der local-part „%(l_part)s“ enthält ungültige Zeichen: %(i_chars)s"
 
 #: VirtualMailManager/ext/postconf.py:84
 #, python-format
@@ -1016,7 +1016,7 @@ msgstr "Kann Datenbank-Modul „%s“ nicht importieren."
 #: VirtualMailManager/handler.py:242
 #, python-format
 msgid "There is already %(a_type)s with the address '%(address)s'."
-msgstr "Es existiert bereits %(a_type)s mit der Adresse „%s“."
+msgstr "Es existiert bereits %(a_type)s mit der Adresse „%(address)s“."
 
 #: VirtualMailManager/handler.py:295
 #, python-format
