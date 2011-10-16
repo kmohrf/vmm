@@ -1,565 +1,790 @@
-# German translations for vmm package.
-# Copyright (C) 2009 Pascal Volk
-# Pascal Volk <p.volk@veb-it.de>, 2009.
+# German translations of vmm.
+# Copyright (C) 2009-2011 Pascal Volk
+# This file is distributed under the same license as the vmm package.
+# Pascal Volk <neverseen@users.sourceforge.net>, 2009-2011.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vmm 0.5.2\n"
+"Project-Id-Version: vmm 0.6.0\n"
 "Report-Msgid-Bugs-To: neverseen@users.sourceforge.net\n"
-"POT-Creation-Date: 2010-01-29 23:22+0100\n"
-"PO-Revision-Date: 2009-08-25 06:11+0200\n"
+"POT-Creation-Date: 2011-10-16 18:44+0200\n"
+"PO-Revision-Date: 2011-10-16 20:12+0200\n"
 "Last-Translator: Pascal Volk <neverseen@users.sourceforge.net>\n"
 "Language-Team: German\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#. TP: Hm, what quotation marks should be used?
+#. TP: Hm, what “quotation marks” should be used?
 #. If you are unsure have a look at:
 #. http://en.wikipedia.org/wiki/Quotation_mark,_non-English_usage
-#: VirtualMailManager/Account.py:37 VirtualMailManager/Relocated.py:42
+#: VirtualMailManager/account.py:59 VirtualMailManager/alias.py:35
+#: VirtualMailManager/domain.py:114 VirtualMailManager/relocated.py:38
 #, python-format
-msgid "There is already an alias with the address “%s”."
-msgstr "Es existiert bereits ein Alias mit der Adresse „%s“."
-
-#: VirtualMailManager/Account.py:42 VirtualMailManager/Alias.py:41
-#, python-format
-msgid "There is already a relocated user with the address “%s”."
-msgstr "Es gibt bereits ein relocated User mit der Adresse „%s“."
-
-#: VirtualMailManager/Account.py:62 VirtualMailManager/Alias.py:57
-#: VirtualMailManager/Domain.py:161 VirtualMailManager/Domain.py:187
-#: VirtualMailManager/Domain.py:218 VirtualMailManager/Relocated.py:58
-#, python-format
-msgid "The domain “%s” doesn't exist."
+msgid "The domain '%s' does not exist."
 msgstr "Die Domain „%s“ existiert nicht."
 
-#: VirtualMailManager/Account.py:81
+#: VirtualMailManager/account.py:103
 #, python-format
-msgid "Unknown service “%s”."
-msgstr "Unbekannter Service „%s“."
+msgid "The mailbox format '%(mbfmt)s' requires Dovecot >= v%(version)s."
+msgstr "Das Mailbox-Format „%(mbfmt)s“ erfordert Dovecot >= v%(version)s."
 
-#: VirtualMailManager/Account.py:84 VirtualMailManager/Account.py:157
-#: VirtualMailManager/Account.py:188 VirtualMailManager/Account.py:223
+#: VirtualMailManager/account.py:110 VirtualMailManager/account.py:347
 #, python-format
-msgid "The account “%s” doesn't exist."
+msgid "Invalid transport '%(transport)s' for mailbox format '%(mbfmt)s'."
+msgstr ""
+"Ungültiger Transport „%(transport)s“ für das Mailbox-Format „%(mbfmt)s“."
+
+#: VirtualMailManager/account.py:133
+#, python-format
+msgid "Unknown service: '%s'"
+msgstr "Unbekannter Service: „%s“."
+
+#: VirtualMailManager/account.py:183 VirtualMailManager/cli/handler.py:93
+#: VirtualMailManager/handler.py:605 VirtualMailManager/handler.py:656
+#: VirtualMailManager/handler.py:682 VirtualMailManager/handler.py:693
+#: VirtualMailManager/handler.py:704 VirtualMailManager/handler.py:716
+#: VirtualMailManager/handler.py:728 VirtualMailManager/handler.py:740
+#, python-format
+msgid "The account '%s' does not exist."
 msgstr "Der Account „%s“ existiert nicht."
 
-#: VirtualMailManager/Account.py:152
+#: VirtualMailManager/account.py:234 VirtualMailManager/account.py:264
+#: VirtualMailManager/cli/handler.py:77 VirtualMailManager/handler.py:573
 #, python-format
-msgid "The account “%s” already exists."
+msgid "The account '%s' already exists."
 msgstr "Der Account „%s“ existiert bereits."
 
-#. TP: A service (pop3/imap/…) is enabled/usable for a user
-#: VirtualMailManager/Account.py:197
+#: VirtualMailManager/account.py:237 VirtualMailManager/handler.py:678
+#, python-format
+msgid "Could not accept password: '%s'"
+msgstr "Konnte Passwort nicht akzeptieren: „%s“"
+
+#: VirtualMailManager/account.py:267
+#, python-format
+msgid "No password set for account: '%s'"
+msgstr "Für den Account „%s“ wurde kein Passwort angegeben."
+
+#: VirtualMailManager/account.py:302
+#, python-format
+msgid "Unknown field: '%s'"
+msgstr "Unbekanntes Feld: „%s“"
+
+#: VirtualMailManager/account.py:324 VirtualMailManager/domain.py:271
+msgid "PostgreSQL-based dictionary quota requires Dovecot >= v1.1.2."
+msgstr "PostgreSQL-basierte Dictionary Quota erfordert Dovecot >= v1.1.2."
+
+#. TP: A service (pop3/imap) is enabled/usable for a user
+#: VirtualMailManager/account.py:381
 msgid "enabled"
 msgstr "aktiviert"
 
 #. TP: A service (pop3/imap) isn't enabled/usable for a user
-#: VirtualMailManager/Account.py:200
+#: VirtualMailManager/account.py:384
 msgid "disabled"
 msgstr "deaktiviert"
 
-#: VirtualMailManager/Account.py:244
+#: VirtualMailManager/account.py:395
 #, python-format
-msgid "There are %(count)d aliases with the destination address “%(address)s”."
-msgstr "Es gibt %(count)d Alias(e) mit der Zieladresse „%(address)s“."
+msgid "Could not fetch information for account: '%s'"
+msgstr "Konnte keine Informationen über den Account „%s“ abrufen."
 
-#: VirtualMailManager/Account.py:252
-msgid "uid must be an int/long."
+#: VirtualMailManager/account.py:439
+#, python-format
+msgid "There are %(count)d aliases with the destination address '%(address)s'."
+msgstr "Es gibt %(count)d Alias(e) mit der Ziel-Adresse „%(address)s“."
+
+#: VirtualMailManager/account.py:468
+msgid "UID must be an int/long."
 msgstr "Die UID muss eine Ganzzahl sein."
 
-#: VirtualMailManager/Account.py:254
-msgid "uid must be greater than 0."
+#: VirtualMailManager/account.py:470
+msgid "UID must be greater than 0."
 msgstr "Die UID muss größer als 0 sein."
 
-#: VirtualMailManager/Account.py:262
+#: VirtualMailManager/account.py:479
 #, python-format
-msgid "There is no account with the UID “%d”."
+msgid "There is no account with the UID: '%d'"
 msgstr "Es existiert kein Account mit der UID „%d“."
 
-#: VirtualMailManager/Alias.py:28 VirtualMailManager/Relocated.py:28
-msgid "Address and destination are identical."
-msgstr "Alias- und Ziel-Adresse sind identisch."
-
-#: VirtualMailManager/Alias.py:37 VirtualMailManager/Relocated.py:37
-#, python-format
-msgid "There is already an account with address “%s”."
-msgstr "Es gibt bereits einen Account mit der Adresse „%s“."
-
-#: VirtualMailManager/Alias.py:67
+#: VirtualMailManager/alias.py:60
 #, python-format
 msgid ""
-"Can't add new destination to alias “%(address)s”.\n"
-"Currently this alias expands into %(count)i recipients.\n"
-"One more destination will render this alias unusable.\n"
-"Hint: Increase Postfix' virtual_alias_expansion_limit\n"
+"Cannot add %(count_new)i new destination(s) to alias '%(address)s'.\n"
+"Currently this alias expands into %(count)i/%(limit)i recipients.\n"
+"%(count_new)i additional destination(s) will render this alias unusable.\n"
+"Hint: Increase Postfix' virtual_alias_expansion_limit"
 msgstr ""
-"Dem Alias „%(address)s“ kann keine weitere Ziel-Adresse hinzugefügt werden.\n"
-"Derzeit verweist der Alias auf %(count)i Empfänger.\n"
-"Eine weitere Ziel-Adresse würde diesen Alias unbrauchbar machen.\n"
-"Tipp: Erhöhen Sie Postfix' virtual_alias_expansion_limit\n"
+"Dem Alias „%(address)s“ können keine weitere %(count_new)i Ziel-Adressen\n"
+"hinzugefügt werden. Derzeit verweist der Alias auf %(count)i von %(limit)i\n"
+"Empfänger.\n"
+"%(count_new)i weitere Ziel-Adressen würde diesen Alias unbrauchbar machen.\n"
+"Tipp: Erhöhen Sie Postfix' virtual_alias_expansion_limit"
 
-#: VirtualMailManager/Alias.py:76
-#, fuzzy
-msgid "No destination address specified for alias."
-msgstr "Keine Ziel-Adresse für den Alias angegeben."
-
-#: VirtualMailManager/Alias.py:87
+#: VirtualMailManager/alias.py:67
 #, python-format
-msgid "The alias “%(a)s” with destination “%(d)s” already exists."
-msgstr "Der Alias „%(a)s“ mit der Ziel-Adresse „%(d)s“ existiert bereits."
+msgid ""
+"Cannot add %(count_new)i new destination(s) to alias '%(address)s'.\n"
+"This alias already exceeds its expansion limit (%(count)i/%(limit)i).\n"
+"So its unusable, all messages addressed to this alias will be bounced.\n"
+"Hint: Delete some destination addresses."
+msgstr ""
+"Dem Alias „%(address)s“ können keine %(count_new)i neue Ziel-Adressen\n"
+"zugewiesen werden. Der Alias hat sein Expansions-Limit (%(count)i/"
+"%(limit)i)\n"
+"bereits überschritten. Somit ist er unbrauchbar, Alle an diese Adresse\n"
+"gesendeten E-Mails werden gebouncet werden.\n"
+"Tipp: Löschen Sie ein paar Ziel-Adressen."
 
-#: VirtualMailManager/Alias.py:100 VirtualMailManager/Alias.py:117
-#, fuzzy, python-format
-msgid "The alias “%s” doesn't exist."
+#: VirtualMailManager/alias.py:142 VirtualMailManager/alias.py:154
+#: VirtualMailManager/alias.py:161 VirtualMailManager/handler.py:634
+#, python-format
+msgid "The alias '%s' does not exist."
 msgstr "Der Alias „%s“ existiert nicht."
 
-#: VirtualMailManager/Alias.py:119
-#, fuzzy, python-format
-msgid "The alias “%(a)s” with destination “%(d)s” doesn't exist."
-msgstr "Der Alias „%(a)s“ mit der Ziel-Adresse „%(d)s“ existiert nicht."
-
-#: VirtualMailManager/AliasDomain.py:30
+#: VirtualMailManager/alias.py:145
 #, python-format
-msgid "The domain “%s” is a primary domain."
+msgid "The address '%(addr)s' is not a destination of the alias '%(alias)s'."
+msgstr "Die Adresse „%(addr)s“ ist keine Ziel-Adresse des Alias „%(alias)s“."
+
+#: VirtualMailManager/aliasdomain.py:50
+#, python-format
+msgid "The domain '%s' is a primary domain."
 msgstr "Die Domain „%s“ ist eine primäre Domain."
 
-#: VirtualMailManager/AliasDomain.py:35
+#: VirtualMailManager/aliasdomain.py:69
 #, python-format
-msgid "The alias domain “%s” already exists."
+msgid "The alias domain '%s' already exists."
 msgstr "Die Alias-Domain „%s“ existiert bereits."
 
-#: VirtualMailManager/AliasDomain.py:38 VirtualMailManager/AliasDomain.py:68
-#, fuzzy
-msgid "No destination domain specified for alias domain."
+#: VirtualMailManager/aliasdomain.py:72 VirtualMailManager/aliasdomain.py:106
+msgid "No destination domain set for the alias domain."
 msgstr "Keine Ziel-Domain für die Alias-Domain angegeben."
 
-#: VirtualMailManager/AliasDomain.py:41 VirtualMailManager/AliasDomain.py:71
-#, fuzzy, python-format
-msgid "The target domain “%s” doesn't exist."
-msgstr "Die Ziel-Domain „%s“ existiert noch nicht."
-
-#: VirtualMailManager/AliasDomain.py:60
+#: VirtualMailManager/aliasdomain.py:75 VirtualMailManager/aliasdomain.py:109
 #, python-format
-msgid "There is no primary domain for the alias domain “%s”."
+msgid "The target domain '%s' does not exist."
+msgstr "Die Ziel-Domain „%s“ existiert nicht."
+
+#: VirtualMailManager/aliasdomain.py:88 VirtualMailManager/aliasdomain.py:112
+#: VirtualMailManager/aliasdomain.py:133
+#, python-format
+msgid "The alias domain '%s' does not exist."
+msgstr "Die Alias-Domain „%s“ existiert nicht."
+
+#: VirtualMailManager/aliasdomain.py:98
+#, python-format
+msgid "There is no primary domain for the alias domain '%s'."
 msgstr "Es gibt keine primäre Domain für die Alias-Domain „%s“."
 
-#: VirtualMailManager/AliasDomain.py:63 VirtualMailManager/AliasDomain.py:74
-#: VirtualMailManager/AliasDomain.py:97
-#, fuzzy, python-format
-msgid "The alias domain “%s” doesn't exist."
-msgstr "Die Alias-Domain „%s“ existiert noch nicht."
-
-#: VirtualMailManager/AliasDomain.py:77
+#: VirtualMailManager/aliasdomain.py:115
 #, python-format
 msgid ""
-"The alias domain “%(alias)s” is already assigned to the domain “%(domain)s”."
+"The alias domain '%(alias)s' is already assigned to the domain '%(domain)s'."
 msgstr ""
 "Die Alias-Domain „%(alias)s“ ist bereits der Domain „%(domain)s“ zugeordnet."
 
-#: VirtualMailManager/Config.py:105
-#, python-format
-msgid "Not a boolean: “%s”"
-msgstr ""
-
-#: VirtualMailManager/Config.py:134
-#, python-format
-msgid "Bad format: “%s” - expected: section.option"
-msgstr ""
-
-#: VirtualMailManager/Config.py:347
-msgid "Missing options, which have no default value.\n"
-msgstr ""
-
-#: VirtualMailManager/Config.py:348 VirtualMailManager/Config.py:416
-#, python-format
-msgid "Using configuration file: %s\n"
-msgstr "Verwende Konfigurationsdatei: %s\n"
-
-#: VirtualMailManager/Config.py:351
-#, python-format
-msgid "* Section: %s\n"
-msgstr "* Sektion: %s\n"
-
-#: VirtualMailManager/Config.py:367
-#, python-format
-msgid "“%s” is not a directory"
-msgstr ""
-
-#: VirtualMailManager/Config.py:379
-#, python-format
-msgid "“%s” is not a file"
-msgstr "„%s“ ist keine Datei."
-
-#: VirtualMailManager/Config.py:382
-#, python-format
-msgid "File is not executable: “%s”"
-msgstr ""
-
-#: VirtualMailManager/Config.py:408
-#, python-format
-msgid "Enter new value for option %(option)s [%(current_value)s]: "
-msgstr "Neuer Wert für Option %(option)s [%(current_value)s]: "
-
-#: VirtualMailManager/Config.py:418
-#, python-format
-msgid "* Configuration section: “%s”"
-msgstr "* Konfigurations Sektion: „%s“"
-
-#: VirtualMailManager/Config.py:429
-#, python-format
-msgid "Warning: %s"
-msgstr "Warnungen: %s"
-
-#: VirtualMailManager/Config.py:433
-#: VirtualMailManager/VirtualMailManager.py:198
-msgid "Too many failures - try again later."
-msgstr ""
-
-#: VirtualMailManager/Domain.py:37
-#, python-format
-msgid "The domain “%s” is an alias domain."
-msgstr "Die Domain „%s“ ist eine Alias-Domain."
-
-#: VirtualMailManager/Domain.py:122
-msgid "There are accounts and aliases."
-msgstr "Es sind noch Accounts und Aliase vorhanden."
-
-#: VirtualMailManager/Domain.py:125
-msgid "There are accounts."
-msgstr "Es sind noch Accounts vorhanden."
-
-#: VirtualMailManager/Domain.py:128
-msgid "There are aliases."
-msgstr "Es sind noch Aliase vorhanden."
-
-#: VirtualMailManager/Domain.py:143
-#, python-format
-msgid "The domain “%s” already exists."
-msgstr "Die Domain „%s“ existiert bereits."
-
-#: VirtualMailManager/EmailAddress.py:42
-#, python-format
-msgid "Missing '@' sign in e-mail address “%s”."
-msgstr "In der E-Mail-Adresse „%s“ fehlt das '@'-Zeichen."
-
-#: VirtualMailManager/EmailAddress.py:45
-#, python-format
-msgid "“%s” doesn't look like an e-mail address."
-msgstr "„%s“ sieht nicht wie eine E-Mail-Adresse aus."
-
-#: VirtualMailManager/EmailAddress.py:50
-#, python-format
-msgid "Missing domain name after “%s@”."
-msgstr "Der Domain-Name nach „%s@“ fehlt."
-
-#: VirtualMailManager/EmailAddress.py:62
-msgid "No local-part specified."
-msgstr "Kein local-part angegeben."
-
-#: VirtualMailManager/EmailAddress.py:65
-#, python-format
-msgid "The local-part “%s” is too long"
-msgstr "Der local-part „%s“ ist zu lang"
-
-#: VirtualMailManager/EmailAddress.py:72
-#, python-format
-msgid "The local-part “%(lpart)s” contains invalid characters: %(ichrs)s"
-msgstr "Der local-part „%(lpart)s“ enthält ungültige Zeichen: %(ichrs)s"
-
-#: VirtualMailManager/MailLocation.py:28
-msgid "Either mid or maillocation must be specified."
-msgstr "Entweder mid oder maillocation muss angegeben werden."
-
-#: VirtualMailManager/MailLocation.py:34
-msgid "mid must be an int/long."
-msgstr "Die MID muss eine Ganzzahl sein."
-
-#: VirtualMailManager/MailLocation.py:42
-#, python-format
-msgid ""
-"Invalid folder name “%s”, it may consist only of\n"
-"1 - 20 single byte characters (A-Z, a-z, 0-9 and _)."
-msgstr ""
-"Unzulässiger Verzeichnisname „%s“, dieser darf nur aus\n"
-"1 - 20 Einzelbytezeichen (A-Z, a-z, 0-9 und _) bestehen."
-
-#: VirtualMailManager/MailLocation.py:55
-msgid "Unknown mid specified."
-msgstr "Unbekannte MID angegeben."
-
-#: VirtualMailManager/Relocated.py:64
-msgid "No destination address specified for relocated user."
-msgstr "Keine Ziel-Adresse für den relocated User angegeben."
-
-#: VirtualMailManager/Relocated.py:74
-#, python-format
-msgid "The relocated user “%s” already exists."
-msgstr "Der relocated User „%s“ existiert bereits."
-
-#: VirtualMailManager/Relocated.py:88 VirtualMailManager/Relocated.py:101
-#, python-format
-msgid "The relocated user “%s” doesn't exist."
-msgstr "Der relocated User „%s“ existiert nicht."
-
-#: VirtualMailManager/Transport.py:27
-msgid "Either tid or transport must be specified."
-msgstr "Entweder tid oder transport muss angegeben werden."
-
-#: VirtualMailManager/Transport.py:33
-msgid "tid must be an int/long."
-msgstr "Die tid muss eine Ganzzahl sein."
-
-#: VirtualMailManager/Transport.py:61
-msgid "Unknown tid specified."
-msgstr "Unbekannte tid angegeben."
-
-#: VirtualMailManager/VirtualMailManager.py:47
-msgid ""
-"You are not root.\n"
-"\tGood bye!\n"
-msgstr ""
-"Sie sind nicht root.\n"
-"\tAuf Wiedersehen.\n"
-
-#: VirtualMailManager/VirtualMailManager.py:66
-msgid "No “vmm.cfg” found in: /root:/usr/local/etc:/etc"
-msgstr "Keine „vmm.cfg“ gefunden in: /root:/usr/local/etc:/etc“"
-
-#: VirtualMailManager/VirtualMailManager.py:77
-#, python-format
-msgid ""
-"fix permissions (%(perms)s) for “%(file)s”\n"
-"`chmod 0600 %(file)s` would be great."
-msgstr ""
-"Bitte Zugriffsrechte (%(perms)s) für „%(file)s“ anpassen\n"
-"`chmod 0600 %(file)s` wäre großartig."
-
-#: VirtualMailManager/VirtualMailManager.py:92
-#, python-format
-msgid ""
-"“%s” is not a directory.\n"
-"(vmm.cfg: section \"misc\", option \"base_directory\")"
-msgstr ""
-"„%s“ ist kein Verzeichnis.\n"
-"(vmm.cfg: Sektion \"misc\", Option \"base_directory\")"
-
-#: VirtualMailManager/VirtualMailManager.py:97
-#, fuzzy, python-format
-msgid ""
-"“%(binary)s” doesn't exist.\n"
-"(vmm.cfg: section \"bin\", option \"%(option)s\")"
-msgstr ""
-"„%(binary)s“ existiert nicht.\n"
-"(vmm.cfg: Sektion \"bin\", Option \"%(option)s\")"
-
-#: VirtualMailManager/VirtualMailManager.py:101
-#, python-format
-msgid ""
-"“%(binary)s” is not executable.\n"
-"(vmm.cfg: section \"bin\", option \"%(option)s\")"
-msgstr ""
-"„%(binary)s“ ist nicht ausführbar.\n"
-"(vmm.cfg: Sektion \"bin\", Option \"%(option)s\")"
-
-#: VirtualMailManager/VirtualMailManager.py:149
-msgid "The domain name is too long."
-msgstr "Der Domain-Name ist zu lang."
-
-#: VirtualMailManager/VirtualMailManager.py:152
-#, python-format
-msgid "The domain name “%s” is invalid."
-msgstr "Der Domain-Name „%s“ ist ungültig."
-
 #. TP: Please preserve the trailing space.
-#: VirtualMailManager/VirtualMailManager.py:191
+#: VirtualMailManager/cli/__init__.py:78
 msgid "Enter new password: "
 msgstr "Neues Passwort eingeben: "
 
 #. TP: Please preserve the trailing space.
-#: VirtualMailManager/VirtualMailManager.py:193
+#: VirtualMailManager/cli/__init__.py:80
 msgid "Retype new password: "
 msgstr "Neues Passwort wiederholen: "
 
-#: VirtualMailManager/VirtualMailManager.py:204
-msgid "Sorry, passwords do not match"
-msgstr "Entschuldigung, die Passwörter stimmen nicht überein"
+#: VirtualMailManager/cli/__init__.py:85 VirtualMailManager/cli/config.py:53
+msgid "Too many failures - try again later."
+msgstr "Zu viele Fehler - Versuchen Sie es später wieder."
 
-#: VirtualMailManager/VirtualMailManager.py:208
-msgid "Sorry, empty passwords are not permitted"
-msgstr "Entschuldigung, leere Passwörter sind nicht zulässig"
+#: VirtualMailManager/cli/__init__.py:91
+msgid "Sorry, passwords do not match."
+msgstr "Entschuldigung, die Passwörter stimmen nicht überein."
 
-#: VirtualMailManager/VirtualMailManager.py:256
-#: VirtualMailManager/VirtualMailManager.py:343
+#: VirtualMailManager/cli/__init__.py:95
+msgid "Sorry, empty passwords are not permitted."
+msgstr "Entschuldigung, leere Passwörter sind nicht zulässig."
+
+#: VirtualMailManager/cli/config.py:32
 #, python-format
-msgid "No such directory: %s"
-msgstr "Verzeichnis nicht gefunden: %s"
+msgid "Enter new value for option %(option)s [%(current_value)s]: "
+msgstr "Neuer Wert für Option %(option)s [%(current_value)s]: "
 
-#: VirtualMailManager/VirtualMailManager.py:331
-msgid "Found \"..\" in home directory path."
-msgstr "\"..\" im Pfad zum Benutzerverzeichnis entdeckt."
-
-#: VirtualMailManager/VirtualMailManager.py:339
-#, fuzzy
-msgid "Detected owner/group mismatch in home directory."
-msgstr "Benutzerverzeichnis gehört dem/der falschen Benutzer/Gruppe."
-
-#: VirtualMailManager/VirtualMailManager.py:354
-#, fuzzy
-msgid "Found \"..\" in domain directory path."
-msgstr "\"..\" im Pfad zum Benutzerverzeichnis entdeckt."
-
-#: VirtualMailManager/VirtualMailManager.py:360
-#, fuzzy
-msgid "Detected group mismatch in domain directory."
-msgstr "Domain-Verzeichnis gehört der falschen Gruppe"
-
-#: VirtualMailManager/VirtualMailManager.py:455
+#: VirtualMailManager/cli/config.py:36
 #, python-format
-msgid "Invalid section: “%s”"
+msgid "Using configuration file: %s\n"
+msgstr "Verwende Konfigurationsdatei: %s\n"
+
+#: VirtualMailManager/cli/config.py:38
+#, python-format
+msgid "* Configuration section: '%s'"
+msgstr "* Konfigurations-Sektion: „%s“"
+
+#: VirtualMailManager/cli/config.py:50
+#, python-format
+msgid "Warning: %s"
+msgstr "Warnung: %s"
+
+#: VirtualMailManager/cli/handler.py:66
+#, python-format
+msgid "Invalid section: '%s'"
 msgstr "Ungültige Sektion: „%s“"
 
-#: VirtualMailManager/VirtualMailManager.py:465
-#: VirtualMailManager/VirtualMailManager.py:475
-#: VirtualMailManager/VirtualMailManager.py:494
-#: VirtualMailManager/VirtualMailManager.py:602
-#: VirtualMailManager/VirtualMailManager.py:633
+#: VirtualMailManager/cli/main.py:32 VirtualMailManager/cli/main.py:65
+#: VirtualMailManager/cli/main.py:68 VirtualMailManager/cli/subcommands.py:593
+#: VirtualMailManager/cli/subcommands.py:613
 #, python-format
-msgid "Invalid argument: “%s”"
+msgid "Error: %s"
+msgstr "Fehler: %s"
+
+#: VirtualMailManager/cli/main.py:41
+msgid "You must specify a subcommand at least."
+msgstr "Sie müssen wenigstens einen Unterbefehl angegeben."
+
+#: VirtualMailManager/cli/main.py:53
+#, python-format
+msgid "Unknown subcommand: '%s'"
+msgstr "Unbekannter Unterbefehl: „%s“"
+
+#. TP: We have to cry, because root has killed/interrupted vmm
+#. with Ctrl+C or Ctrl+D.
+#: VirtualMailManager/cli/main.py:62
+msgid "Ouch!"
+msgstr "Autsch!"
+
+#: VirtualMailManager/cli/main.py:71
+#, python-format
+msgid "Error: Unknown section: '%s'"
+msgstr "Fehler: Unbekannte Sektion: „%s“"
+
+#: VirtualMailManager/cli/main.py:74
+#, python-format
+msgid "Error: No option '%(option)s' in section: '%(section)s'"
+msgstr ""
+"Fehler: Es gibt keine Option „%(option)s“ in der Sektion: „%(section)s“"
+
+#: VirtualMailManager/cli/main.py:77
+msgid "Warnings:"
+msgstr "Warnungen:"
+
+#: VirtualMailManager/cli/subcommands.py:77
+#, python-format
+msgid "Plan A failed ... trying Plan B: %(subcommand)s %(object)s"
+msgstr "Plan A fehlgeschlagen ... versuche Plan B: %(subcommand)s %(object)s"
+
+#: VirtualMailManager/cli/subcommands.py:91
+msgid "Missing alias address and destination."
+msgstr "Alias- und Ziel-Adresse fehlen."
+
+#: VirtualMailManager/cli/subcommands.py:94
+#: VirtualMailManager/cli/subcommands.py:401
+msgid "Missing destination address."
+msgstr "Die Ziel-Adresse fehlt."
+
+#: VirtualMailManager/cli/subcommands.py:101
+#: VirtualMailManager/cli/subcommands.py:111
+msgid "Missing alias address."
+msgstr "Die Alias-Adresse fehlt."
+
+#: VirtualMailManager/cli/subcommands.py:133
+#: VirtualMailManager/cli/subcommands.py:167
+msgid "Missing alias domain name and destination domain name."
+msgstr "Domain-Namen für Alias- und Ziel-Domain fehlen."
+
+#: VirtualMailManager/cli/subcommands.py:136
+#: VirtualMailManager/cli/subcommands.py:170
+msgid "Missing destination domain name."
+msgstr "Keine Ziel-Domain angegeben."
+
+#: VirtualMailManager/cli/subcommands.py:144
+#: VirtualMailManager/cli/subcommands.py:151
+msgid "Missing alias domain name."
+msgstr "Keine Alias-Domain angegeben."
+
+#: VirtualMailManager/cli/subcommands.py:178
+msgid "Missing option name."
+msgstr "Kein Options-Name angegeben."
+
+#: VirtualMailManager/cli/subcommands.py:194
+msgid "Missing option and new value."
+msgstr "Options-Name und neuer Wert fehlen."
+
+#: VirtualMailManager/cli/subcommands.py:196
+msgid "Missing new configuration value."
+msgstr "Kein neuer Konfigurationsrert angegeben."
+
+#: VirtualMailManager/cli/subcommands.py:212
+#: VirtualMailManager/cli/subcommands.py:228
+#: VirtualMailManager/cli/subcommands.py:241
+msgid "Missing domain name."
+msgstr "Kein Domain-Name angegeben."
+
+#: VirtualMailManager/cli/subcommands.py:234
+#: VirtualMailManager/cli/subcommands.py:248
+#: VirtualMailManager/cli/subcommands.py:321
+#: VirtualMailManager/cli/subcommands.py:339
+#: VirtualMailManager/cli/subcommands.py:457
+#: VirtualMailManager/cli/subcommands.py:500 VirtualMailManager/handler.py:446
+#: VirtualMailManager/handler.py:458 VirtualMailManager/handler.py:487
+#: VirtualMailManager/handler.py:651
+#, python-format
+msgid "Invalid argument: '%s'"
 msgstr "Ungültiges Argument: „%s“"
 
-#: VirtualMailManager/VirtualMailManager.py:498
-msgid ""
-"The keyword “detailed” is deprecated and will be removed in a future "
-"release.\n"
-"   Please use the keyword “full” to get full details."
-msgstr ""
-"Das Schlüsselwort „detailed“ ist veraltet und wird in einer zukünftigen\n"
-"   Version entfernt werden.\n"
-"   Verwenden Sie bitte das Schlüsselwort „full“, um alle Details zu erhalten."
+#: VirtualMailManager/cli/subcommands.py:266
+#: VirtualMailManager/cli/subcommands.py:272
+msgid "Domain"
+msgstr "Domain"
 
-#: VirtualMailManager/VirtualMailManager.py:571
-#, python-format
-msgid "The pattern “%s” contains invalid characters."
-msgstr "Das Muster „%s“ enthält ungültige Zeichen."
+#: VirtualMailManager/cli/subcommands.py:274
+#: VirtualMailManager/cli/subcommands.py:283
+msgid "accounts"
+msgstr "Accounts"
 
-#: VirtualMailManager/VirtualMailManager.py:597
-#, fuzzy, python-format
-msgid "The destination account/alias “%s” doesn't exist."
-msgstr "Der Ziel-Account/-Alias „%s“ existiert nicht."
-
-#: VirtualMailManager/VirtualMailManager.py:614
-#, fuzzy, python-format
-msgid ""
-"The account has been successfully deleted from the database.\n"
-"    But an error occurred while deleting the following directory:\n"
-"    “%(directory)s”\n"
-"    Reason: %(reason)s"
-msgstr ""
-"Der Account wurde erfolgreich aus der Datenbank gelöscht.\n"
-"    Aber es trat ein Fehler auf beim Löschen des folgenden Verzeichnisses:\n"
-"    „%(directory)s“\n"
-"    Grund: %(reason)s"
-
-#: VirtualMailManager/VirtualMailManager.py:653
-#, fuzzy
-msgid "Account doesn't exist"
-msgstr "Der Account existiert nicht"
-
-#: VirtualMailManager/VirtualMailManager.py:669
-#: VirtualMailManager/VirtualMailManager.py:679
-msgid ""
-"The service name “managesieve” is deprecated and will be removed\n"
-"   in a future release.\n"
-"   Please use the service name “sieve” instead."
-msgstr ""
-"Der Servicename „managesieve“ ist veraltet und wird in einer zukünftigen\n"
-"   Version entfernt werden.\n"
-"   Verwenden Sie stattdessen bitte den Servicename „sieve“."
-
-#: VirtualMailManager/ext/Postconf.py:41
-#, fuzzy, python-format
-msgid ""
-"The value “%s” doesn't look like a valid postfix configuration parameter "
-"name."
-msgstr ""
-"„%s“ sieht nicht wie ein gültiger Postfix Konfigurationsparametername aus."
-
-#. TP: Please adjust translated words like the original text.
-#. (It's a table header.) Extract from usage text:
-#. Usage: vmm SUBCOMMAND OBJECT ARGS*
-#. short long
-#. subcommand               object             args (* = optional)
-#.
-#. da    domainadd          domain.tld         transport*
-#. di    domaininfo         domain.tld         details*
-#: vmm:26
-#, python-format
-msgid ""
-"Usage: %s SUBCOMMAND OBJECT ARGS*\n"
-"  short long\n"
-"  subcommand               object             args (* = optional)\n"
-msgstr ""
-"Verwendung: %s UNTERBEFEHL OBJEKT ARGS*\n"
-"  kurz  lang\n"
-"  Unterbefehl              Objekt             args (* = optional)\n"
-
-#: vmm:65 vmm:76
-#, python-format
-msgid "Error: %s\n"
-msgstr "Fehler: %s\n"
-
-#. TP: e.g. 'Domain information' or 'Account information'
-#: vmm:104
-msgid "information"
-msgstr "Informationen"
-
-#. TP: e.g. 'Available alias addresses' or 'Available accounts'
-#: vmm:115
-msgid "Available"
-msgstr "Verfügbare"
-
-#: vmm:118 vmm:218 vmm:224
+#: VirtualMailManager/cli/subcommands.py:276
+#: VirtualMailManager/cli/subcommands.py:282
+#: VirtualMailManager/cli/subcommands.py:791
 msgid "alias domains"
 msgstr "Alias-Domains"
 
-#: vmm:128 vmm:139 vmm:163
+#: VirtualMailManager/cli/subcommands.py:278
+#: VirtualMailManager/cli/subcommands.py:284
+msgid "aliases"
+msgstr "Aliase"
+
+#: VirtualMailManager/cli/subcommands.py:280
+#: VirtualMailManager/cli/subcommands.py:285
+msgid "relocated users"
+msgstr "relocated Users"
+
+#: VirtualMailManager/cli/subcommands.py:291
+msgid "Missing domain name and storage value."
+msgstr "Domain-Name und neuer Speicher-Wert fehlen."
+
+#: VirtualMailManager/cli/subcommands.py:294
+#: VirtualMailManager/cli/subcommands.py:560
+msgid "Missing storage value."
+msgstr "Kein Speicher-Wert angegeben."
+
+#: VirtualMailManager/cli/subcommands.py:300
+#: VirtualMailManager/cli/subcommands.py:564
+#, python-format
+msgid "Invalid storage value: '%s'"
+msgstr "Ungültiger Speicher-Wert: „%s“"
+
+#: VirtualMailManager/cli/subcommands.py:310
+#, python-format
+msgid "Neither a valid number of messages nor the keyword 'force': '%s'"
+msgstr ""
+"Weder eine gültige Anzahl von Nachrichten noch das Schlüsselwort „force“: "
+"„%s“"
+
+#: VirtualMailManager/cli/subcommands.py:318
+#: VirtualMailManager/cli/subcommands.py:573
+#, python-format
+msgid "Not a valid number of messages: '%s'"
+msgstr "Keine gültige Anzahl von Nachrichten: „%s“"
+
+#: VirtualMailManager/cli/subcommands.py:330
+msgid "Missing domain name and new transport."
+msgstr "Domain-Name und neuer Transport fehlen."
+
+#: VirtualMailManager/cli/subcommands.py:333
+msgid "Missing new transport."
+msgstr "Neuer Transport fehlt."
+
+#: VirtualMailManager/cli/subcommands.py:347
+msgid "Missing UID."
+msgstr "Keine UID angegeben."
+
+#: VirtualMailManager/cli/subcommands.py:348
+#: VirtualMailManager/cli/subcommands.py:523
+#: VirtualMailManager/cli/subcommands.py:529
+msgid "Account"
+msgstr "Account"
+
+#: VirtualMailManager/cli/subcommands.py:363
+#, python-format
+msgid "Unknown help topic: '%s'"
+msgstr "Unbekanntes Hilfe Thema: „%s“"
+
+#: VirtualMailManager/cli/subcommands.py:376
+msgid "List of available subcommands:"
+msgstr "Liste der vorhandenen Unterbefehle:"
+
+#: VirtualMailManager/cli/subcommands.py:399
+msgid "Missing relocated address and destination."
+msgstr "Die Adresse des relocated Users und Ziel-Adresse fehlen."
+
+#: VirtualMailManager/cli/subcommands.py:408
+#: VirtualMailManager/cli/subcommands.py:415
+msgid "Missing relocated address."
+msgstr "Die Adresse des relocated Users fehlt."
+
+#: VirtualMailManager/cli/subcommands.py:438
+#: VirtualMailManager/cli/subcommands.py:451
+#: VirtualMailManager/cli/subcommands.py:464
+#: VirtualMailManager/cli/subcommands.py:479
+#: VirtualMailManager/cli/subcommands.py:494
+#: VirtualMailManager/cli/subcommands.py:546
+msgid "Missing e-mail address."
+msgstr "E-Mail-Adresse fehlt."
+
+#: VirtualMailManager/cli/subcommands.py:445
+#, python-format
+msgid "Generated password: %s"
+msgstr "Generiertes Passwort: %s "
+
+#: VirtualMailManager/cli/subcommands.py:471
+#: VirtualMailManager/cli/subcommands.py:486
+#, python-format
+msgid "Invalid service arguments: %s"
+msgstr "Ungültiges Service Argument: „%s“"
+
+#: VirtualMailManager/cli/subcommands.py:530
+msgid "alias addresses"
+msgstr "Alias-Adressen"
+
+#: VirtualMailManager/cli/subcommands.py:536
+msgid "Missing e-mail address and user's name."
+msgstr "E-Mail-Adresse und der Name des Benutzers fehlen."
+
+#: VirtualMailManager/cli/subcommands.py:539
+msgid "Missing user's name."
+msgstr "Name des Benutzers fehlt."
+
+#: VirtualMailManager/cli/subcommands.py:557
+msgid "Missing e-mail address and storage value."
+msgstr "E-Mail-Adresse und Speicher-Wert fehlen."
+
+#: VirtualMailManager/cli/subcommands.py:581
+msgid "Missing e-mail address and transport."
+msgstr "E-Mail-Adresse und Transport fehlen."
+
+#: VirtualMailManager/cli/subcommands.py:584
+msgid "Missing transport."
+msgstr "Transport fehlt."
+
+#: VirtualMailManager/cli/subcommands.py:594
+msgid "usage: "
+msgstr "Aufruf: "
+
+#. TP: Please adjust translated words like the original text.
+#. (It's a table header.) Extract from usage text:
+#. usage: vmm subcommand arguments
+#. short long
+#. subcommand                arguments
+#.
+#. da    domainadd           fqdn [transport]
+#. dd    domaindelete        fqdn [force]
+#: VirtualMailManager/cli/subcommands.py:604
+#, python-format
+msgid ""
+"usage: %s subcommand arguments\n"
+"  short long\n"
+"  subcommand                arguments\n"
+msgstr ""
+"Aufruf: %s Unterbefehl Argumente\n"
+"  kurz  lang\n"
+"  Unterbefehl               Argumente\n"
+
+#: VirtualMailManager/cli/subcommands.py:623
+msgid "from"
+msgstr "vom"
+
+#. TP: The words 'from', 'version' and 'on' are used in
+#. the version information, e.g.:
+#. vmm, version 0.5.2 (from 09/09/09)
+#. Python 2.5.4 on FreeBSD
+#: VirtualMailManager/cli/subcommands.py:623
+msgid "version"
+msgstr "Version"
+
+#: VirtualMailManager/cli/subcommands.py:626
+msgid "on"
+msgstr "auf"
+
+#: VirtualMailManager/cli/subcommands.py:628
+msgid "is free software and comes with ABSOLUTELY NO WARRANTY."
+msgstr "ist freie Software und es gibt KEINERLEI GARANTIE"
+
+#: VirtualMailManager/cli/subcommands.py:636
+msgid "uid"
+msgstr "UID"
+
+#: VirtualMailManager/cli/subcommands.py:637
+msgid "get the address of the user with the given UID"
+msgstr "Gibt die Adresse des Benutzers mit der angegebenen UID aus"
+
+#: VirtualMailManager/cli/subcommands.py:638
+#: VirtualMailManager/cli/subcommands.py:654
+msgid "address [password]"
+msgstr "Adresse [Passwort]"
+
+#: VirtualMailManager/cli/subcommands.py:639
+msgid "create a new e-mail user with the given address"
+msgstr "Erzeugt eine neuen E-Mail-Account mit der angegebenen Adresse"
+
+#: VirtualMailManager/cli/subcommands.py:641
+#: VirtualMailManager/cli/subcommands.py:670
+#: VirtualMailManager/cli/subcommands.py:706
+#: VirtualMailManager/cli/subcommands.py:708
+msgid "address"
+msgstr "Adresse"
+
+#: VirtualMailManager/cli/subcommands.py:642
+msgid "delete the specified user"
+msgstr "Löscht den angegebenen Benutzer"
+
+#: VirtualMailManager/cli/subcommands.py:644
+#: VirtualMailManager/cli/subcommands.py:647
+msgid "address [service ...]"
+msgstr "Adresse [Service ...]"
+
+#: VirtualMailManager/cli/subcommands.py:645
+msgid "deactivate all/the given service(s) for a user"
+msgstr "Deaktiviert alle oder die angegebenen Services für einen Benutzer"
+
+#: VirtualMailManager/cli/subcommands.py:648
+msgid "activate all or the given service(s) for a user"
+msgstr "Aktiviert alle oder die angegebenen Service für einen Benutzer "
+
+#: VirtualMailManager/cli/subcommands.py:649
+msgid "address [details]"
+msgstr "Adresse [Details]"
+
+#: VirtualMailManager/cli/subcommands.py:650
+msgid "display information about the given address"
+msgstr "Zeigt Informationen über die angegebene E-Mail-Adresse an"
+
+#: VirtualMailManager/cli/subcommands.py:651
+msgid "address name"
+msgstr "Adresse Name"
+
+#: VirtualMailManager/cli/subcommands.py:652
+msgid "set or update the real name for an address"
+msgstr ""
+"Setzt oder aktualisiert den bürgerlichen Namen für die angegebene Adresse"
+
+#: VirtualMailManager/cli/subcommands.py:655
+msgid "update the password for the given address"
+msgstr "Aktualisiert das Passwort für die angegebene Adresse"
+
+#: VirtualMailManager/cli/subcommands.py:657
+msgid "address storage [messages]"
+msgstr "Adresse Speicher [Nachrichten]"
+
+#: VirtualMailManager/cli/subcommands.py:658
+msgid "update the quota limit for the given address"
+msgstr "Aktualisiert das Quota-Limit für die angegebene Adresse"
+
+#: VirtualMailManager/cli/subcommands.py:660
+msgid "address transport"
+msgstr "Adresse Transport"
+
+#: VirtualMailManager/cli/subcommands.py:661
+msgid "update the transport of the given address"
+msgstr "Aktualisiert den Transport für die angegebene Adresse"
+
+#: VirtualMailManager/cli/subcommands.py:663
+msgid "address destination ..."
+msgstr "Adresse Ziel-Adresse ..."
+
+#: VirtualMailManager/cli/subcommands.py:664
+msgid "create a new alias e-mail address with one or more destinations"
+msgstr ""
+"Erzeugt einen neue E-Mail-Alias-Adresse mit einer oder mehreren Ziel-Adressen"
+
+#: VirtualMailManager/cli/subcommands.py:667
+msgid "address [destination]"
+msgstr "Adresse [Ziel-Adresse]"
+
+#: VirtualMailManager/cli/subcommands.py:668
+msgid "delete the specified alias e-mail address or one of its destinations"
+msgstr ""
+"Löscht die angegebene E-Mail-Alias-Adresse oder eine ihrer Ziel-Adressen"
+
+#: VirtualMailManager/cli/subcommands.py:671
+msgid "show the destination(s) of the specified alias"
+msgstr "Zeigt die Ziel-Adresse(n) für den angegebenen Alias an."
+
+#: VirtualMailManager/cli/subcommands.py:674
+#: VirtualMailManager/cli/subcommands.py:683
+msgid "fqdn destination"
+msgstr "FQDN Ziel-Adresse"
+
+#: VirtualMailManager/cli/subcommands.py:675
+msgid "create a new alias for an existing domain"
+msgstr "Erzeugt einen neuen Alias-Name für eine vorhandene Domain"
+
+#: VirtualMailManager/cli/subcommands.py:677
+#: VirtualMailManager/cli/subcommands.py:680
+#: VirtualMailManager/cli/subcommands.py:689
+msgid "fqdn"
+msgstr "FQDN"
+
+#: VirtualMailManager/cli/subcommands.py:678
+msgid "delete the specified alias domain"
+msgstr "Löscht die angegebene Alias-Domain"
+
+#: VirtualMailManager/cli/subcommands.py:681
+msgid "show the destination of the given alias domain"
+msgstr "Zeigt die Ziel-Domain der angegebenen Alias-Domain an"
+
+#: VirtualMailManager/cli/subcommands.py:684
+msgid "assign the given alias domain to an other domain"
+msgstr "Ordnet die angegebene Alias-Domain einer anderen Domain zu"
+
+#: VirtualMailManager/cli/subcommands.py:686
+msgid "fqdn [transport]"
+msgstr "FQDN [Transport]"
+
+#: VirtualMailManager/cli/subcommands.py:687
+msgid "create a new domain"
+msgstr "Erzeugt eine neue Domain"
+
+#: VirtualMailManager/cli/subcommands.py:690
+msgid "delete the given domain and all its alias domains"
+msgstr "Löscht die angegebene Domain und all ihre Alias-Domains"
+
+#: VirtualMailManager/cli/subcommands.py:691
+msgid "fqdn [details]"
+msgstr "FQDN [Details]"
+
+#: VirtualMailManager/cli/subcommands.py:692
+msgid "display information about the given domain"
+msgstr "Zeigt Informationen über die angegebene Domain an"
+
+#: VirtualMailManager/cli/subcommands.py:694
+msgid "fqdn storage [messages]"
+msgstr "FQDN Speicher [Nachrichten]"
+
+#: VirtualMailManager/cli/subcommands.py:695
+msgid "update the quota limit of the specified domain"
+msgstr "Aktualisiert das Quota-Limit der angegebenen Domain"
+
+#: VirtualMailManager/cli/subcommands.py:697
+msgid "fqdn transport"
+msgstr "FQDN Transport"
+
+#: VirtualMailManager/cli/subcommands.py:698
+msgid "update the transport of the specified domain"
+msgstr "Aktualisiert den Transport der angegebenen Domain"
+
+#: VirtualMailManager/cli/subcommands.py:699
+msgid "[pattern]"
+msgstr "[Muster]"
+
+#: VirtualMailManager/cli/subcommands.py:700
+msgid "list all domains / search domains by pattern"
+msgstr "Listet alle Domains / Suche Domains nach Muster"
+
+#: VirtualMailManager/cli/subcommands.py:703
+msgid "address newaddress"
+msgstr "Adresse Neue_Adresse"
+
+#: VirtualMailManager/cli/subcommands.py:704
+msgid "create a new record for a relocated user"
+msgstr "Erzeugt einen neuen Eintrag für einen relocated User"
+
+#: VirtualMailManager/cli/subcommands.py:707
+msgid "delete the record of the relocated user"
+msgstr "Löscht den Eintrag des relocated Users"
+
+#: VirtualMailManager/cli/subcommands.py:709
+msgid "print information about a relocated user"
+msgstr "Gibt Informationen über einen relocated User aus"
+
+#: VirtualMailManager/cli/subcommands.py:711
+msgid "option"
+msgstr "Option"
+
+#: VirtualMailManager/cli/subcommands.py:712
+msgid "show the actual value of the configuration option"
+msgstr "Zeigt den aktuellen Wert einer Konfigurationsoption an"
+
+#: VirtualMailManager/cli/subcommands.py:713
+msgid "option value"
+msgstr "Option Wert"
+
+#: VirtualMailManager/cli/subcommands.py:714
+msgid "set a new value for the configuration option"
+msgstr "Setze einen neuen Wert für die angegebene Konfigurationsoption"
+
+#: VirtualMailManager/cli/subcommands.py:715
+msgid "[section]"
+msgstr "[Sektion]"
+
+#: VirtualMailManager/cli/subcommands.py:716
+msgid "start interactive configuration modus"
+msgstr "Startet den interaktiven Konfigurations-Modus"
+
+#: VirtualMailManager/cli/subcommands.py:717
+msgid "[subcommand]"
+msgstr "[Unterbefehl]"
+
+#: VirtualMailManager/cli/subcommands.py:718
+msgid "show a help overview or help for the given subcommand"
+msgstr "Zeigt die Hilfsübersicht oder Hilfe zum angegebenen Thema an"
+
+#: VirtualMailManager/cli/subcommands.py:720
+msgid "show version and copyright information"
+msgstr "Zeigt Versions- und Copyright-Informationen an"
+
+#: VirtualMailManager/cli/subcommands.py:769
+#, python-format
+msgid "[%(percent)s%%] %(used)s/%(limit)s"
+msgstr "[%(percent)s%%] %(used)s von %(limit)s"
+
+#. TP: used in e.g. 'Domain information' or 'Account information'
+#: VirtualMailManager/cli/subcommands.py:775
+msgid "information"
+msgstr "Informationen"
+
+#. TP: used in e.g. 'Existing alias addresses' or 'Existing accounts'
+#: VirtualMailManager/cli/subcommands.py:788
+msgid "Existing"
+msgstr "Vorhandene"
+
+#: VirtualMailManager/cli/subcommands.py:801
+#: VirtualMailManager/cli/subcommands.py:843
 msgid "\tNone"
 msgstr "\tKeine"
 
-#: vmm:132
+#: VirtualMailManager/cli/subcommands.py:806
 msgid "Alias information"
 msgstr "Alias Informationen"
 
-#: vmm:134
+#: VirtualMailManager/cli/subcommands.py:808
 #, python-format
 msgid "\tMail for %s will be redirected to:"
 msgstr "\tE-Mails für %s werden weitergeleitet an:"
 
-#: vmm:143
+#: VirtualMailManager/cli/subcommands.py:815
 msgid "Relocated information"
 msgstr "Relocated Informationen"
 
-#: vmm:145
+#: VirtualMailManager/cli/subcommands.py:817
 #, python-format
-msgid "\tUser “%(addr)s” has moved to “%(dest)s”"
+msgid "\tUser '%(addr)s' has moved to '%(dest)s'"
 msgstr "\tDer Benutzer „%(addr)s“ ist erreichbar unter „%(dest)s“"
 
-#: vmm:158
-msgid "Available domains"
-msgstr "Verfügbare Domains"
-
-#: vmm:160
+#: VirtualMailManager/cli/subcommands.py:832
 msgid "Matching domains"
 msgstr "Übereinstimmende Domains"
 
-#: vmm:174
+#: VirtualMailManager/cli/subcommands.py:834
+msgid "Existing domains"
+msgstr "Vorhandene Domains"
+
+#: VirtualMailManager/cli/subcommands.py:849
 msgid "Alias domain information"
 msgstr "Alias-Domain Informationen"
 
-#: vmm:180
+#: VirtualMailManager/cli/subcommands.py:854
 #, python-format
 msgid ""
 "\tThe alias domain %(alias)s belongs to:\n"
@@ -568,142 +793,367 @@ msgstr ""
 "\tDie Alias-Domain %(alias)s gehört zu:\n"
 "\t    * %(domain)s"
 
-#: vmm:191 vmm:199 vmm:207
-msgid "Missing domain name."
-msgstr "Kein Domain-Name angegeben."
-
-#: vmm:210 vmm:214
-msgid "Domain"
-msgstr "Domain"
-
-#: vmm:216 vmm:225
-msgid "accounts"
-msgstr "Accounts"
-
-#: vmm:220 vmm:226
-msgid "aliases"
-msgstr "Aliase"
-
-#: vmm:222 vmm:227
-msgid "relocated users"
-msgstr "Relocated Users"
-
-#: vmm:238
-msgid "Missing domain name and new transport."
-msgstr "Domain-Name und neuer Transport fehlen."
-
-#: vmm:240
-msgid "Missing new transport."
-msgstr "Neuer Transport fehlt."
-
-#: vmm:249 vmm:272
-msgid "Missing alias domain name and target domain name."
-msgstr "Domain-Namen für Alias- und Ziel-Domain fehlen."
-
-#: vmm:251 vmm:274
-msgid "Missing target domain name."
-msgstr "Keine Ziel-Domain angegeben."
-
-#: vmm:257 vmm:280
-msgid "Missing alias domain name."
-msgstr "Keine Alias-Domain angegeben."
-
-#: vmm:286 vmm:295 vmm:303 vmm:345 vmm:353 vmm:361
-msgid "Missing e-mail address."
-msgstr "E-Mail-Adresse fehlt."
-
-#: vmm:312
-msgid "alias addresses"
-msgstr "Alias-Adressen"
-
-#: vmm:329
-#, fuzzy
-msgid "Missing e-mail address and user’s name."
-msgstr "E-Mail-Adresse und der Name des Benutzers fehlen."
-
-#: vmm:331
-#, fuzzy
-msgid "Missing user’s name."
-msgstr "Name des Benutzers fehlt."
-
-#: vmm:337
-msgid "Missing e-mail address and transport."
-msgstr "E-Mail-Adresse und Transport fehlen."
-
-#: vmm:339
-msgid "Missing transport."
-msgstr "Transport fehlt."
-
-#: vmm:370
-msgid "Missing alias address and destination."
-msgstr "Alias- und Ziel-Adresse fehlen."
-
-#: vmm:372 vmm:407
-msgid "Missing destination address."
-msgstr "Die Ziel-Adresse fehlt."
-
-#: vmm:378 vmm:396
-msgid "Missing alias address"
-msgstr "Die Alias-Adresse fehlt."
-
-#: vmm:405
-msgid "Missing relocated address and destination."
-msgstr "Die Adresse des relocated Users und Ziel-Adresse fehlen."
-
-#: vmm:413 vmm:431
-msgid "Missing relocated address"
-msgstr "Die Adresse des relocated Users fehlt."
-
-#: vmm:437
-msgid "Missing userid"
-msgstr "Keine UID angegeben."
-
-#: vmm:450
-msgid "Warnings:"
-msgstr "Warnungen:"
-
-#: vmm:460
-msgid "from"
-msgstr "vom"
-
-#. TP: The words 'from', 'version' and 'on' are used in the version
-#. information:
-#. vmm, version 0.5.2 (from 09/09/09)
-#. Python 2.5.4 on FreeBSD
-#: vmm:460
-msgid "version"
-msgstr "Version"
-
-#: vmm:463
-msgid "on"
-msgstr "auf"
-
-#: vmm:464
-msgid "is free software and comes with ABSOLUTELY NO WARRANTY."
-msgstr ""
-
-#: vmm:472
+#: VirtualMailManager/common.py:63
 #, python-format
-msgid "Plan A failed ... trying Plan B: %(subcommand)s %(object)s"
-msgstr ""
+msgid "No such file: '%s'"
+msgstr "Datei nicht gefunden: „%s“"
 
-#: vmm:535
+#: VirtualMailManager/common.py:66
 #, python-format
-msgid "Unknown subcommand: “%s”"
-msgstr "Unbekannter Unterbefehl „%s“"
+msgid "File is not executable: '%s'"
+msgstr "Datei ist nicht ausführbar: „%s“"
 
-#. TP: We have to cry, because root has killed/interrupted vmm
-#. with Ctrl+C or Ctrl+D.
-#: vmm:540
+#: VirtualMailManager/common.py:82
+msgid "GiB"
+msgstr "GiB"
+
+#: VirtualMailManager/common.py:82
+msgid "TiB"
+msgstr "TiB"
+
+#: VirtualMailManager/common.py:83
+msgid "KiB"
+msgstr "KiB"
+
+#: VirtualMailManager/common.py:83
+msgid "MiB"
+msgstr "MiB"
+
+#. TP: e.g.: '%(size)s %(prefix)s' -> '118.30 MiB'
+#: VirtualMailManager/common.py:87
+#, python-format
+msgid "%(size)s %(prefix)s"
+msgstr "%(size)s %(prefix)s"
+
+#: VirtualMailManager/config.py:89
+#, python-format
+msgid "Not a boolean: '%s'"
+msgstr "Kein Boolescher Wert: „%s“"
+
+#: VirtualMailManager/config.py:127
+#, python-format
+msgid "Bad format: '%s' - expected: section.option"
+msgstr "Ungültiges Format: '%s' - Erwartetes Format: section.option"
+
+#: VirtualMailManager/config.py:380
+#, python-format
+msgid "* Section: %s\n"
+msgstr "* Sektion: %s\n"
+
+#: VirtualMailManager/config.py:390 VirtualMailManager/config.py:398
+#, python-format
+msgid "Check of configuration file %s failed.\n"
+msgstr "Überprüfung der Konfigurationsdatei: %s fehlgeschlagen.\n"
+
+#: VirtualMailManager/config.py:392
+msgid "Missing options, which have no default value.\n"
+msgstr "Fehlende Optionen, die keinen Vorgabewert haben.\n"
+
+#: VirtualMailManager/config.py:400 VirtualMailManager/config.py:402
+msgid "Invalid configuration values.\n"
+msgstr "Ungültige Konfigurationswerte\n"
+
+#: VirtualMailManager/config.py:441 VirtualMailManager/config.py:525
+#, python-format
+msgid "Not a valid Dovecot version: '%s'"
+msgstr "Ungültige Dovecot Version: „%s“ "
+
+#: VirtualMailManager/config.py:447 VirtualMailManager/config.py:482
+#, python-format
+msgid "Unsupported database module: '%s'"
+msgstr "Nicht-unterstütztes Datenbank-Modul: „%s“"
+
+#: VirtualMailManager/config.py:452 VirtualMailManager/config.py:490
+#, python-format
+msgid "Unknown pgsql SSL mode: '%s'"
+msgstr "Unbekannter pgsql SSL Modus: „%s“"
+
+#: VirtualMailManager/config.py:459 VirtualMailManager/config.py:503
+#: VirtualMailManager/maillocation.py:71
+#, python-format
+msgid "Unsupported mailbox format: '%s'"
+msgstr "Nicht-unterstütztes Mailbox-Format: „%s“"
+
+#: VirtualMailManager/config.py:475 VirtualMailManager/handler.py:281
+#: VirtualMailManager/handler.py:355 VirtualMailManager/handler.py:360
+#: VirtualMailManager/handler.py:388
+#, python-format
+msgid "No such directory: %s"
+msgstr "Verzeichnis nicht gefunden: %s"
+
+#: VirtualMailManager/config.py:514
+#, python-format
+msgid "Not a valid size value: '%s'"
+msgstr "Keine gültige Größenangabe: „%s“"
+
+#: VirtualMailManager/domain.py:76
+#, python-format
+msgid "The domain '%s' is an alias domain."
+msgstr "Die Domain „%s“ ist eine Alias-Domain."
+
+#: VirtualMailManager/domain.py:105
+#, python-format
+msgid ""
+"There are %(account_count)u accounts, %(alias_count)u aliases and "
+"%(relocated_count)u relocated users."
+msgstr ""
+"Es sind noch %(account_count)u Accounts, %(alias_count)u Aliase und "
+"%(relocated_count)u relocated Users vorhanden."
+
+#: VirtualMailManager/domain.py:179 VirtualMailManager/domain.py:195
+#: VirtualMailManager/domain.py:209 VirtualMailManager/domain.py:217
+#, python-format
+msgid "The domain '%s' already exists."
+msgstr "Die Domain „%s“ existiert bereits."
+
+#: VirtualMailManager/domain.py:388
+msgid "The domain name is too long"
+msgstr "Der Domain-Name ist zu lang."
+
+#: VirtualMailManager/domain.py:390
+#, python-format
+msgid "The domain name '%s' is invalid"
+msgstr "Der Domain-Name „%s“ ist ungültig."
+
+#: VirtualMailManager/emailaddress.py:73
+#, python-format
+msgid "Missing the '@' sign in address: '%s'"
+msgstr "In der E-Mail-Adresse „%s“ fehlt das „@“-Zeichen."
+
+#: VirtualMailManager/emailaddress.py:76
+#, python-format
+msgid "Too many '@' signs in address: '%s'"
+msgstr "Die E-Mail-Adresse „%s“ enthält viele „@“-Zeichen."
+
+#: VirtualMailManager/emailaddress.py:79
+#, python-format
+msgid "Missing local-part in address: '%s'"
+msgstr "Die E-Mail-Adresse „%s“ hat keinen local-part."
+
+#: VirtualMailManager/emailaddress.py:82
+#, python-format
+msgid "Missing domain name in address: '%s'"
+msgstr "Der Domain-Name nach „%s@“ fehlt."
+
+#: VirtualMailManager/emailaddress.py:145
+#, python-format
+msgid "The local-part '%s' is too long."
+msgstr "Der local-part „%s“ ist zu lang"
+
+#: VirtualMailManager/emailaddress.py:150
+#, python-format
+msgid "The local-part '%(l_part)s' contains invalid characters: %(i_chars)s"
+msgstr "Der local-part „%(l_part)s“ enthält ungültige Zeichen: %(i_chrs)s"
+
+#: VirtualMailManager/ext/postconf.py:84
+#, python-format
+msgid ""
+"The value '%s' does not look like a valid postfix configuration parameter "
+"name."
+msgstr ""
+"Der Wert „%s“ sieht nicht wie ein gültiger Postfix "
+"Konfigurationsparametername aus."
+
+#: VirtualMailManager/handler.py:54
+msgid "an account"
+msgstr "ein Account"
+
+#: VirtualMailManager/handler.py:55
+msgid "an alias"
+msgstr "ein Alias"
+
+#: VirtualMailManager/handler.py:56
+msgid "a relocated user"
+msgstr "ein relocated User"
+
+#: VirtualMailManager/handler.py:82
+msgid ""
+"You are not root.\n"
+"\tGood bye!\n"
+msgstr ""
+"Sie sind nicht root.\n"
+"\tAuf Wiedersehen.\n"
+
+#: VirtualMailManager/handler.py:102
+#, python-format
+msgid "Could not find '%(cfg_file)s' in: '%(cfg_path)s'"
+msgstr "Konnte „%(cfg_file)s“ nicht finden in: „%(cfg_path)s“"
+
+#: VirtualMailManager/handler.py:113
+#, python-format
+msgid ""
+"wrong permissions for '%(file)s': %(perms)s\n"
+"`chmod 0600 %(file)s` would be great."
+msgstr ""
+"Falsche Zugriffsrechte für „%(file)s“: (%(perms)s)\n"
+"`chmod 0600 %(file)s` wäre großartig."
+
+#: VirtualMailManager/handler.py:133
+#, python-format
+msgid ""
+"'%(path)s' is not a directory.\n"
+"(%(cfg_file)s: section 'misc', option 'base_directory')"
+msgstr ""
+"„%(path)s“ ist kein Verzeichnis.\n"
+"(%(cfg_file)s: Sektion „misc“, Option „base_directory“)"
+
+#: VirtualMailManager/handler.py:142
+#, python-format
 msgid ""
 "\n"
-"Ouch!\n"
+"(%(cfg_file)s: section 'bin', option '%(option)s')"
 msgstr ""
 "\n"
-"Autsch!\n"
+"(%(cfg_file)s: Sektion „bin“, Option „%(option)s“)"
 
-#: vmm:543
+#: VirtualMailManager/handler.py:156 VirtualMailManager/handler.py:163
 #, python-format
-msgid "Error: %s"
-msgstr "Fehler: %s"
+msgid "Unable to import database module '%s'."
+msgstr "Kann Datenbank-Modul „%s“ nicht importieren."
 
+#. TP: %(a_type)s will be one of: 'an account', 'an alias' or
+#. 'a relocated user'
+#: VirtualMailManager/handler.py:242
+#, python-format
+msgid "There is already %(a_type)s with the address '%(address)s'."
+msgstr "Es existiert bereits %(a_type)s mit der Adresse „%s“."
+
+#: VirtualMailManager/handler.py:295
+#, python-format
+msgid "'%s' is not a directory."
+msgstr "„%s“ ist kein Verzeichnis."
+
+#: VirtualMailManager/handler.py:298
+#, python-format
+msgid "The file/directory '%s' already exists."
+msgstr "Die Datei/das Verzeichnis „%s“ existiert bereits."
+
+#: VirtualMailManager/handler.py:327
+msgid "Skipped mailbox folders:"
+msgstr "Übersprungene Mailbox Ordner:"
+
+#: VirtualMailManager/handler.py:347
+#, python-format
+msgid ""
+"UID '%(uid)u' and/or GID '%(gid)u' are less than %(min_uid)u/%(min_gid)u."
+msgstr ""
+"UID '%(uid)u' und/oder GID '%(gid)u' sind kleiner als %(min_uid)u/"
+"%(min_gid)u."
+
+#: VirtualMailManager/handler.py:352 VirtualMailManager/handler.py:385
+#, python-format
+msgid "Found \"..\" in domain directory path: %s"
+msgstr "Es wurden \"..\" entdeckt im Pfad zum Domain-Verzeichnis: %s"
+
+#: VirtualMailManager/handler.py:365
+msgid "Detected owner/group mismatch in home directory."
+msgstr "Benutzerverzeichnis gehört dem/der falschen Benutzer/Gruppe."
+
+#: VirtualMailManager/handler.py:381
+#, python-format
+msgid "GID '%(gid)u' is less than '%(min_gid)u'."
+msgstr "GID „%(gid)u“ ist kleiner als „%(min_gid)u“"
+
+#: VirtualMailManager/handler.py:392
+#, python-format
+msgid "Detected group mismatch in domain directory: %s"
+msgstr "Domain-Verzeichnis %s gehört der falschen Gruppe"
+
+#: VirtualMailManager/handler.py:564
+#, python-format
+msgid "The pattern '%s' contains invalid characters."
+msgstr "Das Muster „%s“ enthält ungültige Zeichen."
+
+#: VirtualMailManager/handler.py:591
+msgid "Ignored destination addresses:"
+msgstr "Ignorierte Ziel-Adressen:"
+
+#: VirtualMailManager/handler.py:596 VirtualMailManager/handler.py:755
+#, python-format
+msgid "The destination account/alias '%s' does not exist."
+msgstr "Der Ziel-Account/-Alias „%s“ existiert nicht."
+
+#: VirtualMailManager/handler.py:618
+#, python-format
+msgid ""
+"The account has been successfully deleted from the database.\n"
+"    But an error occurred while deleting the following directory:\n"
+"    '%(directory)s'\n"
+"    Reason: %(reason)s"
+msgstr ""
+"Der Account wurde erfolgreich aus der Datenbank gelöscht.\n"
+"    Aber es trat ein Fehler auf beim Löschen des folgenden Verzeichnisses:\n"
+"    „%(directory)s“\n"
+"    Grund: %(reason)s"
+
+#: VirtualMailManager/handler.py:689
+#, python-format
+msgid "Could not accept name: '%s'"
+msgstr "Konnte Namen nicht akzeptieren: „%s“"
+
+#: VirtualMailManager/handler.py:712
+#, python-format
+msgid "Could not accept transport: '%s'"
+msgstr "Konnte Transport nicht akzeptieren: „%s“"
+
+#: VirtualMailManager/handler.py:765 VirtualMailManager/relocated.py:98
+#: VirtualMailManager/relocated.py:105
+#, python-format
+msgid "The relocated user '%s' does not exist."
+msgstr "Der relocated User „%s“ existiert nicht."
+
+#: VirtualMailManager/mailbox.py:260
+#, python-format
+msgid "Failed to create mailboxes: %r\n"
+msgstr "Erstellen folgender Mailboxen fehlgeschlagen: %r\n"
+
+#: VirtualMailManager/maillocation.py:75
+msgid "Empty directory name"
+msgstr "Verzeichnisname ist leer"
+
+#: VirtualMailManager/maillocation.py:77
+#, python-format
+msgid "Directory name is too long: '%s'"
+msgstr "Der Verzeichnisname ist zu lang: „%s“"
+
+#: VirtualMailManager/maillocation.py:123
+#, python-format
+msgid "Unknown mail_location id: %u"
+msgstr "Unbekannte mail_location ID: %u"
+
+#: VirtualMailManager/password.py:370
+#, python-format
+msgid "Unsupported password scheme: '%s'"
+msgstr "Nicht-unterstütztes Passwort-Schema: „%s“"
+
+#: VirtualMailManager/password.py:373
+#, python-format
+msgid "The password scheme '%(scheme)s' requires Dovecot >= v%(version)s."
+msgstr "Das Passwort-Schema „%(scheme)s“ erfordert Dovecot >= v%(version)s."
+
+#: VirtualMailManager/password.py:379
+msgid "Encoding suffixes for password schemes require Dovecot >= v1.1.alpha1."
+msgstr ""
+"Encoding-Suffixe für Passwort-Schemata erfordern Dovecot >= v1.1.alpha1."
+
+#: VirtualMailManager/password.py:382
+#, python-format
+msgid "Unsupported password encoding: '%s'"
+msgstr "Nicht-unterstütztes Passwort-Encoding: „%s“"
+
+#: VirtualMailManager/quotalimit.py:114
+msgid "Unknown quota limit id specified."
+msgstr "Unbekannte Quota-Limit ID angegeben."
+
+#: VirtualMailManager/relocated.py:71
+msgid "Address and destination are identical."
+msgstr "Alias- und Ziel-Adresse sind identisch."
+
+#: VirtualMailManager/relocated.py:75
+#, python-format
+msgid "The relocated user '%s' already exists."
+msgstr "Der relocated User „%s“ existiert bereits."
+
+#: VirtualMailManager/transport.py:79
+msgid "Unknown transport id specified."
+msgstr "Unbekannte Transport ID angegeben."
