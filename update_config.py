@@ -10,6 +10,12 @@ from ConfigParser import ConfigParser
 from shutil import copy2
 from VirtualMailManager.constants.VERSION import VERSION
 
+try:
+    import psycopg2
+except ImportError:
+    has_psycopg2 = False
+else:
+    has_psycopg2 = True
 
 def get_config_file():
     f = None
@@ -110,7 +116,8 @@ def upd_052(cp):
                      ('misc.dovecotvers',  'misc.dovecot_version')):
         move_option(cp, src, dst)
     cp.remove_section('maildir')
-    add_option(cp, 'database.module', 'pyPgSQL')
+    if not has_psycopg2:
+        add_option(cp, 'database.module', 'pyPgSQL')
     set_dovecot_version(cp)
 
 
