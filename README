@@ -1,0 +1,87 @@
+============================
+vmm - a virtual mail manager
+============================
+
+Welcome to vmm!
+
+vmm is the easy to use command line tool for administrators and postmasters,
+to manage domains, alias-domains, accounts and relocated mail users. It allows
+the fast and easy management of mail servers.
+
+vmm is written in Python_. It's designed for installations using Dovecot_ and
+Postfix_ with a PostgreSQL_ backend.
+
+Features
+========
+• General features
+
+  ‣ Unicode/UTF-8 capable (input/storage/output)
+  ‣ supports IDN_
+  ‣ supports the mailbox format Maildir_ and Dovecot's own high-performance
+    mailbox formats single- and multi-\ dbox_
+  ‣ configurable basic mailbox structure, including sub-mailboxes
+  ‣ multilingual (currently: Dutch, English, French and German)
+
+• Domain features
+
+  ‣ configurable transport setting per domain
+  ‣ unique group identifier (GID) per domain
+  ‣ each domain may have one or more alias domain names
+  ‣ configurable quota limits (size and/or number of messages) for the
+    domain's accounts
+  ‣ supports relocated users
+  ‣ the postmaster account can be created automatically when a new domain is
+    created
+
+• Alias domain features
+
+  ‣ alias domain names can be switched between domains
+
+• Account features
+
+  ‣ configurable transport per account
+  ‣ activate or deactivate one/more/all services (SMTP, POP, IMAP and
+    ManageSieve) per account
+  ‣ configurable quota limit (size and/or number of messages) per user
+  ‣ unique user identifier (UID) per user
+
+• Alias features
+
+  ‣ supports multiple destinations per e-mail alias
+  ‣ destinations  can be deleted separately
+
+Source code
+===========
+vmm's source code is available from the Mercurial_ repositories:
+
+• main repository
+
+  ‣ ``http://hg.localdomain.org/vmm``
+
+• mirror repositories
+
+  ‣ ``https://bitbucket.org/pvo/vmm``
+  ‣ ``http://vmm.hg.sourceforge.net/hgweb/vmm/vmm``
+
+Released versions are also available as gzip compressed tar archives at:
+https://sourceforge.net/projects/vmm/files/vmm/
+
+Installation/Upgrade
+====================
+For installation or upgrading instructions read the `INSTALL` or `UPGRADE`
+file.
+
+License
+=======
+In short: "**New BSD License**" aka "3-clause license". For a few more
+details see the `COPYING` file.
+
+.. External references
+.. _dbox: http://wiki2.dovecot.org/MailboxFormat/dbox
+.. _Dovecot: http://dovecot.org/
+.. _IDN: http://en.wikipedia.org/wiki/Internationalized_domain_name
+.. _Maildir: http://wiki2.dovecot.org/MailboxFormat/Maildir
+.. _Mercurial: http://mercurial.selenic.com/
+.. _Postfix: http://www.postfix.org/
+.. _PostgreSQL: http://www.postgresql.org/
+.. _Python: http://www.python.org/
