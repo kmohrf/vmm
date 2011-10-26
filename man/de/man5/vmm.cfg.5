@@ -1,458 +1,602 @@
-.\" Man page generated from reStructeredText.
-.
-.TH VMM.CFG 5 "2010-01-18" "vmm-0.6.0" "vmm Manual"
+.TH "VMM.CFG" "5" "2011-10-26" "vmm 0.6" "vmm"
 .SH NAME
 vmm.cfg \- Konfigurationsdatei für vmm
-.
-.nr rst2man-indent-level 0
-.
-.de1 rstReportMargin
-\\$1 \\n[an-margin]
-level \\n[rst2man-indent-level]
-level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
--
-\\n[rst2man-indent0]
-\\n[rst2man-indent1]
-\\n[rst2man-indent2]
-..
-.de1 INDENT
-.\" .rstReportMargin pre:
-. RS \\$1
-. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
-. nr rst2man-indent-level +1
-.\" .rstReportMargin post:
-..
-.de UNINDENT
-. RE
-.\" indent \\n[an-margin]
-.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
-.nr rst2man-indent-level -1
-.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
-.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
-..
-.SH SYNOPSIS
-.sp
+.\" -----------------------------------------------------------------------
+.SH ÜBERSICHT
 vmm.cfg
+.\" -----------------------------------------------------------------------
 .SH BESCHREIBUNG
-.sp
-\fBvmm\fP(1) liest seine Konfigurationsparameter aus der Datei \fIvmm.cfg\fP.
-.sp
-Die Konfigurationsdatei ist in mehrere Abschnitte unterteilt. Jeder Abschnitt
-wird mit dem, in eckigen Klammern \(aq\fB[\fP\(aq und \(aq\fB]\fP\(aq eingefassten, Namen des
-Abschnitts eingeleitet, gefolgt von \(aq\fIOption\fP = \fIWert\fP\(aq Einträgen:
-.sp
-.nf
-.ft C
-[database]
-host = 127.0.0.1
-.ft P
-.fi
-.sp
-Leerräume um das Gleichheitszeichen \(aq=\(aq und am Ende eines Wertes werden
+.BR vmm (1)
+liest seine Konfigurationsparameter aus der Datei
+.IR vmm.cfg .
+.PP
+Die Konfigurationsdatei ist in mehrere Sektionen unterteilt.
+Jede Sektion wird mit dem in eckigen Klammern
+.RB ' [ "' und '" ] '
+eingefassten Namen der Sektion eingeleitet, gefolgt von
+.RI ' Option " = " Wert '
+Einträgen.
+.PP
+Leerräume um das Gleichheitszeichen '=' und am Ende eines Wertes werden
 ignoriert.
-.sp
-Leerzeilen und Zeilen, die mit einer \(aq#\(aq oder einem \(aq;\(aq anfangen, werden
+Leerzeilen und Zeilen, die mit einer '#' oder einem ';' anfangen, werden
 ignoriert.
-.sp
+.PP
 Jeder Wert ist von einem der folgenden Datentypen:
-.INDENT 0.0
-.IP \(bu 2
-.
-\fIBoolean\fP um zu bestimmen, ob etwas eingeschaltet/aktiviert (true) oder
+.PP
+.TP 8
+.I Boolean
+um festzulegen, ob etwas eingeschaltet/aktiviert (true) oder
 ausgeschaltet/deaktiviert (false) ist.
-.nf
-Mögliche Werte für \fItrue\fP sind: \fB1\fP, \fByes\fP, \fBtrue\fP und \fBon\fP.
-Mögliche Werte für \fIfalse\fP sind: \fB0\fP, \fBno\fP, \fBfalse\fP und \fBoff\fP.
-.fi
-.sp
-.IP \(bu 2
-.
-\fIInt\fP eine Integer\-Zahl, geschrieben ohne eine gebrochene oder dezimale
+.br
+Mögliche Werte für
+.I true
+sind:
+.BR 1 , " yes" , " true" " und " on .
+.br
+Mögliche Werte für
+.I false
+sind:
+.BR 0 , " no" , " false" " und " off .
+.TP
+.I Int
+eine Integer\-Zahl, geschrieben ohne eine gebrochene oder dezimale
 Komponente.
+.br
+Beispielsweise
+.BR 1 , " 50" " oder " 321
+sind Integer\-Zahlen.
+.TP
+.I String
+eine Folge von Buchstaben und Zahlen.
+.br
+Zum Beispiel:
+.RB ' Wort "', '" "Hallo Welt" "' oder '" /usr/bin/strings '
+.PP
+Die meisten Optionen haben einen Vorgabewert.
+Dieser ist nach dem Namen der Option in Klammern angegebenen.
+Um den Vorgabewert einer Option zu verwenden, wird die entsprechende Zeile
+entweder mit
+.BR # " oder " ;
+auskommentiert oder die Zeile wird einfach aus der
+.I vmm.cfg
+entfernt.
+.PP
+Eine minimale
+.I vmm.cfg
+könnte so aussehen:
+.PP
 .nf
-Beispielsweise \fB1\fP, \fB50\fP oder \fB321\fP sind Integer\-Zahlen.
+[database]
+user = ich
+pass = xxxxxxxx
+
+[misc]
+dovecot_version = 1.2.16
 .fi
-.sp
-.IP \(bu 2
-.
-\fIString\fP eine Folge von Buchstaben und Zahlen.
-.nf
-Zum Beispiel: \(aq\fBWort\fP\(aq, \(aq\fBHallo Welt\fP\(aq oder \(aq\fB/usr/bin/strings\fP\(aq
-.fi
-.sp
-.UNINDENT
-.SS SUCHREIHENFOLGE
-.sp
-Standardmäßig sucht \fBvmm\fP(1) die \fIvmm.cfg\fP in folgenden Verzeichnissen,
-in der angegebenen Reihenfolge:
-.INDENT 0.0
-.INDENT 3.5
-.nf
-\fI/root\fP
-\fI/usr/local/etc\fP
-\fI/etc\fP
-.fi
-.sp
-.UNINDENT
-.UNINDENT
-.sp
+.\" -----------------------------------------------------------------------
+.SH SUCHREIHENFOLGE
+Standardmäßig sucht
+.BR vmm (1)
+die
+.I vmm.cfg
+in folgenden Verzeichnissen, in der angegebenen Reihenfolge:
+.RS
+.PD 0
+.TP
+.I
+/root
+.TP
+.I
+/usr/local/etc
+.TP
+.I
+/etc
+.PD
+.RE
+.PP
 Die zuerst gefundene Datei wird verwendet.
-.SH ABSCHNITTE
-.sp
-Im Folgenden werden die Abschnitte der \fIvmm.cfg\fP und deren Optionen
-beschrieben.
-.SS ACCOUNT
-.sp
-Die Optionen des Abschnitts \fBaccount\fP legen Konto\-spezifische
-Einstellungen fest.
-.INDENT 0.0
-.TP
-.B \fCdelete_directory\fP
-\fIBoolean\fP
-.sp
-Bestimmt das Verhalten von \fBvmm\fP(1) beim Löschen eines Kontos.
-Wenn der Wert dieser Option \fItrue\fP ist, wird das Home\-Verzeichnis des
-zu löschenden Anwenders rekursiv gelöscht.
-.TP
-.B \fCdirectory_mode\fP
-\fIInt\fP
-.sp
+.\" -----------------------------------------------------------------------
+.SH SEKTION ACCOUNT
+Die Optionen der Sektion
+.B account
+legen Konto\-spezifische Einstellungen fest.
+.SS account.delete_directory
+.BR delete_directory " (Vorgabe: false) :"
+.I Boolean
+.PP
+Bestimmt das Verhalten von
+.BR vmm (1)
+beim Löschen eines Kontos (userdelete).
+Wenn der Wert dieser Option
+.I true
+ist, wird das Home\-Verzeichnis des zu löschenden Anwenders rekursiv
+gelöscht.
+.\" ------------------------------------
+.SS account.directory_mode
+.BR directory_mode " (Vorgabe: 448) :"
+.I Int
+.PP
 Zugriffsbits des Home\-Verzeichnisses, sowie aller enthaltenen
 Verzeichnisse, in Dezimal\-Schreibweise (Basis 10).
-.nf
-Beispiel: \(aqdrwx\-\-\-\-\-\-\(aq \-> oktal 0700 \-> dezimal 448
-.fi
-.sp
-.TP
-.B \fCdisk_usage\fP
-\fIBoolean\fP
-.sp
+.br
+Beispiel: 'drwx\-\-\-\-\-\-' \(-> oktal 0700 \(-> dezimal 448
+.\" ------------------------------------
+.SS account.disk_usage
+.BR disk_usage " (Vorgabe: false) :"
+.I Boolean
+.PP
 Legt fest, ob die Festplattenbelegung des Maildirs eines Benutzers jedes
-Mal mit \fBdu\fP(1) ermittelt und mit den Konto\-Informationen ausgegeben
-werden soll.
-.sp
-Bei umfangreichen Maildirs kann das langsam sein. Falls Sie Quotas
-aktiviert haben, wird der \fBvmm\fP\-Unterbefehl \fBuserinfo\fP ebenfalls
-die aktuelle Quota\-Nutzung des Kontos mit ausgegeben. Sie können auch
-eines der optionalen Argumente \fBdu\fP oder \fBfull\fP an \fBuserinfo\fP
-übergeben, um sich die aktuelle Festplattenbelegung anzeigen zu lassen.
-.TP
-.B \fCimap\fP
-\fIBoolean\fP
-.sp
-Bestimmt, ob sich neu angelegte Benutzer per IMAP anmelden können sollen.
-.TP
-.B \fCpassword_length\fP
-\fIInt\fP
-.sp
+Mal mit
+.BR du (1)
+ermittelt und mit den Konto\-Informationen ausgegeben werden soll.
+.PP
+Bei umfangreichen Maildirs kann das langsam sein.
+Falls Sie Quotas aktiviert haben, wird der
+.BR vmm -Unterbefehl
+userinfo ebenfalls die aktuelle Quota\-Nutzung des Kontos mit ausgegeben.
+Sie können auch eines der optionalen Argumente
+.BR du " oder " full
+an userinfo übergeben, um sich die aktuelle Festplattenbelegung anzeigen zu
+lassen.
+.\" ------------------------------------
+.SS account.imap
+.BR imap " (Vorgabe: true) :"
+.I Boolean
+.PP
+Legt fest, ob sich neu angelegte Benutzer per IMAP anmelden können sollen.
+.\" ------------------------------------
+.SS account.password_length
+.BR password_length " (Vorgabe: 8) :"
+.I Int
+.PP
 Diese Option legt die Anzahl der Zeichen für automatisch erzeugte
-Passwörter fest. Alle Werte kleiner als 8 werden auf 8 erhöht.
-.TP
-.B \fCpop3\fP
-.sp
-Bestimmt, ob sich neu angelegte Benutzer per POP3 anmelden können sollen.
-.TP
-.B \fCrandom_password\fP
-\fIBoolean\fP
-.sp
-Mit dieser Option wird bestimmt , ob \fBvmm\fP(1) ein zufälliges Passwort
-generieren soll, wenn kein Passwort an den \fBuseradd\fP Unterbefehl
-übergeben wurde. Ist der Wert dieser Option \fIfalse\fP, wird \fBvmm\fP Sie
-auffordern, ein Passwort für den neun Account einzugeben.
-.sp
-Sie können die Länge für automatisch generierte Passwörter mit der
-Option \fBpassword_length\fP konfigurieren.
-.TP
-.B \fCsieve\fP
-\fIBoolean\fP
-.sp
-Bestimmt, ob sich neu angelegte Benutzer per ManageSieve anmelden
+Passwörter fest.
+Alle Werte kleiner als 8 werden auf 8 erhöht.
+.\" ------------------------------------
+.SS account.pop3
+.BR pop3 " (Vorgabe: true) :"
+.I Boolean
+.PP
+Legt fest, ob sich neu angelegte Benutzer per POP3 anmelden können sollen.
+.\" ------------------------------------
+.SS account.random_password
+.BR random_password " (Vorgabe: false) :"
+.I Boolean
+.PP
+Mit dieser Option wird bestimmt, ob
+.BR vmm (1)
+ein zufälliges Passwort generieren soll, wenn kein Passwort an den
+Unterbefehl useradd übergeben wurde.
+Ist der Wert dieser Option
+.IR false ,
+wird
+.B vmm
+Sie auffordern, ein Passwort für den neuen Account einzugeben.
+.PP
+Sie können die Länge für automatisch generierte Passwörter mit der Option
+.I account.password_length
+konfigurieren.
+.\" ------------------------------------
+.SS account.sieve
+.BR sieve " (Vorgabe: true) :"
+.I Boolean
+.PP
+Legt fest, ob sich neu angelegte Benutzer per ManageSieve anmelden können
+sollen.
+.\" ------------------------------------
+.SS account.smtp
+.BR smtp " (Vorgabe: true) :"
+.I Boolean
+.PP
+Legt fest, ob sich neu angelegte Benutzer per SMTP (SMTP AUTH) anmelden
 können sollen.
-.TP
-.B \fCsmtp\fP
-\fIBoolean\fP
-.sp
-Bestimmt, ob sich neu angelegte Benutzer per SMTP (SMTP AUTH) anmelden
-können sollen.
-.UNINDENT
-.sp
-Beispiel:
-.sp
-.nf
-.ft C
-[account]
-delete_directory = false
-directory_mode = 448
-disk_usage = false
-random_password = true
-password_length = 10
-smtp = true
-pop3 = true
-imap = true
-sieve = true
-.ft P
-.fi
-.SS BIN
-.sp
-Im \fBbin\fP\-Abschnitt werden Pfade zu Binaries angegeben, die von
-\fBvmm\fP(1) benötigt werden.
-.INDENT 0.0
-.TP
-.B \fCdovecotpw\fP
-\fIString\fP
-.sp
-Der absolute Pfad zum dovecotpw Binary. Dieses Binary wird zur
-Hash\-Erzeugung verwendet, wenn \fBmisc.password_scheme\fP einen der
-nachfolgenden Werte hat: \(aqSMD5\(aq, \(aqSSHA\(aq, \(aqCRAM\-MD5\(aq, \(aqHMAC\-MD5\(aq,
-\(aqLANMAN\(aq, \(aqNTLM\(aq oder \(aqRPA\(aq.
-.TP
-.B \fCdu\fP
-\fIString\fP
-.sp
-Der absolute Pfad zu \fBdu\fP(1). Dieses Binary wird verwendet, wenn
-die Festplattenbelegung eines Kontos ermittelt wird.
-.TP
-.B \fCpostconf\fP
-\fIString\fP
-.sp
-Der absolute Pfad zu Postfix\(aq \fBpostconf\fP(1). Dieses Binary wird
-verwendet, wenn \fBvmm\fP(1) diverse Postfix\-Einstellungen prüft, zum
-Beispiel das \fIvirtual_alias_expansion_limit\fP.
-.UNINDENT
-.sp
-Beispiel:
-.sp
-.nf
-.ft C
-[bin]
-dovecotpw = /usr/sbin/dovecotpw
-du = /usr/bin/du
-postconf = /usr/sbin/postconf
-.ft P
-.fi
-.SS CONFIG
-.sp
-Beim \fBconfig\fP\-Abschnitt handelt es sich um einen internen
-Steuerungs\-Abschnitt.
-.INDENT 0.0
-.TP
-.B \fCdone\fP
-\fIBoolean\fP
-.sp
-Diese Option hat den Wert \fIfalse\fP, wenn \fBvmm\fP(1) zum ersten Mal
-installiert wurde. Wenn Sie die Datei \fIvmm.cfg\fP von Hand editieren,
-weisen Sie dieser Option abschließend den Wert \fItrue\fP zu. Wird die
-Konfiguration über das Kommando \fBvmm configure\fP angepasst, wird der
-Wert dieser Option automatisch auf \fItrue\fP gesetzt.
-.sp
-Ist der Wert dieser Option  \fIfalse\fP, so startet \fBvmm\fP(1) beim
-nächsten Aufruf im interaktiven Konfigurations\-Modus.
-.UNINDENT
-.sp
-Beispiel:
-.sp
-.nf
-.ft C
-[config]
-done = true
-.ft P
-.fi
-.SS DATABASE
-.sp
-Der \fBdatabase\fP\-Abschnitt wird verwendet, um die für den Datenbankzugriff
-benötigten Optionen festzulegen.
-.INDENT 0.0
-.TP
-.B \fChost\fP
-\fIString\fP
-.sp
-Der Hostname oder die IP\-Adresse des Datenbank\-Servers.
-.TP
-.B \fCname\fP
-\fIString\fP
-.sp
+.\" -----------------------------------------------------------------------
+.SH SEKTION BIN
+In der
+.BR bin \-Sektion
+werden die Pfade zu den von 
+.BR vmm (1)
+benötigten Binaries angegeben.
+.SS bin.dovecotpw
+.BR dovecotpw " (Vorgabe: /usr/sbin/dovecotpw) :"
+.I String
+.PP
+Der absolute Pfad zum dovecotpw Binary.
+Geben Sie den absoluten Pfad zum
+.BR doveadm (1)
+Binary an, falls Sie Dovecot v2.0 verwenden.
+.PP
+Dieses Binary wird zur Hash\-Erzeugung verwendet, wenn
+.I misc.password_scheme
+einen der nachfolgenden Werte hat: 'CRAM\-MD5', 'HMAC\-MD5', 'LANMAN',
+\(aqOTP', 'RPA' oder 'SKEY'.
+Dieses Binary wird auch benötigt, wenn Ihre Python\-Installation einen der
+folgenden Hash\-Algorithmen nicht unterstützt:
+.IP \(bu 4
+md4: (hashlib + OpenSSL oder PyCrypto) verwendet für die Passwort\-Schemen:
+\(aqPLAIN\-MD4' und 'NTLM'
+.IP \(bu
+sha256: (hashlib oder PyCrypto \(>= 2.1.0alpha1) verwendet für die
+Passwort\-Schemen: 'SHA256' und 'SSHA256'
+.IP \(bu
+sha512: (hashlib) verwendet für die Passwort\-Schemen: 'SHA512' und
+\(aqSSHA512'
+.PP
+Das
+.BR doveadm (1)
+Binary wird auch gebraucht, um die INBOX und zusätzliche Mailboxen
+.RI ( mailbox.folders )
+für einen neuen Account zu erstellen, wenn die Option
+.I mailbox.format
+den Wert
+.BR mdbox " oder " sdbox
+hat.
+.\" ------------------------------------
+.SS bin.du
+.BR du " (Vorgabe: /usr/bin/du) :"
+.I String
+.PP
+Der absolute Pfad zu
+.BR du (1).
+Dieses Binary wird verwendet, wenn die Festplattenbelegung eines Kontos
+ermittelt wird.
+.\" ------------------------------------
+.SS bin.postconf
+.BR postconf " (Vorgabe: /usr/sbin/postconf) :"
+.I String
+.PP
+Der absolute Pfad zu Postfix'
+.BR postconf (1).
+Dieses Binary wird verwendet, wenn
+.BR vmm (1)
+diverse Postfix\-Einstellungen prüft, zum Beispiel das
+.IR virtual_alias_expansion_limit .
+.\" -----------------------------------------------------------------------
+.SH SEKTION DATABASE
+Die
+.BR database \-Sektion
+wird verwendet, um die für den Datenbankzugriff erforderlichen Optionen
+festzulegen.
+.SS database.host
+.BR host " (Vorgabe: localhost) :"
+.I String
+.PP
+Der Hostname oder die IP\-Adresse des Datenbankservers.
+.\" ------------------------------------
+.SS database.module
+.BR module " (Vorgabe: psycopg2) :"
+.I String
+.PP
+Das für den Datenbankzugriff zu verwendende Python PostgreSQL Adapter
+Modul.
+Unterstützte Module sind
+.BR psycopg2 " und " pyPgSQL .
+.\" ------------------------------------
+.SS database.name
+.BR name " (Vorgabe: mailsys) :"
+.I String
+.PP
 Der Name der zu verwendenden Datenbank.
-.TP
-.B \fCpass\fP
-\fIString\fP
-.sp
+.\" ------------------------------------
+.SS database.pass
+.BR pass " (Vorgabe: " None ") :"
+.I String
+.PP
 Das Passwort des Datenbank\-Benutzers.
-.TP
-.B \fCuser\fP
-\fIString\fP
-.sp
+.\" ------------------------------------
+.SS database.port
+.BR port " (Vorgabe: 5432) :"
+.I Int
+.PP
+Der TCP\-Port, auf dem der Datenbankserver Verbindungen annimmt.
+.\" ------------------------------------
+.SS database.sslmode
+.BR sslmode " (Vorgabe: prefer) :"
+.I String
+.PP
+Bestimmt, ob und mit welcher Priorität eine SSL\-Verbindung mit dem
+Datenbankserver ausgehandelt wird.
+Mögliche Werte sind:
+.BR disabled ", " allow ", " prefer ", " require ", " verify\-ca " und "
+.BR verify\-full .
+Die Modi
+.BR verify\-ca " und " verify\-full
+stehen seit PostgreSQL 8.4 zur Verfügung.
+.PP
+Diese Option wird ignoriert, wenn das
+.I database.module
+.B pyPgSQL
+verwendet wird.
+.\" ------------------------------------
+.SS database.user
+.BR user " (Vorgabe: " None ") :"
+.I String
+.PP
 Der Name des Datenbank\-Benutzers.
-.UNINDENT
-.sp
-Beispiel:
-.sp
-.nf
-.ft C
-[database]
-host = localhost
-user = vmm
-pass = PY_SRJ}L/0p\-oOk
-name = mailsys
-.ft P
-.fi
-.SS DOMAIN
-.sp
-Im \fBdomain\fP\-Abschnitt werden Domain\-spezifische Informationen konfiguriert.
-.INDENT 0.0
-.TP
-.B \fCauto_postmaster\fP
-\fIBoolean\fP
-.sp
-Ist der Wert dieser Option \fItrue\fP, wird \fBvmm\fP(1) beim Anlegen einer
-Domain automatisch einen postmaster\-Account erstellen.
-.TP
-.B \fCdelete_directory\fP
-\fIBoolean\fP
-.sp
-Bestimmt, ob beim Löschen einer Domain das Verzeichnis einer Domain,
-inklusive aller Anwender\-Verzeichnisse, rekursiv gelöscht werden soll.
-.TP
-.B \fCdirectory_mode\fP
-\fIInt\fP
-.sp
-Zugriffsbits des Domain\-Verzeichnisses in Dezimal\-Schreibweise (Basis
-10).
-.nf
-Beispiel: \(aqdrwxrwx\-\-\-\(aq \-> oktal 0770 \-> dezimal 504
-.fi
-.sp
-.TP
-.B \fCforce_deletion\fP
-\fIBoolean\fP
-.sp
-Erzwingt das Löschen von Konten und Aliase beim Löschen einer Domain.
-.UNINDENT
-.sp
-Beispiel:
-.sp
-.nf
-.ft C
-[domain]
-auto_postmaster = true
-delete_directory = false
-directory_mode = 504
-force_deletion = false
-.ft P
-.fi
-.SS MAILDIR
-.sp
-Im \fBmaildir\fP\-Abschnitt werden die für die Maildirs erforderlichen Optionen
+.\" -----------------------------------------------------------------------
+.SH SEKTION DOMAIN
+In der
+.BR domain \-Sektion
+werden Domain\-spezifische Einstellungen hinterlegt.
+.SS domain.auto_postmaster
+.BR auto_postmaster " (Vorgabe: true) :"
+.I Boolean
+.PP
+Ist der Wert dieser Option
+.IR true ,
+wird
+.BR vmm (1)
+beim Anlegen einer Domain (domainadd) automatisch einen postmaster\-Account
+erstellen.
+.\" ------------------------------------
+.SS domain.delete_directory
+.BR delete_directory " (Vorgabe: false) :"
+.I Boolean
+.PP
+Legt fest, ob beim Löschen einer Domain (domaindelete) das Verzeichnis der
+zu löschenden Domain, inklusive aller Anwender\-Verzeichnisse, rekursiv
+gelöscht werden soll.
+.\" ------------------------------------
+.SS domain.directory_mode
+.BR directory_mode " (Vorgabe: 504) :"
+.I Int
+.PP
+Zugriffsbits des Domain\-Verzeichnisses in Dezimal\-Schreibweise
+(Basis 10).
+.br
+Beispiel: 'drwxrwx\-\-\-' \(-> oktal 0770 \(-> dezimal 504
+.\" ------------------------------------
+.SS domain.force_deletion
+.BR force_deletion " (Vorgabe: false) :"
+.I Boolean
+.PP
+Erzwingt das Löschen aller zugeordneten Konten und Aliase beim Löschen
+einer Domain (domaindelete).
+.\" -----------------------------------------------------------------------
+.SH SEKTION MAILBOX
+In der
+.BR mailbox \-Sektion
+werden die für die Erstellung von Mailboxen erforderlichen Optionen
 festgelegt.
-.INDENT 0.0
-.TP
-.B \fCfolders\fP
-\fIString\fP
-.sp
-Eine durch Doppelpunkten getrennte Liste mit Verzeichnisnamen, die
-innerhalb des Maildirs erstellt werden sollen. Sollen innerhalb des
-Maildirs keine Verzeichnisse angelegt werden, ist dieser Optionen ein
-einzelner Doppelpunkt (\(aq\fB:\fP\(aq) als Wert zuzuweisen.
-.sp
+Die INBOX wird in jedem Fall erstellt.
+.SS mailbox.folders
+.BR folders " (Vorgabe: Drafts:Sent:Templates:Trash) :"
+.I String
+.PP
+Eine durch Doppelpunkte getrennte Liste mit Namen der zu erstellenden
+Mailboxen.
+Sollen keine zusätzlichen Mailboxen angelegt werden, ist dieser Option ein
+einzelner Doppelpunkt
+.RB (' : ')
+als Wert zuzuweisen.
+.PP
 Sollen Verzeichnisse mit Unterverzeichnissen angelegt werden, ist ein
-einzelner Punkt (\(aq\fB.\fP\(aq) als Separator zu verwenden.
+einzelner Punkt
+.RB (' . ')
+als Separator zu verwenden.
+.PP
+Sollen Mailboxen mit internationalisierten Namen erstellt werden (zum
+Beispiel: 'Wysłane' oder 'Gelöschte Objekte'), ist der Name UTF\-8 kodiert
+anzugeben.
+.BR vmm (1)
+wird die internationalisierten Mailboxnamen in eine modifizierten Variante
+des UTF\-7\-Zeichensatzes (siehe auch: RFC 3501, Sektion 5.1.3)
+konvertieren.
+.\" ------------------------------------
+.SS mailbox.format
+.BR format " (Vorgabe: maildir) :"
+.I String
+.PP
+Das zu verwendende Mailbox\-Format für die Mailboxen der Benutzer.
+Abhängig von der verwendeten Dovecot\-Version
+.RI ( misc.dovecot_version ),
+unterstützt
+.BR vmm (1)
+bis zu drei Formate:
+.TP 8
+.B maildir
+Dovecot \(>= v1.0.0
 .TP
-.B \fCname\fP
-\fIString\fP
-.sp
-Der Standard\-Name des Maildir\-Verzeichnisses im Verzeichnis des
-jeweiligen Anwenders.
-.UNINDENT
-.sp
-Beispiel:
-.sp
-.nf
-.ft C
-[maildir]
-folders = Drafts:Sent:Templates:Trash:Lists.Dovecot:Lists.Postfix
-name = Maildir
-.ft P
-.fi
-.SS MISC
-.sp
-Im \fBmisc\fP\-Abschnitt werden verschiedene Einstellungen festgelegt.
-.INDENT 0.0
+.B mdbox
+Dovecot \(>= v2.0.beta5
 .TP
-.B \fCbase_directory\fP
-\fIString\fP
-.sp
+.B sdbox
+Dovecot \(>= v2.0.rc3
+.\" ------------------------------------
+.SS mailbox.root
+.BR root " (Vorgabe: Maildir) :"
+.I String
+.PP
+Name des Mailbox\-Wurzelverzeichnisses im Home\-Verzeichnis des jeweiligen
+Benutzers.
+Übliche Namen, je nach verwendetem
+.IR mailbox.format ,
+sind
+.BR Maildir ", " mdbox " or " sdbox .
+.\" ------------------------------------
+.SS mailbox.subscribe
+.BR subscribe " (Vorgabe: true) :"
+.I Boolean
+.PP
+Wenn dieser Option der Wert
+.B true
+zugewiesen wurde, werden die, gemäß
+.IR mailbox.folders ,
+erstellen Mailboxen in der subscriptions\-Datei des Benutzers gelistet.
+Sollen die erstellen Mailboxen nicht nicht in der subscriptions\-Datei
+gelistet werden, weisen Sie dieser Option den Wert
+.B false
+zu.
+.\" -----------------------------------------------------------------------
+.SH SEKTION MISC
+In der
+.BR misc \-Sektion
+werden Einstellungen für verschiedene Bereiche festgelegt.
+.SS misc.base_directory
+.BR base_directory " (Vorgabe: /srv/mail) :"
+.I String
+.PP
 Alle Domain\-Verzeichnisse werden innerhalb dieses Basis\-Verzeichnisses
 angelegt.
-.TP
-.B \fCpassword_scheme\fP
-\fIString\fP
-.sp
-Das zu verwendende Passwort\-Schema (siehe auch: \fBdovecotpw \-l\fP).
-.TP
-.B \fCgid_mail\fP
-\fIInt\fP
-.sp
-Die numerische Gruppen\-ID der Gruppe mail, bzw. der Gruppe aus
-\fImail_privileged_group\fP der Datei \fIdovecot.conf\fP.
-.TP
-.B \fCtransport\fP
-\fIString\fP
-.sp
-Der Standard\-Transport aller Domains und Konten. Siehe auch:
-\fBtransport\fP(5)
-.TP
-.B \fCdovecot_version\fP
-\fIInt\fP
-.sp
-Die verketteten Major\- und Minor\-Teile der eingesetzten Dovecot\-Version
-(siehe: \fBdovecot \-\-version\fP).
-.sp
-Wenn das Kommando \fBdovecot \-\-version\fP zum Beispiel \fI1.1.18\fP ausgibt,
-ist dieser Option der Wert \fB11\fP zuzuweisen.
-.UNINDENT
-.sp
-Beispiel:
-.sp
+.\" ------------------------------------
+.SS misc.crypt_blowfish_rounds
+.BR crypt_blowfish_rounds " (Vorgabe: 5) :"
+.I Int
+.PP
+Anzahl der Verschlüsselungsdurchgänge für das
+.I password_scheme
+.BR BLF\-CRYPT .
+.PP
+Der Wert muss im Bereich von
+.BR 4 " \- " 31
+liegen.
+.\" ------------------------------------
+.SS misc.crypt_sha256_rounds
+.BR crypt_sha256_rounds " (Vorgabe: 5000) :"
+.I Int
+.PP
+Anzahl der Verschlüsselungdurchgänge für das
+.I password_scheme
+.BR SHA256\-CRYPT .
+.PP
+Der Wert muss im Bereich von
+.BR 1000 " \- " 999999999
+liegen.
+.\" ------------------------------------
+.SS misc.crypt_sha512_rounds
+.BR crypt_sha512_rounds " (Vorgabe: 5000) :"
+.I Int
+.PP
+Anzahl der Verschlüsselungdurchgänge für das
+.I password_scheme
+.BR SHA512\-CRYPT .
+.PP
+Der Wert muss im Bereich von
+.BR 1000 " \- " 999999999
+liegen.
+.\" ------------------------------------
+.SS misc.dovecot_version
+.BR dovecot_version " (Vorgabe: " None ") :"
+.I String
+.PP
+Die aktuell eingesetzte Dovecot\-Version.
+(siehe:
+.BR "dovecot \-\-version" ).
+
+Wenn das Kommando
+.B dovecot \-\-version
+zum Beispiel
+.I 2.0.beta4 (8818db00d347)
+ausgibt, ist dieser Option der Wert
+.B 2.0.beta4
+zuzuweisen.
+.\" ------------------------------------
+.SS misc.password_scheme
+.BR password_scheme " (Vorgabe: CRAM\-MD5) :"
+.I String
+.PP
+Das zu verwendende Passwort\-Schema.
+Um eine Liste aller verfügbaren Passwort\-Schemata zu erhalten, führen Sie
+das Kommando
+.B dovecotpw -l
+(Dovecot v1.x) oder
+.B doveadm pw \-l
+(Dovecot v2.0) aus.
+.PP
+Seit Dovecot \(>= v1.1.alpha1 ist es möglich,
+dem
+.I password_scheme
+ein Encoding\-Suffix anzufügen.
+Unterstützte Encoding\-Suffixe:
+.BR .b64 ", " .base64 " und " .hex .
+Beispiel: PLAIN.BASE64
+.\" ------------------------------------
+.SS misc.quota_bytes
+.BR quota_bytes " (Vorgabe: 0) :"
+.I String
+.PP
+Quota Limit in Bytes.
+0 bedeutet unbegrenzt.
+Dieses Limit wird bei allen neu angelegten Domains angewendet.
+.PP
+Der Wert dieser Option kann als Integer\-Wert, zum Beispiel
+.B 20480
+geschrieben werden.
+Es ist auch möglich dem Wert eines der folgenden
+Suffixe anzuhängen:
+.BR b " (Bytes), " k " (Kilobytes), " M " (Megabytes) oder " G
+(Gigabytes).
+.br
+1024 entspricht 1024b oder 1k.
+.\" ------------------------------------
+.SS misc.quota_messages
+.BR quota_messages " (Vorgabe: 0) :"
+.I Int
+.PP
+Quota Limit als Anzahl von Nachrichten.
+0 bedeutet unbegrenzt.
+Dieses Limit wird bei allen neu angelegten Domains angewendet.
+.\" ------------------------------------
+.SS misc.transport
+.BR transport " (Vorgabe: dovecot:) :"
+.I String
+.PP
+Der Standard\-Transport aller Domains und Konten.
+Siehe auch:
+.BR transport (5).
+.\" -----------------------------------------------------------------------
+.SH BEISPIEL
+Eine Beispiel\-Konfiguration.
+Alle Optionen, die nicht in der Konfigurationsdatei gelistet sind, haben
+ihren Vorgabewert.
+.PP
 .nf
-.ft C
+[account]
+password_length = 10
+random_password = true
+
+[bin]
+dovecotpw = /usr/bin/doveadm
+
+[database]
+host = dbsrv8.example.net
+pass = PY_SRJ}L/0p\-oOk
+port = 5433
+sslmode = require
+user = vmm
+
+[mailbox]
+folders = Drafts:Sent:Templates:Trash:Lists.Dovecot:Lists.Postfix
+
 [misc]
-base_directory = /srv/mail
-password_scheme = CRAM\-MD5
-gid_mail = 8
-transport = dovecot:
-dovecot_version = 11
-.ft P
+crypt_sha512_rounds = 10000
+dovecot_version = 2.0.beta4
+password_scheme = SHA512\-CRYPT.hex
+quota_bytes = 500M
+quota_messages = 10000
+transport = lmtp:unix:private/dovecot\-lmtp
 .fi
-.SH DATEIEN
-.INDENT 0.0
-.TP
-.B \fI/root/vmm.cfg\fP
-.nf
-Wird verwendet, falls vorhanden.
-.fi
-.sp
-.TP
-.B \fI/usr/local/etc/vmm.cfg\fP
-.nf
-Wird verwendet, sollte obige Datei nicht gefunden werden.
-.fi
-.sp
-.TP
-.B \fI/etc/vmm.cfg\fP
-.nf
-Wird verwendet, falls obengenannte Dateien nicht existieren.
-.fi
-.sp
-.UNINDENT
+.\" -----------------------------------------------------------------------
 .SH SIEHE AUCH
-.sp
-vmm(1), Programm für die Kommandozeile, um E\-Mail\-Domains, \-Konten und \-Aliase
-zu verwalten.
+.BR doveadm\-pw (1),
+.BR dovecotpw (1),
+.BR postconf (1),
+.BR vmm (1),
+.BR transport (5)
+.\" -----------------------------------------------------------------------
+.SH INTERNET RESSOURCEN
+.TP
+Wiki
+http://de.vmm.localdomain.org/
+.TP
+Projekt\-Seite
+http://sf.net/projects/vmm/
+.TP
+Bugtracker
+http://sf.net/tracker/?group_id=213727&atid=1026862
+.\" -----------------------------------------------------------------------
 .SH COPYING
-.sp
-vmm und die dazugehörigen Manualseiten wurden von Pascal Volk geschrieben
-und sind unter den Bedingungen der BSD Lizenz lizenziert.
-.SH AUTHOR
-Pascal Volk <neverseen@users.sourceforge.net>
-.\" Generated by docutils manpage writer.
-.\" 
-.
+vmm und die dazugehörigen Manualseiten wurden von Pascal Volk <neverseen AT
+users.sourceforge.net> geschrieben und sind unter den Bedingungen der BSD
+Lizenz lizenziert.
