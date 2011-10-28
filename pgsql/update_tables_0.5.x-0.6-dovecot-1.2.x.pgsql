@@ -1,24 +1,45 @@
 SET client_encoding = 'UTF8';
 SET client_min_messages = warning;
 
+-- ---
+-- Create the new service_set table and insert all possible combinations
+-- --
+CREATE SEQUENCE service_set_id;
+
+CREATE TABLE service_set (
+    ssid        bigint NOT NULL DEFAULT nextval('service_set_id'),
+    smtp        boolean NOT NULL DEFAULT TRUE,
+    pop3        boolean NOT NULL DEFAULT TRUE,
+    imap        boolean NOT NULL DEFAULT TRUE,
+    sieve       boolean NOT NULL DEFAULT TRUE,
+    CONSTRAINT  pkey_service_set PRIMARY KEY (ssid),
+    CONSTRAINT  ukey_service_set UNIQUE (smtp, pop3, imap, sieve)
+);
+
+COPY service_set (smtp, pop3, imap, sieve) FROM stdin;
+TRUE	TRUE	TRUE	TRUE
+FALSE	TRUE	TRUE	TRUE
+TRUE	FALSE	TRUE	TRUE
+FALSE	FALSE	TRUE	TRUE
+TRUE	TRUE	FALSE	TRUE
+FALSE	TRUE	FALSE	TRUE
+TRUE	FALSE	FALSE	TRUE
+FALSE	FALSE	FALSE	TRUE
+TRUE	TRUE	TRUE	FALSE
+FALSE	TRUE	TRUE	FALSE
+TRUE	FALSE	TRUE	FALSE
+FALSE	FALSE	TRUE	FALSE
+TRUE	TRUE	FALSE	FALSE
+FALSE	TRUE	FALSE	FALSE
+TRUE	FALSE	FALSE	FALSE
+FALSE	FALSE	FALSE	FALSE
+\.
 
 -- ---
--- Make room for sha512-crypt.hex hashed passwords
--- ---
-DROP VIEW dovecot_password;
-
-ALTER TABLE users ALTER COLUMN passwd TYPE varchar(270);
-
-CREATE VIEW dovecot_password AS
-    SELECT local_part || '@' || domain_name.domainname AS "user",
-           passwd AS "password", smtp, pop3, imap, sieve
-      FROM users
-           LEFT JOIN domain_name USING (gid);
-
--- ---
--- Make room for different mailbox formats.
+-- Make room for different mailbox formats and longer password hashes.
 -- ---
 DROP VIEW dovecot_user;
+DROP VIEW dovecot_password;
 DROP VIEW postfix_maildir;
 DROP VIEW vmm_domain_info;
 
@@ -45,6 +66,7 @@ ALTER TABLE maillocation
 ALTER TABLE maillocation ADD CONSTRAINT fkey_maillocation_fid_mailboxformat
     FOREIGN KEY (fid) REFERENCES mailboxformat (fid);
 
+ALTER TABLE users ALTER COLUMN passwd TYPE varchar(270);
 
 -- ---
 -- Add quota stuff
@@ -59,7 +81,7 @@ CREATE TABLE quotalimit (
 -- Insert default (non) quota limit
 INSERT INTO quotalimit(bytes, messages) VALUES (0, 0);
 
--- Adjust tables
+-- Adjust tables (quota)
 ALTER TABLE domain_data ADD COLUMN qid bigint NOT NULL DEFAULT 1;
 ALTER TABLE domain_data ADD CONSTRAINT fkey_domain_data_qid_quotalimit
     FOREIGN KEY (qid) REFERENCES quotalimit (qid);
@@ -115,6 +137,28 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER mergeuserquota BEFORE INSERT ON userquota
     FOR EACH ROW EXECUTE PROCEDURE merge_userquota();
 
+-- Adjust tables (services)
+ALTER TABLE domain_data ADD COLUMN ssid bigint NOT NULL DEFAULT 1;
+ALTER TABLE domain_data ADD CONSTRAINT fkey_domain_data_ssid_service_set
+    FOREIGN KEY (ssid) REFERENCES service_set (ssid);
+
+ALTER TABLE users ADD COLUMN ssid bigint NOT NULL DEFAULT 1;
+-- save current service sets
+UPDATE users u
+   SET ssid = ss.ssid
+  FROM service_set ss
+ WHERE ss.smtp = u.smtp
+   AND ss.pop3 = u.pop3
+   AND ss.imap = u.imap
+   AND ss.sieve = u.sieve;
+
+ALTER TABLE users DROP COLUMN smtp;
+ALTER TABLE users DROP COLUMN pop3;
+ALTER TABLE users DROP COLUMN imap;
+ALTER TABLE users DROP COLUMN sieve;
+ALTER TABLE users ADD CONSTRAINT fkey_users_ssid_service_set
+    FOREIGN KEY (ssid) REFERENCES service_set (ssid);
+
 -- ---
 -- Restore views
 -- ---
@@ -127,6 +171,13 @@ CREATE VIEW dovecot_user AS
            LEFT JOIN domain_name USING (gid)
            LEFT JOIN maillocation USING (mid)
            LEFT JOIN mailboxformat USING (fid);
+
+CREATE OR REPLACE VIEW dovecot_password AS
+    SELECT local_part || '@' || domainname AS "user",
+           passwd AS "password", smtp, pop3, imap, sieve
+      FROM users
+           LEFT JOIN domain_name USING (gid)
+           LEFT JOIN service_set USING (ssid);
 
 CREATE VIEW postfix_maildir AS
     SELECT local_part || '@' || domain_name.domainname AS address,

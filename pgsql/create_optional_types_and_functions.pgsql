@@ -288,7 +288,7 @@ CREATE TYPE dovecotuser AS (
     mail        text
 );
 -- ---
--- Data type for function dovecotquotauser(varchar, varchar) 
+-- Data type for function dovecotquotauser(varchar, varchar)
 -- ---
 CREATE TYPE dovecotquotauser AS (
     userid      varchar(320),
@@ -410,11 +410,12 @@ AS $$
     BEGIN
         FOR record IN
             SELECT userid, passwd, smtp, pop3, imap, managesieve
-              FROM users
+              FROM users, service_set
              WHERE gid = (SELECT gid
                             FROM domain_name
                            WHERE domainname = the_domain)
                AND local_part = localpart
+               AND service_set.ssid = users.ssid
             LOOP
                 RETURN NEXT record;
             END LOOP;

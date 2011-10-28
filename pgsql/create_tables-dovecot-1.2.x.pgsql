@@ -10,6 +10,8 @@ CREATE SEQUENCE maillocation_id;
 
 CREATE SEQUENCE quotalimit_id;
 
+CREATE SEQUENCE service_set_id;
+
 CREATE SEQUENCE domain_gid
     START WITH 70000
     INCREMENT BY 1
@@ -67,16 +69,48 @@ CREATE TABLE quotalimit (
 -- Insert default (non) quota limit
 INSERT INTO quotalimit(bytes, messages) VALUES (0, 0);
 
+CREATE TABLE service_set (
+    ssid        bigint NOT NULL DEFAULT nextval('service_set_id'),
+    smtp        boolean NOT NULL DEFAULT TRUE,
+    pop3        boolean NOT NULL DEFAULT TRUE,
+    imap        boolean NOT NULL DEFAULT TRUE,
+    sieve       boolean NOT NULL DEFAULT TRUE,
+    CONSTRAINT  pkey_service_set PRIMARY KEY (ssid),
+    CONSTRAINT  ukey_service_set UNIQUE (smtp, pop3, imap, sieve)
+);
+-- Insert all possible service combinations
+COPY service_set (smtp, pop3, imap, sieve) FROM stdin;
+TRUE	TRUE	TRUE	TRUE
+FALSE	TRUE	TRUE	TRUE
+TRUE	FALSE	TRUE	TRUE
+FALSE	FALSE	TRUE	TRUE
+TRUE	TRUE	FALSE	TRUE
+FALSE	TRUE	FALSE	TRUE
+TRUE	FALSE	FALSE	TRUE
+FALSE	FALSE	FALSE	TRUE
+TRUE	TRUE	TRUE	FALSE
+FALSE	TRUE	TRUE	FALSE
+TRUE	FALSE	TRUE	FALSE
+FALSE	FALSE	TRUE	FALSE
+TRUE	TRUE	FALSE	FALSE
+FALSE	TRUE	FALSE	FALSE
+TRUE	FALSE	FALSE	FALSE
+FALSE	FALSE	FALSE	FALSE
+\.
+
 CREATE TABLE domain_data (
     gid         bigint NOT NULL DEFAULT nextval('domain_gid'),
-    tid         bigint NOT NULL DEFAULT 1, -- default transport
     qid         bigint NOT NULL DEFAULT 1, -- default quota limit
+    ssid        bigint NOT NULL DEFAULT 1, -- default service set
+    tid         bigint NOT NULL DEFAULT 1, -- default transport
     domaindir   varchar(40) NOT NULL, --/srv/mail/$RAND/4294967294
     CONSTRAINT  pkey_domain_data PRIMARY KEY (gid),
-    CONSTRAINT  fkey_domain_data_tid_transport FOREIGN KEY (tid)
-        REFERENCES transport (tid),
     CONSTRAINT  fkey_domain_data_qid_quotalimit FOREIGN KEY (qid)
-        REFERENCES quotalimit (qid)
+        REFERENCES quotalimit (qid),
+    CONSTRAINT  fkey_domain_data_ssid_service_set FOREIGN KEY (ssid)
+        REFERENCES service_set (ssid),
+    CONSTRAINT  fkey_domain_data_tid_transport FOREIGN KEY (tid)
+        REFERENCES transport (tid)
 );
 
 CREATE TABLE domain_name (
@@ -95,22 +129,21 @@ CREATE TABLE users (
     uid         bigint NOT NULL DEFAULT nextval('users_uid'),
     gid         bigint NOT NULL,
     mid         bigint NOT NULL DEFAULT 1,
-    tid         bigint NOT NULL DEFAULT 1,
     qid         bigint NOT NULL DEFAULT 1,
-    smtp        boolean NOT NULL DEFAULT TRUE,
-    pop3        boolean NOT NULL DEFAULT TRUE,
-    imap        boolean NOT NULL DEFAULT TRUE,
-    sieve       boolean NOT NULL DEFAULT TRUE,
+    ssid        bigint NOT NULL DEFAULT 1,
+    tid         bigint NOT NULL DEFAULT 1,
     CONSTRAINT  pkey_users PRIMARY KEY (local_part, gid),
     CONSTRAINT  ukey_users_uid UNIQUE (uid),
     CONSTRAINT  fkey_users_gid_domain_data FOREIGN KEY (gid)
         REFERENCES domain_data (gid),
     CONSTRAINT  fkey_users_mid_maillocation FOREIGN KEY (mid)
         REFERENCES maillocation (mid),
-    CONSTRAINT  fkey_users_tid_transport FOREIGN KEY (tid)
-        REFERENCES transport (tid),
     CONSTRAINT  fkey_users_qid_quotalimit FOREIGN KEY (qid)
-        REFERENCES quotalimit (qid)
+        REFERENCES quotalimit (qid),
+    CONSTRAINT fkey_users_ssid_service_set FOREIGN KEY (ssid)
+        REFERENCES service_set (ssid),
+    CONSTRAINT  fkey_users_tid_transport FOREIGN KEY (tid)
+        REFERENCES transport (tid)
 );
 
 CREATE TABLE userquota (
@@ -144,7 +177,8 @@ CREATE OR REPLACE VIEW dovecot_password AS
     SELECT local_part || '@' || domain_name.domainname AS "user",
            passwd AS "password", smtp, pop3, imap, sieve
       FROM users
-           LEFT JOIN domain_name USING (gid);
+           LEFT JOIN domain_name USING (gid)
+           LEFT JOIN service_set USING (ssid);
 
 CREATE OR REPLACE VIEW dovecot_user AS
     SELECT local_part || '@' || domain_name.domainname AS userid,
