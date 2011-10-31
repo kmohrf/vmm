@@ -9,6 +9,8 @@
     to the service_set table.
 """
 
+SERVICES = ('smtp', 'pop3', 'imap', 'sieve')
+
 cfg_dget = lambda option: None
 
 
@@ -29,7 +31,7 @@ class ServiceSet(object):
       Boolean flag for service sieve
     """
     __slots__ = ('_ssid', '_services', '_sieve_col', '_dbh')
-    _kwargs = ('ssid', 'smtp', 'pop3', 'imap', 'sieve')
+    _kwargs = (('ssid',) + SERVICES)
 
     def __init__(self, dbh, **kwargs):
         """Creates a new ServiceSet instance.
