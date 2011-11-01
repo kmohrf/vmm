@@ -18,6 +18,7 @@ from VirtualMailManager.constants import \
 from VirtualMailManager.errors import VMMError, DomainError as DomErr
 from VirtualMailManager.pycompat import all, any
 from VirtualMailManager.quotalimit import QuotaLimit
+from VirtualMailManager.serviceset import ServiceSet
 from VirtualMailManager.transport import Transport
 
 
@@ -29,8 +30,8 @@ cfg_dget = lambda option: None
 
 class Domain(object):
     """Class to manage e-mail domains."""
-    __slots__ = ('_directory', '_gid', '_name', '_qlimit', '_transport',
-                 '_dbh', '_new')
+    __slots__ = ('_directory', '_gid', '_name', '_qlimit', '_services',
+                 '_transport', '_dbh', '_new')
 
     def __init__(self, dbh, domainname):
         """Creates a new Domain instance.
@@ -53,6 +54,7 @@ class Domain(object):
         self._dbh = dbh
         self._gid = 0
         self._qlimit = None
+        self._services = None
         self._transport = None
         self._directory = None
         self._new = True
@@ -66,18 +68,19 @@ class Domain(object):
         domain.
         """
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT dd.gid, qid, tid, domaindir, is_primary FROM '
-                    'domain_data dd, domain_name dn WHERE domainname = %s AND '
-                    'dn.gid = dd.gid', (self._name,))
+        dbc.execute('SELECT dd.gid, qid, ssid, tid, domaindir, is_primary '
+                    'FROM domain_data dd, domain_name dn WHERE domainname = '
+                    '%s AND dn.gid = dd.gid', (self._name,))
         result = dbc.fetchone()
         dbc.close()
         if result:
-            if not result[4]:
+            if not result[5]:
                 raise DomErr(_(u"The domain '%s' is an alias domain.") %
                              self._name, DOMAIN_ALIAS_EXISTS)
-            self._gid, self._directory = result[0], result[3]
+            self._gid, self._directory = result[0], result[4]
             self._qlimit = QuotaLimit(self._dbh, qid=result[1])
-            self._transport = Transport(self._dbh, tid=result[2])
+            self._services = ServiceSet(self._dbh, ssid=result[2])
+            self._transport = Transport(self._dbh, tid=result[3])
             self._new = False
 
     def _set_gid(self):
@@ -122,13 +125,13 @@ class Domain(object):
         Arguments:
 
         `column` : basestring
-          Name of the table column. Currently: qid and tid
+          Name of the table column. Currently: qid, ssid and tid
         `value` : long
           The referenced key
         `force` : bool
           enforce the new setting also for existing users. Default: `False`
         """
-        if column not in ('qid', 'tid'):
+        if column not in ('qid', 'ssid', 'tid'):
             raise ValueError('Unknown column: %r' % column)
         dbc = self._dbh.cursor()
         dbc.execute('UPDATE domain_data SET %s = %%s WHERE gid = %%s' % column,
@@ -161,6 +164,11 @@ class Domain(object):
     def quotalimit(self):
         """The Domain's quota limit."""
         return self._qlimit
+
+    @property
+    def serviceset(self):
+        """The Domain's serviceset."""
+        return self._services
 
     @property
     def transport(self):
@@ -197,6 +205,20 @@ class Domain(object):
         assert isinstance(quotalimit, QuotaLimit)
         self._qlimit = quotalimit
 
+    def set_serviceset(self, serviceset):
+        """Set the services for the new Domain.
+
+        Argument:
+
+       `serviceset` : VirtualMailManager.serviceset.ServiceSet
+         The service set for the new Domain.
+        """
+        if not self._new:
+            raise DomErr(_(u"The domain '%s' already exists.") % self._name,
+                         DOMAIN_EXISTS)
+        assert isinstance(serviceset, ServiceSet)
+        self._services = serviceset
+
     def set_transport(self, transport):
         """Set the transport for the new Domain.
 
@@ -216,11 +238,13 @@ class Domain(object):
         if not self._new:
             raise DomErr(_(u"The domain '%s' already exists.") % self._name,
                          DOMAIN_EXISTS)
-        assert all((self._directory, self._qlimit, self._transport))
+        assert all((self._directory, self._qlimit, self._services,
+                    self._transport))
         dbc = self._dbh.cursor()
-        dbc.execute('INSERT INTO domain_data (gid, qid, tid, domaindir) '
-                    'VALUES (%s, %s, %s, %s)', (self._gid, self._qlimit.qid,
-                    self._transport.tid, self._directory))
+        dbc.execute('INSERT INTO domain_data (gid, qid, ssid, tid, domaindir) '
+                    'VALUES (%s, %s, %s, %s, %s)', (self._gid,
+                    self._qlimit.qid, self._services.ssid, self._transport.tid,
+                    self._directory))
         dbc.execute('INSERT INTO domain_name (domainname, gid, is_primary) '
                     'VALUES (%s, %s, TRUE)', (self._name, self._gid))
         self._dbh.commit()
@@ -251,6 +275,7 @@ class Domain(object):
         dbc.close()
         self._gid = 0
         self._directory = self._qlimit = self._transport = None
+        self._services = None
         self._new = True
 
     def update_quotalimit(self, quotalimit, force=False):
@@ -276,6 +301,26 @@ class Domain(object):
             return
         self._update_tables('qid', quotalimit.qid, force)
         self._qlimit = quotalimit
+
+    def update_serviceset(self, serviceset, force=False):
+        """Assign a different set of services to the Domain,
+
+        If *force* is `True` the *serviceset* will be also assigned to
+        all existing accounts of the Domain.  Otherwise the *serviceset*
+        will be only the 'default' for accounts created from now on.
+
+        Arguments:
+        `serviceset` : VirtualMailManager.serviceset.ServiceSet
+          the new set of services
+        `force`
+          enforce the serviceset for all accounts, default `False`
+        """
+        self._chk_state()
+        assert isinstance(serviceset, ServiceSet)
+        if not force and serviceset == self._services:
+            return
+        self._update_tables('ssid', serviceset.ssid, force)
+        self._services = serviceset
 
     def update_transport(self, transport, force=False):
         """Sets a new transport for the Domain.

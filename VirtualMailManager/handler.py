@@ -28,8 +28,9 @@ from VirtualMailManager.constants import MIN_GID, MIN_UID, \
      DATABASE_ERROR, DOMAINDIR_GROUP_MISMATCH, DOMAIN_INVALID, \
      FOUND_DOTS_IN_PATH, INVALID_ARGUMENT, MAILDIR_PERM_MISMATCH, \
      NOT_EXECUTABLE, NO_SUCH_ACCOUNT, NO_SUCH_ALIAS, NO_SUCH_BINARY, \
-     NO_SUCH_DIRECTORY, NO_SUCH_RELOCATED, RELOCATED_EXISTS, VMM_ERROR
-from VirtualMailManager.domain import Domain, get_gid
+     NO_SUCH_DIRECTORY, NO_SUCH_RELOCATED, RELOCATED_EXISTS, UNKNOWN_SERVICE, \
+     VMM_ERROR
+from VirtualMailManager.domain import Domain
 from VirtualMailManager.emailaddress import DestinationEmailAddress, \
      EmailAddress
 from VirtualMailManager.errors import \
@@ -38,6 +39,7 @@ from VirtualMailManager.mailbox import new as new_mailbox
 from VirtualMailManager.pycompat import all, any
 from VirtualMailManager.quotalimit import QuotaLimit
 from VirtualMailManager.relocated import Relocated
+from VirtualMailManager.serviceset import ServiceSet, SERVICES
 from VirtualMailManager.transport import Transport
 
 
@@ -433,6 +435,11 @@ class Handler(object):
         dom.set_quotalimit(QuotaLimit(self._dbh,
                            bytes=long(self._cfg.dget('misc.quota_bytes')),
                            messages=self._cfg.dget('misc.quota_messages')))
+        dom.set_serviceset(ServiceSet(self._dbh,
+                                      imap=self._cfg.dget('account.imap'),
+                                      pop3=self._cfg.dget('account.pop3'),
+                                      sieve=self._cfg.dget('account.sieve'),
+                                      smtp=self._cfg.dget('account.smtp')))
         dom.set_directory(self._cfg.dget('misc.base_directory'))
         dom.save()
         self._make_domain_dir(dom)
@@ -451,6 +458,22 @@ class Handler(object):
             dom.update_quotalimit(quotalimit)
         else:
             dom.update_quotalimit(quotalimit, force=True)
+
+    def domain_services(self, domainname, force=None, *services):
+        """Wrapper around Domain.update_serviceset()."""
+        kwargs = dict.fromkeys(SERVICES, False)
+        if force is not None and force != 'force':
+            raise DomainError(_(u"Invalid argument: '%s'") % force,
+                              INVALID_ARGUMENT)
+        for service in set(services):
+            if service not in SERVICES:
+                raise DomainError(_(u"Unknown service: '%s'") % service,
+                                  UNKNOWN_SERVICE)
+            kwargs[service] = True
+
+        dom = self._get_domain(domainname)
+        serviceset = ServiceSet(self._dbh, **kwargs)
+        dom.update_serviceset(serviceset, (True, False)[not force])
 
     def domain_transport(self, domainname, transport, force=None):
         """Wrapper around Domain.update_transport()"""
