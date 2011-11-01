@@ -29,6 +29,8 @@ class ServiceSet(object):
       Boolean flag for service imap
     `sieve` : bool
       Boolean flag for service sieve
+    `services` : dict
+      The four services above with boolean values
     """
     __slots__ = ('_ssid', '_services', '_sieve_col', '_dbh')
     _kwargs = (('ssid',) + SERVICES)
@@ -151,5 +153,11 @@ class ServiceSet(object):
         dbc.execute("SELECT nextval('service_set_id')")
         self._ssid = dbc.fetchone()[0]
         dbc.close()
+
+    @property
+    def services(self):
+        """A dictionary: Keys: `smtp`, `pop3`, `imap` and `sieve` with
+        boolean values."""
+        return self._services.copy()
 
 del cfg_dget
