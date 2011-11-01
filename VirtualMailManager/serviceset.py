@@ -57,7 +57,7 @@ class ServiceSet(object):
         """
         self._dbh = dbh
         self._ssid = 0
-        self._services = dict.fromkeys(self.__class__._kwargs[1:], True)
+        self._services = dict.fromkeys(SERVICES, True)
         if cfg_dget('misc.dovecot_version') < 0x10200b02:
             self._sieve_col = 'managesieve'
         else:
@@ -127,7 +127,7 @@ class ServiceSet(object):
         if not result:
             raise ValueError('Unknown service_set id specified: %r' % ssid)
         self._ssid = result[0]
-        self._services.update(zip(self.__class__._kwargs[1:], result[1:]))
+        self._services.update(zip(SERVICES, result[1:]))
 
     def _save(self):
         """Store a new service_set in the database."""
