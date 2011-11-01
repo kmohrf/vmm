@@ -8,18 +8,18 @@
     Virtual Mail Manager's Account class to manage e-mail accounts.
 """
 
-from VirtualMailManager.domain import Domain
-from VirtualMailManager.emailaddress import EmailAddress
-from VirtualMailManager.quotalimit import QuotaLimit
-from VirtualMailManager.transport import Transport
 from VirtualMailManager.common import version_str
 from VirtualMailManager.constants import \
      ACCOUNT_EXISTS, ACCOUNT_MISSING_PASSWORD, ALIAS_PRESENT, \
      INVALID_ARGUMENT, INVALID_MAIL_LOCATION, NO_SUCH_ACCOUNT, \
      NO_SUCH_DOMAIN, UNKNOWN_SERVICE, VMM_ERROR
+from VirtualMailManager.domain import Domain
+from VirtualMailManager.emailaddress import EmailAddress
 from VirtualMailManager.errors import VMMError, AccountError as AErr
 from VirtualMailManager.maillocation import MailLocation
 from VirtualMailManager.password import pwhash
+from VirtualMailManager.quotalimit import QuotaLimit
+from VirtualMailManager.transport import Transport
 
 __all__ = ('SERVICES', 'Account', 'get_account_by_uid')
 
