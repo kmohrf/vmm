@@ -740,29 +740,20 @@ The account has been successfully deleted from the database.
                            acc.address, NO_SUCH_ACCOUNT)
         acc.update_transport(Transport(self._dbh, transport=transport))
 
-    def user_disable(self, emailaddress, services=None):
-        """Wrapper for Account.disable(*services)"""
-        if services is None:
-            services = []
-        else:
-            assert isinstance(services, list)
+    def user_services(self, emailaddress, *services):
+        """Wrapper around Account.update_serviceset()."""
+        kwargs = dict.fromkeys(SERVICES, False)
+        for service in set(services):
+            if service not in SERVICES:
+                raise VMMError(_(u"Unknown service: '%s'") % service,
+                               UNKNOWN_SERVICE)
+            kwargs[service] = True
         acc = self._get_account(emailaddress)
         if not acc:
             raise VMMError(_(u"The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
-        acc.disable(*services)
-
-    def user_enable(self, emailaddress, services=None):
-        """Wrapper for Account.enable(*services)"""
-        if services is None:
-            services = []
-        else:
-            assert isinstance(services, list)
-        acc = self._get_account(emailaddress)
-        if not acc:
-            raise VMMError(_(u"The account '%s' does not exist.") %
-                           acc.address, NO_SUCH_ACCOUNT)
-        acc.enable(*services)
+        serviceset = ServiceSet(self._dbh, **kwargs)
+        acc.update_serviceset(serviceset)
 
     def relocated_add(self, emailaddress, targetaddress):
         """Creates a new `Relocated` entry in the database. If there is
