@@ -15,23 +15,23 @@ from textwrap import TextWrapper
 from time import strftime, strptime
 
 from VirtualMailManager import ENCODING
-from VirtualMailManager.account import SERVICES
 from VirtualMailManager.cli import get_winsize, prog, w_err, w_std
 from VirtualMailManager.common import human_size, size_in_bytes, version_str
 from VirtualMailManager.constants import __copyright__, __date__, \
      __version__, ACCOUNT_EXISTS, ALIAS_EXISTS, ALIASDOMAIN_ISDOMAIN, \
      DOMAIN_ALIAS_EXISTS, INVALID_ARGUMENT, EX_MISSING_ARGS, RELOCATED_EXISTS
 from VirtualMailManager.errors import VMMError
+from VirtualMailManager.serviceset import SERVICES
 
 __all__ = (
     'Command', 'RunContext', 'cmd_map', 'usage', 'alias_add', 'alias_delete',
     'alias_info', 'aliasdomain_add', 'aliasdomain_delete', 'aliasdomain_info',
     'aliasdomain_switch', 'config_get', 'config_set', 'configure',
     'domain_add', 'domain_delete',  'domain_info', 'domain_quota',
-    'domain_transport', 'get_user', 'help_', 'list_domains', 'relocated_add',
-    'relocated_delete', 'relocated_info', 'user_add', 'user_delete',
-    'user_disable', 'user_enable', 'user_info', 'user_name', 'user_password',
-    'user_quota', 'user_transport', 'version',
+    'domain_services', 'domain_transport', 'get_user', 'help_', 'list_domains',
+    'relocated_add', 'relocated_delete', 'relocated_info', 'user_add',
+    'user_delete', 'user_info', 'user_name', 'user_password', 'user_quota',
+    'user_services', 'user_transport', 'version',
 )
 
 _ = lambda msg: msg
@@ -324,6 +324,36 @@ def domain_quota(ctx):
     ctx.hdlr.domain_quotalimit(ctx.args[2].lower(), bytes_, messages, force)
 
 
+def domain_services(ctx):
+    """allow all named service and block the uncredited."""
+    if ctx.argc < 3:
+        usage(EX_MISSING_ARGS, _(u'Missing domain name.'), ctx.scmd)
+    services = []
+    force = False
+    if ctx.argc is 4:
+        arg = ctx.args[3].lower()
+        if arg in SERVICES:
+            services.append(arg)
+        elif arg == 'force':
+            force = True
+        else:
+            usage(INVALID_ARGUMENT, _(u"Invalid argument: '%s'") % arg,
+                  ctx.scmd)
+    else:
+        services.extend([service.lower() for service in ctx.args[3:-1]])
+        arg = ctx.args[-1].lower()
+        if arg == 'force':
+            force = True
+        else:
+            services.append(arg)
+        unknown = [service for service in services if service not in SERVICES]
+        if unknown:
+            usage(INVALID_ARGUMENT, _(u'Invalid service arguments: %s') %
+                  ' '.join(unknown), ctx.scmd)
+    ctx.hdlr.domain_services(ctx.args[2].lower(), (None, 'force')[force],
+                             *services)
+
+
 def domain_transport(ctx):
     """update the transport of the specified domain"""
     if ctx.argc < 3:
@@ -458,36 +488,6 @@ def user_delete(ctx):
               ctx.scmd)
 
 
-def user_disable(ctx):
-    """deactivate all/the given service(s) for a user"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing e-mail address.'), ctx.scmd)
-    elif ctx.argc < 4:
-        ctx.hdlr.user_disable(ctx.args[2].lower())
-    else:
-        services = [service.lower() for service in ctx.args[3:]]
-        unknown = [service for service in services if service not in SERVICES]
-        if unknown:
-            usage(INVALID_ARGUMENT, _(u"Invalid service arguments: %s") %
-                  ' '.join(unknown), ctx.scmd)
-        ctx.hdlr.user_disable(ctx.args[2].lower(), services)
-
-
-def user_enable(ctx):
-    """activate all or the given service(s) for a user"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing e-mail address.'), ctx.scmd)
-    elif ctx.argc < 4:
-        ctx.hdlr.user_enable(ctx.args[2].lower())
-    else:
-        services = [service.lower() for service in ctx.args[3:]]
-        unknown = [service for service in services if service not in SERVICES]
-        if unknown:
-            usage(INVALID_ARGUMENT, _(u"Invalid service arguments: %s") %
-                  ' '.join(unknown), ctx.scmd)
-        ctx.hdlr.user_enable(ctx.args[2].lower(), services)
-
-
 def user_info(ctx):
     """display information about the given address"""
     if ctx.argc < 3:
@@ -575,6 +575,20 @@ def user_quota(ctx):
     ctx.hdlr.user_quotalimit(ctx.args[2].lower(), bytes_, messages)
 
 
+def user_services(ctx):
+    """allow all named service and block the uncredited."""
+    if ctx.argc < 3:
+        usage(EX_MISSING_ARGS, _(u'Missing e-mail address.'), ctx.scmd)
+    services = []
+    if ctx.argc >= 4:
+        services.extend([service.lower() for service in ctx.args[3:]])
+        unknown = [service for service in services if service not in SERVICES]
+        if unknown:
+            usage(INVALID_ARGUMENT, _(u'Invalid service arguments: %s') %
+                  ' '.join(unknown), ctx.scmd)
+    ctx.hdlr.user_services(ctx.args[2].lower(), *services)
+
+
 def user_transport(ctx):
     """update the transport of the given address"""
     if ctx.argc < 3:
@@ -640,12 +654,6 @@ def update_cmd_map():
     'userdelete': cmd('userdelete', 'ud', user_delete,
                       _(u'address') + ' [force]',
                       _(u'delete the specified user')),
-    'userdisable': cmd('userdisable', 'u0', user_disable,
-                       _(u'address [service ...]'),
-                       _(u'deactivate all/the given service(s) for a user')),
-    'userenable': cmd('userenable', 'u1', user_enable,
-                      _(u'address [service ...]'),
-                      _(u'activate all or the given service(s) for a user')),
     'userinfo': cmd('userinfo', 'ui', user_info, _(u'address [details]'),
                     _(u'display information about the given address')),
     'username': cmd('username', 'un', user_name, _(u'address name'),
@@ -656,6 +664,10 @@ def update_cmd_map():
     'userquota': cmd('userquota', 'uq', user_quota,
                      _(u'address storage [messages]'),
                      _(u'update the quota limit for the given address')),
+    'userservices': cmd('userservices', 'us', user_services,
+                        _(u'address [service ...]'),
+                        _(u'enables the specified services and disables all '
+                          u'not specified services')),
     'usertransport': cmd('usertransport', 'ut', user_transport,
                          _(u'address transport'),
                          _(u'update the transport of the given address')),
@@ -693,6 +705,10 @@ def update_cmd_map():
     'domainquota': cmd('domainquota', 'dq', domain_quota,
                        _(u'fqdn storage [messages]') + ' [force]',
                        _(u'update the quota limit of the specified domain')),
+    'domainservices': cmd('domainservices', 'ds', domain_services,
+                          _(u'fqdn [service ...]') + ' [force]',
+                        _(u'enables the specified services and disables all '
+                          u'not specified services of the given domain')),
     'domaintransport': cmd('domaintransport', 'dt', domain_transport,
                            _(u'fqdn transport') + ' [force]',
                            _(u'update the transport of the specified domain')),
