@@ -707,8 +707,8 @@ def update_cmd_map():
                        _(u'update the quota limit of the specified domain')),
     'domainservices': cmd('domainservices', 'ds', domain_services,
                           _(u'fqdn [service ...]') + ' [force]',
-                        _(u'enables the specified services and disables all '
-                          u'not specified services of the given domain')),
+                          _(u'enables the specified services and disables all '
+                            u'not specified services of the given domain')),
     'domaintransport': cmd('domaintransport', 'dt', domain_transport,
                            _(u'fqdn transport') + ' [force]',
                            _(u'update the transport of the specified domain')),
