@@ -12,7 +12,7 @@ from VirtualMailManager.common import version_str
 from VirtualMailManager.constants import \
      ACCOUNT_EXISTS, ACCOUNT_MISSING_PASSWORD, ALIAS_PRESENT, \
      INVALID_ARGUMENT, INVALID_MAIL_LOCATION, NO_SUCH_ACCOUNT, \
-     NO_SUCH_DOMAIN, UNKNOWN_SERVICE, VMM_ERROR
+     NO_SUCH_DOMAIN, VMM_ERROR
 from VirtualMailManager.domain import Domain
 from VirtualMailManager.emailaddress import EmailAddress
 from VirtualMailManager.errors import VMMError, AccountError as AErr
