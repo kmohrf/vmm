@@ -69,8 +69,3 @@ class MailLocationError(VMMError):
 class RelocatedError(VMMError):
     """Exception class for Relocated exceptions"""
     pass
-
-
-class TransportError(VMMError):
-    """Exception class for Transport exceptions"""
-    pass

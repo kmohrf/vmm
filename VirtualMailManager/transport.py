@@ -9,8 +9,6 @@
     domains and accounts.
 """
 
-from VirtualMailManager.constants import UNKNOWN_TRANSPORT_ID
-from VirtualMailManager.errors import TransportError
 from VirtualMailManager.pycompat import any
 
 _ = lambda msg: msg
@@ -33,11 +31,11 @@ class Transport(object):
 
         """
         self._dbh = dbh
+        self._tid = 0
         assert any((tid, transport))
         if tid:
             assert not isinstance(tid, bool) and isinstance(tid, (int, long))
-            self._tid = tid
-            self._load_by_id()
+            self._load_by_id(tid)
         else:
             assert isinstance(transport, basestring)
             self._transport = transport
@@ -66,18 +64,16 @@ class Transport(object):
     def __str__(self):
         return self._transport
 
-    def _load_by_id(self):
+    def _load_by_id(self, tid):
         """load a transport by its id from the database"""
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT transport FROM transport WHERE tid = %s',
-                    (self._tid,))
+        dbc.execute('SELECT transport FROM transport WHERE tid = %s', (tid,))
         result = dbc.fetchone()
         dbc.close()
-        if result:
-            self._transport = result[0]
-        else:
-            raise TransportError(_(u'Unknown transport id specified.'),
-                                 UNKNOWN_TRANSPORT_ID)
+        if not result:
+            raise ValueError('Unknown transport id specified: %r' % tid)
+        self._transport = result[0]
+        self._tid = tid
 
     def _load_by_name(self):
         """Load a transport by its transport name from the database."""
