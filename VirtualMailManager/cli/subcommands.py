@@ -742,25 +742,24 @@ def _get_order(ctx):
     get a dict from the handler."""
     order = ()
     if ctx.scmd == 'domaininfo':
-        order = ((u'domainname', 0), (u'gid', 1), (u'transport', 0),
-                 (u'domaindir', 0), (u'quota limit', 0), (u'aliasdomains', 0),
-                 (u'accounts', 0), (u'aliases', 0), (u'relocated', 0))
+        order = ((u'domain name', 0), (u'gid', 1), (u'domain directory', 0),
+                 (u'quota limit', 0), (u'active services', 0),
+                 (u'transport', 0), (u'alias domains', 0), (u'accounts', 0),
+                 (u'aliases', 0), (u'relocated', 0))
     elif ctx.scmd == 'userinfo':
-        dc12 = ctx.cget('misc.dovecot_version') >= 0x10200b02
-        sieve = (u'managesieve', u'sieve')[dc12]
         if ctx.argc == 4 and ctx.args[3] != u'aliases' or \
            ctx.cget('account.disk_usage'):
             order = ((u'address', 0), (u'name', 0), (u'uid', 1), (u'gid', 1),
                      (u'home', 0), (u'mail_location', 0),
                      (u'quota storage', 0), (u'quota messages', 0),
                      (u'disk usage', 0), (u'transport', 0), (u'smtp', 1),
-                     (u'pop3', 1), (u'imap', 1), (sieve, 1))
+                     (u'pop3', 1), (u'imap', 1), (u'sieve', 1))
         else:
             order = ((u'address', 0), (u'name', 0), (u'uid', 1), (u'gid', 1),
                      (u'home', 0), (u'mail_location', 0),
                      (u'quota storage', 0), (u'quota messages', 0),
                      (u'transport', 0), (u'smtp', 1), (u'pop3', 1),
-                     (u'imap', 1), (sieve, 1))
+                     (u'imap', 1), (u'sieve', 1))
     elif ctx.scmd == 'getuser':
         order = ((u'uid', 1), (u'gid', 1), (u'address', 0))
     return order
@@ -792,9 +791,9 @@ def _print_info(ctx, info, title):
     w_std(msg, u'-' * len(msg))
     for key, upper in _get_order(ctx):
         if upper:
-            w_std(u'\t%s: %s' % (key.upper().ljust(15, u'.'), info[key]))
+            w_std(u'\t%s: %s' % (key.upper().ljust(17, u'.'), info[key]))
         else:
-            w_std(u'\t%s: %s' % (key.title().ljust(15, u'.'), info[key]))
+            w_std(u'\t%s: %s' % (key.title().ljust(17, u'.'), info[key]))
     print
 
 

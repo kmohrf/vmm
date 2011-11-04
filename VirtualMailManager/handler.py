@@ -511,9 +511,9 @@ class Handler(object):
                            INVALID_ARGUMENT)
         dom = self._get_domain(domainname)
         dominfo = dom.get_info()
-        if dominfo['domainname'].startswith('xn--'):
-            dominfo['domainname'] += ' (%s)' % \
-                                     dominfo['domainname'].decode('idna')
+        if dominfo['domain name'].startswith('xn--'):
+            dominfo['domain name'] += ' (%s)' % \
+                                      dominfo['domain name'].decode('idna')
         if details is None:
             return dominfo
         elif details == 'accounts':

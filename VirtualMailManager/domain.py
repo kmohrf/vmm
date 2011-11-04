@@ -347,18 +347,26 @@ class Domain(object):
         """Returns a dictionary with information about the domain."""
         self._chk_state()
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT aliasdomains, accounts, aliases, relocated '
-                    'FROM vmm_domain_info WHERE gid = %s', (self._gid,))
+        dbc.execute('SELECT aliasdomains "alias domains", accounts, aliases, '
+                    'relocated FROM vmm_domain_info WHERE gid = %s',
+                    (self._gid,))
         info = dbc.fetchone()
         dbc.close()
-        keys = ('aliasdomains', 'accounts', 'aliases', 'relocated')
+        keys = ('alias domains', 'accounts', 'aliases', 'relocated')
         info = dict(zip(keys, info))
         info['gid'] = self._gid
-        info['domainname'] = self._name
+        info['domain name'] = self._name
         info['transport'] = self._transport.transport
-        info['domaindir'] = self._directory
+        info['domain directory'] = self._directory
         info['bytes'] = self._qlimit.bytes
         info['messages'] = self._qlimit.messages
+        services = self._services.services
+        services = [s.upper() for s in services if services[s]]
+        if services:
+            services.sort()
+        else:
+            services.append('None')
+        info['active services'] = ' '.join(services)
         return info
 
     def get_accounts(self):
