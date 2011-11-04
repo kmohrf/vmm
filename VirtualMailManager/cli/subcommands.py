@@ -330,7 +330,9 @@ def domain_services(ctx):
         usage(EX_MISSING_ARGS, _(u'Missing domain name.'), ctx.scmd)
     services = []
     force = False
-    if ctx.argc is 4:
+    if ctx.argc is 3:
+        pass
+    elif ctx.argc is 4:
         arg = ctx.args[3].lower()
         if arg in SERVICES:
             services.append(arg)
