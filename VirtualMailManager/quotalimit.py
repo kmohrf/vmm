@@ -9,8 +9,6 @@
     for domains and accounts.
 """
 
-from VirtualMailManager.constants import VMM_ERROR
-from VirtualMailManager.errors import VMMError
 from VirtualMailManager.pycompat import all
 
 _ = lambda msg: msg
@@ -111,7 +109,7 @@ class QuotaLimit(object):
         res = dbc.fetchone()
         dbc.close()
         if not res:
-            raise VMMError(_(u'Unknown quota limit id specified.'), VMM_ERROR)
+            raise ValueError('Unknown quota limit id specified: %r' % qid)
         self._qid = qid
         self._bytes, self._messages = res
 

@@ -10,8 +10,7 @@
 
 """
 
-from VirtualMailManager.constants import \
-     MAILLOCATION_INIT, UNKNOWN_MAILLOCATION_ID
+from VirtualMailManager.constants import MAILLOCATION_INIT
 from VirtualMailManager.errors import MailLocationError as MLErr
 from VirtualMailManager.pycompat import all
 
@@ -120,8 +119,7 @@ class MailLocation(object):
         result = dbc.fetchone()
         dbc.close()
         if not result:
-            raise MLErr(_(u'Unknown mail_location id: %u') % mid,
-                        UNKNOWN_MAILLOCATION_ID)
+            raise ValueError('Unknown mail_location id specified: %r' % mid)
         self._mid = mid
         self._mbfmt, self._directory = result
 
