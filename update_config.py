@@ -104,7 +104,7 @@ def upd_052(cp):
         cp.remove_section('domdir')
     if cp.has_section('services'):
         for service in cp.options('services'):
-            move_option(cp, 'services.%s'%service, 'account.%s'%service)
+            move_option(cp, 'services.%s' % service, 'domain.%s' % service)
         cp.remove_section('services')
     for src, dst in (('maildir.mode',      'account.directory_mode'),
                      ('maildir.diskusage', 'account.disk_usage'),
@@ -112,6 +112,7 @@ def upd_052(cp):
                      ('maildir.folders',   'mailbox.folders'),
                      ('maildir.name',      'mailbox.root'),
                      ('misc.forcedel',     'domain.force_deletion'),
+                     ('misc.transport',    'domain.transport'),
                      ('misc.passwdscheme', 'misc.password_scheme'),
                      ('misc.dovecotvers',  'misc.dovecot_version')):
         move_option(cp, src, dst)
