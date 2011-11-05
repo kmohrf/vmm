@@ -10,6 +10,7 @@
 
 import gettext
 import locale
+import sys
 
 from VirtualMailManager.constants import __author__, __date__, __version__
 
@@ -26,6 +27,8 @@ __all__ = [
 try:
     locale.setlocale(locale.LC_ALL, '')
 except locale.Error:
+    sys.stderr.write('warning: unsupported locale setting - '
+                     'that may cause encoding problems.\n\n')
     locale.setlocale(locale.LC_ALL, 'C')
 ENCODING = locale.nl_langinfo(locale.CODESET)
 
