@@ -429,17 +429,17 @@ class Handler(object):
         dom = self._get_domain(domainname)
         if transport is None:
             dom.set_transport(Transport(self._dbh,
-                              transport=self._cfg.dget('misc.transport')))
+                              transport=self._cfg.dget('domain.transport')))
         else:
             dom.set_transport(Transport(self._dbh, transport=transport))
         dom.set_quotalimit(QuotaLimit(self._dbh,
-                           bytes=long(self._cfg.dget('misc.quota_bytes')),
-                           messages=self._cfg.dget('misc.quota_messages')))
+                           bytes=long(self._cfg.dget('domain.quota_bytes')),
+                           messages=self._cfg.dget('domain.quota_messages')))
         dom.set_serviceset(ServiceSet(self._dbh,
-                                      imap=self._cfg.dget('account.imap'),
-                                      pop3=self._cfg.dget('account.pop3'),
-                                      sieve=self._cfg.dget('account.sieve'),
-                                      smtp=self._cfg.dget('account.smtp')))
+                                      imap=self._cfg.dget('domain.imap'),
+                                      pop3=self._cfg.dget('domain.pop3'),
+                                      sieve=self._cfg.dget('domain.sieve'),
+                                      smtp=self._cfg.dget('domain.smtp')))
         dom.set_directory(self._cfg.dget('misc.base_directory'))
         dom.save()
         self._make_domain_dir(dom)

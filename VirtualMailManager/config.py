@@ -305,10 +305,6 @@ class Config(LazyConfig):
                 'disk_usage': LCO(bool_t, False, self.getboolean),
                 'password_length': LCO(int, 8, self.getint),
                 'random_password': LCO(bool_t, False, self.getboolean),
-                'imap': LCO(bool_t, True, self.getboolean),
-                'pop3': LCO(bool_t, True, self.getboolean),
-                'sieve': LCO(bool_t, True, self.getboolean),
-                'smtp': LCO(bool_t, True, self.getboolean),
             },
             'bin': {
                 'dovecotpw': LCO(str, '/usr/sbin/dovecotpw', self.get,
@@ -330,6 +326,14 @@ class Config(LazyConfig):
                 'delete_directory': LCO(bool_t, False, self.getboolean),
                 'directory_mode': LCO(int, 504, self.getint),
                 'force_deletion': LCO(bool_t, False, self.getboolean),
+                'imap': LCO(bool_t, True, self.getboolean),
+                'pop3': LCO(bool_t, True, self.getboolean),
+                'sieve': LCO(bool_t, True, self.getboolean),
+                'smtp': LCO(bool_t, True, self.getboolean),
+                'quota_bytes': LCO(str, '0', self.get_in_bytes,
+                                   check_size_value),
+                'quota_messages': LCO(int, 0, self.getint),
+                'transport': LCO(str, 'dovecot:', self.get),
             },
             'mailbox': {
                 'folders': LCO(str, 'Drafts:Sent:Templates:Trash',
@@ -347,10 +351,6 @@ class Config(LazyConfig):
                                        check_version_format),
                 'password_scheme': LCO(str, 'CRAM-MD5', self.get,
                                        verify_scheme),
-                'quota_bytes': LCO(str, '0', self.get_in_bytes,
-                                   check_size_value),
-                'quota_messages': LCO(int, 0, self.getint),
-                'transport': LCO(str, 'dovecot:', self.get),
             },
         }
 
@@ -457,11 +457,11 @@ class Config(LazyConfig):
         if not known_format(value):
             self._missing['mailbox'] = ['format: ' +\
                               _(u"Unsupported mailbox format: '%s'") % value]
-        # section misc
+        # section domain
         try:
-            value = self.dget('misc.quota_bytes')
+            value = self.dget('domain.quota_bytes')
         except (ValueError, TypeError), err:
-            self._missing['misc'] = [u'quota_bytes: ' + str(err)]
+            self._missing['domain'] = [u'quota_bytes: ' + str(err)]
 
 
 def is_dir(path):

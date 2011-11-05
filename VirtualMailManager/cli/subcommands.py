@@ -180,7 +180,7 @@ def config_get(ctx):
     noop = lambda option: option
     opt_formater = {
         'misc.dovecot_version': version_str,
-        'misc.quota_bytes': human_size,
+        'domain.quota_bytes': human_size,
     }
 
     option = ctx.args[2].lower()
