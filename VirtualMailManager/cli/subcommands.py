@@ -119,7 +119,7 @@ def alias_info(ctx):
             ctx.scmd = ctx.args[1] = 'userinfo'
             user_info(ctx)
         elif err.code is RELOCATED_EXISTS:
-            w_std(0, ctx.plan_a_b % {'subcommand': u'relocatedinfo',
+            w_err(0, ctx.plan_a_b % {'subcommand': u'relocatedinfo',
                   'object': address})
             ctx.scmd = ctx.args[1] = 'relocatedinfo'
             relocated_info(ctx)
