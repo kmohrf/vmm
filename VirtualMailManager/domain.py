@@ -110,12 +110,18 @@ class Domain(object):
                            u'relocated users.') % dict(zip(keys, result)),
                          ACCOUNT_AND_ALIAS_PRESENT)
 
-    def _chk_state(self):
-        """Throws a DomainError if the Domain is new - not saved in the
-        database."""
-        if self._new:
+    def _chk_state(self, must_exist=True):
+        """Checks the state of the Domain instance and will raise a
+        VirtualMailManager.errors.DomainError:
+          - if *must_exist* is `True` and the domain doesn't exist
+          - or *must_exist* is `False` and the domain exists
+        """
+        if must_exist and self._new:
             raise DomErr(_(u"The domain '%s' does not exist.") % self._name,
                          NO_SUCH_DOMAIN)
+        elif not must_exist and not self._new:
+            raise DomErr(_(u"The domain '%s' already exists.") % self._name,
+                         DOMAIN_EXISTS)
 
     def _update_tables(self, column, value, force=False):
         """Update various columns in the domain_data table. When *force* is
@@ -183,9 +189,7 @@ class Domain(object):
         `basedir` : basestring
           The base directory of all domains
         """
-        if not self._new:
-            raise DomErr(_(u"The domain '%s' already exists.") % self._name,
-                         DOMAIN_EXISTS)
+        self._chk_state(False)
         assert self._directory is None
         self._set_gid()
         self._directory = os.path.join(basedir, choice(MAILDIR_CHARS),
@@ -199,9 +203,7 @@ class Domain(object):
         `quotalimit` : VirtualMailManager.quotalimit.QuotaLimit
           The quota limit of the new Domain.
         """
-        if not self._new:
-            raise DomErr(_(u"The domain '%s' already exists.") % self._name,
-                         DOMAIN_EXISTS)
+        self._chk_state(False)
         assert isinstance(quotalimit, QuotaLimit)
         self._qlimit = quotalimit
 
@@ -213,9 +215,7 @@ class Domain(object):
        `serviceset` : VirtualMailManager.serviceset.ServiceSet
          The service set for the new Domain.
         """
-        if not self._new:
-            raise DomErr(_(u"The domain '%s' already exists.") % self._name,
-                         DOMAIN_EXISTS)
+        self._chk_state(False)
         assert isinstance(serviceset, ServiceSet)
         self._services = serviceset
 
@@ -227,17 +227,13 @@ class Domain(object):
         `transport` : VirtualMailManager.Transport
           The transport of the new Domain
         """
-        if not self._new:
-            raise DomErr(_(u"The domain '%s' already exists.") % self._name,
-                         DOMAIN_EXISTS)
+        self._chk_state(False)
         assert isinstance(transport, Transport)
         self._transport = transport
 
     def save(self):
         """Stores the new domain in the database."""
-        if not self._new:
-            raise DomErr(_(u"The domain '%s' already exists.") % self._name,
-                         DOMAIN_EXISTS)
+        self._chk_state(False)
         assert all((self._directory, self._qlimit, self._services,
                     self._transport))
         dbc = self._dbh.cursor()
