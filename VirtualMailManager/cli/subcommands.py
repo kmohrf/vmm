@@ -21,6 +21,7 @@ from VirtualMailManager.constants import __copyright__, __date__, \
      __version__, ACCOUNT_EXISTS, ALIAS_EXISTS, ALIASDOMAIN_ISDOMAIN, \
      DOMAIN_ALIAS_EXISTS, INVALID_ARGUMENT, EX_MISSING_ARGS, RELOCATED_EXISTS
 from VirtualMailManager.errors import VMMError
+from VirtualMailManager.password import list_schemes
 from VirtualMailManager.serviceset import SERVICES
 
 __all__ = (
@@ -29,9 +30,9 @@ __all__ = (
     'aliasdomain_switch', 'config_get', 'config_set', 'configure',
     'domain_add', 'domain_delete',  'domain_info', 'domain_quota',
     'domain_services', 'domain_transport', 'get_user', 'help_', 'list_domains',
-    'relocated_add', 'relocated_delete', 'relocated_info', 'user_add',
-    'user_delete', 'user_info', 'user_name', 'user_password', 'user_quota',
-    'user_services', 'user_transport', 'version',
+    'list_pwschemes', 'relocated_add', 'relocated_delete', 'relocated_info',
+    'user_add', 'user_delete', 'user_info', 'user_name', 'user_password',
+    'user_quota', 'user_services', 'user_transport', 'version',
 )
 
 _ = lambda msg: msg
@@ -424,6 +425,25 @@ def list_domains(ctx):
     _print_domain_list(gids, domains, matching)
 
 
+def list_pwschemes(ctx_unused):
+    """Prints all usable password schemes and password encoding suffixes."""
+    keys = (_(u'Usable password schemes:'), _(u'Usable encoding suffixes:'))
+    old_ii, old_si = txt_wrpr.initial_indent, txt_wrpr.subsequent_indent
+    txt_wrpr.initial_indent = ''
+    indent = 0
+
+    for key in keys:
+        k_len = len(key)
+        if k_len > indent:
+            indent = k_len
+    txt_wrpr.subsequent_indent = (indent + 1) * ' '
+    fmt = '%%-%us %%s' % indent
+    for key, value in zip(keys, list_schemes()):
+        w_std('\n'.join(txt_wrpr.wrap(fmt % (key, ' '.join(value)))))
+
+    txt_wrpr.initial_indent, txt_wrpr.subsequent_indent = old_ii, old_si
+
+
 def relocated_add(ctx):
     """create a new record for a relocated user"""
     if ctx.argc < 3:
@@ -629,7 +649,7 @@ def usage(errno, errmsg, subcommand=None):
     w_err(errno, '', _(u"Error: %s") % errmsg)
 
 
-def version(ctx):
+def version(ctx_unused):
     """Write version and copyright information to stdout."""
     w_std('%s, %s %s (%s %s)\nPython %s %s %s\n\n%s\n%s %s' % (prog,
     # TP: The words 'from', 'version' and 'on' are used in
@@ -732,6 +752,9 @@ def update_cmd_map():
                       _('set a new value for the configuration option')),
     'configure': cmd('configure', 'cf', configure, _(u'[section]'),
                      _(u'start interactive configuration modus')),
+    'listpwschemes': cmd('listpwschemes', 'lp', list_pwschemes, '',
+                         _(u'lists all usable password schemes and password '
+                           u'encoding suffixes')),
     'help': cmd('help', 'h', help_, _(u'[subcommand]'),
                 _(u'show a help overview or help for the given subcommand')),
     'version': cmd('version', 'v', version, '',
