@@ -1,4 +1,4 @@
-.TH "VMM.CFG" "5" "2011-10-26" "vmm 0.6" "vmm"
+.TH "VMM.CFG" "5" "2011-11-06" "vmm 0.6" "vmm"
 .SH NAME
 vmm.cfg \- Konfigurationsdatei für vmm
 .\" -----------------------------------------------------------------------
@@ -140,12 +140,6 @@ Sie können auch eines der optionalen Argumente
 an userinfo übergeben, um sich die aktuelle Festplattenbelegung anzeigen zu
 lassen.
 .\" ------------------------------------
-.SS account.imap
-.BR imap " (Vorgabe: true) :"
-.I Boolean
-.PP
-Legt fest, ob sich neu angelegte Benutzer per IMAP anmelden können sollen.
-.\" ------------------------------------
 .SS account.password_length
 .BR password_length " (Vorgabe: 8) :"
 .I Int
@@ -153,12 +147,6 @@ Legt fest, ob sich neu angelegte Benutzer per IMAP anmelden können sollen.
 Diese Option legt die Anzahl der Zeichen für automatisch erzeugte
 Passwörter fest.
 Alle Werte kleiner als 8 werden auf 8 erhöht.
-.\" ------------------------------------
-.SS account.pop3
-.BR pop3 " (Vorgabe: true) :"
-.I Boolean
-.PP
-Legt fest, ob sich neu angelegte Benutzer per POP3 anmelden können sollen.
 .\" ------------------------------------
 .SS account.random_password
 .BR random_password " (Vorgabe: false) :"
@@ -177,25 +165,11 @@ Sie auffordern, ein Passwort für den neuen Account einzugeben.
 Sie können die Länge für automatisch generierte Passwörter mit der Option
 .I account.password_length
 konfigurieren.
-.\" ------------------------------------
-.SS account.sieve
-.BR sieve " (Vorgabe: true) :"
-.I Boolean
-.PP
-Legt fest, ob sich neu angelegte Benutzer per ManageSieve anmelden können
-sollen.
-.\" ------------------------------------
-.SS account.smtp
-.BR smtp " (Vorgabe: true) :"
-.I Boolean
-.PP
-Legt fest, ob sich neu angelegte Benutzer per SMTP (SMTP AUTH) anmelden
-können sollen.
 .\" -----------------------------------------------------------------------
 .SH SEKTION BIN
 In der
 .BR bin \-Sektion
-werden die Pfade zu den von 
+werden die Pfade zu den von
 .BR vmm (1)
 benötigten Binaries angegeben.
 .SS bin.dovecotpw
@@ -319,6 +293,32 @@ Der Name des Datenbank\-Benutzers.
 In der
 .BR domain \-Sektion
 werden Domain\-spezifische Einstellungen hinterlegt.
+.PP
+Das Quota\-Limit (quota_bytes und quota_messages), Service\-Einstellungen
+(imap,  pop3, sieve und smtp) und der Transport werden angewendet, wenn
+eine Domain angelegt wird.
+Um die Einstellungen einer vorhandenen Domain zu ändern, verwenden Sie
+einen der folgenden
+.BR vmm (1)
+Unterbefehle:
+.PP
+.TP
+.B domainquota
+um das Quota\-Limit einer Domain zu ändern
+.TP
+.B domainservices
+um einer Domain einen abweichenden Satz von nutzbaren Services zuzuweisen
+.TP
+.B domaintransport
+um einen neuen Vorgabe\-Transport für eine Domain festzulegen
+.PP
+Wenn ein Account angelegt wird, erbt er alle Einstellungen von der Domain,
+zu der er hinzugefügt wird.
+Abweichende Einstellungen für einen vorhandenen Account nehmen Sie mit
+einem der Unterbefehle
+.BR userquota ", " userservices " und " usertransport
+vor.
+.\" ------------------------------------
 .SS domain.auto_postmaster
 .BR auto_postmaster " (Vorgabe: true) :"
 .I Boolean
@@ -353,6 +353,66 @@ Beispiel: 'drwxrwx\-\-\-' \(-> oktal 0770 \(-> dezimal 504
 .PP
 Erzwingt das Löschen aller zugeordneten Konten und Aliase beim Löschen
 einer Domain (domaindelete).
+.\" ------------------------------------
+.SS domain.imap
+.BR imap " (Vorgabe: true) :"
+.I Boolean
+.PP
+Legt fest, ob sich neu angelegte Benutzer per IMAP anmelden können sollen.
+.\" ------------------------------------
+.SS domain.pop3
+.BR pop3 " (Vorgabe: true) :"
+.I Boolean
+.PP
+Legt fest, ob sich neu angelegte Benutzer per POP3 anmelden können sollen.
+.\" ------------------------------------
+.SS domain.quota_bytes
+.BR quota_bytes " (Vorgabe: 0) :"
+.I String
+.PP
+Quota Limit in Bytes.
+0 bedeutet unbegrenzt.
+Dieses Limit wird beim Anlegen von Domains angewendet.
+.PP
+Der Wert dieser Option kann als Integer\-Wert, zum Beispiel
+.B 20480
+geschrieben werden.
+Es ist auch möglich dem Wert eines der folgenden
+Suffixe anzuhängen:
+.BR b " (Bytes), " k " (Kilobytes), " M " (Megabytes) oder " G
+(Gigabytes).
+.br
+1024 entspricht 1024b oder 1k.
+.\" ------------------------------------
+.SS domain.quota_messages
+.BR quota_messages " (Vorgabe: 0) :"
+.I Int
+.PP
+Quota Limit als Anzahl von Nachrichten.
+0 bedeutet unbegrenzt.
+Dieses Limit wird beim Anlegen neuer Domains angewendet.
+.\" ------------------------------------
+.SS domain.sieve
+.BR sieve " (Vorgabe: true) :"
+.I Boolean
+.PP
+Legt fest, ob sich neu angelegte Benutzer per SIEVE (ManageSieve) anmelden
+können sollen.
+.\" ------------------------------------
+.SS domain.smtp
+.BR smtp " (Vorgabe: true) :"
+.I Boolean
+.PP
+Legt fest, ob sich neu angelegte Benutzer per SMTP (SMTP AUTH) anmelden
+können sollen.
+.\" ------------------------------------
+.SS domain.transport
+.BR transport " (Vorgabe: dovecot:) :"
+.I String
+.PP
+Der Standard\-Transport aller neuen Domains.
+Siehe auch:
+.BR transport (5).
 .\" -----------------------------------------------------------------------
 .SH SEKTION MAILBOX
 In der
@@ -511,40 +571,6 @@ ein Encoding\-Suffix anzufügen.
 Unterstützte Encoding\-Suffixe:
 .BR .b64 ", " .base64 " und " .hex .
 Beispiel: PLAIN.BASE64
-.\" ------------------------------------
-.SS misc.quota_bytes
-.BR quota_bytes " (Vorgabe: 0) :"
-.I String
-.PP
-Quota Limit in Bytes.
-0 bedeutet unbegrenzt.
-Dieses Limit wird bei allen neu angelegten Domains angewendet.
-.PP
-Der Wert dieser Option kann als Integer\-Wert, zum Beispiel
-.B 20480
-geschrieben werden.
-Es ist auch möglich dem Wert eines der folgenden
-Suffixe anzuhängen:
-.BR b " (Bytes), " k " (Kilobytes), " M " (Megabytes) oder " G
-(Gigabytes).
-.br
-1024 entspricht 1024b oder 1k.
-.\" ------------------------------------
-.SS misc.quota_messages
-.BR quota_messages " (Vorgabe: 0) :"
-.I Int
-.PP
-Quota Limit als Anzahl von Nachrichten.
-0 bedeutet unbegrenzt.
-Dieses Limit wird bei allen neu angelegten Domains angewendet.
-.\" ------------------------------------
-.SS misc.transport
-.BR transport " (Vorgabe: dovecot:) :"
-.I String
-.PP
-Der Standard\-Transport aller Domains und Konten.
-Siehe auch:
-.BR transport (5).
 .\" -----------------------------------------------------------------------
 .SH BEISPIEL
 Eine Beispiel\-Konfiguration.
@@ -566,6 +592,11 @@ port = 5433
 sslmode = require
 user = vmm
 
+[domain]
+quota_bytes = 500M
+quota_messages = 10000
+transport = lmtp:unix:private/dovecot\-lmtp
+
 [mailbox]
 folders = Drafts:Sent:Templates:Trash:Lists.Dovecot:Lists.Postfix
 
@@ -573,9 +604,6 @@ folders = Drafts:Sent:Templates:Trash:Lists.Dovecot:Lists.Postfix
 crypt_sha512_rounds = 10000
 dovecot_version = 2.0.beta4
 password_scheme = SHA512\-CRYPT.hex
-quota_bytes = 500M
-quota_messages = 10000
-transport = lmtp:unix:private/dovecot\-lmtp
 .fi
 .\" -----------------------------------------------------------------------
 .SH SIEHE AUCH

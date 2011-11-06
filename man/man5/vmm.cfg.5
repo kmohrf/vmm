@@ -1,4 +1,4 @@
-.TH "VMM.CFG" "5" "2011-02-24" "vmm 0.6" "vmm"
+.TH "VMM.CFG" "5" "2011-11-06" "vmm 0.6" "vmm"
 .SH NAME
 vmm.cfg \- configuration file for vmm
 .\" -----------------------------------------------------------------------
@@ -135,12 +135,6 @@ You may also use userinfo's optional details\-argument
 .BR du " or " full ,
 in order to display the current disk usage of an account's mail directory.
 .\" ------------------------------------
-.SS account.imap
-.BR imap " (default: true) :"
-.I Boolean
-.PP
-Determines whether a newly created user can log in via IMAP.
-.\" ------------------------------------
 .SS account.password_length
 .BR password_length " (default: 8) :"
 .I Int
@@ -148,12 +142,6 @@ Determines whether a newly created user can log in via IMAP.
 Determines how many characters and/or numbers should be used for randomly
 generated passwords.
 Any value less than 8 will be increased to 8.
-.\" ------------------------------------
-.SS account.pop3
-.BR pop3 " (default: true) :"
-.I Boolean
-.PP
-Determines whether a newly created user can log in via POP3.
 .\" ------------------------------------
 .SS account.random_password
 .BR random_password " (default: false) :"
@@ -171,18 +159,6 @@ will prompt you to enter a password for the new account.
 You can specify the password length of generated passwords with the
 .I account.password_length
 option.
-.\" ------------------------------------
-.SS account.sieve
-.BR sieve " (default: true) :"
-.I Boolean
-.PP
-Determines whether a newly created user can log in via ManageSieve.
-.\" ------------------------------------
-.SS account.smtp
-.BR smtp " (default: true) :"
-.I Boolean
-.PP
-Determines whether a newly created user can log in via SMTP (SMTP AUTH).
 .\" -----------------------------------------------------------------------
 .SH SECTION BIN
 The
@@ -309,6 +285,30 @@ Name of the database user.
 The
 .B domain
 section specifies some domain related settings.
+.PP
+The quota limit (quota_bytes and quota_messages), service settings (imap,
+pop3, sieve and smtp) and the transport setting will be applied when a
+domain is created.
+In order to modify those settings for an existing domain, use one of
+the following
+.BR vmm (1)
+subcommands:
+.PP
+.TP
+.B domainquota
+in order to update a domain's quota limit
+.TP
+.B domainservices
+in order to assign a different service set to a domain
+.TP
+.B domaintransport
+in order to set a new default domain transport
+.PP
+When an account is created, it inherits all the settings of the domain
+to which it is added.
+Different settings for an existing account can be set using the subcommands
+.BR userquota ", " userservices " and " usertransport .
+.\" ------------------------------------
 .SS domain.auto_postmaster
 .BR auto_postmaster " (default: true) :"
 .I Boolean
@@ -339,6 +339,62 @@ For example: `drwxrwx\-\-\-' \(-> octal 0770 \(-> decimal 504
 .PP
 Force the deletion of accounts and aliases when a domain is deleted
 (domaindelete).
+.\" ------------------------------------
+.SS domain.imap
+.BR imap " (default: true) :"
+.I Boolean
+.PP
+Determines whether newly created users can log in via IMAP.
+.\" ------------------------------------
+.SS domain.pop3
+.BR pop3 " (default: true) :"
+.I Boolean
+.PP
+Determines whether newly created users can log in via POP3.
+.\" ------------------------------------
+.SS domain.quota_bytes
+.BR quota_bytes " (default: 0) :"
+.I String
+.PP
+Quota limit in bytes.
+0 means unlimited.
+This limit will be applied to all newly created domains.
+.PP
+The option's value can be written as an integer value, e.g.:
+.BR 20480 .
+It's also possible to append one of the following prefixes to the limit:
+.BR b " (bytes), " k " (kilobytes), " M " (megabytes) or " G
+(gigabytes).
+.br
+1024 is the same as 1024b or 1k.
+.\" ------------------------------------
+.SS domain.quota_messages
+.BR quota_messages " (default: 0) :"
+.I Int
+.PP
+Quota limit in number of messages.
+0 means unlimited.
+This limit will be applied to all newly created domains.
+.\" ------------------------------------
+.SS domain.sieve
+.BR sieve " (default: true) :"
+.I Boolean
+.PP
+Determines whether newly created users can log in via SIEVE (ManageSieve).
+.\" ------------------------------------
+.SS domain.smtp
+.BR smtp " (default: true) :"
+.I Boolean
+.PP
+Determines whether newly created users can log in via SMTP (SMTP AUTH).
+.\" ------------------------------------
+.SS domain.transport
+.BR transport " (default: dovecot:) :"
+.I String
+.PP
+Default transport for domains and accounts.
+For details see
+.BR transport (5).
 .\" -----------------------------------------------------------------------
 .SH SECTION MAILBOX
 The
@@ -480,39 +536,6 @@ suffix to the password_scheme.
 Supported encoding suffixes are:
 .BR .b64 ", " .base64 " and " .hex .
 For example: PLAIN.BASE64
-.\" ------------------------------------
-.SS misc.quota_bytes
-.BR quota_bytes " (default: 0) :"
-.I String
-.PP
-Quota limit in bytes.
-0 means unlimited.
-This limit will be applied to all newly created domains.
-.PP
-The option's value can be written as an integer value, e.g.:
-.BR 20480 .
-It's also possible to append one of the following prefixes to the limit:
-.BR b " (bytes), " k " (kilobytes), " M " (megabytes) or " G
-(gigabytes).
-.br
-1024 is the same as 1024b or 1k.
-.\" ------------------------------------
-.SS misc.quota_messages
-.BR quota_messages " (default: 0) :"
-.I Int
-.PP
-Quota limit in number of messages.
-0 means unlimited.
-This limit will be
-applied to all newly created domains.
-.\" ------------------------------------
-.SS misc.transport
-.BR transport " (default: dovecot:) :"
-.I String
-.PP
-Default transport for domains and accounts.
-For details see
-.BR transport (5).
 .\" -----------------------------------------------------------------------
 .SH EXAMPLE
 An example configuration.
@@ -534,6 +557,11 @@ port = 5433
 sslmode = require
 user = vmm
 
+[domain]
+quota_bytes = 500M
+quota_messages = 10000
+transport = lmtp:unix:private/dovecot\-lmtp
+
 [mailbox]
 folders = Drafts:Sent:Templates:Trash:Lists.Dovecot:Lists.Postfix
 
@@ -541,9 +569,6 @@ folders = Drafts:Sent:Templates:Trash:Lists.Dovecot:Lists.Postfix
 crypt_sha512_rounds = 10000
 dovecot_version = 2.0.beta4
 password_scheme = SHA512\-CRYPT.hex
-quota_bytes = 500M
-quota_messages = 10000
-transport = lmtp:unix:private/dovecot\-lmtp
 .fi
 .\" -----------------------------------------------------------------------
 .SH SEE ALSO
