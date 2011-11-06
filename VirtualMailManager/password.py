@@ -12,6 +12,7 @@
         hashed_password = pwhash(password[, scheme][, user])
         random_password = randompw()
         scheme, encoding = verify_scheme(scheme)
+        schemes, encodings = list_schemes()
 """
 
 from crypt import crypt
@@ -346,6 +347,23 @@ _scheme_info = {
     'SSHA256': (_ssha256_hash, 0x10200a04),
     'SSHA512': (_ssha512_hash, 0x20000b03),
 }
+
+
+def list_schemes():
+    """Returns the tuple (schemes, encodings).
+
+    `schemes` is an iterator for all supported password schemes (depends on
+    the used Dovecot version and features of the libc).
+    `encodings` is a tuple with all usable encoding suffixes. The tuple may
+    be empty.
+    """
+    dcv = cfg_dget('misc.dovecot_version')
+    schemes = (k for (k, v) in _scheme_info.iteritems() if v[1] <= dcv)
+    if dcv >= 0x10100a01:
+        encodings = DEFAULT_B64[1:] + DEFAULT_HEX[1:]
+    else:
+        encodings = ()
+    return schemes, encodings
 
 
 def verify_scheme(scheme):
