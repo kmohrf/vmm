@@ -1,17 +1,52 @@
 # -*- coding: UTF-8 -*-
-# Copyright (c) 2007 - 2010, Pascal Volk
+# Copyright (c) 2007 - 2011, Pascal Volk
 # See COPYING for distribution information.
+"""
+    VirtualMailManager.constants
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    VirtualMailManager's constants:
+        * version information
+        * upper and lower limits MIN_* / MAX_*
+        * exit codes
+        * error codes
+"""
+# version information
+
+__all__ = ['__author__', '__date__', '__version__']
+AUTHOR = 'Pascal Volk <neverseen@users.sourceforge.net>'
+RELDATE = '2009-09-09'
+VERSION = '0.5.2'
+__author__ = AUTHOR
+__copyright__ = 'Copyright (c) 2007-2011 %s' % __author__
+__date__ = RELDATE
+__version__ = VERSION
+
+
+# limits
+
+MIN_GID = 70000
+MIN_UID = 70000
+
+
+# exit codes
+
+EX_SUCCESS = 0
+EX_MISSING_ARGS = 1
+EX_UNKNOWN_COMMAND = 2
+EX_USER_INTERRUPT = 3
+
+
+# error codes
 
 ACCOUNT_AND_ALIAS_PRESENT = 20
 ACCOUNT_EXISTS = 21
-ACCOUNT_PRESENT = 22
+ACCOUNT_MISSING_PASSWORD = 69
 ALIASDOMAIN_EXISTS = 23
 ALIASDOMAIN_ISDOMAIN = 24
 ALIASDOMAIN_NO_DOMDEST = 25
-ALIAS_ADDR_DEST_IDENTICAL = 26
 ALIAS_EXCEEDS_EXPANSION_LIMIT = 27
 ALIAS_EXISTS = 28
-ALIAS_MISSING_DEST = 29
 ALIAS_PRESENT = 30
 CONF_ERROR = 31
 CONF_NOFILE = 32
@@ -26,8 +61,8 @@ DOMAIN_NO_NAME = 40
 DOMAIN_TOO_LONG = 41
 FOUND_DOTS_IN_PATH = 42
 INVALID_ADDRESS = 43
-INVALID_AGUMENT = 44
-INVALID_OPTION = 45
+INVALID_ARGUMENT = 44
+INVALID_MAIL_LOCATION = 70
 INVALID_SECTION = 46
 LOCALPART_INVALID = 47
 LOCALPART_TOO_LONG = 48
@@ -43,10 +78,6 @@ NO_SUCH_DOMAIN = 57
 NO_SUCH_RELOCATED = 58
 RELOCATED_ADDR_DEST_IDENTICAL = 59
 RELOCATED_EXISTS = 60
-RELOCATED_MISSING_DEST = 61
-TRANSPORT_INIT = 62
-UNKNOWN_MAILLOCATION_ID = 63
-UNKNOWN_SERVICE = 64
-UNKNOWN_TRANSPORT_ID = 65
-VMM_ERROR = 66
-VMM_TOO_MANY_FAILURES = 67
+UNKNOWN_SERVICE = 65
+VMM_ERROR = 67
+VMM_TOO_MANY_FAILURES = 68

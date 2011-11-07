@@ -1,3 +1,5 @@
+subcommand for displaying support crypt algorithms.
+
 
 - Aliases
     - avoid looping aliases
@@ -8,3 +10,7 @@
         + aliases
         + destinations/alias
         + alias domains
+
+Database:
+   public.users.digestmd5: add "character varying(48)"
+	Outlook will love it. (`doveadm pw -s DIGEST-MD5.hex -p 1 -u 0`)

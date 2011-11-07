@@ -38,7 +38,7 @@ If you have installed vmm 0.4/0.4-r41 you have to proceed this steps:
          In prior setups the service dovecot was configured slightly different.
          If you have set the command attribute 'user' to 'nobody:mail', so
          either remove the group mail or replace it with the group nobody
-         or nogroup.
+         or nogroup. (see command output from: id -ng nobody)
 
          e.g.: flags=DRhu user=nobody argv=/usr/local/lib/dovecot/deliver …
 

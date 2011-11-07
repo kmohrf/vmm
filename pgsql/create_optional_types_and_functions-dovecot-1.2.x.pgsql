@@ -88,7 +88,7 @@ AS $$
         address varchar(320) := localpart || '@' || the_domain;
     BEGIN
         FOR rec IN
-            SELECT address, domaindir||'/'||users.uid||'/'||maillocation||'/'
+            SELECT address, domaindir||'/'||users.uid||'/'||directory||'/'
               FROM domain_data, users, maillocation
              WHERE domain_data.gid = did
                AND users.gid = did
@@ -108,7 +108,6 @@ EXTERNAL SECURITY INVOKER;
 -- ---
 -- Data type for functions: postfix_relocated_map(varchar, varchar)
 --                          postfix_virtual_alias_map(varchar, varchar)
---                          
 -- ---
 CREATE TYPE recipient_destination AS (
     recipient   varchar(320),
@@ -288,6 +287,17 @@ CREATE TYPE dovecotuser AS (
     home        text,
     mail        text
 );
+-- ---
+-- Data type for function dovecotquotauser(varchar, varchar)
+-- ---
+CREATE TYPE dovecotquotauser AS (
+    userid      varchar(320),
+    uid         bigint,
+    gid         bigint,
+    home        text,
+    mail        text,
+    quota_rule  text
+);
 
 -- ---
 -- Parameters (from login name [localpart@the_domain]):
@@ -296,7 +306,9 @@ CREATE TYPE dovecotuser AS (
 -- Returns: dovecotuser records
 --
 -- Required access privileges for your dovecot database user:
---      GRANT SELECT ON users,domain_data,domain_name,maillocation TO dovecot;
+--      GRANT SELECT
+--          ON users, domain_data, domain_name, maillocation, mailboxformat
+--          TO dovecot;
 --
 -- For more details see http://wiki.dovecot.org/UserDatabase
 -- ---
@@ -309,13 +321,52 @@ AS $$
         did bigint := (SELECT gid FROM domain_name WHERE domainname=the_domain);
     BEGIN
         FOR record IN
-            SELECT userid, uid, did, domaindir ||'/'|| uid AS home,
-                   '~/'|| maillocation AS mail
-              FROM users, domain_data, maillocation
+            SELECT userid, uid, did, domaindir || '/' || uid AS home,
+                   format || ':~/' || directory AS mail
+              FROM users, domain_data, mailboxformat, maillocation
              WHERE users.gid = did
                AND users.local_part = localpart
                AND maillocation.mid = users.mid
+               AND mailboxformat.fid = maillocation.fid
                AND domain_data.gid = did
+            LOOP
+                RETURN NEXT record;
+            END LOOP;
+        RETURN;
+    END;
+$$ LANGUAGE plpgsql STABLE
+RETURNS NULL ON NULL INPUT
+EXTERNAL SECURITY INVOKER;
+
+-- ---
+-- Nearly the same as function dovecotuser above. It returns additionally the
+-- field quota_rule.
+--
+-- Required access privileges for your dovecot database user:
+--      GRANT SELECT
+--          ON users, domain_data, domain_name, maillocation, mailboxformat,
+--             quotalimit
+--          TO dovecot;
+-- ---
+CREATE OR REPLACE FUNCTION dovecotquotauser(
+    IN localpart varchar, IN the_domain varchar) RETURNS SETOF dovecotquotauser
+AS $$
+    DECLARE
+        record dovecotquotauser;
+        userid varchar(320) := localpart || '@' || the_domain;
+        did bigint := (SELECT gid FROM domain_name WHERE domainname=the_domain);
+    BEGIN
+        FOR record IN
+            SELECT userid, uid, did, domaindir || '/' || uid AS home,
+                   format || ':~/' || directory AS mail, '*:bytes=' ||
+                   bytes || ':messages=' || messages AS quota_rule
+              FROM users, domain_data, mailboxformat, maillocation, quotalimit
+             WHERE users.gid = did
+               AND users.local_part = localpart
+               AND maillocation.mid = users.mid
+               AND mailboxformat.fid = maillocation.fid
+               AND domain_data.gid = did
+               AND quotalimit.qid = users.qid
             LOOP
                 RETURN NEXT record;
             END LOOP;
@@ -332,7 +383,7 @@ EXTERNAL SECURITY INVOKER;
 -- ---
 CREATE TYPE dovecotpassword AS (
     userid    varchar(320),
-    password  varchar(74),
+    password  varchar(270),
     smtp      boolean,
     pop3      boolean,
     imap      boolean,
@@ -359,11 +410,12 @@ AS $$
     BEGIN
         FOR record IN
             SELECT userid, passwd, smtp, pop3, imap, sieve
-              FROM users
+              FROM users, service_set
              WHERE gid = (SELECT gid
                             FROM domain_name
                            WHERE domainname = the_domain)
                AND local_part = localpart
+               AND service_set.ssid = users.ssid
             LOOP
                 RETURN NEXT record;
             END LOOP;
