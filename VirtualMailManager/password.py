@@ -360,7 +360,7 @@ def list_schemes():
     dcv = cfg_dget('misc.dovecot_version')
     schemes = (k for (k, v) in _scheme_info.iteritems() if v[1] <= dcv)
     if dcv >= 0x10100a01:
-        encodings = DEFAULT_B64[1:] + DEFAULT_HEX[1:]
+        encodings = ('.B64', '.BASE64', '.HEX')
     else:
         encodings = ()
     return schemes, encodings
