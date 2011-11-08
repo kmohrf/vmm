@@ -112,6 +112,7 @@ class Handler(object):
         fmode = int(oct(fstat.st_mode & 0777))
         if fmode % 100 and fstat.st_uid != fstat.st_gid or \
            fmode % 10 and fstat.st_uid == fstat.st_gid:
+            # TP: Please keep the backticks around the command. `chmod 0600 …`
             raise PermissionError(_(u"wrong permissions for '%(file)s': "
                                     u"%(perms)s\n`chmod 0600 %(file)s` would "
                                     u"be great.") % {'file': self._cfg_fname,
