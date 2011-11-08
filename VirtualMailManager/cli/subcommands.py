@@ -427,21 +427,21 @@ def list_domains(ctx):
 
 def list_pwschemes(ctx_unused):
     """Prints all usable password schemes and password encoding suffixes."""
+    # TODO: Remove trailing colons from keys.
+    # For now it is to late, the translators has stared their work
     keys = (_(u'Usable password schemes:'), _(u'Usable encoding suffixes:'))
     old_ii, old_si = txt_wrpr.initial_indent, txt_wrpr.subsequent_indent
-    txt_wrpr.initial_indent = ''
-    indent = 0
+    txt_wrpr.initial_indent = txt_wrpr.subsequent_indent = '\t'
+    txt_wrpr.width = txt_wrpr.width - 8
 
-    for key in keys:
-        k_len = len(key)
-        if k_len > indent:
-            indent = k_len
-    txt_wrpr.subsequent_indent = (indent + 1) * ' '
-    fmt = '%%-%us %%s' % indent
     for key, value in zip(keys, list_schemes()):
-        w_std('\n'.join(txt_wrpr.wrap(fmt % (key, ' '.join(value)))))
+        if key.endswith(':'):  # who knows … (see TODO above)
+            key = key.rpartition(':')[0]
+        w_std(key, len(key) * '-')
+        w_std('\n'.join(txt_wrpr.wrap(' '.join(value))), '')
 
     txt_wrpr.initial_indent, txt_wrpr.subsequent_indent = old_ii, old_si
+    txt_wrpr.width = txt_wrpr.width + 8
 
 
 def relocated_add(ctx):
