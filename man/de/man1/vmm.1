@@ -267,6 +267,38 @@ Beispiel:
         [+] sales.example.com
 .fi
 .\" ------------------------------------
+.SS listpwschemes (lp)
+.B vmm listpwschemes
+.PP
+Dieser Unterbefehl listet alle unterstützte Passwort\-Schemen, die als Wert
+für
+.I misc.password_scheme
+in der
+.I vmm.cfg
+verwendet werden können.
+Die Ausgabe variiert, je nach eingesetzter Dovecot Version und der libc des
+Systems.
+.br
+Sollte Ihre Dovecot\-Installation nicht zu alt sein, werden zusätzlich
+die verwendbaren Encoding\-Suffixe ausgegeben.
+Eines dieser Suffixe kann an das Passwort-Schema angefügt werden.
+.PP
+Beispiel:
+.PP
+.nf
+.B vmm listpwschemes
+Verfügbare Passwort-Schemata
+----------------------------
+        CRYPT SHA512-CRYPT LDAP-MD5 DIGEST-MD5 SHA256 SHA512 SSHA512
+        SKEY SSHA NTLM RPA MD5-CRYPT HMAC-MD5 SHA1 PLAIN SHA CRAM-MD5
+        SSHA256 MD5 LANMAN CLEARTEXT PLAIN-MD5 PLAIN-MD4 OTP SMD5
+        SHA256-CRYPT
+
+Verwendbare Encoding-Suffixe
+----------------------------
+        .B64 .BASE64 .HEX
+.fi
+.\" ------------------------------------
 .SS version (v)
 .B vmm version
 .PP
@@ -427,6 +459,30 @@ Beispiel:
 .B vmm domainquota example.com 1g force
 .fi
 .\" ------------------------------------
+.SS domainservices (ds)
+.B vmm domainservices
+.IR fqdn " [" "service ..." ]
+.RB [ force ]
+.PP
+Um festzulegen, welche Services für die Anwender der Domain \(em mit dem
+angegebenen
+.I fqdn
+\(em nutzbar sein sollen, wird dieser Unterbefehl verwendet.
+.PP
+Der Zugriff auf alle genannten Services wird den Anwender gestattet.
+Der Zugriff auf nicht genannte Services wird verweigert werden.
+Verwendbare
+.IR service \-Namen
+sind:
+.BR  imap ", " pop3 ", " sieve " und " smtp .
+.br
+Wurde das Schlüsselwort
+.B force
+nicht angegeben, gelten die Service\-Einstellungen als Vorgabewert für neu
+angelegte Konten in der Domain.
+Andernfalls werden sie zusätzlich auf alle bestehenden Konten der Domain
+angewandt werden.
+.\" ------------------------------------
 .SS domaintransport (dt)
 .BI "vmm domaintransport" " fqdn transport"
 .RB [ force ]
@@ -576,49 +632,6 @@ Um dieses zu umgehen, kann das optionale Schlüsselwort
 .B force
 angegebenen werden.
 .\" ------------------------------------
-.SS userdisable (u0)
-.BI "vmm userdisable" " address"
-.RI [ "service ..." ]
-.PP
-Soll ein Anwender keinen Zugriff auf bestimmte oder alle Service haben,
-kann der Zugriff mit diesem Unterbefehl beschränkt werden.
-.PP
-Wurde kein
-.I service
-angegeben, werden alle Services
-.RB  ( smtp ", " pop3 ", " imap " und " sieve )
-für das Konto mit der angegebenen
-.I Adresse
-deaktiviert.
-Andernfalls wird nur der Zugriff auf den/die angegebenen
-.IR service /s
-gesperrt.
-.PP
-Beispiele:
-.PP
-.nf
-.B vmm u0 b.user@example.com imap pop3
-.B vmm userdisable c.user@example.com
-.fi
-.\" ------------------------------------
-.SS userenable (u1)
-.BI "vmm userenable" " address"
-.RI [ "service ..." ]
-.PP
-Um den Zugriff auf bestimmte oder alle gesperrten Service zu gewähren,
-wird dieser Unterbefehl verwendet.
-.PP
-Wurde kein
-.I service
-angegeben, werden alle Services
-.RB  ( smtp ", " pop3 ", " imap " und " sieve )
-für das Konto mit der angegebenen
-.I Adresse
-aktiviert.
-Andernfalls wird nur der Zugriff auf den/die angegebenen
-.IR service /s
-aktiviert.
-.\" ------------------------------------
 .SS userinfo (ui)
 .B "vmm userinfo"
 .IR address " [" details ]
@@ -723,6 +736,16 @@ Beispiel:
 .nf
 .B vmm userquota d.user@example.com 750m
 .fi
+.\" ------------------------------------
+.SS userservices (us)
+.B vmm userservices
+.IR address " [" "service ..." ]
+.PP
+Verwenden Sie diesen Unterbefehl, um einem Anwender den Zugriff auf die
+genannten Services zu gestatten.
+.PP
+Der Zugriff auf alle nicht genannten Services wird dem Anwender, mit der
+angegebenen Adresse, verwehrt werden.
 .\" ------------------------------------
 .SS usertransport (ut)
 .BI "vmm usertransport" " address transport"

@@ -1,4 +1,4 @@
-.TH "VMM" "1" "2011-02-24" "vmm 0.6" "vmm"
+.TH "VMM" "1" "2011-11-09" "vmm 0.6" "vmm"
 .SH NAME
 vmm \- command line tool to manage email domains/accounts/aliases
 .\" -----------------------------------------------------------------------
@@ -255,6 +255,37 @@ Matching domains
         [+] example.org
 .fi
 .\" ------------------------------------
+.SS listpwschemes (lp)
+.B vmm listpwschemes
+.PP
+This subcommand lists all password schemes which could be used in the
+.I vmm.cfg
+as value of the
+.I misc.password_scheme
+option.
+The output varies, depending on the used Dovecot version and the system's
+libc.
+.br
+When your Dovecot installation isn't too old, you will see additionally a
+few usable encoding suffixes.
+One of them can be appended to the password scheme.
+.PP
+Example:
+.PP
+.nf
+.B vmm listpwschemes
+Usable password schemes
+-----------------------
+        CRYPT SHA512-CRYPT LDAP-MD5 DIGEST-MD5 SHA256 SHA512 SSHA512
+        SKEY SSHA NTLM RPA MD5-CRYPT HMAC-MD5 SHA1 PLAIN SHA CRAM-MD5
+        SSHA256 MD5 LANMAN CLEARTEXT PLAIN-MD5 PLAIN-MD4 OTP SMD5
+        SHA256-CRYPT
+
+Usable encoding suffixes
+------------------------
+        .B64 .BASE64 .HEX
+.fi
+.\" ------------------------------------
 .SS version (v)
 .B vmm version
 .PP
@@ -404,6 +435,30 @@ Example:
 .B vmm domainquota example.com 1g force
 .fi
 .\" ------------------------------------
+.SS domainservices (ds)
+.B vmm domainservices
+.IR fqdn " [" "service ..." ]
+.RB [ force ]
+.PP
+To define which services could be used by the users of the domain \(em with
+the given
+.I fqdn
+\(em use this subcommand.
+.PP
+Each specified
+.I service
+will be enabled/usable.
+All other services will be deactivated/unusable.
+Possible service names are: 
+.BR  imap ", " pop3 ", " sieve " and " smtp .
+.br
+When the keyword
+.B force
+was omitted, the service setting will be the default for new created
+accounts.
+Otherwise it will additionally apply the settings to all existing accounts
+of the domain.
+.\" ------------------------------------
 .SS domaintransport (dt)
 .BI "vmm domaintransport" " fqdn transport"
 .RB [ force ]
@@ -545,48 +600,6 @@ will abort the requested operation and show an error message.
 To prevent this, specify the optional keyword
 .BR force .
 .\" ------------------------------------
-.SS userdisable (u0)
-.BI "vmm userdisable" " address"
-.RI [ "service ..." ]
-.PP
-If a user should not be able to access one or more services you can
-restrict the user's access with this subcommand.
-.PP
-If no
-.I service
-was given all services
-.RB ( imap ", " pop3 ", " sieve " and " smtp )
-will be disabled for the account with the specified
-.IR address .
-Otherwise only the specified
-.IR service (s)
-will be restricted.
-.PP
-Examples:
-.PP
-.nf
-.B vmm u0 b.user@example.com imap pop3
-.B vmm userdisable c.user@example.com
-.fi
-.\" ------------------------------------
-.SS userenable (u1)
-.BI "vmm userenable" " address"
-.RI [ "service ..." ]
-.PP
-To allow access to one or more restricted
-.IR service (s)
-use this subcommand.
-.PP
-If no
-.I service
-was given all services
-.RB ( imap ", " pop3 ", " sieve " and " smtp )
-will be enabled for the account with the specified
-.IR address .
-Otherwise only the specified
-.IR service (s)
-will be enabled.
-.\" ------------------------------------
 .SS userinfo (ui)
 .B "vmm userinfo"
 .IR address " [" details ]
@@ -689,6 +702,16 @@ Example:
 .nf
 .B vmm userquota d.user@example.com 750m
 .fi
+.\" ------------------------------------
+.SS userservices (us)
+.B vmm userservices
+.IR address " [" "service ..." ]
+.PP
+To grant a user access to the specified services, use this command.
+.PP
+All omitted services will be deactivated/unusable for the user with the
+given
+.IR address .
 .\" ------------------------------------
 .SS usertransport (ut)
 .BI "vmm usertransport" " address transport"
