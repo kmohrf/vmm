@@ -263,13 +263,13 @@ def domain_info(ctx):
         if not details:
             info['bytes'] = human_size(info['bytes'])
             info['messages'] = locale.format('%d', info['messages'], True)
-            info['quota limit'] = q_limit % info
+            info['quota limit/user'] = q_limit % info
             _print_info(ctx, info, _(u'Domain'))
         else:
             info[0]['bytes'] = human_size(info[0]['bytes'])
             info[0]['messages'] = locale.format('%d', info[0]['messages'],
                                                 True)
-            info[0]['quota limit'] = q_limit % info[0]
+            info[0]['quota limit/user'] = q_limit % info[0]
             _print_info(ctx, info[0], _(u'Domain'))
             if details == u'accounts':
                 _print_list(info[1], _(u'accounts'))
@@ -764,7 +764,7 @@ def _get_order(ctx):
     order = ()
     if ctx.scmd == 'domaininfo':
         order = ((u'domain name', 0), (u'gid', 1), (u'domain directory', 0),
-                 (u'quota limit', 0), (u'active services', 0),
+                 (u'quota limit/user', 0), (u'active services', 0),
                  (u'transport', 0), (u'alias domains', 0), (u'accounts', 0),
                  (u'aliases', 0), (u'relocated', 0))
     elif ctx.scmd == 'userinfo':
