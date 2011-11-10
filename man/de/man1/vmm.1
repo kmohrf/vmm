@@ -1,4 +1,4 @@
-.TH "VMM" "1" "2011-11-09" "vmm 0.6" "vmm"
+.TH "VMM" "1" "2011-11-10" "vmm 0.6" "vmm"
 .SH NAME
 vmm \- Kommandozeilenprogramm zur Verwaltung von E\-Mail\-Domains/\-Konten
 und \-Aliase.
@@ -197,9 +197,9 @@ Beispiel:
 .PP
 .nf
 .B vmm configure mailbox
-Verwende Konfigurationsdatei: /usr/local/etc/vmm.cfg
+Konfigurationsdatei wird verwendet: /root/vmm.cfg
 
-* Konfigurations\-Sektion: „mailbox“
+* Konfigurationsabschnitt: »mailbox«
 Neuer Wert für Option folders [Drafts:Sent:Templates:Trash]:
 Neuer Wert für Option format [maildir]: mdbox
 Neuer Wert für Option subscribe [True]:
@@ -219,11 +219,11 @@ die E\-Mail\-Adresse des Benutzers ermittelt werden.
 Beispiel:
 .PP
 .nf
-.B vmm getuser 70772
-Account Informationen
----------------------
-        UID............: 70772
-        GID............: 70312
+.B vmm getuser 79876
+Konto Informationen
+-------------------
+        UID............: 79876
+        GID............: 70704
         Address........: a.user@example.com
 .fi
 .\" ------------------------------------
@@ -349,11 +349,13 @@ Beispiele:
 .PP
 .nf
 .B vmm domainadd support.example.com smtp:[mx1.example.com]:2025
+Konto für postmaster@support.example.com wird angelegt
 Neues Passwort eingeben:
 Neues Passwort wiederholen:
 .B vmm cs account.random_password true
 .B vmm domainadd vertrieb.example.com
-Generiertes Passwort: Bg3eVmzKqtLn.Di7
+Konto für postmaster@vertrieb.example.com wird angelegt
+Erzeugtes Passwort: YoG3Uw*5aH
 .fi
 .\" ------------------------------------
 .SS domaindelete (dd)
@@ -420,15 +422,16 @@ Beispiel:
 .B vmm domaininfo sales.example.com
 Domain Informationen
 --------------------
-        Domainname.....: sales.example.com
-        GID............: 70698
-        Transport......: dovecot:
-        Domaindir......: /srv/mail/k/70698
-        Quota Limit....: Storage: 0; Messages: 0
-        Aliasdomains...: 0
-        Accounts.......: 1
-        Aliases........: 0
-        Relocated......: 0
+        Domain Name......: sales.example.com
+        GID..............: 70708
+        Domain Directory.: /srv/mail/c/70708
+        Quota Limit/User.: Storage: 500,00 MiB; Messages: 10.000
+        Active Services..: IMAP SIEVE
+        Transport........: lmtp:unix:private/dovecot-lmtp
+        Alias Domains....: 0
+        Accounts.........: 1
+        Aliases..........: 0
+        Relocated........: 0
 .fi
 .\" ------------------------------------
 .SS domainquota (dq)
@@ -673,21 +676,21 @@ Beispiel:
 .PP
 .nf
 .B vmm userinfo d.user@example.com
-Account Informationen
----------------------
-        Address........: d.user@example.com
-        Name...........: None
-        UID............: 79839
-        GID............: 70312
-        Home...........: /srv/mail/8/70312/79839
-        Mail_Location..: mdbox:~/mdbox
-        Quota Storage..: [  0,00%] 0 von 1,00 GiB
-        Quota Messages.: [  0,00%] 0 von 0
-        Transport......: dovecot:
-        SMTP...........: aktiviert
-        POP3...........: aktiviert
-        IMAP...........: aktiviert
-        SIEVE..........: aktiviert
+Konto Informationen
+-------------------
+        Address..........: d.user@example.com
+        Name.............: None
+        UID..............: 79881
+        GID..............: 70704
+        Home.............: /srv/mail/2/70704/79881
+        Mail_Location....: mdbox:~/mdbox
+        Quota Storage....: [  0,00%] 0/500,00 MiB
+        Quota Messages...: [  0,00%] 0/10.000
+        Transport........: lmtp:unix:private/dovecot-lmtp
+        SMTP.............: deaktiviert
+        POP3.............: deaktiviert
+        IMAP.............: aktiviert
+        SIEVE............: aktiviert
 .fi
 .\" ------------------------------------
 .SS username (un)
@@ -848,9 +851,9 @@ Beispiel:
 .PP
 .nf
 .B vmm relocatedinfo b.nutzer@example.com
-Relocated Informationen
------------------------
-        Der Benutzer „b.nutzer@example.com“ ist erreichbar unter „b\-nutzer@company.tld“
+Verschiebe\-Informationen
+------------------------
+        Der Benutzer »b.nutzer@example.com« wurde nach »b\-nutzer@firma.tld« verschoben
 .fi
 .\" ------------------------------------
 .SS relocateddelete (rd)
