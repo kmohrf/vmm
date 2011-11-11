@@ -1,4 +1,4 @@
-.TH "VMM.CFG" "5" "2011-11-06" "vmm 0.6" "vmm"
+.TH "VMM.CFG" "5" "2011-11-11" "vmm 0.6" "vmm"
 .SH NAME
 vmm.cfg \- Konfigurationsdatei für vmm
 .\" -----------------------------------------------------------------------
@@ -557,15 +557,12 @@ zuzuweisen.
 .I String
 .PP
 Das zu verwendende Passwort\-Schema.
-Um eine Liste aller verfügbaren Passwort\-Schemata zu erhalten, führen Sie
+Um eine Liste aller verwendbaren Passwort\-Schemen zu erhalten, führen Sie
 das Kommando
-.B dovecotpw -l
-(Dovecot v1.x) oder
-.B doveadm pw \-l
-(Dovecot v2.0) aus.
+.B vmm lp
+aus.
 .PP
-Seit Dovecot \(>= v1.1.alpha1 ist es möglich,
-dem
+Seit Dovecot \(>= v1.1.alpha1 ist es möglich, dem
 .I password_scheme
 ein Encoding\-Suffix anzufügen.
 Unterstützte Encoding\-Suffixe:
@@ -607,8 +604,6 @@ password_scheme = SHA512\-CRYPT.hex
 .fi
 .\" -----------------------------------------------------------------------
 .SH SIEHE AUCH
-.BR doveadm\-pw (1),
-.BR dovecotpw (1),
 .BR postconf (1),
 .BR vmm (1),
 .BR transport (5)

@@ -1,4 +1,4 @@
-.TH "VMM.CFG" "5" "2011-11-06" "vmm 0.6" "vmm"
+.TH "VMM.CFG" "5" "2011-11-11" "vmm 0.6" "vmm"
 .SH NAME
 vmm.cfg \- configuration file for vmm
 .\" -----------------------------------------------------------------------
@@ -525,11 +525,8 @@ set the value of this option to
 .I String
 .PP
 Password scheme to use.
-To get a list of all available password schemes execute the command
-.B dovecotpw \-l
-(Dovecot v1.x) or
-.B doveadm pw \-l
-(Dovecot v2.0).
+To get a list of all usable password schemes execute the command
+.BR "vmm lp" .
 .PP
 With Dovecot \(>= v1.1.alpha1 it is also possible to append an encoding
 suffix to the password_scheme.
@@ -572,8 +569,6 @@ password_scheme = SHA512\-CRYPT.hex
 .fi
 .\" -----------------------------------------------------------------------
 .SH SEE ALSO
-.BR doveadm\-pw (1),
-.BR dovecotpw (1),
 .BR postconf (1),
 .BR vmm (1),
 .BR transport (5)
