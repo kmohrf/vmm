@@ -14,7 +14,7 @@
 # version information
 
 __all__ = ['__author__', '__date__', '__version__']
-AUTHOR = 'Pascal Volk <neverseen@users.sourceforge.net>'
+AUTHOR = 'Pascal Volk <user+vmm@localhost.localdomain.org>'
 RELDATE = '2009-09-09'
 VERSION = '0.5.2'
 __author__ = AUTHOR
