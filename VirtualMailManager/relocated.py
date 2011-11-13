@@ -9,9 +9,10 @@
 """
 
 from VirtualMailManager.domain import get_gid
-from VirtualMailManager.emailaddress import EmailAddress
+from VirtualMailManager.emailaddress import EmailAddress, \
+     DestinationEmailAddress
 from VirtualMailManager.errors import RelocatedError as RErr
-from VirtualMailManager.constants import NO_SUCH_DOMAIN, \
+from VirtualMailManager.constants import DOMAIN_INVALID, NO_SUCH_DOMAIN, \
      NO_SUCH_RELOCATED, RELOCATED_ADDR_DEST_IDENTICAL, RELOCATED_EXISTS
 
 
@@ -56,7 +57,11 @@ class Relocated(object):
         destination = dbc.fetchone()
         dbc.close()
         if destination:
-            self._dest = EmailAddress(destination[0])
+            destination = DestinationEmailAddress(destination[0], self._dbh)
+            if destination.at_localhost:
+                raise RErr(_(u"The destination address' domain name must not "
+                             u"be localhost."), DOMAIN_INVALID)
+            self._dest = destination
 
     @property
     def address(self):
@@ -66,7 +71,10 @@ class Relocated(object):
     def set_destination(self, destination):
         """Sets/updates the new address of the relocated user."""
         update = False
-        assert isinstance(destination, EmailAddress)
+        assert isinstance(destination, DestinationEmailAddress)
+        if destination.at_localhost:
+            raise RErr(_(u"The destination address' domain name must not be "
+                         u"localhost."), DOMAIN_INVALID)
         if self._addr == destination:
             raise RErr(_(u'Address and destination are identical.'),
                        RELOCATED_ADDR_DEST_IDENTICAL)
