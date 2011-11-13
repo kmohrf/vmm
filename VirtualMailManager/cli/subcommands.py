@@ -436,7 +436,8 @@ def list_pwschemes(ctx_unused):
 
     for key, value in zip(keys, list_schemes()):
         if key.endswith(':'):  # who knows … (see TODO above)
-            key = key.rpartition(':')[0]
+            #key = key.rpartition(':')[0]
+            key = key[:-1]  # This one is for Py24
         w_std(key, len(key) * '-')
         w_std('\n'.join(txt_wrpr.wrap(' '.join(value))), '')
 
