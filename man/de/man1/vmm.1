@@ -1,4 +1,4 @@
-.TH "VMM" "1" "2011-11-12" "vmm 0.6" "vmm"
+.TH "VMM" "1" "2011-11-13" "vmm 0.6" "vmm"
 .SH NAME
 vmm \- Kommandozeilenprogramm zur Verwaltung von E\-Mail\-Domains/\-Konten
 und \-Aliase.
@@ -136,11 +136,11 @@ gesichert.
 Beispiel:
 .PP
 .nf
-.B vmm configget misc.transport
-misc.transport = dovecot:
-.B vmm configset misc.transport lmtp:unix:private/dovecot\-lmtp
-.B vmm cg misc.transport
-misc.transport = lmtp:unix:private/dovecot\-lmtp
+.B vmm configget domain.transport
+domain.transport = dovecot:
+.B vmm configset domain.transport lmtp:unix:private/dovecot\-lmtp
+.B vmm cg domain.transport
+domain.transport = lmtp:unix:private/dovecot\-lmtp
 .fi
 .\" ------------------------------------
 .SS configure (cf)
@@ -443,7 +443,7 @@ Dieser Unterbefehl wird verwendet, um für die Konten der Domain ein neues
 Quota\-Limit festzulegen.
 .PP
 Standardmäßig gilt für Konten das Quota\-Limit der
-.IR vmm.cfg " (" misc.quota_bytes " und " misc.quota_messages ).
+.IR vmm.cfg " (" domain.quota_bytes " und " domain.quota_messages ).
 Das neue Quota\-Limit wird für alle zukünftig angelegte Konten gelten.
 Soll das neue Quota\-Limit auch auf bestehende Konten der Domain angewendet
 werden, so ist das optionale Schlüsselwort

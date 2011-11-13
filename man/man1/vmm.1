@@ -1,4 +1,4 @@
-.TH "VMM" "1" "2011-11-12" "vmm 0.6" "vmm"
+.TH "VMM" "1" "2011-11-13" "vmm 0.6" "vmm"
 .SH NAME
 vmm \- command line tool to manage email domains/accounts/aliases
 .\" -----------------------------------------------------------------------
@@ -127,11 +127,11 @@ Your current configuration file will be backed as
 Example:
 .PP
 .nf
-.B vmm configget misc.transport
-misc.transport = dovecot:
-.B vmm configset misc.transport lmtp:unix:private/dovecot\-lmtp
-.B vmm cg misc.transport
-misc.transport = lmtp:unix:private/dovecot\-lmtp
+.B vmm configget domain.transport
+domain.transport = dovecot:
+.B vmm configset domain.transport lmtp:unix:private/dovecot\-lmtp
+.B vmm cg domain.transport
+domain.transport = lmtp:unix:private/dovecot\-lmtp
 .fi
 .\" ------------------------------------
 .SS configure (cf)
@@ -306,7 +306,7 @@ Adds the new domain into the database and creates the domain directory.
 If the optional argument
 .I transport
 is given, it will override the default transport
-.RI ( misc.transport ") from " vmm.cfg .
+.RI ( domain.transport ") from " vmm.cfg .
 The specified
 .I transport
 will be the default transport for all new accounts in this domain.
@@ -420,7 +420,7 @@ This subcommand is used to configure a new quota limit for the accounts of
 the domain - not for the domain itself.
 .PP
 The default quota limit for accounts is defined in the
-.IR vmm.cfg " (" misc.quota_bytes " and " misc.quota_messages ).
+.IR vmm.cfg " (" domain.quota_bytes " and " domain.quota_messages ).
 The new quota limit will be applied to all newly created accounts.
 If you want to apply the new quota limit also to existing accounts, you
 have to give the optional keyword
