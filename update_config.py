@@ -8,7 +8,18 @@ os.sys.path.remove(os.sys.path[0])
 from time import time
 from ConfigParser import ConfigParser
 from shutil import copy2
-from VirtualMailManager.constants.VERSION import VERSION
+try:
+    from VirtualMailManager.constants.VERSION import VERSION
+except ImportError:
+    os.sys.stderr.write('error: no pre 0.6.0 version information found\n')
+    raise SystemExit(2)
+
+# we have to remove the old CamelCase files
+import VirtualMailManager
+vmm_inst_dir = os.path.dirname(VirtualMailManager.__file__)
+tmp_info = open('/tmp/vmm_inst_dir', 'w')
+tmp_info.write(vmm_inst_dir)
+tmp_info.close()
 
 try:
     import psycopg2

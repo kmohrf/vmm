@@ -7,9 +7,6 @@ LANG=C
 PATH=/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 PREFIX=/usr/local
 
-PF_CONFDIR=$(postconf -h config_directory)
-PF_GID=$(id -g $(postconf -h mail_owner))
-POSTCONF=$(which postconf)
 DOVECOT_VERS=$(dovecot --version | awk '{print $1}')
 LOCALE_DIR=${PREFIX}/share/locale
 DOC_DIR=${PREFIX}/share/doc/vmm
@@ -21,7 +18,6 @@ fi
 DOCS="ChangeLog COPYING NEWS INSTALL README"
 
 INSTALL_OPTS="-g 0 -o 0 -p"
-INSTALL_OPTS_CF="-b -m 0640 -g ${PF_GID} -o 0 -p"
 
 if [ $(id -u) -ne 0 ]; then
     echo "Run this script as root."
@@ -38,9 +34,15 @@ elif [ $rv -eq 3 ]; then
     echo "please read the upgrade instructions at http://vmm.localdomain.org/"
     exit 1
 elif [ $rv -ne 0 ]; then
-    echo "Sorry, something went wrong. Please file a bug:"
-    echo "https://sourceforge.net/tracker/?group_id=213727"
+    echo "Sorry, something went wrong. Please file a bug at:"
+    echo "https://bitbucket.org/pvo/vmm/issues"
     exit 1
+fi
+
+# remove old CamelCase files
+if [ -f /tmp/vmm_inst_dir ] ; then
+    rm -rf `cat /tmp/vmm_inst_dir`
+    rm -f /tmp/vmm_inst_dir
 fi
 
 python setup.py -q install --force --prefix ${PREFIX}
