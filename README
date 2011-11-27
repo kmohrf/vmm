@@ -1,12 +1,14 @@
+.. -*- restructuredtext -*-
+
 ============================
 vmm - a virtual mail manager
 ============================
 
 Welcome to vmm!
 
-vmm is the easy to use command line tool for administrators and postmasters,
-to manage domains, alias-domains, accounts and relocated mail users. It allows
-the fast and easy management of mail servers.
+**vmm** is the easy to use and configurable command line tool for
+administrators and postmasters, to manage domains, alias-domains, accounts and
+relocated mail users. It allows the fast and easy management of mail servers.
 
 vmm is written in Python_. It's designed for installations using Dovecot_ and
 Postfix_ with a PostgreSQL_ backend.
@@ -20,16 +22,25 @@ Features
   ‣ supports the mailbox format Maildir_ and Dovecot's own high-performance
     mailbox formats single- and multi-\ dbox_
   ‣ configurable basic mailbox structure, including sub-mailboxes
-  ‣ multilingual (currently: Dutch, English, French and German)
+  ‣ multilingual — currently:
+
+     * Dutch
+     * English
+     * Finnish
+     * French
+     * German
+     * Vietnamese
 
 • Domain features
 
-  ‣ configurable transport setting per domain
+  ‣ configurable transport_ setting per domain
   ‣ unique group identifier (GID) per domain
   ‣ each domain may have one or more alias domain names
+  ‣ activate or deactivate services (SMTP, POP, IMAP and ManageSieve) for new
+    or all accounts of a domain
   ‣ configurable quota limits (size and/or number of messages) for the
     domain's accounts
-  ‣ supports relocated users
+  ‣ supports relocated_ users
   ‣ the postmaster account can be created automatically when a new domain is
     created
 
@@ -48,7 +59,40 @@ Features
 • Alias features
 
   ‣ supports multiple destinations per e-mail alias
-  ‣ destinations  can be deleted separately
+  ‣ destinations can be deleted separately
+
+Installation Prerequisites
+==========================
+You already should have installed and configured Postfix and Dovecot with
+PostgreSQL support. You also need access to a local or remote PostgreSQL
+server.
+
+To verify that your Dovecot and Postfix installation has support for
+PostgreSQL use the ``postconf`` and ``dovecot`` commands as shown below::
+
+        hostname ~ # postconf -m | grep pgsql
+        pgsql
+        hostname ~ # postconf -a | grep dovecot
+        dovecot
+        hostname ~ # dovecot --build-options | grep postgresql
+        SQL drivers: mysql postgresql sqlite
+
+vmm depends on Python (≥ 2.4.0) and Psycopg_ (≥ 2.0) or pyPgSQL_ (≥ 2.5.1).
+Psycopg and pyPgSQL are depending on parts of the *eGenix.com mx Base
+Distribution* (mxDateTime_ and mxTools_).
+
+If you are using Python ≤ 2.5.0:
+
+  • if you want to store your users' passwords as ``PLAIN-MD4`` digest in the
+    database, vmm will try to use ``Crypto.Hash.MD4`` from PyCrypto_
+  • if you are using Dovecot ≥ v1.1.0 and you want to store your users'
+    passwords as ``SHA256`` or ``SSHA256`` hashes, vmm will try to use
+    ``Crypto.Hash.SHA256`` from PyCrypto. For ``SHA256``/``SSHA256`` you
+    should have installed PyCrypto, at least in version 2.1.0alpha1.
+
+  When the Crypto.Hash module couldn't be imported, vmm will use
+  dovecotpw/doveadm, if  the *misc.password_scheme* setting in your *vmm.cfg*
+  is set to ``PLAIN-MD4``, ``SHA256`` or ``SSHA256``.
 
 Source code
 ===========
@@ -82,6 +126,13 @@ details see the `COPYING` file.
 .. _IDN: http://en.wikipedia.org/wiki/Internationalized_domain_name
 .. _Maildir: http://wiki2.dovecot.org/MailboxFormat/Maildir
 .. _Mercurial: http://mercurial.selenic.com/
+.. _mxDateTime: http://www.egenix.com/products/python/mxBase/mxDateTime/
+.. _mxTools: http://www.egenix.com/products/python/mxBase/mxTools/
 .. _Postfix: http://www.postfix.org/
 .. _PostgreSQL: http://www.postgresql.org/
+.. _Psycopg: http://initd.org/psycopg/
+.. _PyCrypto: http://www.pycrypto.org/
+.. _pyPgSQL: http://pypgsql.sourceforge.net/
 .. _Python: http://www.python.org/
+.. _relocated: http://www.postfix.org/relocated.5.html
+.. _transport: http://www.postfix.org/transport.5.html
