@@ -11,4 +11,9 @@ password = some_password
 dbname = mailsys
 
 # The SQL query template used to search the database
-query = SELECT destination FROM postfix_alias WHERE address='%s'
+# Use this VIEW-based template if you didn't create the pgsql function
+# `postfix_virtual_alias_map'.
+#query = SELECT destination FROM postfix_alias WHERE address='%s'
+
+# the recommended, function-based template
+query = SELECT destination FROM postfix_virtual_alias_map('%u', '%d')
