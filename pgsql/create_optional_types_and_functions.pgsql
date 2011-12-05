@@ -397,7 +397,7 @@ CREATE TYPE dovecotpassword AS (
 -- Returns: dovecotpassword records
 --
 -- Required access privileges for your dovecot database user:
---      GRANT SELECT ON users, domain_name TO dovecot;
+--      GRANT SELECT ON users, domain_name, service_set TO dovecot;
 --
 -- For more details see http://wiki.dovecot.org/AuthDatabase/SQL
 -- ---
