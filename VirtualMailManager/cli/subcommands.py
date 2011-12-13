@@ -546,7 +546,7 @@ def user_info(ctx):
             _print_info(ctx, info, _(u'Account'))
         else:
             info[0]['quota storage'] = _format_quota_usage(info[0]['ql_bytes'],
-                    info['uq_bytes'], True)
+                    info[0]['uq_bytes'], True)
             info[0]['quota messages'] = _format_quota_usage(
                     info[0]['ql_messages'], info[0]['uq_messages'])
             _print_info(ctx, info[0], _(u'Account'))
