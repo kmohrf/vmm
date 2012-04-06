@@ -96,13 +96,17 @@ class Domain(object):
         are accounts, aliases and/or relocated users.
         """
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT count(gid) FROM users WHERE gid = %(gid)u '
-                    'UNION SELECT count(gid) FROM alias WHERE gid = %(gid)u '
-                    'UNION SELECT count(gid) FROM relocated WHERE gid = '
-                    '%(gid)u' % {'gid': self._gid})
+        dbc.execute('SELECT '
+                    '(SELECT count(gid) FROM users WHERE gid = %(gid)u)'
+                    '  as account_count, '
+                    '(SELECT count(gid) FROM alias WHERE gid = %(gid)u)'
+                    '  as alias_count, '
+                    '(SELECT count(gid) FROM relocated WHERE gid = %(gid)u)'
+                    '  as relocated_count'
+                    % {'gid': self._gid})
         result = dbc.fetchall()
         dbc.close()
-        result = [count[0] for count in result]
+        result = result[0]
         if any(result):
             keys = ('account_count', 'alias_count', 'relocated_count')
             raise DomErr(_(u'There are %(account_count)u accounts, '
