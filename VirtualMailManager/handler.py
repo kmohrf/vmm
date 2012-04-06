@@ -290,6 +290,7 @@ class Handler(object):
         hashdir, domdir = domain.directory.split(os.path.sep)[-2:]
         dir_created = False
         os.chdir(self._cfg.dget('misc.base_directory'))
+        old_umask = os.umask(0022)
         if not os.path.exists(hashdir):
             os.mkdir(hashdir, 0711)
             os.chown(hashdir, 0, 0)
@@ -303,6 +304,7 @@ class Handler(object):
         os.mkdir(os.path.join(hashdir, domdir),
                  self._cfg.dget('domain.directory_mode'))
         os.chown(domain.directory, 0, domain.gid)
+        os.umask(old_umask)
         os.chdir(cwd)
 
     def _make_home(self, account):
