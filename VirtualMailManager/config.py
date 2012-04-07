@@ -20,7 +20,7 @@ from VirtualMailManager.errors import ConfigError, VMMError
 from VirtualMailManager.maillocation import known_format
 from VirtualMailManager.password import verify_scheme as _verify_scheme
 
-DB_MUDULES = ('psycopg2', 'pypgsql')
+DB_MODULES = ('psycopg2', 'pypgsql')
 DB_SSL_MODES = ('allow', 'disabled', 'prefer', 'require', 'verify-ca',
                 'verify-full')
 
@@ -440,7 +440,7 @@ class Config(LazyConfig):
         # section database
         db_err = []
         value = self.dget('database.module').lower()
-        if value not in DB_MUDULES:
+        if value not in DB_MODULES:
             db_err.append('module: ' + \
                           _(u"Unsupported database module: '%s'") % value)
         if value == 'psycopg2':
@@ -475,7 +475,7 @@ def is_dir(path):
 
 def check_db_module(module):
     """Check if the *module* is a supported pgsql module."""
-    if module.lower() in DB_MUDULES:
+    if module.lower() in DB_MODULES:
         return module
     raise ConfigValueError(_(u"Unsupported database module: '%s'") %
                            get_unicode(module))
