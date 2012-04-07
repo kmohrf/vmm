@@ -6,3 +6,4 @@ syntax: glob
 .*.swp
 .swp
 doc/build
+build
