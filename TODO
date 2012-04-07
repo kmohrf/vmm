@@ -14,3 +14,19 @@ subcommand for displaying support crypt algorithms.
 Database:
    public.users.digestmd5: add "character varying(48)"
 	Outlook will love it. (`doveadm pw -s DIGEST-MD5.hex -p 1 -u 0`)
+
+- Non-root usage [madduck@madduck.net]:
+    - Provide /usr/share/vmm/vmm-{mkdirs,rmdirs,du} setuid wrappers that do
+      precisely what they have to and no more. The should probably even call
+      /usr/share/vmm/vmm-wrapper-helper as unprivileged user to parse the
+      arguments, match them with the database and obtain the actual data to
+      process, e.g. email@add.ress → home directory mapping from the DB, or
+      obtaining the set of precreatable maildirs from the config.
+
+    - configset and configure need root, it is questionable whether these
+      can/should be wrapped, as they will be disabled anyway for Debian, and
+      they are root-like activities (unlike day-to-day postmaster work).
+
+    - Pascal suggested to use hooks:
+      07 23:36 <Faxe> zwei config settings handle_dir in domain und account
+      07 23:37 <Faxe> und dann post-{domain,user}add scripte, die den wrapper aufrufen
