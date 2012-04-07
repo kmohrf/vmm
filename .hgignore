@@ -7,3 +7,5 @@ syntax: glob
 .swp
 doc/build
 build
+debian/vmm
+.pc
