@@ -10,4 +10,6 @@ build
 debian/vmm
 debian/*.log
 debian/*.debhelper
+debian/files
+debian/*substvars
 .pc
