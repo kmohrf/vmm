@@ -11,9 +11,4 @@ password = some_password
 dbname = mailsys
 
 # The SQL query template used to search the database
-# Use this VIEW-based template if you didn't create the pgsql function
-# `postfix_transport_map'.
-#query = SELECT transport FROM postfix_transport WHERE address='%s'
-
-# the recommended, function-based template
 query = SELECT transport FROM postfix_transport_map('%u', '%d')
