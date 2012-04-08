@@ -36,11 +36,16 @@ FALSE	FALSE	FALSE	FALSE
 \.
 
 -- ---
--- Make room for different mailbox formats and longer password hashes.
+-- Drop the obsolete VIEWs, we've functions now.
 -- ---
 DROP VIEW dovecot_user;
 DROP VIEW dovecot_password;
+DROP VIEW postfix_alias;
 DROP VIEW postfix_maildir;
+DROP VIEW postfix_relocated;
+DROP VIEW postfix_transport;
+DROP VIEW postfix_uid;
+-- the vmm_domain_info view will be restored later
 DROP VIEW vmm_domain_info;
 
 CREATE SEQUENCE mailboxformat_id;
@@ -138,34 +143,8 @@ ALTER TABLE users ADD CONSTRAINT fkey_users_ssid_service_set
     FOREIGN KEY (ssid) REFERENCES service_set (ssid);
 
 -- ---
--- Restore views
+-- Restore view
 -- ---
-CREATE VIEW dovecot_user AS
-    SELECT local_part || '@' || domain_name.domainname AS userid,
-           uid, gid, domain_data.domaindir || '/' || uid AS home,
-           mailboxformat.format || ':~/' || maillocation.directory AS mail
-      FROM users
-           LEFT JOIN domain_data USING (gid)
-           LEFT JOIN domain_name USING (gid)
-           LEFT JOIN maillocation USING (mid)
-           LEFT JOIN mailboxformat USING (fid);
-
-CREATE OR REPLACE VIEW dovecot_password AS
-    SELECT local_part || '@' || domainname AS "user",
-           passwd AS "password", smtp, pop3, imap, managesieve
-      FROM users
-           LEFT JOIN domain_name USING (gid)
-           LEFT JOIN service_set USING (ssid);
-
-CREATE VIEW postfix_maildir AS
-    SELECT local_part || '@' || domain_name.domainname AS address,
-           domain_data.domaindir||'/'||uid||'/'||maillocation.directory||'/'
-           AS maildir
-      FROM users
-           LEFT JOIN domain_data USING (gid)
-           LEFT JOIN domain_name USING (gid)
-           LEFT JOIN maillocation USING (mid);
-
 CREATE VIEW vmm_domain_info AS
     SELECT gid, count(uid) AS accounts,
            (SELECT count(DISTINCT address)

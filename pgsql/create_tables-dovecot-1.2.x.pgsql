@@ -173,57 +173,9 @@ CREATE TABLE relocated (
         REFERENCES domain_data (gid)
 );
 
-CREATE OR REPLACE VIEW dovecot_password AS
-    SELECT local_part || '@' || domain_name.domainname AS "user",
-           passwd AS "password", smtp, pop3, imap, sieve
-      FROM users
-           LEFT JOIN domain_name USING (gid)
-           LEFT JOIN service_set USING (ssid);
-
-CREATE OR REPLACE VIEW dovecot_user AS
-    SELECT local_part || '@' || domain_name.domainname AS userid,
-           uid, gid, domain_data.domaindir || '/' || uid AS home,
-           mailboxformat.format || ':~/' || maillocation.directory AS mail
-      FROM users
-           LEFT JOIN domain_data USING (gid)
-           LEFT JOIN domain_name USING (gid)
-           LEFT JOIN maillocation USING (mid)
-           LEFT JOIN mailboxformat USING (fid);
-
 CREATE OR REPLACE VIEW postfix_gid AS
     SELECT gid, domainname
       FROM domain_name;
-
-CREATE OR REPLACE VIEW postfix_uid AS
-    SELECT local_part || '@' || domain_name.domainname AS address, uid
-      FROM users
-           LEFT JOIN domain_name USING (gid);
-
-CREATE OR REPLACE VIEW postfix_maildir AS
-    SELECT local_part || '@' || domain_name.domainname AS address,
-           domain_data.domaindir||'/'||uid||'/'||maillocation.directory||'/'
-           AS maildir
-      FROM users
-           LEFT JOIN domain_data USING (gid)
-           LEFT JOIN domain_name USING (gid)
-           LEFT JOIN maillocation USING (mid);
-
-CREATE OR REPLACE VIEW postfix_relocated AS
-    SELECT address || '@' || domain_name.domainname AS address, destination
-      FROM relocated
-           LEFT JOIN domain_name USING (gid);
-
-CREATE OR REPLACE VIEW postfix_alias AS
-    SELECT address || '@' || domain_name.domainname AS address, destination, gid
-      FROM alias
-           LEFT JOIN domain_name USING (gid);
-
-CREATE OR REPLACE VIEW postfix_transport AS
-    SELECT local_part || '@' || domain_name.domainname AS address,
-           transport.transport
-      FROM users
-           LEFT JOIN transport USING (tid)
-           LEFT JOIN domain_name USING (gid);
 
 CREATE OR REPLACE VIEW vmm_domain_info AS
     SELECT gid, count(uid) AS accounts,
