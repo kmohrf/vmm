@@ -8,4 +8,6 @@ syntax: glob
 doc/build
 build
 debian/vmm
+debian/*.log
+debian/*.debhelper
 .pc
