@@ -474,13 +474,30 @@ AS $$
                 RETURN NEXT record;
             END LOOP;
         IF NOT FOUND THEN
+            -- First, we have to check existing mailboxes and
+            -- return identity if one exists
             FOR record IN
-                SELECT recipient, destination
-                  FROM catchall
+                SELECT recipient, recipient as destination
+                  FROM users
                  WHERE gid = did
+                   AND local_part = localpart
+                UNION SELECT recipient, recipient as destination
+                  FROM relocated
+                 WHERE gid = did
+                   AND address = localpart
                 LOOP
                     RETURN NEXT record;
                 END LOOP;
+            -- Only now can we think about catchalls...
+            IF NOT FOUND THEN
+                FOR record IN
+                    SELECT recipient, destination
+                      FROM catchall
+                    WHERE gid = did
+                    LOOP
+                        RETURN NEXT record;
+                    END LOOP;
+            END IF;
         END IF;
         RETURN;
     END;
