@@ -27,7 +27,8 @@ from VirtualMailManager.serviceset import SERVICES
 __all__ = (
     'Command', 'RunContext', 'cmd_map', 'usage', 'alias_add', 'alias_delete',
     'alias_info', 'aliasdomain_add', 'aliasdomain_delete', 'aliasdomain_info',
-    'aliasdomain_switch', 'config_get', 'config_set', 'configure',
+    'aliasdomain_switch', 'catchall_add', 'catchall_info', 'catchall_delete',
+    'config_get', 'config_set', 'configure',
     'domain_add', 'domain_delete',  'domain_info', 'domain_quota',
     'domain_services', 'domain_transport', 'get_user', 'help_', 'list_domains',
     'list_pwschemes', 'relocated_add', 'relocated_delete', 'relocated_info',
@@ -171,6 +172,34 @@ def aliasdomain_switch(ctx):
         usage(EX_MISSING_ARGS, _(u'Missing destination domain name.'),
               ctx.scmd)
     ctx.hdlr.aliasdomain_switch(ctx.args[2].lower(), ctx.args[3].lower())
+
+
+def catchall_add(ctx):
+    """create a new catchall alias e-mail address"""
+    if ctx.argc < 3:
+        usage(EX_MISSING_ARGS, _(u'Missing domain and destination.'),
+              ctx.scmd)
+    elif ctx.argc < 4:
+        usage(EX_MISSING_ARGS, _(u'Missing destination address.'), ctx.scmd)
+    ctx.hdlr.catchall_add(ctx.args[2].lower(), *ctx.args[3:])
+
+
+def catchall_delete(ctx):
+    """delete the specified destination or all of the catchall destination"""
+    if ctx.argc < 3:
+        usage(EX_MISSING_ARGS, _(u'Missing domain.'), ctx.scmd)
+    elif ctx.argc < 4:
+        ctx.hdlr.catchall_delete(ctx.args[2].lower())
+    else:
+        ctx.hdlr.catchall_delete(ctx.args[2].lower(), ctx.args[3])
+
+
+def catchall_info(ctx):
+    """show the catchall destination(s) of the specified domain"""
+    if ctx.argc < 3:
+        usage(EX_MISSING_ARGS, _(u'Missing domain.'), ctx.scmd)
+    address = ctx.args[2].lower()
+    _print_catchall_info(address, ctx.hdlr.catchall_info(address))
 
 
 def config_get(ctx):
@@ -714,6 +743,17 @@ def update_cmd_map():
     'aliasdomainswitch': cmd('aliasdomainswitch', 'ads', aliasdomain_switch,
                              'fqdn destination', _(u'assign the given alias '
                              'domain to an other domain')),
+    # CatchallAlias commands
+    'catchalladd': cmd('catchalladd', 'caa', catchall_add,
+                       'domain destination ...',
+                       _(u'add one or more catch-all destinations for a '
+                         u'domain')),
+    'catchalldelete': cmd('catchalldelete', 'cad', catchall_delete,
+                       'domain [destination]',
+                       _(u'delete the specified catch-all destination or all '
+                         u'of a domain\'s destinations')),
+    'catchallinfo': cmd('catchallinfo', 'cai', catchall_info, 'domain',
+                     _(u'show the catch-all destination(s) of the specified domain')),
     # Domain commands
     'domainadd': cmd('domainadd', 'da', domain_add, 'fqdn [transport]',
                      _(u'create a new domain')),
@@ -843,6 +883,16 @@ def _print_aliase_info(alias, destinations):
     title = _(u'Alias information')
     w_std(title, u'-' * len(title))
     w_std(_(u'\tMail for %s will be redirected to:') % alias)
+    w_std(*(u'\t     * %s' % dest for dest in destinations))
+    print
+
+
+def _print_catchall_info(domain, destinations):
+    """Print the catchall destinations of a domain"""
+    title = _(u'Catch-all information')
+    w_std(title, u'-' * len(title))
+    w_std(_(u'\tMail to unknown localparts in domain %s will be sent to:')
+          % domain)
     w_std(*(u'\t     * %s' % dest for dest in destinations))
     print
 
