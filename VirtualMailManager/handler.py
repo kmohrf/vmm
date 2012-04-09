@@ -515,7 +515,7 @@ class Handler(object):
         Domain.get_aliase_names(), Domain.get_aliases() and
         Domain.get_relocated."""
         if details not in [None, 'accounts', 'aliasdomains', 'aliases', 'full',
-                           'relocated']:
+                           'relocated', 'catchall']:
             raise VMMError(_(u"Invalid argument: '%s'") % details,
                            INVALID_ARGUMENT)
         dom = self._get_domain(domainname)
@@ -533,9 +533,11 @@ class Handler(object):
             return (dominfo, dom.get_aliases())
         elif details == 'relocated':
             return(dominfo, dom.get_relocated())
+        elif details == 'catchall':
+            return(dominfo, dom.get_catchall())
         else:
             return (dominfo, dom.get_aliase_names(), dom.get_accounts(),
-                    dom.get_aliases(), dom.get_relocated())
+                    dom.get_aliases(), dom.get_relocated(), dom.get_catchall())
 
     def aliasdomain_add(self, aliasname, domainname):
         """Adds an alias domain to the domain.

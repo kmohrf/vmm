@@ -274,7 +274,7 @@ def domain_info(ctx):
     else:
         details = ctx.args[3].lower()
         if details not in ('accounts', 'aliasdomains', 'aliases', 'full',
-                           'relocated'):
+                           'relocated', 'catchall'):
             usage(INVALID_ARGUMENT, _(u"Invalid argument: '%s'") % details,
                   ctx.scmd)
     try:
@@ -308,11 +308,14 @@ def domain_info(ctx):
                 _print_list(info[1], _(u'aliases'))
             elif details == u'relocated':
                 _print_list(info[1], _(u'relocated users'))
+            elif details == u'catchall':
+                _print_list(info[1], _(u'catch-all destinations'))
             else:
                 _print_list(info[1], _(u'alias domains'))
                 _print_list(info[2], _(u'accounts'))
                 _print_list(info[3], _(u'aliases'))
                 _print_list(info[4], _(u'relocated users'))
+                _print_list(info[5], _(u'catch-all destinations'))
 
 
 def domain_quota(ctx):

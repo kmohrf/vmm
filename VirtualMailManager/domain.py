@@ -414,6 +414,16 @@ class Domain(object):
             relocated = [addr((address[0], _dom)) for address in addresses]
         return relocated
 
+    def get_catchall(self):
+        """Returns a list with all catchall e-mail addresses of the domain."""
+        self._chk_state()
+        dbc = self._dbh.cursor()
+        dbc.execute('SELECT DISTINCT destination FROM catchall WHERE gid = %s ORDER '
+                    'BY destination', (self._gid,))
+        addresses = dbc.fetchall()
+        dbc.close()
+        return addresses
+
     def get_aliase_names(self):
         """Returns a list with all alias domain names of the domain."""
         self._chk_state()
