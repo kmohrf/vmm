@@ -91,7 +91,7 @@ Hint: Delete some destination addresses.""")
         """
         dbc = self._dbh.cursor()
         if not destination:
-            dbc.execute('DELETE FROM catchall WHERE gid = %s', self._gid)
+            dbc.execute('DELETE FROM catchall WHERE gid = %s', (self._gid,))
         else:
             dbc.execute('DELETE FROM catchall WHERE gid = %s '
                         'AND destination = %s', (self._gid, str(destination)))
