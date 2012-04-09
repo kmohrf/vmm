@@ -39,7 +39,7 @@ class CatchallAlias(object):
     def __init__(self, dbh, domain):
         self._domain = domain
         self._dbh = dbh
-        self._gid = get_gid(self._dbh, self._addr.domain)
+        self._gid = get_gid(self._dbh, self.domain)
         if not self._gid:
             raise AErr(_(u"The domain '%s' does not exist.") %
                        self._addr.domainname, NO_SUCH_DOMAIN)
@@ -51,7 +51,7 @@ class CatchallAlias(object):
         """Loads all known destination addresses into the _dests list."""
         dbc = self._dbh.cursor()
         dbc.execute('SELECT destination FROM catchall WHERE gid = %s',
-                    self._gid)
+                    (self._gid,))
         dests = dbc.fetchall()
         if dbc.rowcount > 0:
             self._dests.extend(DestAddr(dest[0], self._dbh) for dest in dests)
