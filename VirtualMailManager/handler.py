@@ -697,7 +697,7 @@ The account has been successfully deleted from the database.
     def catchall_info(self, domain):
         """Returns an iterator object for all destinations (`EmailAddress`
         instances) for the `CatchallAlias` with the given *domain*."""
-        return self._get_catchall(domain)
+        return self._get_catchall(domain).get_destinations()
 
     def catchall_delete(self, domain, targetaddress=None):
         """Deletes the `CatchallAlias` for domain *domain* with all its
