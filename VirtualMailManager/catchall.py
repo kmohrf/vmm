@@ -42,7 +42,7 @@ class CatchallAlias(object):
         self._gid = get_gid(self._dbh, self.domain)
         if not self._gid:
             raise AErr(_(u"The domain '%s' does not exist.") %
-                       self._addr.domainname, NO_SUCH_DOMAIN)
+                       self.domain, NO_SUCH_DOMAIN)
         self._dests = []
 
         self._load_dests()
