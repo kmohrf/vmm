@@ -21,6 +21,7 @@ from subprocess import Popen, PIPE
 from VirtualMailManager.account import Account
 from VirtualMailManager.alias import Alias
 from VirtualMailManager.aliasdomain import AliasDomain
+from VirtualMailManager.catchall import CatchallAlias
 from VirtualMailManager.common import exec_ok, lisdir
 from VirtualMailManager.config import Config as Cfg
 from VirtualMailManager.constants import MIN_GID, MIN_UID, \
@@ -257,6 +258,11 @@ class Handler(object):
         address = EmailAddress(address)
         self._db_connect()
         return Alias(self._dbh, address)
+
+    def _get_catchall(self, domain):
+        """Return a CatchallAlias instances for the given domain (str)."""
+        self._db_connect()
+        return CatchallAlias(self._dbh, domain)
 
     def _get_relocated(self, address):
         """Return a Relocated instances for the given address (str)."""
@@ -670,6 +676,39 @@ The account has been successfully deleted from the database.
         else:
             alias.del_destination(DestinationEmailAddress(targetaddress,
                                                           self._dbh))
+
+    def catchall_add(self, domain, *targetaddresses):
+        """Creates a new `CatchallAlias` entry for the given *domain* with
+        the given *targetaddresses*."""
+        catchall = self._get_catchall(domain)
+        destinations = [DestinationEmailAddress(addr, self._dbh) \
+                for addr in targetaddresses]
+        warnings = []
+        destinations = catchall.add_destinations(destinations, warnings)
+        if warnings:
+            self._warnings.append(_('Ignored destination addresses:'))
+            self._warnings.extend(('  * %s' % w for w in warnings))
+        for destination in destinations:
+            if destination.gid and \
+               not self._chk_other_address_types(destination, TYPE_RELOCATED):
+                self._warnings.append(_(u"The destination account/alias '%s' "
+                                        u"does not exist.") % destination)
+
+    def catchall_info(self, domain):
+        """Returns an iterator object for all destinations (`EmailAddress`
+        instances) for the `CatchallAlias` with the given *domain*."""
+        return self._get_catchall(domain)
+
+    def catchall_delete(self, domain, targetaddress=None):
+        """Deletes the `CatchallAlias` for domain *domain* with all its
+        destinations from the database. If *targetaddress* is not ``None``,
+        only this destination will be removed from the alias."""
+        catchall = self._get_catchall(domain)
+        if targetaddress is None:
+            catchall.delete()
+        else:
+            catchall.del_destination(DestinationEmailAddress(targetaddress,
+                                                             self._dbh))
 
     def user_info(self, emailaddress, details=None):
         """Wrapper around Account.get_info(...)"""
