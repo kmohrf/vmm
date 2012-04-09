@@ -143,6 +143,18 @@ ALTER TABLE users ADD CONSTRAINT fkey_users_ssid_service_set
     FOREIGN KEY (ssid) REFERENCES service_set (ssid);
 
 -- ---
+-- Catchall
+-- ---
+
+CREATE TABLE catchall (
+    gid         bigint NOT NULL,
+    destination varchar(320) NOT NULL,
+    CONSTRAINT  pkey_catchall PRIMARY KEY (gid, destination),
+    CONSTRAINT  fkey_catchall_gid_domain_data FOREIGN KEY (gid)
+        REFERENCES domain_data (gid)
+);
+
+-- ---
 -- Restore view
 -- ---
 CREATE VIEW vmm_domain_info AS

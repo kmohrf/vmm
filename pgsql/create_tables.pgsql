@@ -173,6 +173,14 @@ CREATE TABLE relocated (
         REFERENCES domain_data (gid)
 );
 
+CREATE TABLE catchall (
+    gid         bigint NOT NULL,
+    destination varchar(320) NOT NULL,
+    CONSTRAINT  pkey_catchall PRIMARY KEY (gid, destination),
+    CONSTRAINT  fkey_catchall_gid_domain_data FOREIGN KEY (gid)
+        REFERENCES domain_data (gid)
+);
+
 CREATE OR REPLACE VIEW postfix_gid AS
     SELECT gid, domainname
       FROM domain_name;
