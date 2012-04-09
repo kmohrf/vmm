@@ -598,6 +598,15 @@ AS $$
             LOOP
                 RETURN NEXT record;
             END LOOP;
+        IF NOT FOUND THEN
+            FOR record IN
+                SELECT recipient, destination
+                  FROM catchall
+                 WHERE gid = did
+                LOOP
+                    RETURN NEXT record;
+                END LOOP;
+        END IF;
         RETURN;
     END;
 $$ LANGUAGE plpgsql STABLE
