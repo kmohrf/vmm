@@ -832,6 +832,54 @@ Example:
 .B vmm relocateddelete b.user@example.com
 .fi
 .\" -----------------------------------------------------------------------
+.SH CATCH-ALL SUBCOMMANDS
+.SS catchalladd (caa)
+.BI "vmm catchalladd" " domain destination ..."
+.PP
+This subcommand allows to specify destination addresses for a domain, which
+shall receive mail addressed to unknown local parts within that domain. Those
+catch-all aliases hence "catch all" mail to any address in the domain (unless
+a more specific alias, mailbox or relocated entry exists).
+.PP
+WARNING: Catch-all addresses can cause mail server flooding because spammers
+like to deliver mail to all possible combinations of names, e.g. to all
+addresses between abba@example.org and zztop@example.org.
+.PP
+Example:
+.PP
+.nf
+.B vmm catchalladd example.com user@example.org
+.fi
+.\" ------------------------------------
+.SS catchallinfo (cai)
+.BI "vmm catchallinfo " domain
+.PP
+This subcommand displays information about catch-all aliases defined for
+a domain.
+.PP
+Example:
+.PP
+.nf
+.B vmm catchallinfo example.com
+Catch-all information
+---------------------
+  Mail to unknown localparts in domain sarah-machwirth.de will be sent to:
+         * user@example.org
+.fi
+.\" ------------------------------------
+.SS catchalldelete (cadd)
+.BI "vmm catchalldelete " domain
+.RI [ destination ]
+.PP
+With this subcommand, catch-all aliases defined for a domain can be removed,
+either all of them, or a single one if specified explicitly.
+.PP
+Example:
+.PP
+.nf
+.B vmm catchalldelete example user@example.com
+.fi
+.\" -----------------------------------------------------------------------
 .SH FILES
 .TP
 .I /root/vmm.cfg
