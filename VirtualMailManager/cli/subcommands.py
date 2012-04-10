@@ -810,7 +810,7 @@ def _get_order(ctx):
         order = ((u'domain name', 0), (u'gid', 1), (u'domain directory', 0),
                  (u'quota limit/user', 0), (u'active services', 0),
                  (u'transport', 0), (u'alias domains', 0), (u'accounts', 0),
-                 (u'aliases', 0), (u'relocated', 0))
+                 (u'aliases', 0), (u'relocated', 0), (u'catch-all dests', 0))
     elif ctx.scmd == 'userinfo':
         if ctx.argc == 4 and ctx.args[3] != u'aliases' or \
            ctx.cget('account.disk_usage'):

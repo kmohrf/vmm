@@ -348,11 +348,12 @@ class Domain(object):
         self._chk_state()
         dbc = self._dbh.cursor()
         dbc.execute('SELECT aliasdomains "alias domains", accounts, aliases, '
-                    'relocated FROM vmm_domain_info WHERE gid = %s',
-                    (self._gid,))
+                    'relocated, catchall "catch-all dests" '
+                    'FROM vmm_domain_info WHERE gid = %s', (self._gid,))
         info = dbc.fetchone()
         dbc.close()
-        keys = ('alias domains', 'accounts', 'aliases', 'relocated')
+        keys = ('alias domains', 'accounts', 'aliases', 'relocated',
+                'catch-all dests')
         info = dict(zip(keys, info))
         info['gid'] = self._gid
         info['domain name'] = self._name

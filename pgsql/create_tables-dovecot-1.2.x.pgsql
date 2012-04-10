@@ -196,7 +196,10 @@ CREATE OR REPLACE VIEW vmm_domain_info AS
            (SELECT count(gid)
               FROM domain_name
              WHERE domain_name.gid = domain_data.gid
-               AND NOT domain_name.is_primary) AS aliasdomains
+               AND NOT domain_name.is_primary) AS aliasdomains,
+           (SELECT count(gid)
+              FROM catchall
+             WHERE catchall.gid = domain_data.gid) AS catchall
       FROM domain_data
            LEFT JOIN domain_name USING (gid)
            LEFT JOIN users USING (gid)
