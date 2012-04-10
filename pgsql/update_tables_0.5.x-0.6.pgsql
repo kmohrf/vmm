@@ -461,7 +461,9 @@ CREATE OR REPLACE FUNCTION postfix_virtual_alias_map(
     RETURNS SETOF recipient_destination
 AS $$
     DECLARE
+        recordc recipient_destination;
         record recipient_destination;
+        catchall_cursor refcursor;
         recipient varchar(320) := localpart || '@' || the_domain;
         did bigint := (SELECT gid FROM domain_name WHERE domainname=the_domain);
     BEGIN
@@ -473,31 +475,51 @@ AS $$
             LOOP
                 RETURN NEXT record;
             END LOOP;
+
         IF NOT FOUND THEN
-            -- First, we have to check existing mailboxes and
-            -- return identity if one exists
-            FOR record IN
-                SELECT recipient, recipient as destination
-                  FROM users
-                 WHERE gid = did
-                   AND local_part = localpart
-                UNION SELECT recipient, recipient as destination
-                  FROM relocated
-                 WHERE gid = did
-                   AND address = localpart
-                LOOP
-                    RETURN NEXT record;
-                END LOOP;
-            -- Only now can we think about catchalls...
-            IF NOT FOUND THEN
+            -- There is no matching virtual_alias. If there are no catchall
+            -- records for this domain, we can just return NULL since Postfix
+            -- will then later consult mailboxes/relocated itself. But if
+            -- there is a catchall destination, then it would take precedence
+            -- over mailboxes/relocated, which is not what we want. Therefore,
+            -- we must first find out if the query is for an existing mailbox
+            -- or relocated entry and return the identity mapping if that is
+            -- the case
+            OPEN catchall_cursor FOR
+                SELECT recipient, destination
+                  FROM catchall
+                 WHERE gid = did;
+            FETCH NEXT FROM catchall_cursor INTO recordc;
+
+            IF recordc IS NOT NULL THEN
+                -- Since there are catchall records for this domain
+                -- check the mailbox and relocated records and return identity
+                -- if a matching record exists.
                 FOR record IN
-                    SELECT recipient, destination
-                      FROM catchall
+                    SELECT recipient, recipient as destination
+                      FROM users
                     WHERE gid = did
+                      AND local_part = localpart
+                    UNION SELECT recipient, recipient as destination
+                      FROM relocated
+                    WHERE gid = did
+                      AND address = localpart
                     LOOP
                         RETURN NEXT record;
                     END LOOP;
+
+                IF NOT FOUND THEN
+                    -- There were no records found for mailboxes/relocated,
+                    -- so now we can actually iterate the cursor and populate
+                    -- the return set
+                    LOOP
+                        RETURN NEXT recordc;
+                        FETCH NEXT FROM catchall_cursor INTO recordc;
+                        EXIT WHEN recordc IS NULL;
+                    END LOOP;
+                END IF;
             END IF;
+            CLOSE catchall_cursor;
         END IF;
         RETURN;
     END;
