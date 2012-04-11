@@ -459,6 +459,25 @@ EXTERNAL SECURITY INVOKER;
 --      varchar the_domain
 -- Returns: recipient_destination records
 -- ---
+CREATE OR REPLACE FUNCTION _interpolate_destination(
+    IN destination varchar, localpart varchar, IN the_domain varchar)
+    RETURNS varchar
+AS $$
+    DECLARE
+        result varchar(320);
+    BEGIN
+        IF position('%' in destination) = 0 THEN
+            RETURN destination;
+        END IF;
+        result := replace(destination, '%n', localpart);
+        result := replace(result, '%d', the_domain);
+        result := replace(result, '%=', localpart || '=' || the_domain);
+        RETURN result;
+    END;
+$$ LANGUAGE plpgsql STABLE
+RETURNS NULL ON NULL INPUT
+EXTERNAL SECURITY INVOKER;
+
 CREATE OR REPLACE FUNCTION postfix_virtual_alias_map(
     IN localpart varchar, IN the_domain varchar)
     RETURNS SETOF recipient_destination
@@ -471,7 +490,8 @@ AS $$
         did bigint := (SELECT gid FROM domain_name WHERE domainname=the_domain);
     BEGIN
         FOR record IN
-            SELECT recipient, destination
+            SELECT recipient,
+                _interpolate_destination(destination, localpart, the_domain)
               FROM alias
              WHERE gid = did
                AND address = localpart
@@ -489,7 +509,8 @@ AS $$
             -- or relocated entry and return the identity mapping if that is
             -- the case
             OPEN catchall_cursor FOR
-                SELECT recipient, destination
+                SELECT recipient,
+                    _interpolate_destination(destination, localpart, the_domain)
                   FROM catchall
                  WHERE gid = did;
             FETCH NEXT FROM catchall_cursor INTO recordc;

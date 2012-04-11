@@ -746,11 +746,21 @@ with one or more
 .I destination
 addresses.
 .PP
+Within the destination address, the placeholders
+.IR %n ,
+.IR %d ,
+and
+.IR %=
+will be replaced by the local part, the domain, or the email address with '@'
+replaced by '=' respectively. In combination with alias domains, this enables
+domain-specific destinations.
+.PP
 Examples:
 .PP
 .nf
 .B vmm aliasadd john.doe@example.com d.user@example.com
 .B vmm aa support@example.com d.user@example.com e.user@example.com
+.B vmm aa postmaster@example.com postmaster+%d@example.org
 .fi
 .\" ------------------------------------
 .SS aliasdelete (ad)

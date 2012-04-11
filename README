@@ -61,6 +61,13 @@ Features
 
   ‣ supports multiple destinations per e-mail alias
   ‣ destinations can be deleted separately
+  ‣ destinations can be interpolated using the original address' localpart
+    and domain, allowing aliases to have different meaning in aliasdomains,
+    e.g. with the following defined in example.org:
+      postmaster@example.org  →  postmaster+%d@admin.example.org
+    If example.com is an aliasdomain of example.org, the alias will become
+      postmaster@example.org  →  postmaster+example.org@admin.example.org
+      postmaster@example.com  →  postmaster+example.com@admin.example.org
 
 Installation Prerequisites
 ==========================

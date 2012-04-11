@@ -780,11 +780,21 @@ Mit diesem Unterbefehl werden neue Alias\-Adressen, mit einer oder mehren
 .IR destination (en),
 erstellt.
 .PP
+Innerhalb der Zieladresse werden die Zeichenketten
+.IR %n ,
+.IR %d
+und
+.IR %=
+durch den ursprünglichen lokalen Teil, die Domain bzw. die Emailadresse mit
+'=' anstelle von '@' ersetzt. Dies ermöglicht z.B. in Verbindung mit
+Alias-Domains domain-spezifische Empfänger.
+.PP
 Beispiele:
 .PP
 .nf
 .B vmm aliasadd john.doe@example.com d.user@example.com
 .B vmm aa support@example.com d.user@example.com e.user@example.com
+.B vmm aa postmaster@example.com postmaster+%d@example.org
 .fi
 .\" ------------------------------------
 .SS aliasdelete (ad)
