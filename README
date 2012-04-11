@@ -43,6 +43,7 @@ Features
   ‣ supports relocated_ users
   ‣ the postmaster account can be created automatically when a new domain is
     created
+  ‣ supports per-domain catch-all aliases
 
 • Alias domain features
 
