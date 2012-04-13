@@ -763,15 +763,19 @@ The account has been successfully deleted from the database.
 
     def user_quotalimit(self, emailaddress, bytes_, messages=0):
         """Wrapper for Account.update_quotalimit(QuotaLimit)."""
-        if not all(isinstance(i, (int, long)) for i in (bytes_, messages)):
-            raise TypeError("'bytes_' and 'messages' have to be "
-                            "integers or longs.")
         acc = self._get_account(emailaddress)
         if not acc:
             raise VMMError(_(u"The account '%s' does not exist.") %
-                           acc.address, NO_SUCH_ACCOUNT)
-        acc.update_quotalimit(QuotaLimit(self._dbh, bytes=bytes_,
-                                         messages=messages))
+                        acc.address, NO_SUCH_ACCOUNT)
+        if bytes_ == 'default':
+            quotalimit = None
+        else:
+            if not all(isinstance(i, (int, long)) for i in (bytes_, messages)):
+                raise TypeError("'bytes_' and 'messages' have to be "
+                                "integers or longs.")
+            quotalimit = QuotaLimit(self._dbh, bytes=bytes_,
+                                    messages=messages)
+        acc.update_quotalimit(quotalimit)
 
     def user_transport(self, emailaddress, transport):
         """Wrapper for Account.update_transport(Transport)."""
@@ -782,21 +786,26 @@ The account has been successfully deleted from the database.
         if not acc:
             raise VMMError(_(u"The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
-        acc.update_transport(Transport(self._dbh, transport=transport))
+        transport = None if transport == 'default' \
+                         else Transport(self._dbh, transport=transport)
+        acc.update_transport(transport)
 
     def user_services(self, emailaddress, *services):
         """Wrapper around Account.update_serviceset()."""
-        kwargs = dict.fromkeys(SERVICES, False)
-        for service in set(services):
-            if service not in SERVICES:
-                raise VMMError(_(u"Unknown service: '%s'") % service,
-                               UNKNOWN_SERVICE)
-            kwargs[service] = True
         acc = self._get_account(emailaddress)
         if not acc:
             raise VMMError(_(u"The account '%s' does not exist.") %
-                           acc.address, NO_SUCH_ACCOUNT)
-        serviceset = ServiceSet(self._dbh, **kwargs)
+                        acc.address, NO_SUCH_ACCOUNT)
+        if len(services) == 1 and services[0] == 'default':
+            serviceset = None
+        else:
+            kwargs = dict.fromkeys(SERVICES, False)
+            for service in set(services):
+                if service not in SERVICES:
+                    raise VMMError(_(u"Unknown service: '%s'") % service,
+                                UNKNOWN_SERVICE)
+                kwargs[service] = True
+            serviceset = ServiceSet(self._dbh, **kwargs)
         acc.update_serviceset(serviceset)
 
     def relocated_add(self, emailaddress, targetaddress):

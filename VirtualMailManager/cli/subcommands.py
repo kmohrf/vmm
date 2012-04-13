@@ -617,7 +617,8 @@ def user_quota(ctx):
     elif ctx.argc < 4:
         usage(EX_MISSING_ARGS, _(u'Missing storage value.'), ctx.scmd)
     try:
-        bytes_ = size_in_bytes(ctx.args[3])
+        bytes_ = ctx.args[3] if ctx.args[3] == 'default' \
+                             else size_in_bytes(ctx.args[3])
     except (ValueError, TypeError):
         usage(INVALID_ARGUMENT, _(u"Invalid storage value: '%s'") %
               ctx.args[3], ctx.scmd)
@@ -641,7 +642,7 @@ def user_services(ctx):
     if ctx.argc >= 4:
         services.extend([service.lower() for service in ctx.args[3:]])
         unknown = [service for service in services if service not in SERVICES]
-        if unknown:
+        if unknown and ctx.args[3] != 'default':
             usage(INVALID_ARGUMENT, _(u'Invalid service arguments: %s') %
                   ' '.join(unknown), ctx.scmd)
     ctx.hdlr.user_services(ctx.args[2].lower(), *services)
@@ -719,14 +720,14 @@ def update_cmd_map():
                         'address [password]',
                         _(u'update the password for the given address')),
     'userquota': cmd('userquota', 'uq', user_quota,
-                     'address storage [messages]',
+                     'address storage [messages] | address default',
                      _(u'update the quota limit for the given address')),
     'userservices': cmd('userservices', 'us', user_services,
-                        'address [service ...]',
+                        'address [service ...] | address default',
                         _(u'enables the specified services and disables all '
                           u'not specified services')),
     'usertransport': cmd('usertransport', 'ut', user_transport,
-                         'address transport',
+                         'address transport | address default',
                          _(u'update the transport of the given address')),
     # Alias commands
     'aliasadd': cmd('aliasadd', 'aa', alias_add, 'address destination ...',
