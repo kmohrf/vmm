@@ -30,3 +30,13 @@ Database:
     - Pascal suggested to use hooks:
       07 23:36 <Faxe> zwei config settings handle_dir in domain und account
       07 23:37 <Faxe> und dann post-{domain,user}add scripte, die den wrapper aufrufen
+
+- relay_domains management [madduck@madduck.net]:
+    - should be in a separate table
+
+- default aliases [madduck@madduck.net]
+    - it should be possible to define a set of default aliases and their
+      destinations for a domain, e.g. postmaster@ and abuse@. For most
+      flexibility, there ought to be a m:n table connecting domains to sets of
+      default aliases. These aliases then get treated like normal aliases
+      unless they are overridden by a real alias.
