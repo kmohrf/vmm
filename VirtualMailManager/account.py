@@ -8,7 +8,8 @@
     Virtual Mail Manager's Account class to manage e-mail accounts.
 """
 
-from VirtualMailManager.common import version_str
+from VirtualMailManager.common import version_str, \
+     format_domain_default
 from VirtualMailManager.constants import \
      ACCOUNT_EXISTS, ACCOUNT_MISSING_PASSWORD, ALIAS_PRESENT, \
      INVALID_ARGUMENT, INVALID_MAIL_LOCATION, NO_SUCH_ACCOUNT, \
@@ -349,7 +350,8 @@ class Account(object):
 
         The keys of the dict are: 'address', 'gid', 'home', 'imap'
         'mail_location', 'name', 'pop3', 'sieve', 'smtp', transport', 'uid',
-        'uq_bytes', 'uq_messages', 'ql_bytes', and 'ql_messages'.
+        'uq_bytes', 'uq_messages', 'ql_bytes', 'ql_messages', and
+        'ql_domaindefault'.
         """
         self._chk_state()
         dbc = self._dbh.cursor()
@@ -366,9 +368,15 @@ class Account(object):
             info['gid'] = self._domain.gid
             info['home'] = '%s/%s' % (self._domain.directory, self._uid)
             info['mail_location'] = self._mail.mail_location
-            info['ql_bytes'] = self._qlimit.bytes
-            info['ql_messages'] = self._qlimit.messages
-            info['transport'] = self._transport.transport
+            if self._qlimit:
+                info['ql_bytes'] = self._qlimit.bytes
+                info['ql_messages'] = self._qlimit.messages
+                info['ql_domaindefault'] = False
+            else:
+                info['ql_bytes'] = self._domain.quotalimit.bytes
+                info['ql_messages'] = self._domain.quotalimit.messages
+                info['ql_domaindefault'] = True
+            info['transport'] = self._get_info_transport()
             info['uid'] = self._uid
             return info
         # nearly impossible‽
