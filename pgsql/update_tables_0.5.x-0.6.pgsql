@@ -91,7 +91,7 @@ ALTER TABLE domain_data ADD COLUMN qid bigint NOT NULL DEFAULT 1;
 ALTER TABLE domain_data ADD CONSTRAINT fkey_domain_data_qid_quotalimit
     FOREIGN KEY (qid) REFERENCES quotalimit (qid);
 
-ALTER TABLE users ADD COLUMN qid bigint NOT NULL DEFAULT 1;
+ALTER TABLE users ADD COLUMN qid bigint NULL DEFAULT NULL;
 ALTER TABLE users ADD CONSTRAINT fkey_users_qid_quotalimit
     FOREIGN KEY (qid) REFERENCES quotalimit (qid);
 
@@ -125,7 +125,7 @@ ALTER TABLE domain_data ADD COLUMN ssid bigint NOT NULL DEFAULT 1;
 ALTER TABLE domain_data ADD CONSTRAINT fkey_domain_data_ssid_service_set
     FOREIGN KEY (ssid) REFERENCES service_set (ssid);
 
-ALTER TABLE users ADD COLUMN ssid bigint NOT NULL DEFAULT 1;
+ALTER TABLE users ADD COLUMN ssid bigint NULL DEFAULT NULL;
 -- save current service sets
 UPDATE users u
    SET ssid = ss.ssid
@@ -144,6 +144,24 @@ ALTER TABLE users ADD CONSTRAINT fkey_users_ssid_service_set
 
 -- ---
 -- Catchall
+-- ---
+-- Quota/Service/Transport inheritance
+-- ---
+ALTER TABLE users ALTER COLUMN tid DROP NULL;
+ALTER TABLE users ALTER COLUMN tid SET DEFAULT NULL;
+-- The qid and ssid columns have already been defined accordingly above.
+-- The rest of the logic will take place in the functions.
+
+-- While qid and ssid are new and it's perfectly okay for existing users to
+-- get NULL values (i.e. inherit from the domain's default), tid existed in
+-- vmm 0.5.x. A sensible way forward seems thus to NULL all user records' tid
+-- fields where the tid duplicates the value stored in the domain's record.
+UPDATE users
+   SET tid = NULL
+ WHERE tid = (SELECT tid
+                FROM domain_data
+               WHERE domain_data.gid = users.gid);
+
 -- ---
 
 CREATE TABLE catchall (
@@ -277,12 +295,20 @@ AS $$
     BEGIN
         FOR record IN
             SELECT userid, passwd, smtp, pop3, imap, managesieve
-              FROM users, service_set
-             WHERE gid = (SELECT gid
-                            FROM domain_name
-                           WHERE domainname = the_domain)
+              FROM users, service_set, domain_data
+             WHERE users.gid = (SELECT gid
+                                  FROM domain_name
+                                 WHERE domainname = the_domain)
                AND local_part = localpart
                AND service_set.ssid = users.ssid
+               AND users.gid = domain_data.gid
+               AND CASE WHEN
+                  users.ssid IS NOT NULL
+                  THEN
+                    service_set.ssid = users.ssid
+                  ELSE
+                    service_set.ssid = domain_data.ssid
+                  END
             LOOP
                 RETURN NEXT record;
             END LOOP;
@@ -313,7 +339,13 @@ AS $$
                AND maillocation.mid = users.mid
                AND mailboxformat.fid = maillocation.fid
                AND domain_data.gid = did
-               AND quotalimit.qid = users.qid
+               AND CASE WHEN
+                     users.qid IS NOT NULL
+                   THEN
+                     quotalimit.qid = users.qid
+                   ELSE
+                     quotalimit.qid = domain_data.qid
+                   END
             LOOP
                 RETURN NEXT record;
             END LOOP;
@@ -435,16 +467,20 @@ AS $$
     DECLARE
         record recipient_transport;
         recipient varchar(320) := localpart || '@' || the_domain;
+        did bigint := (SELECT gid FROM domain_name WHERE domainname = the_domain);
+        transport_id bigint := (SELECT tid FROM users
+                                  WHERE gid = did AND local_part = localpart);
     BEGIN
+        IF transport_id IS NULL THEN
+            SELECT tid INTO STRICT transport_id
+              FROM domain_data
+             WHERE gid = did;
+        END IF;
+
         FOR record IN
             SELECT recipient, transport
               FROM transport
-             WHERE tid = (SELECT tid
-                            FROM users
-                           WHERE gid = (SELECT gid
-                                          FROM domain_name
-                                         WHERE domainname = the_domain)
-                             AND local_part = localpart)
+             WHERE tid = transport_id
             LOOP
                 RETURN NEXT record;
             END LOOP;
