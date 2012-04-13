@@ -612,11 +612,12 @@ AS $$
         record recipient_destination;
         catchall_cursor refcursor;
         recipient varchar(320) := localpart || '@' || the_domain;
+        idestination varchar(320) :=
+            _interpolate_destination(destination, localpart, the_domain);
         did bigint := (SELECT gid FROM domain_name WHERE domainname=the_domain);
     BEGIN
         FOR record IN
-            SELECT recipient,
-                _interpolate_destination(destination, localpart, the_domain)
+            SELECT recipient, idestination
               FROM alias
              WHERE gid = did
                AND address = localpart
@@ -634,8 +635,7 @@ AS $$
             -- or relocated entry and return the identity mapping if that is
             -- the case
             OPEN catchall_cursor FOR
-                SELECT recipient,
-                    _interpolate_destination(destination, localpart, the_domain)
+                SELECT recipient, idestination
                   FROM catchall
                  WHERE gid = did;
             FETCH NEXT FROM catchall_cursor INTO recordc;
