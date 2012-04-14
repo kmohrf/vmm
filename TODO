@@ -46,8 +46,3 @@ Database:
       users, aliases, relocated, and addresses (the union of all three).
       Ideally, the commands would also take % wildcards, so that I can limit
       the output
-
-- domain and account notes [madduck@madduck.net]:
-    - I found it useful to keep a free-text "notes" field for accounts and
-      domains, where the admin can store anything s/he wants. This would
-      simply be a new field in the two tables and the appropriate UI changes.
