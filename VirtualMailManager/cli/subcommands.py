@@ -16,8 +16,7 @@ from time import strftime, strptime
 
 from VirtualMailManager import ENCODING
 from VirtualMailManager.cli import get_winsize, prog, w_err, w_std
-from VirtualMailManager.common import human_size, size_in_bytes, \
-     version_str, format_domain_default
+from VirtualMailManager.common import human_size, size_in_bytes, version_str
 from VirtualMailManager.constants import __copyright__, __date__, \
      __version__, ACCOUNT_EXISTS, ALIAS_EXISTS, ALIASDOMAIN_ISDOMAIN, \
      DOMAIN_ALIAS_EXISTS, INVALID_ARGUMENT, EX_MISSING_ARGS, RELOCATED_EXISTS
@@ -573,17 +572,15 @@ def user_info(ctx):
     else:
         if details in (None, 'du'):
             info['quota storage'] = _format_quota_usage(info['ql_bytes'],
-                    info['uq_bytes'], True, info['ql_domaindefault'])
+                    info['uq_bytes'], True)
             info['quota messages'] = _format_quota_usage(info['ql_messages'],
-                    info['uq_messages'], domaindefault=info['ql_domaindefault'])
+                    info['uq_messages'])
             _print_info(ctx, info, _(u'Account'))
         else:
             info[0]['quota storage'] = _format_quota_usage(info[0]['ql_bytes'],
-                    info[0]['uq_bytes'], True, info[0]['ql_domaindefault'])
-            info[0]['quota messages'] = \
-                _format_quota_usage(info[0]['ql_messages'],
-                                    info[0]['uq_messages'],
-                                    domaindefault=info[0]['ql_domaindefault'])
+                    info[0]['uq_bytes'], True)
+            info[0]['quota messages'] = _format_quota_usage(
+                    info[0]['ql_messages'], info[0]['uq_messages'])
             _print_info(ctx, info[0], _(u'Account'))
             _print_list(info[1], _(u'alias addresses'))
 
@@ -833,7 +830,7 @@ def _get_order(ctx):
     return order
 
 
-def _format_quota_usage(limit, used, human=False, domaindefault=False):
+def _format_quota_usage(limit, used, human=False):
     """Put quota's limit / usage / percentage in a formatted string."""
     if human:
         q_usage = {
@@ -849,8 +846,7 @@ def _format_quota_usage(limit, used, human=False, domaindefault=False):
         q_usage['percent'] = locale.format('%6.2f', 100. / limit * used, True)
     else:
         q_usage['percent'] = locale.format('%6.2f', 0, True)
-    fmt = format_domain_default if domaindefault else lambda s: s
-    return fmt(_(u'[%(percent)s%%] %(used)s/%(limit)s') % q_usage)
+    return _(u'[%(percent)s%%] %(used)s/%(limit)s') % q_usage
 
 
 def _print_info(ctx, info, title):

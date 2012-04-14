@@ -186,7 +186,4 @@ def version_str(version):
     _version_cache[version] = version_string
     return version_string
 
-def format_domain_default(domaindata):
-    return _(u'%s [domain default]') % domaindata
-
 del _

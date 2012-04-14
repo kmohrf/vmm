@@ -129,9 +129,9 @@ CREATE TABLE users (
     uid         bigint NOT NULL DEFAULT nextval('users_uid'),
     gid         bigint NOT NULL,
     mid         bigint NOT NULL DEFAULT 1,
-    qid         bigint NULL DEFAULT NULL,
-    ssid        bigint NULL DEFAULT NULL,
-    tid         bigint NULL DEFAULT NULL,
+    qid         bigint NOT NULL DEFAULT 1,
+    ssid        bigint NOT NULL DEFAULT 1,
+    tid         bigint NOT NULL DEFAULT 1,
     CONSTRAINT  pkey_users PRIMARY KEY (local_part, gid),
     CONSTRAINT  ukey_users_uid UNIQUE (uid),
     CONSTRAINT  fkey_users_gid_domain_data FOREIGN KEY (gid)
@@ -369,19 +369,12 @@ AS $$
     BEGIN
         FOR record IN
             SELECT userid, passwd, smtp, pop3, imap, sieve
-              FROM users, service_set, domain_data
-             WHERE users.gid = (SELECT gid
-                                  FROM domain_name
-                                 WHERE domainname = the_domain)
+              FROM users, service_set
+             WHERE gid = (SELECT gid
+                            FROM domain_name
+                           WHERE domainname = the_domain)
                AND local_part = localpart
-               AND users.gid = domain_data.gid
-               AND CASE WHEN
-                     users.ssid IS NOT NULL
-                     THEN
-                       service_set.ssid = users.ssid
-                     ELSE
-                       service_set.ssid = domain_data.ssid
-                     END
+               AND service_set.ssid = users.ssid
             LOOP
                 RETURN NEXT record;
             END LOOP;
@@ -418,13 +411,7 @@ AS $$
                AND maillocation.mid = users.mid
                AND mailboxformat.fid = maillocation.fid
                AND domain_data.gid = did
-               AND CASE WHEN
-                     users.qid IS NOT NULL
-                   THEN
-                     quotalimit.qid = users.qid
-                   ELSE
-                     quotalimit.qid = domain_data.qid
-                   END
+               AND quotalimit.qid = users.qid
             LOOP
                 RETURN NEXT record;
             END LOOP;
@@ -568,20 +555,16 @@ AS $$
     DECLARE
         record recipient_transport;
         recipient varchar(320) := localpart || '@' || the_domain;
-        did bigint := (SELECT gid FROM domain_name WHERE domainname = the_domain);
-        transport_id bigint := (SELECT tid FROM users
-                                  WHERE gid = did AND local_part = localpart);
     BEGIN
-        IF transport_id IS NULL THEN
-            SELECT tid INTO STRICT transport_id
-              FROM domain_data
-             WHERE gid = did;
-        END IF;
-
         FOR record IN
             SELECT recipient, transport
               FROM transport
-             WHERE tid = transport_id
+             WHERE tid = (SELECT tid
+                            FROM users
+                           WHERE gid = (SELECT gid
+                                          FROM domain_name
+                                         WHERE domainname = the_domain)
+                             AND local_part = localpart)
             LOOP
                 RETURN NEXT record;
             END LOOP;
