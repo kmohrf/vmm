@@ -13,3 +13,4 @@ debian/*.debhelper
 debian/files
 debian/*substvars
 .pc
+*.egg-info
