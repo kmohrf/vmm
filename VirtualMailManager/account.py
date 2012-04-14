@@ -479,7 +479,7 @@ def get_account_by_uid(uid, dbh):
         raise AErr(_(u'UID must be greater than 0.'), INVALID_ARGUMENT)
     dbc = dbh.cursor()
     dbc.execute("SELECT local_part||'@'|| domain_name.domainname AS address, "
-                "uid, users.gid FROM users LEFT JOIN domain_name ON "
+                "uid, users.gid, note FROM users LEFT JOIN domain_name ON "
                 "(domain_name.gid = users.gid AND is_primary) WHERE uid = %s",
                 (uid,))
     info = dbc.fetchone()
@@ -487,7 +487,7 @@ def get_account_by_uid(uid, dbh):
     if not info:
         raise AErr(_(u"There is no account with the UID: '%d'") % uid,
                    NO_SUCH_ACCOUNT)
-    info = dict(zip(('address', 'uid', 'gid'), info))
+    info = dict(zip(('address', 'uid', 'gid', 'note'), info))
     return info
 
 del _, cfg_dget
