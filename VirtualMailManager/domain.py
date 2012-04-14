@@ -129,8 +129,8 @@ class Domain(object):
 
     def _update_tables(self, column, value, force=False):
         """Update various columns in the domain_data table. When *force* is
-        `True` also the corresponding column in the users table will be
-        updated.
+        `True`, the corresponding column in the users table will be reset to
+        NULL.
 
         Arguments:
 
@@ -139,7 +139,7 @@ class Domain(object):
         `value` : long
           The referenced key
         `force` : bool
-          enforce the new setting also for existing users. Default: `False`
+          reset existing users. Default: `False`
         """
         if column not in ('qid', 'ssid', 'tid'):
             raise ValueError('Unknown column: %r' % column)
@@ -149,8 +149,8 @@ class Domain(object):
         if dbc.rowcount > 0:
             self._dbh.commit()
         if force:
-            dbc.execute('UPDATE users SET %s = %%s WHERE gid = %%s' % column,
-                        (value, self._gid))
+            dbc.execute('UPDATE users SET %s = NULL WHERE gid = %%s' % column,
+                        (self._gid,))
             if dbc.rowcount > 0:
                 self._dbh.commit()
         dbc.close()
@@ -281,9 +281,9 @@ class Domain(object):
     def update_quotalimit(self, quotalimit, force=False):
         """Update the quota limit of the Domain.
 
-        If *force* is `True` the new *quotalimit* will be applied to
-        all existing accounts of the domain. Otherwise the *quotalimit*
-        will be only applied to accounts created from now on.
+        If *force* is `True`, accounts-specific overrides will be reset
+        for all existing accounts of the domain. Otherwise, the limit
+        will only affect accounts that use the default.
 
         Arguments:
 
@@ -305,9 +305,9 @@ class Domain(object):
     def update_serviceset(self, serviceset, force=False):
         """Assign a different set of services to the Domain,
 
-        If *force* is `True` the *serviceset* will be also assigned to
-        all existing accounts of the Domain.  Otherwise the *serviceset*
-        will be only the 'default' for accounts created from now on.
+        If *force* is `True`, accounts-specific overrides will be reset
+        for all existing accounts of the domain. Otherwise, the service
+        set will only affect accounts that use the default.
 
         Arguments:
         `serviceset` : VirtualMailManager.serviceset.ServiceSet
@@ -325,9 +325,9 @@ class Domain(object):
     def update_transport(self, transport, force=False):
         """Sets a new transport for the Domain.
 
-        If *force* is `True` the new *transport* will be assigned to all
-        existing accounts.  Otherwise the *transport* will be only used for
-        accounts created from now on.
+        If *force* is `True`, accounts-specific overrides will be reset
+        for all existing accounts of the domain. Otherwise, the transport
+        setting will only affect accounts that use the default.
 
         Arguments:
 

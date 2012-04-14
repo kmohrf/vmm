@@ -421,9 +421,10 @@ the domain - not for the domain itself.
 .PP
 The default quota limit for accounts is defined in the
 .IR vmm.cfg " (" domain.quota_bytes " and " domain.quota_messages ).
-The new quota limit will be applied to all newly created accounts.
-If you want to apply the new quota limit also to existing accounts, you
-have to give the optional keyword
+.PP
+The new quota limit will affect only those accounts for which the limit
+has not been overridden. If you want to restore the default to all accounts,
+you may pass the keyword
 .BR force .
 .br
 When the argument
@@ -455,12 +456,10 @@ All other services will be deactivated/unusable.
 Possible service names are: 
 .BR  imap ", " pop3 ", " sieve " and " smtp .
 .br
-When the keyword
-.B force
-was omitted, the service setting will be the default for new created
-accounts.
-Otherwise it will additionally apply the settings to all existing accounts
-of the domain.
+The new service set will affect only those accounts for which the set has not
+been overridden. If you want to restore the default to all accounts, you may
+pass the keyword
+.BR force .
 .\" ------------------------------------
 .SS domaintransport (dt)
 .BI "vmm domaintransport" " fqdn transport"
@@ -468,10 +467,10 @@ of the domain.
 .PP
 A new transport for the indicated domain can be set with this subcommand.
 .PP
-If the optional keyword
-.B force
-is given all account specific transport settings will be also updated.
-Otherwise this setting will affect only new created accounts.
+The new transport will affect only those accounts for which the transport has
+not been overridden. If you want to restore the default to all accounts, you
+may pass the keyword
+.BR force .
 .PP
 Example:
 .PP

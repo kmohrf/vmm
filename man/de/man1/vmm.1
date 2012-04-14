@@ -444,9 +444,9 @@ Quota\-Limit festzulegen.
 .PP
 Standardmäßig gilt für Konten das Quota\-Limit der
 .IR vmm.cfg " (" domain.quota_bytes " und " domain.quota_messages ).
-Das neue Quota\-Limit wird für alle zukünftig angelegte Konten gelten.
-Soll das neue Quota\-Limit auch auf bestehende Konten der Domain angewendet
-werden, so ist das optionale Schlüsselwort
+Das neue Quota\-Limit gilt für für alle bestehenden Konten, die nicht selbst
+ein Quota\-Limit definieren. Soll das neue Quota\-Limit auch für Konten mit
+eigenen Limiten angewendet werden, so ist das optionale Schlüsselwort
 .B force
 anzugeben.
 .br
@@ -479,12 +479,12 @@ Verwendbare
 sind:
 .BR  imap ", " pop3 ", " sieve " und " smtp .
 .br
-Wurde das Schlüsselwort
+Wird das Schlüsselwort
 .B force
-nicht angegeben, gelten die Service\-Einstellungen als Vorgabewert für neu
-angelegte Konten in der Domain.
-Andernfalls werden sie zusätzlich auf alle bestehenden Konten der Domain
-angewandt werden.
+angegeben, so werden alle kontospezifischen Einstellungen gelöscht und es
+gelten fortan die Service\-Einstellungen der Domain für alle Konten. Ohne
+dieses Schlüsselwort gelten die neuen Einstellungen nur für Konten, bei denen
+die Service-Einstellungen nicht individuell geändert wurden.
 .\" ------------------------------------
 .SS domaintransport (dt)
 .BI "vmm domaintransport" " fqdn transport"
@@ -496,15 +496,12 @@ für die Domain mit dem angegebenen
 .I fqdn
 kann mit diesem Unterbefehl festgelegt werden.
 .PP
-Wurde das optionale Schlüsselwort
+Wird das Schlüsselwort
 .B force
-angegeben, so werden alle bisherigen Transport\-Einstellungen, der in
-dieser Domain vorhandenen Konten, mit dem neuen
-.I transport
-überschrieben.
-Andernfalls gilt der neue
-.I transport
-nur für Konten, die zukünftig erstellt werden.
+angegeben, so werden alle kontospezifischen Einstellungen gelöscht und es
+gelten fortan die Transport\-Einstellungen der Domain für alle Konten. Ohne
+dieses Schlüsselwort gelten die neuen Einstellungen nur für Konten, bei denen
+die Transport-Einstellungen nicht individuell geändert wurden.
 .PP
 Beispiel:
 .PP
