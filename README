@@ -55,6 +55,8 @@ Features
   ‣ activate or deactivate one/more/all services (SMTP, POP, IMAP and
     ManageSieve) per account
   ‣ configurable quota limit (size and/or number of messages) per user
+  ‣ per-account configuration overrides defaults defined by the domain,
+    otherwise the setting is inherited
   ‣ unique user identifier (UID) per user
 
 • Alias features
