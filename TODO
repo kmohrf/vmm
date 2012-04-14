@@ -40,3 +40,8 @@ Database:
       flexibility, there ought to be a m:n table connecting domains to sets of
       default aliases. These aliases then get treated like normal aliases
       unless they are overridden by a real alias.
+
+- domain and account notes [madduck@madduck.net]:
+    - I found it useful to keep a free-text "notes" field for accounts and
+      domains, where the admin can store anything s/he wants. This would
+      simply be a new field in the two tables and the appropriate UI changes.
