@@ -692,6 +692,19 @@ Example:
 .B vmm up d.user@example.com \(dqA |\(rs/|0r3 5ecur3 P4s5\(rs/\(rs/0rd?\(dq
 .fi
 .\" ------------------------------------
+.SS usernote (uo)
+.BI "vmm usernote" " address"
+.RI [ note ]
+.PP
+With this subcommand, it is possible to attach a note to the specified
+account. Without an argument, an existing note is removed.
+.PP
+Example:
+.PP
+.nf
+.B vmm uo d.user@example.com Only needed until end of May 2012
+.fi
+.\" ------------------------------------
 .SS userquota (uq)
 .BI "vmm userquota" " address storage"
 .RI [ messages ]
