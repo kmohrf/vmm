@@ -593,9 +593,11 @@ def user_name(ctx):
     if ctx.argc < 3:
         usage(EX_MISSING_ARGS, _(u"Missing e-mail address and user's name."),
               ctx.scmd)
-    if ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u"Missing user's name."), ctx.scmd)
-    ctx.hdlr.user_name(ctx.args[2].lower(), ctx.args[3])
+    elif ctx.argc < 4:
+        name = None
+    else:
+        name = ctx.args[3]
+    ctx.hdlr.user_name(ctx.args[2].lower(), name)
 
 
 def user_password(ctx):

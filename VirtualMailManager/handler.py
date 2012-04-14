@@ -752,9 +752,6 @@ The account has been successfully deleted from the database.
 
     def user_name(self, emailaddress, name):
         """Wrapper for Account.modify('name', ...)."""
-        if not isinstance(name, basestring) or not name:
-            raise VMMError(_(u"Could not accept name: '%s'") % name,
-                           INVALID_ARGUMENT)
         acc = self._get_account(emailaddress)
         if not acc:
             raise VMMError(_(u"The account '%s' does not exist.") %
