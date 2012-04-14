@@ -477,6 +477,19 @@ Example:
 .nf
 .B vmm domaintransport support.example.com dovecot:
 .fi
+.\" ------------------------------------
+.SS domainnote (do)
+.BI "vmm domainnote" " fqdn"
+.RI [ note ]
+.PP
+With this subcommand, it is possible to attach a note to the specified
+domain. Without an argument, an existing note is removed.
+.PP
+Example:
+.PP
+.nf
+.B vmm do example.com Belongs to Robert
+.fi
 .\" -----------------------------------------------------------------------
 .SH ALIAS DOMAIN SUBCOMMANDS
 An alias domain is an alias for a domain that was previously added with the
