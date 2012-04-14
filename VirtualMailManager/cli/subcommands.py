@@ -898,7 +898,22 @@ def _print_info(ctx, info, title):
         else:
             w_std(u'\t%s: %s' % (key.title().ljust(17, u'.'), info[key]))
     print
+    note = info.get('note', None)
+    if note is not None:
+        _print_note(note)
 
+def _print_note(note):
+    msg = _(u'Note')
+    w_std(msg, u'-' * len(msg))
+    old_ii = txt_wrpr.initial_indent
+    old_si = txt_wrpr.subsequent_indent
+    txt_wrpr.initial_indent = txt_wrpr.subsequent_indent = '\t'
+    txt_wrpr.width -= 8
+    for para in note.split('\n'):
+        w_std(txt_wrpr.fill(para))
+    txt_wrpr.width += 8
+    txt_wrpr.subsequent_indent = old_si
+    txt_wrpr.initial_indent = old_ii
 
 def _print_list(alist, title):
     """Print a list."""
