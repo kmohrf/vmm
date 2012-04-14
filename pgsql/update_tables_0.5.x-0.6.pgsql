@@ -173,6 +173,13 @@ CREATE TABLE catchall (
 );
 
 -- ---
+-- Account/domain notes
+-- ---
+
+ALTER TABLE users ADD COLUMN note text NULL DEFAULT NULL;
+ALTER TABLE domain_data ADD COLUMN note text NULL DEFAULT NULL;
+
+-- ---
 -- Restore view
 -- ---
 CREATE VIEW vmm_domain_info AS
