@@ -32,7 +32,7 @@ cfg_dget = lambda option: None
 class Account(object):
     """Class to manage e-mail accounts."""
     __slots__ = ('_addr', '_dbh', '_domain', '_mail', '_new', '_passwd',
-                 '_qlimit', '_services', '_transport', '_uid')
+                 '_qlimit', '_services', '_transport', '_note', '_uid')
 
     def __init__(self, dbh, address):
         """Creates a new Account instance.
@@ -63,6 +63,7 @@ class Account(object):
         self._qlimit = None
         self._services = None
         self._transport = None
+        self._note = None
         self._passwd = None
         self._new = True
         self._load()
@@ -72,16 +73,16 @@ class Account(object):
         return not self._new
 
     def _load(self):
-        """Load 'uid', 'mid', 'qid', 'ssid'  and 'tid' from the database and
-        set _new to `False` - if the user could be found. """
+        """Load 'uid', 'mid', 'qid', 'ssid', 'tid' and 'note' from the
+        database and set _new to `False` - if the user could be found. """
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT uid, mid, qid, ssid, tid FROM users WHERE gid = '
-                    '%s AND local_part = %s', (self._domain.gid,
-                                               self._addr.localpart))
+        dbc.execute('SELECT uid, mid, qid, ssid, tid, note FROM users '
+                    'WHERE gid = %s AND local_part = %s',
+                    (self._domain.gid, self._addr.localpart))
         result = dbc.fetchone()
         dbc.close()
         if result:
-            self._uid, _mid, _qid, _ssid, _tid = result
+            self._uid, _mid, _qid, _ssid, _tid, _note = result
 
             def load_helper(ctor, own, field, dbresult):
                 cur = None if own is None else getattr(own, field)
@@ -96,6 +97,7 @@ class Account(object):
             self._transport = load_helper(Transport, self._transport, 'tid',
                                           _tid)
             self._mail = MailLocation(self._dbh, mid=_mid)
+            self._note = _note
             self._new = False
 
     def _set_uid(self):
@@ -193,6 +195,11 @@ class Account(object):
         return self._mail
 
     @property
+    def note(self):
+        """The Account's note."""
+        return self._note
+
+    @property
     def uid(self):
         """The Account's unique ID."""
         return self._uid
@@ -216,6 +223,17 @@ class Account(object):
                        ACCOUNT_MISSING_PASSWORD)
         self._passwd = password
 
+    def set_note(self, note):
+        """Set the account's (optional) note.
+
+        Argument:
+
+        `note` : basestring or None
+          The note, or None to remove
+        """
+        assert note is None or isinstance(note, basestring)
+        self._note = note
+
     def save(self):
         """Save the new Account in the database."""
         if not self._new:
@@ -228,13 +246,15 @@ class Account(object):
                                    directory=cfg_dget('mailbox.root')))
         dbc = self._dbh.cursor()
         dbc.execute('INSERT INTO users (local_part, passwd, uid, gid, mid, '
-                    'qid, ssid, tid) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)',
+                    'qid, ssid, tid, note) '
+                    'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)',
                     (self._addr.localpart,
                      pwhash(self._passwd, user=self._addr), self._uid,
                      self._domain.gid, self._mail.mid,
                      self._qlimit.qid if self._qlimit else None,
                      self._services.ssid if self._services else None,
-                     self._transport.tid if self._transport else None))
+                     self._transport.tid if self._transport else None,
+                     self._note))
         self._dbh.commit()
         dbc.close()
         self._new = False
@@ -242,16 +262,16 @@ class Account(object):
     def modify(self, field, value):
         """Update the Account's *field* to the new *value*.
 
-        Possible values for *field* are: 'name', 'password'.
+        Possible values for *field* are: 'name', 'password', 'note'.
 
         Arguments:
 
         `field` : basestring
-          The attribute name: 'name' or 'password'
+          The attribute name: 'name', 'password' or 'note'
         `value` : basestring
           The new value of the attribute.
         """
-        if field not in ('name', 'password'):
+        if field not in ('name', 'password', 'note'):
             raise AErr(_(u"Unknown field: '%s'") % field, INVALID_ARGUMENT)
         self._chk_state()
         dbc = self._dbh.cursor()
@@ -259,7 +279,7 @@ class Account(object):
             dbc.execute('UPDATE users SET passwd = %s WHERE uid = %s',
                         (pwhash(value, user=self._addr), self._uid))
         else:
-            dbc.execute('UPDATE users SET name = %s WHERE uid = %s',
+            dbc.execute('UPDATE users SET %s = %%s WHERE uid = %%s' % field,
                         (value, self._uid))
         if dbc.rowcount > 0:
             self._dbh.commit()
@@ -377,6 +397,7 @@ class Account(object):
                 info['ql_messages'] = self._domain.quotalimit.messages
                 info['ql_domaindefault'] = True
             info['transport'] = self._get_info_transport()
+            info['note'] = self._note
             info['uid'] = self._uid
             return info
         # nearly impossible‽

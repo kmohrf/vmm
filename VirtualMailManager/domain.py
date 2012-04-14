@@ -31,7 +31,7 @@ cfg_dget = lambda option: None
 class Domain(object):
     """Class to manage e-mail domains."""
     __slots__ = ('_directory', '_gid', '_name', '_qlimit', '_services',
-                 '_transport', '_dbh', '_new')
+                 '_transport', '_note', '_dbh', '_new')
 
     def __init__(self, dbh, domainname):
         """Creates a new Domain instance.
@@ -57,6 +57,7 @@ class Domain(object):
         self._services = None
         self._transport = None
         self._directory = None
+        self._note = None
         self._new = True
         self._load()
 
@@ -68,7 +69,8 @@ class Domain(object):
         domain.
         """
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT dd.gid, qid, ssid, tid, domaindir, is_primary '
+        dbc.execute('SELECT dd.gid, qid, ssid, tid, domaindir, is_primary, '
+                    'note '
                     'FROM domain_data dd, domain_name dn WHERE domainname = '
                     '%s AND dn.gid = dd.gid', (self._name,))
         result = dbc.fetchone()
@@ -81,6 +83,7 @@ class Domain(object):
             self._qlimit = QuotaLimit(self._dbh, qid=result[1])
             self._services = ServiceSet(self._dbh, ssid=result[2])
             self._transport = Transport(self._dbh, tid=result[3])
+            self._note = result[6]
             self._new = False
 
     def _set_gid(self):
@@ -127,7 +130,16 @@ class Domain(object):
             raise DomErr(_(u"The domain '%s' already exists.") % self._name,
                          DOMAIN_EXISTS)
 
-    def _update_tables(self, column, value, force=False):
+    def _update_tables(self, column, value):
+        """Update table columns in the domain_data table."""
+        dbc = self._dbh.cursor()
+        dbc.execute('UPDATE domain_data SET %s = %%s WHERE gid = %%s' % column,
+                    (value, self._gid))
+        if dbc.rowcount > 0:
+            self._dbh.commit()
+        dbc.close()
+
+    def _update_tables_ref(self, column, value, force=False):
         """Update various columns in the domain_data table. When *force* is
         `True`, the corresponding column in the users table will be reset to
         NULL.
@@ -143,17 +155,14 @@ class Domain(object):
         """
         if column not in ('qid', 'ssid', 'tid'):
             raise ValueError('Unknown column: %r' % column)
-        dbc = self._dbh.cursor()
-        dbc.execute('UPDATE domain_data SET %s = %%s WHERE gid = %%s' % column,
-                    (value, self._gid))
-        if dbc.rowcount > 0:
-            self._dbh.commit()
+        self._update_tables(column, value)
         if force:
+            dbc = self._dbh.cursor()
             dbc.execute('UPDATE users SET %s = NULL WHERE gid = %%s' % column,
                         (self._gid,))
             if dbc.rowcount > 0:
                 self._dbh.commit()
-        dbc.close()
+            dbc.close()
 
     @property
     def gid(self):
@@ -184,6 +193,11 @@ class Domain(object):
     def transport(self):
         """The Domain's transport."""
         return self._transport
+
+    @property
+    def note(self):
+        """The Domain's note."""
+        return self._note
 
     def set_directory(self, basedir):
         """Set the path value of the Domain's directory, inside *basedir*.
@@ -235,16 +249,29 @@ class Domain(object):
         assert isinstance(transport, Transport)
         self._transport = transport
 
+    def set_note(self, note):
+        """Set the domain's (optional) note.
+
+        Argument:
+
+        `note` : basestring or None
+          The note, or None to remove
+        """
+        self._chk_state(False)
+        assert note is None or isinstance(note, basestring)
+        self._note = note
+
     def save(self):
         """Stores the new domain in the database."""
         self._chk_state(False)
         assert all((self._directory, self._qlimit, self._services,
                     self._transport))
         dbc = self._dbh.cursor()
-        dbc.execute('INSERT INTO domain_data (gid, qid, ssid, tid, domaindir) '
-                    'VALUES (%s, %s, %s, %s, %s)', (self._gid,
+        dbc.execute('INSERT INTO domain_data (gid, qid, ssid, tid, domaindir, '
+                    'note) '
+                    'VALUES (%s, %s, %s, %s, %s, %s)', (self._gid,
                     self._qlimit.qid, self._services.ssid, self._transport.tid,
-                    self._directory))
+                    self._directory, self._note))
         dbc.execute('INSERT INTO domain_name (domainname, gid, is_primary) '
                     'VALUES (%s, %s, TRUE)', (self._name, self._gid))
         self._dbh.commit()
@@ -299,7 +326,7 @@ class Domain(object):
         assert isinstance(quotalimit, QuotaLimit)
         if not force and quotalimit == self._qlimit:
             return
-        self._update_tables('qid', quotalimit.qid, force)
+        self._update_tables_ref('qid', quotalimit.qid, force)
         self._qlimit = quotalimit
 
     def update_serviceset(self, serviceset, force=False):
@@ -319,7 +346,7 @@ class Domain(object):
         assert isinstance(serviceset, ServiceSet)
         if not force and serviceset == self._services:
             return
-        self._update_tables('ssid', serviceset.ssid, force)
+        self._update_tables_ref('ssid', serviceset.ssid, force)
         self._services = serviceset
 
     def update_transport(self, transport, force=False):
@@ -340,8 +367,23 @@ class Domain(object):
         assert isinstance(transport, Transport)
         if not force and transport == self._transport:
             return
-        self._update_tables('tid', transport.tid, force)
+        self._update_tables_ref('tid', transport.tid, force)
         self._transport = transport
+
+    def update_note(self, note):
+        """Sets a new note for the Domain.
+
+        Arguments:
+
+        `transport` : basestring or None
+          the new note
+        """
+        self._chk_state()
+        assert note is None or isinstance(note, basestring)
+        if note == self._note:
+            return
+        self._update_tables('note', note)
+        self._note = note
 
     def get_info(self):
         """Returns a dictionary with information about the domain."""
@@ -368,6 +410,7 @@ class Domain(object):
         else:
             services.append('None')
         info['active services'] = ' '.join(services)
+        info['note'] = self._note
         return info
 
     def get_accounts(self):

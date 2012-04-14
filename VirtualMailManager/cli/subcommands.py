@@ -31,10 +31,11 @@ __all__ = (
     'aliasdomain_switch', 'catchall_add', 'catchall_info', 'catchall_delete',
     'config_get', 'config_set', 'configure',
     'domain_add', 'domain_delete',  'domain_info', 'domain_quota',
-    'domain_services', 'domain_transport', 'get_user', 'help_', 'list_domains',
-    'list_pwschemes', 'relocated_add', 'relocated_delete', 'relocated_info',
-    'user_add', 'user_delete', 'user_info', 'user_name', 'user_password',
-    'user_quota', 'user_services', 'user_transport', 'version',
+    'domain_services', 'domain_transport', 'domain_note', 'get_user', 'help_',
+    'list_domains', 'list_pwschemes', 'relocated_add', 'relocated_delete',
+    'relocated_info', 'user_add', 'user_delete', 'user_info', 'user_name',
+    'user_password', 'user_quota', 'user_services', 'user_transport',
+    'user_note', 'version',
 )
 
 _ = lambda msg: msg
@@ -407,6 +408,18 @@ def domain_transport(ctx):
         ctx.hdlr.domain_transport(ctx.args[2].lower(), ctx.args[3], force)
 
 
+def domain_note(ctx):
+    """update the note of the given domain"""
+    if ctx.argc < 3:
+        usage(EX_MISSING_ARGS, _(u'Missing domain name.'),
+              ctx.scmd)
+    elif ctx.argc < 4:
+        note = None
+    else:
+        note = ' '.join(ctx.args[3:])
+    ctx.hdlr.domain_note(ctx.args[2].lower(), note)
+
+
 def get_user(ctx):
     """get the address of the user with the given UID"""
     if ctx.argc < 3:
@@ -611,6 +624,18 @@ def user_password(ctx):
     ctx.hdlr.user_password(ctx.args[2].lower(), password)
 
 
+def user_note(ctx):
+    """update the note of the given address"""
+    if ctx.argc < 3:
+        usage(EX_MISSING_ARGS, _(u'Missing e-mail address.'),
+              ctx.scmd)
+    elif ctx.argc < 4:
+        note = None
+    else:
+        note = ' '.join(ctx.args[3:])
+    ctx.hdlr.user_note(ctx.args[2].lower(), note)
+
+
 def user_quota(ctx):
     """update the quota limit for the given address"""
     if ctx.argc < 3:
@@ -731,6 +756,9 @@ def update_cmd_map():
     'usertransport': cmd('usertransport', 'ut', user_transport,
                          'address transport | address default',
                          _(u'update the transport of the given address')),
+    'usernote': cmd('usernote', 'uo', user_note,
+                    'address note',
+                    _(u'update the note of the given address')),
     # Alias commands
     'aliasadd': cmd('aliasadd', 'aa', alias_add, 'address destination ...',
                     _(u'create a new alias e-mail address with one or more '
@@ -780,6 +808,9 @@ def update_cmd_map():
     'domaintransport': cmd('domaintransport', 'dt', domain_transport,
                            'fqdn transport [force]',
                            _(u'update the transport of the specified domain')),
+    'domainnote': cmd('domainnote', 'do', domain_note,
+                      'fqdn note',
+                      _(u'update the note of the given domain')),
     'listdomains': cmd('listdomains', 'ld', list_domains, '[pattern]',
                       _(u'list all domains or search for domains by pattern')),
     # Relocated commands

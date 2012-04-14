@@ -484,17 +484,10 @@ class Handler(object):
         serviceset = ServiceSet(self._dbh, **kwargs)
         dom.update_serviceset(serviceset, (True, False)[not force])
 
-    def domain_transport(self, domainname, transport, force=None):
+    def domain_note(self, domainname, note):
         """Wrapper around Domain.update_transport()"""
-        if force is not None and force != 'force':
-            raise DomainError(_(u"Invalid argument: '%s'") % force,
-                              INVALID_ARGUMENT)
         dom = self._get_domain(domainname)
-        trsp = Transport(self._dbh, transport=transport)
-        if force is None:
-            dom.update_transport(trsp)
-        else:
-            dom.update_transport(trsp, force=True)
+        dom.update_note(note)
 
     def domain_delete(self, domainname, force=False):
         """Wrapper around Domain.delete()"""
@@ -757,6 +750,14 @@ The account has been successfully deleted from the database.
             raise VMMError(_(u"The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
         acc.modify('name', name)
+
+    def user_note(self, emailaddress, note):
+        """Wrapper for Account.modify('note', ...)."""
+        acc = self._get_account(emailaddress)
+        if not acc:
+            raise VMMError(_(u"The account '%s' does not exist.") %
+                           acc.address, NO_SUCH_ACCOUNT)
+        acc.modify('note', note)
 
     def user_quotalimit(self, emailaddress, bytes_, messages=0):
         """Wrapper for Account.update_quotalimit(QuotaLimit)."""
