@@ -104,7 +104,7 @@ CREATE TABLE domain_data (
     ssid        bigint NOT NULL DEFAULT 1, -- default service_set
     tid         bigint NOT NULL DEFAULT 1, -- default transport
     domaindir   varchar(40) NOT NULL, --/srv/mail/$RAND/4294967294
-    note        varchar NULL DEFAULT NULL,
+    note        text NULL DEFAULT NULL,
     CONSTRAINT  pkey_domain_data PRIMARY KEY (gid),
     CONSTRAINT  fkey_domain_data_qid_quotalimit FOREIGN KEY (qid)
         REFERENCES quotalimit (qid),
@@ -133,7 +133,7 @@ CREATE TABLE users (
     qid         bigint NULL DEFAULT NULL,
     ssid        bigint NULL DEFAULT NULL,
     tid         bigint NULL DEFAULT NULL,
-    note        varchar NULL DEFAULT NULL,
+    note        text NULL DEFAULT NULL,
     CONSTRAINT  pkey_users PRIMARY KEY (local_part, gid),
     CONSTRAINT  ukey_users_uid UNIQUE (uid),
     CONSTRAINT  fkey_users_gid_domain_data FOREIGN KEY (gid)
