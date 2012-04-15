@@ -21,7 +21,7 @@ Von jedem
 .I Unterbefehl
 gibt es jeweils eine lange und kurze Variante.
 Die Kurzform ist in Klammern geschrieben.
-Bei beiden Formen ist die Groß-/Kleinschreibung zu berücksichtigen.
+Bei beiden Formen ist die Groß\-/Kleinschreibung zu berücksichtigen.
 .PP
 Die meisten
 .IR Unterbefehl e
@@ -281,7 +281,7 @@ Systems.
 .br
 Sollte Ihre Dovecot\-Installation nicht zu alt sein, werden zusätzlich
 die verwendbaren Encoding\-Suffixe ausgegeben.
-Eines dieser Suffixe kann an das Passwort-Schema angefügt werden.
+Eines dieser Suffixe kann an das Passwort\-Schema angefügt werden.
 .PP
 Beispiel:
 .PP
@@ -488,7 +488,7 @@ Wird das Schlüsselwort
 angegeben, so werden alle kontospezifischen Einstellungen gelöscht und es
 gelten fortan die Service\-Einstellungen der Domain für alle Konten. Ohne
 dieses Schlüsselwort gelten die neuen Einstellungen nur für Konten, bei denen
-die Service-Einstellungen nicht individuell geändert wurden.
+die Service\-Einstellungen nicht individuell geändert wurden.
 .\" ------------------------------------
 .SS domaintransport (dt)
 .BI "vmm domaintransport" " fqdn transport"
@@ -505,7 +505,7 @@ Wird das Schlüsselwort
 angegeben, so werden alle kontospezifischen Einstellungen gelöscht und es
 gelten fortan die Transport\-Einstellungen der Domain für alle Konten. Ohne
 dieses Schlüsselwort gelten die neuen Einstellungen nur für Konten, bei denen
-die Transport-Einstellungen nicht individuell geändert wurden.
+die Transport\-Einstellungen nicht individuell geändert wurden.
 .PP
 Beispiel:
 .PP
@@ -839,7 +839,7 @@ und
 .IR %=
 durch den ursprünglichen lokalen Teil, die Domain bzw. die Emailadresse mit
 '=' anstelle von '@' ersetzt. Dies ermöglicht z.B. in Verbindung mit
-Alias-Domains domain-spezifische Empfänger.
+Alias\-Domains domain\-spezifische Empfänger.
 .PP
 Beispiele:
 .PP
@@ -930,7 +930,7 @@ Beispiel:
 .B vmm relocateddelete b.nutzer@example.com
 .fi
 .\" -----------------------------------------------------------------------
-.SH CATCH-ALL UNTERBEFEHLE
+.SH CATCH\-ALL UNTERBEFEHLE
 .SS catchalladd (caa)
 .BI "vmm catchalladd" " fqdn destination ..."
 .PP
@@ -940,7 +940,7 @@ dieser Domains adressiert sind.
 Diese Adressen \(dqfangen alle\(dq diese E\-Mails auf, es sei denn es
 bestehen spezifischere Aliase, Mailboxen oder Relocated\-Einträge.
 .PP
-WARNUNG: Catch-all Adressen können dazu führen, daß ein Mailserver von Spam
+WARNUNG: Catch\-all Adressen können dazu führen, daß ein Mailserver von Spam
 überflutet wird, da Spammer zuweilen gerne alle möglichen Emailadressen
 ausprobieren und man auf einmal zig tausend Nachrichten gerichtet an
 Adressen von abba@example.org bis zztop@example.org weitergeleitet bekommt.
@@ -954,7 +954,7 @@ Beispiel:
 .SS catchallinfo (cai)
 .BI "vmm catchallinfo " fqdn
 .PP
-Dieser Unterbefehl zeigt die für eine Domain definierten Catch-All Aliase
+Dieser Unterbefehl zeigt die für eine Domain definierten Catch\-all Aliase
 an.
 .PP
 Beispiel:
@@ -972,7 +972,7 @@ Catch-all Informationen
 .BI "vmm catchalldelete " fqdn
 .RI [ destination ]
 .PP
-Mit diesem Unterbefehl werden Catch-All Aliase einer Domain wieder
+Mit diesem Unterbefehl werden Catch\-all Aliase einer Domain wieder
 gelöscht, entweder nur das angegebene Alias, oder alle, wenn keines
 angegeben wurde.
 .PP

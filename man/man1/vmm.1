@@ -736,7 +736,7 @@ was omitted the default number of messages
 .PP
 Instead of
 .I transport
-pass 'default' to remove the account-specific override, causing the
+pass 'default' to remove the account\-specific override, causing the
 domain's value to be in effect.
 .PP
 Example:
@@ -757,7 +757,7 @@ given
 .PP
 Instead of
 .I transport
-pass 'default' to remove the account-specific override, causing the
+pass 'default' to remove the account\-specific override, causing the
 domain's value to be in effect.
 .PP
 Example:
@@ -774,7 +774,7 @@ for an account can be specified with this subcommand.
 .PP
 Instead of
 .I transport
-pass 'default' to remove the account-specific override, causing the
+pass 'default' to remove the account\-specific override, causing the
 domain's value to be in effect.
 .PP
 Example:
@@ -807,7 +807,7 @@ and
 .IR %=
 will be replaced by the local part, the domain, or the email address with '@'
 replaced by '=' respectively. In combination with alias domains, this enables
-domain-specific destinations.
+domain\-specific destinations.
 .PP
 Examples:
 .PP
@@ -896,16 +896,16 @@ Example:
 .B vmm relocateddelete b.user@example.com
 .fi
 .\" -----------------------------------------------------------------------
-.SH CATCH-ALL SUBCOMMANDS
+.SH CATCH\-ALL SUBCOMMANDS
 .SS catchalladd (caa)
 .BI "vmm catchalladd" " fqdn destination ..."
 .PP
 This subcommand allows to specify destination addresses for a domain, which
 shall receive mail addressed to unknown local parts within that domain.
-Those catch-all aliases hence \(dqcatch all\(dq mail to any address in the
+Those catch\-all aliases hence \(dqcatch all\(dq mail to any address in the
 domain (unless a more specific alias, mailbox or relocated entry exists).
 .PP
-WARNING: Catch-all addresses can cause mail server flooding because
+WARNING: Catch\-all addresses can cause mail server flooding because
 spammers like to deliver mail to all possible combinations of names, e.g.
 to all addresses between abba@example.org and zztop@example.org.
 .PP
@@ -918,7 +918,7 @@ Example:
 .SS catchallinfo (cai)
 .BI "vmm catchallinfo " fqdn
 .PP
-This subcommand displays information about catch-all aliases defined for
+This subcommand displays information about catch\-all aliases defined for
 a domain.
 .PP
 Example:
@@ -935,7 +935,7 @@ Catch-all information
 .BI "vmm catchalldelete " fqdn
 .RI [ destination ]
 .PP
-With this subcommand, catch-all aliases defined for a domain can be
+With this subcommand, catch\-all aliases defined for a domain can be
 removed, either all of them, or a single one if specified explicitly.
 .PP
 Example:
