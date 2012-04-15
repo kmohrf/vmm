@@ -549,9 +549,16 @@ AS $$
         record recipient_transport;
         recipient varchar(320) := localpart || '@' || the_domain;
         did bigint := (SELECT gid FROM domain_name WHERE domainname = the_domain);
-        transport_id bigint := (SELECT tid FROM users
-                                  WHERE gid = did AND local_part = localpart);
+        transport_id bigint;
     BEGIN
+        IF did IS NULL THEN
+            RETURN;
+        END IF;
+
+        SELECT tid INTO transport_id
+          FROM users
+         WHERE gid = did AND local_part = localpart;
+
         IF transport_id IS NULL THEN
             SELECT tid INTO STRICT transport_id
               FROM domain_data
