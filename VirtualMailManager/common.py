@@ -187,6 +187,7 @@ def version_str(version):
     return version_string
 
 def format_domain_default(domaindata):
+    """Format info output when the value displayed is the domain default."""
     return _(u'%s [domain default]') % domaindata
 
 del _
