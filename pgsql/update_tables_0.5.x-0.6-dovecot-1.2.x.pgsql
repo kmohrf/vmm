@@ -179,7 +179,7 @@ CREATE TABLE catchall (
 -- ---
 -- Quota/Service/Transport inheritance
 -- ---
-ALTER TABLE users ALTER COLUMN tid DROP NULL;
+ALTER TABLE users ALTER COLUMN tid DROP NOT NULL;
 ALTER TABLE users ALTER COLUMN tid SET DEFAULT NULL;
 -- The qid and ssid columns have already been defined accordingly above.
 -- The rest of the logic will take place in the functions.
