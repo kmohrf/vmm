@@ -1,4 +1,4 @@
-.TH "VMM" "1" "2012-04-14" "vmm 0.6" "vmm"
+.TH "VMM" "1" "2012-04-15" "vmm 0.6" "vmm"
 .SH NAME
 vmm \- Kommandozeilenprogramm zur Verwaltung von E\-Mail\-Domains/\-Konten
 und \-Aliase.
@@ -928,17 +928,18 @@ Beispiel:
 .\" -----------------------------------------------------------------------
 .SH CATCH-ALL UNTERBEFEHLE
 .SS catchalladd (caa)
-.BI "vmm catchalladd" " domain destination ..."
+.BI "vmm catchalladd" " fqdn destination ..."
 .PP
 Mit diesem Unterbefehl können für eine Domain Adressen definiert werden, an
-die E-mails geleitet werden, die an nicht-existente Adressen innerhalb dieser
-Domains adressiert sind. Diese Adressen \"fangen alle\" diese E-mails auf, es
-sei denn es bestehen spezifischere Aliase, Mailboxes oder Relocated-Einträge.
+die E\-Mails geleitet werden, die an nicht\-existente Adressen innerhalb
+dieser Domains adressiert sind.
+Diese Adressen \(dqfangen alle\(dq diese E\-Mails auf, es sei denn es
+bestehen spezifischere Aliase, Mailboxen oder Relocated\-Einträge.
 .PP
 WARNUNG: Catch-all Adressen können dazu führen, daß ein Mailserver von Spam
 überflutet wird, da Spammer zuweilen gerne alle möglichen Emailadressen
-ausprobieren und man auf einmal zig tausend Nachrichten gerichtet an Adressen
-von abba@example.org bis zztop@example.org weitergeleitet bekommt.
+ausprobieren und man auf einmal zig tausend Nachrichten gerichtet an
+Adressen von abba@example.org bis zztop@example.org weitergeleitet bekommt.
 .PP
 Beispiel:
 .PP
@@ -947,9 +948,10 @@ Beispiel:
 .fi
 .\" ------------------------------------
 .SS catchallinfo (cai)
-.BI "vmm catchallinfo " domain
+.BI "vmm catchallinfo " fqdn
 .PP
-Dieser Unterbefehl zeigt die für eine Domain definierten Catch-All Aliase an.
+Dieser Unterbefehl zeigt die für eine Domain definierten Catch-All Aliase
+an.
 .PP
 Beispiel:
 .PP
@@ -962,12 +964,13 @@ Catch-all Informationen
          * b.nutzer@example.org
 .fi
 .\" ------------------------------------
-.SS catchalldelete (cadd)
-.BI "vmm catchalldelete " domain
+.SS catchalldelete (cad)
+.BI "vmm catchalldelete " fqdn
 .RI [ destination ]
 .PP
-Mit diesem Unterbefehl werden Catch-All Aliase einer Domain wieder gelöscht,
-entweder nur das angegebene Alias, oder alle, wenn keines angegeben wurde.
+Mit diesem Unterbefehl werden Catch-All Aliase einer Domain wieder
+gelöscht, entweder nur das angegebene Alias, oder alle, wenn keines
+angegeben wurde.
 .PP
 Beispiel:
 .PP
