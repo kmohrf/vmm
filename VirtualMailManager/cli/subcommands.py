@@ -20,7 +20,8 @@ from VirtualMailManager.common import human_size, size_in_bytes, \
      version_str, format_domain_default
 from VirtualMailManager.constants import __copyright__, __date__, \
      __version__, ACCOUNT_EXISTS, ALIAS_EXISTS, ALIASDOMAIN_ISDOMAIN, \
-     DOMAIN_ALIAS_EXISTS, INVALID_ARGUMENT, EX_MISSING_ARGS, RELOCATED_EXISTS
+     DOMAIN_ALIAS_EXISTS, INVALID_ARGUMENT, EX_MISSING_ARGS, \
+     RELOCATED_EXISTS, TYPE_ACCOUNT, TYPE_ALIAS, TYPE_RELOCATED
 from VirtualMailManager.errors import VMMError
 from VirtualMailManager.password import list_schemes
 from VirtualMailManager.serviceset import SERVICES
@@ -32,7 +33,8 @@ __all__ = (
     'config_get', 'config_set', 'configure',
     'domain_add', 'domain_delete',  'domain_info', 'domain_quota',
     'domain_services', 'domain_transport', 'domain_note', 'get_user', 'help_',
-    'list_domains', 'list_pwschemes', 'relocated_add', 'relocated_delete',
+    'list_domains', 'list_pwschemes', 'list_users', 'list_aliases',
+    'list_relocated', 'list_addresses', 'relocated_add', 'relocated_delete',
     'relocated_info', 'user_add', 'user_delete', 'user_info', 'user_name',
     'user_password', 'user_quota', 'user_services', 'user_transport',
     'user_note', 'version',
@@ -491,6 +493,34 @@ def list_pwschemes(ctx_unused):
     txt_wrpr.width = txt_wrpr.width + 8
 
 
+def list_addresses(ctx, limit=None):
+    """List all addresses / search addresses by pattern. The output can be
+    limited with TYPE_ACCOUNT, TYPE_ALIAS and TYPE_RELOCATED, which can be
+    bitwise ORed as a combination. Not specifying a limit is the same as
+    combining all three."""
+    if limit is None:
+        limit = TYPE_ACCOUNT | TYPE_ALIAS | TYPE_RELOCATED
+    matching = ctx.argc > 2
+    if matching:
+        gids, addresses = ctx.hdlr.address_list(limit, ctx.args[2].lower())
+    else:
+        gids, addresses = ctx.hdlr.address_list(limit)
+    _print_address_list(limit, gids, addresses, matching)
+
+
+def list_users(ctx):
+    """list all user accounts / search user accounts by pattern"""
+    return list_addresses(ctx, TYPE_ACCOUNT)
+
+def list_aliases(ctx):
+    """list all aliases / search aliases by pattern"""
+    return list_addresses(ctx, TYPE_ALIAS)
+
+def list_relocated(ctx):
+    """list all relocated records / search relocated records by pattern"""
+    return list_addresses(ctx, TYPE_RELOCATED)
+
+
 def relocated_add(ctx):
     """create a new record for a relocated user"""
     if ctx.argc < 3:
@@ -811,8 +841,17 @@ def update_cmd_map():
     'domainnote': cmd('domainnote', 'do', domain_note,
                       'fqdn note',
                       _(u'update the note of the given domain')),
+    # List commands
     'listdomains': cmd('listdomains', 'ld', list_domains, '[pattern]',
                       _(u'list all domains or search for domains by pattern')),
+    'listaddresses': cmd('listaddresses', 'll', list_addresses, '[pattern]',
+                      _(u'list all addresses or search for addresses by pattern')),
+    'listusers': cmd('listusers', 'lu', list_users, '[pattern]',
+                      _(u'list all user accounts or search for accounts by pattern')),
+    'listaliases': cmd('listaliases', 'la', list_aliases, '[pattern]',
+                      _(u'list all aliases or search for aliases by pattern')),
+    'listrelocated': cmd('listrelocated', 'lr', list_relocated, '[pattern]',
+                      _(u'list all relocated entries or search for entries by pattern')),
     # Relocated commands
     'relocatedadd': cmd('relocatedadd', 'ra', relocated_add,
                         'address newaddress',
@@ -982,6 +1021,52 @@ def _print_domain_list(dids, domains, matching):
                 w_std(_format_domain(domains[did][0]))
             if len(domains[did]) > 1:
                 w_std(*(_format_domain(a, False) for a in domains[did][1:]))
+    else:
+        w_std(_('\tNone'))
+    print
+
+
+def _print_address_list(which, dids, addresses, matching):
+    """Print a list of (matching) addresses."""
+    _trans = { TYPE_ACCOUNT                  : _('user accounts')
+             , TYPE_ALIAS                    : _('aliases')
+             , TYPE_RELOCATED                : _('relocated entries')
+             , TYPE_ACCOUNT | TYPE_ALIAS
+                 : _('user accounts and aliases')
+             , TYPE_ACCOUNT | TYPE_RELOCATED
+                 : _('user accounts and relocated entries')
+             , TYPE_ALIAS | TYPE_RELOCATED
+                 : _('aliases and relocated entries')
+             , TYPE_ACCOUNT | TYPE_ALIAS | TYPE_RELOCATED : _('addresses')
+             }
+    try:
+        if matching:
+            title = _(u'Matching %s') % _trans[which]
+        else:
+            title = _(u'Existing %s') % _trans[which]
+        w_std(title, '-' * len(title))
+    except KeyError:
+        raise VMMError(_("Invalid address type for list: '%s'") % which,
+                       INVALID_ARGUMENT)
+    if addresses:
+        if which & (which - 1) == 0:
+            # only one type is requested, so no type indicator
+            _trans = { TYPE_ACCOUNT   : _('')
+                     , TYPE_ALIAS     : _('')
+                     , TYPE_RELOCATED : _('')
+                     }
+        else:
+            _trans = { TYPE_ACCOUNT   : _('u')
+                     , TYPE_ALIAS     : _('a')
+                     , TYPE_RELOCATED : _('r')
+                     }
+        for did in dids:
+            for addr, atype, aliasdomain in addresses[did]:
+                if aliasdomain:
+                    leader = '[%s-]' % _trans[atype]
+                else:
+                    leader = '[%s+]' % _trans[atype]
+                w_std('\t%s %s' % (leader, addr))
     else:
         w_std(_('\tNone'))
     print

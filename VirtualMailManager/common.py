@@ -14,9 +14,9 @@ import re
 import stat
 
 from VirtualMailManager import ENCODING
-from VirtualMailManager.constants import NOT_EXECUTABLE, NO_SUCH_BINARY
+from VirtualMailManager.constants import NOT_EXECUTABLE, NO_SUCH_BINARY, \
+     TYPE_ACCOUNT, TYPE_ALIAS, TYPE_RELOCATED
 from VirtualMailManager.errors import VMMError
-
 
 VERSION_RE = re.compile(r'^(\d+)\.(\d+)\.(?:(\d+)|(alpha|beta|rc)(\d+))$')
 
@@ -189,5 +189,74 @@ def version_str(version):
 def format_domain_default(domaindata):
     """Format info output when the value displayed is the domain default."""
     return _(u'%s [domain default]') % domaindata
+
+
+def search_addresses(dbh, typelimit=None, lpattern=None, llike=False,
+                     dpattern=None, dlike=False):
+    """'Search' for addresses by *pattern* in the database.
+
+    The search is limited by *typelimit*, a bitfield with values TYPE_ACCOUNT,
+    TYPE_ALIAS, TYPE_RELOCATED, or a bitwise OR thereof. If no limit is
+    specified, all types will be searched.
+
+    *lpattern* may be a local part or a partial local part - starting and/or
+    ending with a '%' sign.  When the *lpattern* starts or ends with a '%' sign
+    *llike* has to be `True` to perform a wildcard search. To retrieve all
+    available addresses use the arguments' default values.
+
+    *dpattern* and *dlike* behave analogously for the domain part of an
+    address, allowing for separate pattern matching: testuser%@example.%
+
+    The return value of this function is a tuple. The first element is a list
+    of domain IDs sorted alphabetically by the corresponding domain names. The
+    second element is a dictionary indexed by domain ID, holding lists to
+    associated addresses. Each address is itself actually a tuple of address,
+    type, and boolean indicating whether the address stems from an alias
+    domain.
+    """
+    if typelimit == None:
+            typelimit = TYPE_ACCOUNT | TYPE_ALIAS | TYPE_RELOCATED
+    queries = []
+    if typelimit & TYPE_ACCOUNT:
+        queries.append('SELECT gid, local_part, %d AS type FROM users'
+                       % TYPE_ACCOUNT)
+    if typelimit & TYPE_ALIAS:
+        queries.append('SELECT gid, address as local_part, %d AS type '
+                       'FROM alias' % TYPE_ALIAS)
+    if typelimit & TYPE_RELOCATED:
+        queries.append('SELECT gid, address as local_part, %d AS type '
+                       'FROM relocated' % TYPE_RELOCATED)
+    sql  = "SELECT gid, local_part || '@' || domainname AS address, "
+    sql += 'type, NOT is_primary AS from_aliasdomain FROM ('
+    sql += ' UNION '.join(queries)
+    sql += ') a JOIN domain_name USING (gid)'
+    nextkw = 'WHERE'
+    sqlargs = []
+    for like, field, pattern in ((dlike, 'domainname', dpattern),
+                                 (llike, 'local_part', lpattern)):
+        if like:
+            match = 'LIKE'
+        else:
+            if not pattern: continue
+            match = '='
+        sql += ' %s %s %s %%s' % (nextkw, field, match)
+        sqlargs.append(pattern)
+        nextkw = 'AND'
+    sql += ' ORDER BY domainname, local_part'
+    dbc = dbh.cursor()
+    dbc.execute(sql, sqlargs)
+    result = dbc.fetchall()
+    dbc.close()
+
+    gids = []
+    daddrs = {}
+    lastgid = None
+    for gid, address, addrtype, aliasdomain in result:
+        if gid != lastgid:
+            gids.append(gid)
+            lastgid = gid
+            daddrs[gid] = []
+        daddrs[gid].append((address, addrtype, aliasdomain))
+    return gids, daddrs
 
 del _

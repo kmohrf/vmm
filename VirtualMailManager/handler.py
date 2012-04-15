@@ -30,10 +30,10 @@ from VirtualMailManager.constants import MIN_GID, MIN_UID, \
      FOUND_DOTS_IN_PATH, INVALID_ARGUMENT, MAILDIR_PERM_MISMATCH, \
      NOT_EXECUTABLE, NO_SUCH_ACCOUNT, NO_SUCH_ALIAS, NO_SUCH_BINARY, \
      NO_SUCH_DIRECTORY, NO_SUCH_RELOCATED, RELOCATED_EXISTS, UNKNOWN_SERVICE, \
-     VMM_ERROR
+     VMM_ERROR, LOCALPART_INVALID, TYPE_ACCOUNT, TYPE_ALIAS, TYPE_RELOCATED
 from VirtualMailManager.domain import Domain
 from VirtualMailManager.emailaddress import DestinationEmailAddress, \
-     EmailAddress
+     EmailAddress, RE_LOCALPART
 from VirtualMailManager.errors import \
      DomainError, NotRootError, PermissionError, VMMError
 from VirtualMailManager.mailbox import new as new_mailbox
@@ -50,15 +50,11 @@ _db_mod = None
 CFG_FILE = 'vmm.cfg'
 CFG_PATH = '/root:/usr/local/etc:/etc'
 RE_DOMAIN_SEARCH = """^[a-z0-9-\.]+$"""
-TYPE_ACCOUNT = 0x1
-TYPE_ALIAS = 0x2
-TYPE_RELOCATED = 0x4
 OTHER_TYPES = {
     TYPE_ACCOUNT: (_(u'an account'), ACCOUNT_EXISTS),
     TYPE_ALIAS: (_(u'an alias'), ALIAS_EXISTS),
     TYPE_RELOCATED: (_(u'a relocated user'), RELOCATED_EXISTS),
 }
-
 
 class Handler(object):
     """Wrapper class to simplify the access on all the stuff from
@@ -592,6 +588,46 @@ class Handler(object):
                                  u"characters.") % pattern, DOMAIN_INVALID)
         self._db_connect()
         return search(self._dbh, pattern=pattern, like=like)
+
+    def address_list(self, typelimit, pattern=None):
+        """TODO"""
+        llike = dlike = False
+        lpattern = dpattern = None
+        if pattern:
+            parts = pattern.split('@', 2)
+            if len(parts) == 2:
+                # The pattern includes '@', so let's treat the
+                # parts separately to allow for pattern search like %@domain.%
+                lpattern = parts[0]
+                llike = lpattern.startswith('%') or lpattern.endswith('%')
+                dpattern = parts[1]
+                dlike = dpattern.startswith('%') or dpattern.endswith('%')
+
+                if llike:
+                    checkp = lpattern.strip('%')
+                else:
+                    checkp = lpattern
+                if len(checkp) > 0 and re.search(RE_LOCALPART, checkp):
+                    raise VMMError(_(u"The pattern '%s' contains invalid "
+                                     u"characters.") % pattern, LOCALPART_INVALID)
+            else:
+                # else just match on domains
+                # (or should that be local part, I don't know…)
+                dpattern = parts[0]
+                dlike = dpattern.startswith('%') or dpattern.endswith('%')
+
+            if dlike:
+                checkp = dpattern.strip('%')
+            else:
+                checkp = dpattern
+            if len(checkp) > 0 and not re.match(RE_DOMAIN_SEARCH, checkp):
+                raise VMMError(_(u"The pattern '%s' contains invalid "
+                                 u"characters.") % pattern, DOMAIN_INVALID)
+        self._db_connect()
+        from VirtualMailManager.common import search_addresses
+        return search_addresses(self._dbh, typelimit=typelimit,
+                                lpattern=lpattern, llike=llike,
+                                dpattern=dpattern, dlike=dlike)
 
     def user_add(self, emailaddress, password):
         """Wrapper around Account.set_password() and Account.save()."""

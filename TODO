@@ -40,9 +40,3 @@ Database:
       flexibility, there ought to be a m:n table connecting domains to sets of
       default aliases. These aliases then get treated like normal aliases
       unless they are overridden by a real alias.
-
-- list{aliases,accounts,relocated,addresses} subcommands [madduck@madduck.net]
-    - I would find it useful if I could query the database for all defined
-      users, aliases, relocated, and addresses (the union of all three).
-      Ideally, the commands would also take % wildcards, so that I can limit
-      the output

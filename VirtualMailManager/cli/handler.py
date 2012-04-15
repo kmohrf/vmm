@@ -11,11 +11,11 @@
 import os
 
 from VirtualMailManager.errors import VMMError
-from VirtualMailManager.handler import Handler, TYPE_ACCOUNT
+from VirtualMailManager.handler import Handler
 from VirtualMailManager.cli import read_pass
 from VirtualMailManager.cli.config import CliConfig as Cfg
 from VirtualMailManager.constants import ACCOUNT_EXISTS, INVALID_SECTION, \
-     NO_SUCH_ACCOUNT
+     NO_SUCH_ACCOUNT, TYPE_ACCOUNT
 from VirtualMailManager.password import randompw
 
 _ = lambda msg: msg
