@@ -782,14 +782,14 @@ def update_cmd_map():
                              'domain to an other domain')),
     # CatchallAlias commands
     'catchalladd': cmd('catchalladd', 'caa', catchall_add,
-                       'domain destination ...',
+                       'fqdn destination ...',
                        _(u'add one or more catch-all destinations for a '
                          u'domain')),
     'catchalldelete': cmd('catchalldelete', 'cad', catchall_delete,
-                       'domain [destination]',
+                       'fqdn [destination]',
                        _(u'delete the specified catch-all destination or all '
                          u'of a domain\'s destinations')),
-    'catchallinfo': cmd('catchallinfo', 'cai', catchall_info, 'domain',
+    'catchallinfo': cmd('catchallinfo', 'cai', catchall_info, 'fqdn',
                      _(u'show the catch-all destination(s) of the specified domain')),
     # Domain commands
     'domainadd': cmd('domainadd', 'da', domain_add, 'fqdn [transport]',
