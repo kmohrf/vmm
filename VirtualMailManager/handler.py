@@ -480,8 +480,20 @@ class Handler(object):
         serviceset = ServiceSet(self._dbh, **kwargs)
         dom.update_serviceset(serviceset, (True, False)[not force])
 
-    def domain_note(self, domainname, note):
+    def domain_transport(self, domainname, transport, force=None):
         """Wrapper around Domain.update_transport()"""
+        if force is not None and force != 'force':
+            raise DomainError(_(u"Invalid argument: '%s'") % force,
+                              INVALID_ARGUMENT)
+        dom = self._get_domain(domainname)
+        trsp = Transport(self._dbh, transport=transport)
+        if force is None:
+            dom.update_transport(trsp)
+        else:
+            dom.update_transport(trsp, force=True)
+
+    def domain_note(self, domainname, note):
+        """Wrapper around Domain.update_note()"""
         dom = self._get_domain(domainname)
         dom.update_note(note)
 
