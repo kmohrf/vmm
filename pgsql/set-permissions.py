@@ -93,19 +93,19 @@ def set_permissions(dbh, dc_vers, dovecot, postfix):
     dbc.execute('GRANT SELECT, INSERT, UPDATE, DELETE ON %s TO %s' %
                 (dc_rw, dovecot))
     dbc.execute('GRANT SELECT ON alias, catchall, domain_data, domain_name, '
-                'maillocation, relocated, transport, users TO %s' % postfix)
+                'maillocation, postfix_gid, relocated, transport, users TO %s'
+                % postfix)
     dbc.close()
 
 
 def set_permissions84(dbh, dc_vers, dovecot, postfix):
     dc_rw_tbls = ('userquota_11', 'userquota')[dc_vers == 12]
-    dc_ro_tbls = 'maillocation, service_set, quotalimit'
-    pf_ro_tbls = 'alias, catchall, relocated, transport'
+    dc_ro_tbls = 'mailboxformat, maillocation, service_set, quotalimit'
+    pf_ro_tbls = 'alias, catchall, postfix_gid, relocated, transport'
     db = dict(dovecot=dovecot, postfix=postfix)
     db['dovecot_tbls'] = {
         'domain_data': 'domaindir, gid, qid, ssid',
         'domain_name': 'domainname, gid',
-        'mailboxformat': 'format',
         'users': 'gid, local_part, mid, passwd, qid, ssid, uid',
     }
     db['postfix_tbls'] = {
