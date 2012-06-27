@@ -41,6 +41,7 @@ userdb {
 ###
 first_valid_gid = 70000
 first_valid_uid = 70000
+mail_access_groups = dovemail
 mail_location = maildir:~/Maildir
 
 # uncomment if you want to use the quota plugin
@@ -66,7 +67,7 @@ service lmtp {
 }
 
 service auth {
-  user = nobody
+  user = doveauth
   unix_listener auth-userdb {
   }
   unix_listener /var/spool/postfix/private/dovecot-auth {
@@ -78,17 +79,17 @@ service auth {
 
 service auth-worker {
   unix_listener auth-worker {
-    user = nobody
+    user = doveauth
     group = $default_internal_user
     mode = 0660
   }
-  user = nobody
+  user = doveauth
 }
 
 service dict {
   unix_listener dict {
-    # we need mode 0666, because we have a GID/domain and a UID/user
-    mode = 0666
+    group = dovemail
+    mode = 0660
   }
 }
 

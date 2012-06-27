@@ -23,6 +23,22 @@ If you are using Python <= 2.5.0:
 [3] PyCrypto: <http://www.pycrypto.org/> (Debian: python-crypto)
 
 
+Create additionally a user and groups for improved security
+  We will create the system user `doveauth'. This user is used in the
+  authentication process. On a Debian GNU/Linux System use this command:
+
+	adduser --system --home /nonexistent --no-create-home --group \
+	--disabled-login --gecos "Dovecot IMAP/POP3 authentication user" \
+	doveauth
+
+  This will create the doveauth user and group.
+  For Dovecot >= 2.0 we create also the group `dovemail'. Dovecot will assign
+  this group to all Dovecot processes.
+  On a Debian GNU/Linux bases system run:
+
+	addgroup --system dovemail
+
+
 Configuring PostgreSQL
 (for more details see: http://vmm.localdomain.org/PreparingPostgreSQL)
 
@@ -96,7 +112,7 @@ Configuring Dovecot v1.x
       userdb sql {
         args = /etc/dovecot/dovecot-sql.conf
       }
-      user = nobody
+      user = doveauth
       socket listen {
         master {
           path = /var/run/dovecot/auth-master
