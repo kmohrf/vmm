@@ -673,12 +673,14 @@ def user_quota(ctx):
               ctx.scmd)
     elif ctx.argc < 4:
         usage(EX_MISSING_ARGS, _(u'Missing storage value.'), ctx.scmd)
-    try:
-        bytes_ = ctx.args[3] if ctx.args[3] == 'default' \
-                             else size_in_bytes(ctx.args[3])
-    except (ValueError, TypeError):
-        usage(INVALID_ARGUMENT, _(u"Invalid storage value: '%s'") %
-              ctx.args[3], ctx.scmd)
+    if ctx.args[3] != 'default':
+        try:
+            bytes_ = size_in_bytes(ctx.args[3])
+        except (ValueError, TypeError):
+            usage(INVALID_ARGUMENT, _(u"Invalid storage value: '%s'") %
+                  ctx.args[3], ctx.scmd)
+    else:
+        bytes_ = ctx.args[3]
     if ctx.argc < 5:
         messages = 0
     else:

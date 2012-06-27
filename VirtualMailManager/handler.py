@@ -832,8 +832,10 @@ The account has been successfully deleted from the database.
         if not acc:
             raise VMMError(_(u"The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
-        transport = None if transport == 'default' \
-                         else Transport(self._dbh, transport=transport)
+        if transport == 'default':
+            transport = None
+        else:
+            transport = Transport(self._dbh, transport=transport)
         acc.update_transport(transport)
 
     def user_services(self, emailaddress, *services):

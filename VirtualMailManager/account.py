@@ -85,11 +85,17 @@ class Account(object):
             self._uid, _mid, _qid, _ssid, _tid, _note = result
 
             def load_helper(ctor, own, field, dbresult):
-                cur = None if own is None else getattr(own, field)
+                #  Py25: cur = None if own is None else getattr(own, field)
+                if own is None:
+                    cur = None
+                else:
+                    cur = getattr(own, field)
                 if cur != dbresult:
-                    kwargs = { field : dbresult }
-                    return None if dbresult is None \
-                                else ctor(self._dbh, **kwargs)
+                    kwargs = {field: dbresult}
+                    if dbresult is None:
+                        return dbresult
+                    else:
+                        return ctor(self._dbh, **kwargs)
 
             self._qlimit = load_helper(QuotaLimit, self._qlimit, 'qid', _qid)
             self._services = load_helper(ServiceSet, self._services, 'ssid',
