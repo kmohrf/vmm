@@ -15,7 +15,7 @@ if [ ${PREFIX} = "/usr" ]; then
 else
     MANDIR=${PREFIX}/man
 fi
-DOCS="ChangeLog COPYING NEWS INSTALL README"
+DOCS="ChangeLog Configure.Dovecot_2 COPYING INSTALL NEWS README"
 
 INSTALL_OPTS="-g 0 -o 0 -p"
 
