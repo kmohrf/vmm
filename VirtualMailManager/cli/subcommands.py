@@ -924,7 +924,11 @@ def _format_quota_usage(limit, used, human=False, domaindefault=False):
         q_usage['percent'] = locale.format('%6.2f', 100. / limit * used, True)
     else:
         q_usage['percent'] = locale.format('%6.2f', 0, True)
-    fmt = format_domain_default if domaindefault else lambda s: s
+    #  Py25: fmt = format_domain_default if domaindefault else lambda s: s
+    if domaindefault:
+        fmt = format_domain_default
+    else:
+        fmt = lambda s: s
     return fmt(_(u'[%(percent)s%%] %(used)s/%(limit)s') % q_usage)
 
 
