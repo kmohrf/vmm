@@ -124,7 +124,7 @@ class Account(object):
                        'mbfmt': maillocation.mbformat,
                        'version': version_str(maillocation.dovecot_version)},
                        INVALID_MAIL_LOCATION)
-        if not maillocation.postfix and \
+        if self._transport and not maillocation.postfix and \
           self._transport.transport.lower() in ('virtual:', 'virtual'):
             raise AErr(_(u"Invalid transport '%(transport)s' for mailbox "
                          u"format '%(mbfmt)s'.") %
