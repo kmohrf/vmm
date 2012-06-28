@@ -673,7 +673,7 @@ def user_quota(ctx):
               ctx.scmd)
     elif ctx.argc < 4:
         usage(EX_MISSING_ARGS, _(u'Missing storage value.'), ctx.scmd)
-    if ctx.args[3] != 'default':
+    if ctx.args[3] != 'domain':
         try:
             bytes_ = size_in_bytes(ctx.args[3])
         except (ValueError, TypeError):
@@ -701,7 +701,7 @@ def user_services(ctx):
     if ctx.argc >= 4:
         services.extend([service.lower() for service in ctx.args[3:]])
         unknown = [service for service in services if service not in SERVICES]
-        if unknown and ctx.args[3] != 'default':
+        if unknown and ctx.args[3] != 'domain':
             usage(INVALID_ARGUMENT, _(u'Invalid service arguments: %s') %
                   ' '.join(unknown), ctx.scmd)
     ctx.hdlr.user_services(ctx.args[2].lower(), *services)
@@ -779,14 +779,14 @@ def update_cmd_map():
                         'address [password]',
                         _(u'update the password for the given address')),
     'userquota': cmd('userquota', 'uq', user_quota,
-                     'address storage [messages] | address default',
+                     'address storage [messages] | address domain',
                      _(u'update the quota limit for the given address')),
     'userservices': cmd('userservices', 'us', user_services,
-                        'address [service ...] | address default',
+                        'address [service ...] | address domain',
                         _(u'enables the specified services and disables all '
                           u'not specified services')),
     'usertransport': cmd('usertransport', 'ut', user_transport,
-                         'address transport | address default',
+                         'address transport | address domain',
                          _(u'update the transport of the given address')),
     'usernote': cmd('usernote', 'uo', user_note,
                     'address note',

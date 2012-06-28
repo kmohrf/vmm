@@ -766,7 +766,7 @@ ausgelassen wurde, wird der Vorgabewert
 .B 0
 (null) als Anzahl von Nachrichten angewendet werden.
 .PP
-Anstelle einer Limite, bewirkt das Wort 'default', daß die Limite des
+Anstelle einer Limite, bewirkt das Wort 'domain', daß die Limite des
 Kontos gelöscht wird und somit wieder der in der Domain gespeicherte
 Wert für das Konto gilt.
 .PP
@@ -774,7 +774,7 @@ Beispiel:
 .PP
 .nf
 .B vmm userquota d.user@example.com 750m
-.B vmm userquote d.user@example.com default
+.B vmm userquote d.user@example.com domain
 .fi
 .\" ------------------------------------
 .SS userservices (us)
@@ -787,7 +787,7 @@ genannten Services zu gestatten.
 Der Zugriff auf alle nicht genannten Services wird dem Anwender, mit der
 angegebenen Adresse, verwehrt werden.
 .PP
-Anstelle einer Liste, bewirkt das Wort 'default', daß die benutzerspezifische
+Anstelle einer Liste, bewirkt das Wort 'domain', daß die benutzerspezifische
 Liste gelöscht wird und somit wieder die in der Domain gespeicherte
 Liste für das Konto gilt.
 .PP
@@ -795,7 +795,7 @@ Beispiel:
 .PP
 .nf
 .B vmm userservices d.user@example.com SMTP IMAP
-.B vmm userservices d.user@example.com default
+.B vmm userservices d.user@example.com domain
 .\" ------------------------------------
 .SS usertransport (ut)
 .BI "vmm usertransport" " address transport"
@@ -806,7 +806,7 @@ für das Konto mit der angegebenen Adresse bestimmt werden.
 .PP
 Wird als
 .I transport
-das Wort 'default' übergeben, so wird der explizite Transport des Kontos
+das Wort 'domain' übergeben, so wird der explizite Transport des Kontos
 wieder gelöscht und der in der Domain gespeicherte Wert benutzt.
 .PP
 Beispiel:
@@ -820,8 +820,8 @@ nochmals zu versuchen.
 .nf
 .B vmm ut d.user@example.com \(dqretry:4.0.0 Mailbox being migrated\(dq
 # Konvertieren der Mailbox …
-# … danach den Transport auf den Domain-Default setzen
-.B vmm usertransport d.user@example.com default
+# … danach den Transport auf den Domainwert setzen
+.B vmm usertransport d.user@example.com domain
 .fi
 .\" -----------------------------------------------------------------------
 .SH ALIAS UNTERBEFEHLE
