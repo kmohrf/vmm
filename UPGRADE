@@ -1,59 +1,83 @@
-If you still have installed vmm 0.3.x you have to proceed this step first:
+If you still have installed vmm 0.4.x you have to proceed this step first:
 
-    * upgrade your vmm installation to version 0.4-r41
+    * upgrade your vmm installation to version 0.5.2
 
 
-If you have installed vmm 0.4/0.4-r41 you have to proceed this steps:
+If you have installed vmm 0.5.2 you have to proceed this steps:
 
     * stop Postfix and Dovecot
     * backup/dump your database.
     * backup/dump your database!
 
     * start psql and connect to the appropriate database
-      (ex. psql mailsys mailsys vmm -W -h localhost)
-    * update the database: \i update_tables_0.4.x-0.5.pgsql
-    * GRANT SELECT ON postfix_alias TO postfix;
-                                       ^^^^^^^^ <- your Postfix db user
+      (ex. psql mailsys vmm -W -h 127.0.0.1)
+    * update the database,
+      - Dovecot < 1.2.0
+	\i vmm-x.y.z/pgsql/update_tables_0.5.x-0.6.pgsql
+      - Dovecot >= 1.2.0, 2.0.0 and 2.1.0
+	\i vmm-x.y.z/pgsql/update_tables_0.5.x-0.6-dovecot-1.2.x.pgsql
+    * Set database permissions.
+      (see python set-permissions.py -h for details)
+      python vmm-x.y.z/pgsql/set-permissions.py -a -H 127.0.0.1 -U vmm
 
 
-  Dovecot v1.2.x
-    -> Are you already using Dovecot v1.2.x?
-       * update the database for Dovecot v1.2.x:
-         \i update_tables_0.5.x_for_dovecot-1.2.x.pgsql
-       * GRANT SELECT ON dovecot_password TO dovecot;
-                                             ^^^^^^^^ <- your Dovecot db user
+    /!\ Important note /!\
 
-       * When you are using the SQL function »dovecotpassword()« in your
-         dovecot-sql.conf, update it also:
-         \i update_types_and_functions_0.5.x_for_dovecot-1.2.x.pgsql
+    All the views (dovecot_* and postfix_*) have been replaced by database
+    functions. So you have to adjust all your postfix/pgsql-*.cf files and
+    also your /etc/dovecot/dovecot-sql.conf or
+    /etc/dovecot/dovecot-sql.conf.ext.
+    (See the vmm-x.y.z postfix/pgsql-*.cf files and INSTALL/Configure.Dovecot_2
+    files for the new query.)
 
-       * You have also to adjust the permissions of the set-uid deliver copy:
-         on BSD:
-           chgrp nobody /usr/local/lib/dovecot/deliver
-         on Linux:
-           chgrp nogroup /usr/local/lib/dovecot/deliver
-         chmod u+s,o-rwx /usr/local/lib/dovecot/deliver
-
-       * Check the master.cf from Postfix.
-         In prior setups the service dovecot was configured slightly different.
-         If you have set the command attribute 'user' to 'nobody:mail', so
-         either remove the group mail or replace it with the group nobody
-         or nogroup. (see command output from: id -ng nobody)
-
-         e.g.: flags=DRhu user=nobody argv=/usr/local/lib/dovecot/deliver …
 
     * execute upgrade.sh
+      This will also upgrade your vmm.cfg and apply the following modifications:
 
-    * start Dovecot and Postfix
+	     old			     new
+	------------------------------------------------------------
+	domdir.mode		->	domain.directory_mode
+	domdir.delete		->	domain.delete_directory
+	domdir.base		->	misc.base_directory
+	domdir			->	_section domdir deleted_
+
+	maildir.mode		->	account.directory_mode
+	maildir.diskusage	->	account.disk_usage
+	maildir.delete		->	account.delete_directory
+	maildir.folders		->	mailbox.folders
+	maildir.name		->	mailbox.root
+	maildir			->	_section maildir deleted_
+
+	misc.forcedel		->	domain.force_deletion
+	misc.transport		->	domain.transport
+	misc.passwdscheme	->	misc.password_scheme
+	misc.dovecotvers	->	misc.dovecot_version (12 -> 1.2.11)
+	misc.gid_mail		->	/dev/null
+
+	services.smtp		->	domain.smtp
+	services.pop3		->	domain.pop3
+	services.imap		->	domain.imap
+	services.sieve		->	domain.sieve
+	services		->	_section services deleted_
+
+	_NEW_.random_password	->	account.random_password
+	_NEW_.password_length	->	account.password_length
+	_NEW_.auto_postmaster	->	domain.auto_postmaster
+	_NEW_.quota_bytes	->	domain.quota_bytes
+	_NEW_.quota_messages	->	domain.quota_messages
+	_NEW_.module		->	database.module
+	_NEW_.port		->	database.port
+	_NEW_.sslmode		->	database.sslmode
+	_NEW_.format		->	mailbox.format
+	_NEW_.crypt_blowfish_rounds ->	misc.crypt_blowfish_rounds
+	_NEW_.crypt_sha256_rounds   ->	misc.crypt_sha256_rounds
+	_NEW_.crypt_sha512_rounds   ->	misc.crypt_sha512_rounds
+
+	config.done             ->	/dev/null
+	config                  ->	_section config deleted_
 
 
-
-If you have installed vmm 0.5.x:
-
-    * execute upgrade.sh
-
-    -> Are you already using Dovecot v1.2.x?
-       See a few lines above.
+    * start Dovecot and Postfix again
 
 
 else
