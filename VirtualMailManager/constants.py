@@ -15,8 +15,8 @@
 
 __all__ = ['__author__', '__date__', '__version__']
 AUTHOR = 'Pascal Volk <user+vmm@localhost.localdomain.org>'
-RELDATE = '2009-09-09'
-VERSION = '0.5.2'
+RELDATE = '2012-06-28'
+VERSION = '0.6.0'
 __author__ = AUTHOR
 __copyright__ = 'Copyright (c) 2007-2012 %s' % __author__
 __date__ = RELDATE

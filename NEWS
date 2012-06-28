@@ -1,3 +1,43 @@
+v0.6.0	2012-06-28  Pascal Volk <user+vmm@localhost.localdomain.org>
+
+	* Now vmm supports Dovecot v.2.0.x and v2.1.x
+	* Added support for Psycopg 2
+	* Added support for Blowfish-, SHA-256- and SHA-512-crypt password
+	  hashes. Works also with Dovecot < v2.0.x.
+	  New subcommand: listpwschemes
+	* Added support for PostgreSQL-based dictionary quota limits per user.
+	  Configurable globally and per domain. New commands: domainquota and
+	  userquota. (Requires Dovecot >= v1.1.2)
+	* Command aliasadd accepts multiple destinations.
+	* Command domainadd can automatically create a postmaster account.
+	* Command useradd can generate random passwords.
+	* Notes can be assigned to domains and accounts (by Martin F. Krafft).
+	  New subcommands domainnote and usernote.
+	* The subcommands userenable and userdisable have been replaced by
+	  userservices. It is now also possible to enable/disable services per
+	  domain with the additional subcommand domainservices.
+	* New translation: Vietnamese
+	+ Catch-all support (by Martin F. Krafft) New subcommands: catchalladd,
+	  catchalldelete and catchallinfo.
+	+ Interpolated alias destinations (by Martin F. Krafft). For example:
+	  The alias postmaster@example.org → postmaster+%d@admin.example.org
+	  will forward mails addressed to postmaster@example.org to
+	  postmaster+example.org@admin.example.org.
+	+ New subcommands: configget and configset.
+	+ New subcommands by Martin F. Krafft: listaddresses, listaliases,
+	  listrelocated and listusers
+	+ Added support for Dovecot's own high-performance mailbox formats
+	  single- and multi-dbox.
+	- Fixed Python 2.6 DeprecationWarnings
+	- Command domaindelete replaced keywords 'delalias', 'deluser' and
+	  'delall' by the keyword 'force'.
+	- Command listdomains lists now all matching domains, also when the
+	  result contains primary and alias names, but the found alias is not
+	  alias for any of the found primaries.
+	- Commands userenable/userdisable accept multiple service names. The
+	  keyword 'all' has been removed.
+	- Command userdelete replaced keyword 'delalias' by 'force'.
+
 v0.5.2  2009-09-09  Pascal Volk <neverseen@users.sf.net>
 
 	* Now vmm supports Dovecot v1.2.x.

@@ -7,7 +7,7 @@ import os
 from distutils.core import setup
 from distutils.dist import DistributionMetadata
 
-VERSION = '0.5.2'
+VERSION = '0.6.0'
 
 descr = 'Tool to manage mail domains/accounts/aliases for Dovecot and Postfix'
 long_description = """
@@ -29,8 +29,10 @@ classifiers = ['Development Status :: 5 - Production/Stable',
                'License :: OSI Approved :: BSD License',
                'Natural Language :: Dutch',
                'Natural Language :: English',
+               'Natural Language :: Finnish',
                'Natural Language :: French',
                'Natural Language :: German',
+               'Natural Language :: Vietnamese',
                'Operating System :: POSIX',
                'Operating System :: POSIX :: BSD',
                'Operating System :: POSIX :: Linux',
