@@ -1,526 +1,801 @@
 # Finnish messages for vmm.
-# Copyright © 2010 Free Software Foundation, Inc.
+# Copyright © 2010, 2012 Free Software Foundation, Inc.
 # This file is distributed under the same license as the vmm package.
-# Jorma Karvonen <karvonen.jorma@gmail.com>, 2010.
+# Jorma Karvonen <karvonen.jorma@gmail.com>, 2010, 2012.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vmm 0.5.2\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-08-25 06:07+0200\n"
-"PO-Revision-Date: 2010-12-15 18:19+0200\n"
+"Project-Id-Version: vmm 0.6.0\n"
+"Report-Msgid-Bugs-To: user+vmm/tp@localhost.localdomain.org\n"
+"POT-Creation-Date: 2011-11-07 05:20+0100\n"
+"PO-Revision-Date: 2012-03-13 21:27+0200\n"
 "Last-Translator: Jorma Karvonen <karvonen.jorma@gmail.com>\n"
 "Language-Team: Finnish <translation-team-fi@lists.sourceforge.net>\n"
+"Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: VirtualMailManager/Account.py:36 VirtualMailManager/Relocated.py:44
+#. TP: Hm, what “quotation marks” should be used?
+#. If you are unsure have a look at:
+#. http://en.wikipedia.org/wiki/Quotation_mark,_non-English_usage
+#: VirtualMailManager/account.py:58 VirtualMailManager/alias.py:35
+#: VirtualMailManager/domain.py:120 VirtualMailManager/relocated.py:38
 #, python-format
-msgid "There is already an alias with the address “%s”."
-msgstr "On jo olemassa alias osoitteella “%s”."
+msgid "The domain '%s' does not exist."
+msgstr "Verkkotunnus ’%s’ ei ole vielä olemassa."
 
-#: VirtualMailManager/Account.py:41 VirtualMailManager/Alias.py:45
+#: VirtualMailManager/account.py:106
 #, python-format
-msgid "There is already a relocated user with the address “%s”."
-msgstr "On jo sijoitettu käyttäjä osoitteella “%s”."
+msgid "The mailbox format '%(mbfmt)s' requires Dovecot >= v%(version)s."
+msgstr "Sähköpostilaatikkomuoto ’%(mbfmt)s’ vaatii Dovecot >= v%(version)s."
 
-#: VirtualMailManager/Account.py:61 VirtualMailManager/Alias.py:61
-#: VirtualMailManager/Domain.py:163 VirtualMailManager/Domain.py:189
-#: VirtualMailManager/Domain.py:220 VirtualMailManager/Relocated.py:60
+#: VirtualMailManager/account.py:113 VirtualMailManager/account.py:305
 #, python-format
-msgid "The domain “%s” doesn't exist yet."
-msgstr "Verkkotunnus “%s” ei ole vielä olemassa."
+msgid "Invalid transport '%(transport)s' for mailbox format '%(mbfmt)s'."
+msgstr "Virheellinen siirto ’%(transport)s’ sähköpostilaatikkomuodolle ’%(mbfmt)s’."
 
-#: VirtualMailManager/Account.py:80
+#: VirtualMailManager/account.py:153 VirtualMailManager/cli/handler.py:93
+#: VirtualMailManager/handler.py:628 VirtualMailManager/handler.py:679
+#: VirtualMailManager/handler.py:705 VirtualMailManager/handler.py:716
+#: VirtualMailManager/handler.py:727 VirtualMailManager/handler.py:739
+#: VirtualMailManager/handler.py:753
 #, python-format
-msgid "Unknown service “%s”."
-msgstr "Tuntematon palvelu “%s”."
+msgid "The account '%s' does not exist."
+msgstr "Tiliä ’%s’ ei ole olemassa."
 
-#: VirtualMailManager/Account.py:83 VirtualMailManager/Account.py:150
-#: VirtualMailManager/Account.py:178 VirtualMailManager/Account.py:212
+#: VirtualMailManager/account.py:204 VirtualMailManager/account.py:214
+#: VirtualMailManager/cli/handler.py:77 VirtualMailManager/handler.py:596
 #, python-format
-msgid "The account “%s” doesn't exists."
-msgstr "Tiliä “%s” ei ole vielä olemassa."
+msgid "The account '%s' already exists."
+msgstr "Tili ’%s’ on jo olemassa."
 
-#: VirtualMailManager/Account.py:145
+#: VirtualMailManager/account.py:207 VirtualMailManager/handler.py:701
 #, python-format
-msgid "The account “%s” already exists."
-msgstr "Tili “%s” on jo olemassa."
+msgid "Could not accept password: '%s'"
+msgstr "Ei voitu hyväksyä salasanaa: ’%s’"
 
-#: VirtualMailManager/Account.py:186
-msgid "enabled"
-msgstr "otettu käyttöön"
+#: VirtualMailManager/account.py:217
+#, python-format
+msgid "No password set for account: '%s'"
+msgstr "Tilille ei ole asetettu salasanaa: ’%s’"
 
-#: VirtualMailManager/Account.py:188
+#: VirtualMailManager/account.py:245
+#, python-format
+msgid "Unknown field: '%s'"
+msgstr "Tuntematon kenttä: ’%s’"
+
+#: VirtualMailManager/account.py:267 VirtualMailManager/domain.py:292
+msgid "PostgreSQL-based dictionary quota requires Dovecot >= v1.1.2."
+msgstr "PostgreSQL-perustainen sanakirjakiintiö vaatii Dovecot >= v1.1.2"
+
+#. TP: A service (e.g. pop3 or imap) may be enabled/usable or
+#. disabled/unusable for a user.
+#: VirtualMailManager/account.py:332
 msgid "disabled"
 msgstr "poistettu käytöstä"
 
+#: VirtualMailManager/account.py:332
+msgid "enabled"
+msgstr "otettu käyttöön"
+
+#: VirtualMailManager/account.py:343
+#, python-format
+msgid "Could not fetch information for account: '%s'"
+msgstr "Ei voitu noutaa tietoa tilille: ’%s’"
+
 #  Alla "count" ja "address" ovat muuttujia, jotka korvautuvat suorituksen yhteydessä koodilla.
-#: VirtualMailManager/Account.py:233
+#: VirtualMailManager/account.py:387
 #, python-format
-msgid "There are %(count)d aliases with the destination address “%(address)s”."
-msgstr "Jo %(count)d aliaksella on kohdeosoite “%(address)s”."
+msgid "There are %(count)d aliases with the destination address '%(address)s'."
+msgstr "On %(count)d aliasta kohdeosoitteella ’%(address)s’."
 
-#: VirtualMailManager/Account.py:241
-msgid "uid must be an int/long."
-msgstr "uid-käyttäjätunnisteen on oltava tyypiltään int/long."
+#: VirtualMailManager/account.py:416
+msgid "UID must be an int/long."
+msgstr "UID-käyttäjätunnisteen on oltava tyypiltään int/long."
 
-#: VirtualMailManager/Account.py:243
-msgid "uid must be greater than 0."
-msgstr "uid-käyttäjätunnisteen on oltava suurempi kuin 0."
+#: VirtualMailManager/account.py:418
+msgid "UID must be greater than 0."
+msgstr "UID-käyttäjätunnisteen on oltava suurempi kuin 0."
 
-#: VirtualMailManager/Account.py:251
+#: VirtualMailManager/account.py:427
 #, python-format
-msgid "There is no account with the UID “%d”."
-msgstr "Ei ole tiliä, jonka UID-käyttäjätunniste on “%d”."
-
-#: VirtualMailManager/Alias.py:30 VirtualMailManager/Relocated.py:30
-msgid "Address and destination are identical."
-msgstr "Osoite ja kohde ovat identtisiä."
-
-#: VirtualMailManager/Alias.py:40 VirtualMailManager/Relocated.py:39
-#, python-format
-msgid "There is already an account with address “%s”."
-msgstr "On jo olemassa tili osoitteella “%s”."
+msgid "There is no account with the UID: '%d'"
+msgstr "Ei ole tiliä UID-käyttäjätunnisteella: ’%d’"
 
 #  Alla "address" ja "count" ovat muuttuja, jotka korvautuvat suorituksen yhteydessä koodilla.
-#: VirtualMailManager/Alias.py:71
+#: VirtualMailManager/alias.py:60
 #, python-format
 msgid ""
-"Can't add new destination to alias “%(address)s”.\n"
-"Currently this alias expands into %(count)i recipients.\n"
-"One more destination will render this alias unusable.\n"
-"Hint: Increase Postfix' virtual_alias_expansion_limit\n"
+"Cannot add %(count_new)i new destination(s) to alias '%(address)s'.\n"
+"Currently this alias expands into %(count)i/%(limit)i recipients.\n"
+"%(count_new)i additional destination(s) will render this alias unusable.\n"
+"Hint: Increase Postfix' virtual_alias_expansion_limit"
 msgstr ""
-"Aliakselle “%(address)s” ei voi lisätä uutta kohdetta,\n"
-"koska sillä on %(count)i vastaanottajaa.\n"
-"Yksi lisäys tekee tämän aliaksen käyttökelvottomaksi.\n"
-"Vihje: Kasvata Postfix-arvoa virtual_alias_expansion_limit\n"
+"Ei voida lisätä %(count_new)i uutta kohdetta aliakselle ’%(address)s’.\n"
+"Nykyisin tämä alias laajenee %(count)i/%(limit)i vastaanottajaan.\n"
+"%(count_new)i lisäkohdetta tekee tämän aliaksen käyttökelvottomaksi.\n"
+"Vihje: Kasvata Postfix-arvoa virtual_alias_expansion_limit"
 
-#: VirtualMailManager/Alias.py:80
-msgid "No destination address for alias denoted."
-msgstr "Aliakselle ei ole osoitettu kohdeosoitetta."
-
-#  Alla "a" ja "d" ovat muuttujia, jotka korvautuvat suorituksen yhteydessä koodilla.
-#: VirtualMailManager/Alias.py:91
+#: VirtualMailManager/alias.py:67
 #, python-format
-msgid "The alias “%(a)s” with destination “%(d)s” already exists."
-msgstr "Alias “%(a)s” kohteella “%(d)s” on jo olemassa."
+msgid ""
+"Cannot add %(count_new)i new destination(s) to alias '%(address)s'.\n"
+"This alias already exceeds its expansion limit (%(count)i/%(limit)i).\n"
+"So its unusable, all messages addressed to this alias will be bounced.\n"
+"Hint: Delete some destination addresses."
+msgstr ""
+"Ei voida lisätä %(count_new)i uutta kohdetta aliakseen '%(address)s'.\n"
+"Tämä alias ylittää jo laajennusrajansa (%(count)i/%(limit)i).\n"
+"Joten se on käyttökelvoton. Kaikki tähän osoitteeseen suunnatut viestit\n"
+"ponnahtavat takaisin.\n"
+"Vihje: Poista joitakin kohdeosoitteita."
 
-#: VirtualMailManager/Alias.py:106 VirtualMailManager/Alias.py:123
+#: VirtualMailManager/alias.py:142 VirtualMailManager/alias.py:154
+#: VirtualMailManager/alias.py:161 VirtualMailManager/handler.py:657
 #, python-format
-msgid "The alias “%s” doesn't exists."
-msgstr "Alias “%s” ei ole olemassa."
+msgid "The alias '%s' does not exist."
+msgstr "Alias ’%s’ ei ole olemassa."
 
-#  Alla "a" ja "d" ovat muuttujia, jotka korvautuvat suorituksen yhteydessä koodilla.
-#: VirtualMailManager/Alias.py:125
+#: VirtualMailManager/alias.py:145
 #, python-format
-msgid "The alias “%(a)s” with destination “%(d)s” doesn't exists."
-msgstr "Alias “%(a)s” kohteella “%(d)s” ei ole olemassa."
+msgid "The address '%(addr)s' is not a destination of the alias '%(alias)s'."
+msgstr "Osoite ’%(addr)s’ ei ole aliaksen ’%(alias)s’ kohde."
 
-#: VirtualMailManager/AliasDomain.py:32
+#: VirtualMailManager/aliasdomain.py:50
 #, python-format
-msgid "The domain “%s” is a primary domain."
-msgstr "Verkkotunnus “%s” on ensisijainen verkkotunnus."
+msgid "The domain '%s' is a primary domain."
+msgstr "Verkkotunnus ’%s’ on ensisijainen verkkotunnus."
 
-#: VirtualMailManager/AliasDomain.py:37
+#: VirtualMailManager/aliasdomain.py:69
 #, python-format
-msgid "The alias domain “%s” already exists."
-msgstr "Aliasverkkotunnus “%s” on jo olemassa."
+msgid "The alias domain '%s' already exists."
+msgstr "Aliasverkkotunnus ’%s’ on jo olemassa."
 
-#: VirtualMailManager/AliasDomain.py:40 VirtualMailManager/AliasDomain.py:70
-msgid "No destination domain for alias domain denoted."
-msgstr "Kohdeverkkotunnukselle ei ole osoitettu aliasverkkotunnusta."
+#: VirtualMailManager/aliasdomain.py:72 VirtualMailManager/aliasdomain.py:106
+msgid "No destination domain set for the alias domain."
+msgstr "Ei kohdeverkkotunnusjoukkoa aliasverkkotunnukselle."
 
-#: VirtualMailManager/AliasDomain.py:43 VirtualMailManager/AliasDomain.py:73
+#: VirtualMailManager/aliasdomain.py:75 VirtualMailManager/aliasdomain.py:109
 #, python-format
-msgid "The target domain “%s” doesn't exist yet."
-msgstr "Kohdeverkkotunnusta “%s” ei vielä ole."
+msgid "The target domain '%s' does not exist."
+msgstr "Kohdeverkkotunnusta ’%s’ ei ole."
 
-#: VirtualMailManager/AliasDomain.py:62
+#: VirtualMailManager/aliasdomain.py:88 VirtualMailManager/aliasdomain.py:112
+#: VirtualMailManager/aliasdomain.py:133
 #, python-format
-msgid "There is no primary domain for the alias domain “%s”."
-msgstr "Ei ole ensisijaista verkkotunnusta aliasverkkotunnukselle “%s”."
+msgid "The alias domain '%s' does not exist."
+msgstr "Aliasverkkotunnusta ’%s’ ei ole."
 
-#: VirtualMailManager/AliasDomain.py:65 VirtualMailManager/AliasDomain.py:76
-#: VirtualMailManager/AliasDomain.py:99
+#: VirtualMailManager/aliasdomain.py:98
 #, python-format
-msgid "The alias domain “%s” doesn't exist yet."
-msgstr "Aliasverkkotunnusta “%s” ei vielä ole."
+msgid "There is no primary domain for the alias domain '%s'."
+msgstr "Ei ole ensisijaista verkkotunnusta aliasverkkotunnukselle ’%s’."
 
 #  Alla "alias" ja "domain" ovat muuttujia, jotka korvautuvat suorituksen yhteydessä koodilla.
-#: VirtualMailManager/AliasDomain.py:79
+#: VirtualMailManager/aliasdomain.py:115
 #, python-format
-msgid "The alias domain “%(alias)s” is already assigned to the domain “%(domain)s”."
-msgstr "Aliasverkkotunnus “%(alias)s” on jo liitetty verkkotunnukseen “%(domain)s”."
+msgid "The alias domain '%(alias)s' is already assigned to the domain '%(domain)s'."
+msgstr "Aliasverkkotunnus ’%(alias)s’ on jo liitetty verkkotunnukseen ’%(domain)s’."
 
-#: VirtualMailManager/Config.py:102 VirtualMailManager/Config.py:137
+#. TP: Please preserve the trailing space.
+#: VirtualMailManager/cli/__init__.py:78
+msgid "Enter new password: "
+msgstr "Uusi salasana: "
+
+#. TP: Please preserve the trailing space.
+#: VirtualMailManager/cli/__init__.py:80
+msgid "Retype new password: "
+msgstr "Uusi salasana uudelleen: "
+
+#: VirtualMailManager/cli/__init__.py:85 VirtualMailManager/cli/config.py:53
+msgid "Too many failures - try again later."
+msgstr "Liian monia häiriöitä - yritä uudelleen myöhemmin."
+
+#: VirtualMailManager/cli/__init__.py:91
+msgid "Sorry, passwords do not match."
+msgstr "Salasanat eivät täsmää."
+
+#: VirtualMailManager/cli/__init__.py:95
+msgid "Sorry, empty passwords are not permitted."
+msgstr "Tyhjät salasanat eivät ole sallittuja."
+
+#  Alla "opt" ja "val" ovat muuttujia, jotka korvautuvat suorituksen yhteydessä koodilla.
+#: VirtualMailManager/cli/config.py:32
+#, python-format
+msgid "Enter new value for option %(option)s [%(current_value)s]: "
+msgstr "Uusi arvo valitsimelle %(option)s [%(current_value)s]: "
+
+#: VirtualMailManager/cli/config.py:36
 #, python-format
 msgid "Using configuration file: %s\n"
 msgstr "Käytetään asetustiedostoa: %s\n"
 
-#: VirtualMailManager/Config.py:106
+#: VirtualMailManager/cli/config.py:38
 #, python-format
-msgid "missing section: %s\n"
-msgstr "puuttuva lohko: %s\n"
+msgid "* Configuration section: '%s'"
+msgstr "* Asetuslohko: ’%s’"
 
-#: VirtualMailManager/Config.py:108
+#: VirtualMailManager/cli/config.py:50
 #, python-format
-msgid "missing options in section %s:\n"
-msgstr "puuttuvia valitsimia lohkossa %s:\n"
+msgid "Warning: %s"
+msgstr "Varoitus: %s"
 
-#: VirtualMailManager/Config.py:140
+#: VirtualMailManager/cli/handler.py:66
 #, python-format
-msgid "* Config section: “%s”"
-msgstr "* Asetuslohko: “%s”"
-
-#  Alla "opt" ja "val" ovat muuttujia, jotka korvautuvat suorituksen yhteydessä koodilla.
-#: VirtualMailManager/Config.py:143
-#, python-format
-msgid "Enter new value for option %(opt)s [%(val)s]: "
-msgstr "Uusi arvo valitsimelle %(opt)s [%(val)s]: "
-
-#: VirtualMailManager/Domain.py:39
-#, python-format
-msgid "The domain “%s” is an alias domain."
-msgstr "Verkkotunnus “%s” on aliasverkkotunnus."
-
-#: VirtualMailManager/Domain.py:124
-msgid "There are accounts and aliases."
-msgstr "On tilejä ja aliaksia."
-
-#: VirtualMailManager/Domain.py:127
-msgid "There are accounts."
-msgstr "Tilejä on."
-
-#: VirtualMailManager/Domain.py:130
-msgid "There are aliases."
-msgstr "Aliaksia on."
-
-#: VirtualMailManager/Domain.py:145
-#, python-format
-msgid "The domain “%s” already exists."
-msgstr "Verkkotunnus “%s” on jo olemassa."
-
-#: VirtualMailManager/EmailAddress.py:46
-#, python-format
-msgid "Missing '@' sign in e-mail address “%s”."
-msgstr "Puuttuva ’@’-merkki sähköpostiosoitteessa “%s”."
-
-#: VirtualMailManager/EmailAddress.py:49
-#, python-format
-msgid "“%s” looks not like an e-mail address."
-msgstr "“%s” ei näytä sähköpostiosoitteelta."
-
-#: VirtualMailManager/EmailAddress.py:54
-#, python-format
-msgid "Missing domain name after “%s@”."
-msgstr "Puuttuu verkkotunnusnimi “%s@”-merkkijonon jäljestä."
-
-#: VirtualMailManager/EmailAddress.py:66
-msgid "No localpart specified."
-msgstr "Paikallisosaa ei ole määritelty."
-
-#: VirtualMailManager/EmailAddress.py:69
-#, python-format
-msgid "The local part “%s” is too long"
-msgstr "Paikallisosa “%s” on liian pitkä"
-
-#  Alla "lpart" ja "ichrs" ovat muuttujia, jotka korvautuvat suorituksen yhteydessä koodilla.
-#: VirtualMailManager/EmailAddress.py:76
-#, python-format
-msgid "The local part “%(lpart)s” contains invalid characters: %(ichrs)s"
-msgstr "Paikallisosa “%(lpart)s” sisältää virheellisiä merkkejä: %(ichrs)s"
-
-#: VirtualMailManager/MailLocation.py:32
-msgid "Either mid or maillocation must be specified."
-msgstr "Joko mid-tunniste tai sähköpostisijainti on määriteltävä."
-
-#: VirtualMailManager/MailLocation.py:38
-msgid "mid must be an int/long."
-msgstr "tunnisteen mid on oltava tyypiltään int/long."
-
-#: VirtualMailManager/MailLocation.py:46
-#, python-format
-msgid ""
-"Invalid folder name “%s”, it may consist only of\n"
-"1 - 20 single byte characters (A-Z, a-z, 0-9 and _)."
-msgstr ""
-"Virheellinen kansionimi “%s”, se voi sisältää vain\n"
-"1 - 20 yhden tavun mittaisia merkkejä (A-Z, a-z, 0-9 ja _)."
-
-#: VirtualMailManager/MailLocation.py:59
-msgid "Unknown mid specified."
-msgstr "Tuntematon mid-määritelty."
-
-#: VirtualMailManager/Relocated.py:65
-msgid "No destination address for relocated user denoted."
-msgstr "Sijoitetulle käyttäjälle ei ole osoitettu kohdeosoitetta."
-
-#: VirtualMailManager/Relocated.py:75
-#, python-format
-msgid "The relocated user “%s” already exists."
-msgstr "Sijoitettu käyttäjä “%s” on jo olemassa."
-
-#: VirtualMailManager/Relocated.py:89 VirtualMailManager/Relocated.py:102
-#, python-format
-msgid "The relocated user “%s” doesn't exists."
-msgstr "Sijoitettua käyttäjää “%s” ei ole olemassa."
-
-#: VirtualMailManager/Transport.py:29
-msgid "Either tid or transport must be specified."
-msgstr "Joko tid-siirtotunniste tai siirto on määriteltävä."
-
-#: VirtualMailManager/Transport.py:35
-msgid "tid must be an int/long."
-msgstr "tunnisteen tid on oltava tyypiltään int/long."
-
-#: VirtualMailManager/Transport.py:63
-msgid "Unknown tid specified."
-msgstr "Tuntematon tid-siirtotunniste määritelty."
-
-#: VirtualMailManager/VirtualMailManager.py:54
-msgid ""
-"You are not root.\n"
-"\tGood bye!\n"
-msgstr ""
-"Et ole root-käyttäjä.\n"
-"\tNäkemiin!\n"
-
-#: VirtualMailManager/VirtualMailManager.py:74
-msgid "No “vmm.cfg” found in: /root:/usr/local/etc:/etc"
-msgstr "Tiedostoa “vmm.cfg” ei löytynyt hakemistoista: /root:/usr/local/etc:/etc"
-
-#  Alla "perms" ja "file" ovat muuttujia, jotka korvautuvat suorituksen yhteydessä koodilla. Lainausmerkit jätettiin paikallistamatta, koska ne saattavat olla skriptin toiminnan kannalta kriittisiä.
-#: VirtualMailManager/VirtualMailManager.py:85
-#, python-format
-msgid ""
-"fix permissions (%(perms)s) for “%(file)s”\n"
-"`chmod 0600 %(file)s` would be great."
-msgstr ""
-"korjaa käyttöoikeudet (%(perms)s) tiedostolle “%(file)s”\n"
-"`chmod 0600 %(file)s` olisi erinomainen."
-
-#: VirtualMailManager/VirtualMailManager.py:100
-#, python-format
-msgid ""
-"“%s” is not a directory.\n"
-"(vmm.cfg: section \"domdir\", option \"base\")"
-msgstr ""
-"“%s” ei ole hakemisto.\n"
-"(vmm.cfg: lohko ”domdir”, valitsin ”base”)"
-
-#  Alla "options" on muuttuja, joka korvautuu suorituksen yhteydessä koodilla.
-#: VirtualMailManager/VirtualMailManager.py:105
-#, python-format
-msgid ""
-"“%(binary)s” doesn't exists.\n"
-"(vmm.cfg: section \"bin\", option \"%(option)s\")"
-msgstr ""
-"“%(binary)s” ei ole olemassa.\n"
-"(vmm.cfg: lohko ”bin”, valitsin ”%(option)s”)"
-
-#  Alla "options" on muuttuja, joka korvautuu suorituksen yhteydessä koodilla.
-#: VirtualMailManager/VirtualMailManager.py:109
-#, python-format
-msgid ""
-"“%(binary)s” is not executable.\n"
-"(vmm.cfg: section \"bin\", option \"%(option)s\")"
-msgstr ""
-"“%(binary)s” ei ole suoritettava tiedosto.\n"
-"(vmm.cfg: lohko ”bin”, valitsin ”%(option)s”)"
-
-#: VirtualMailManager/VirtualMailManager.py:166
-msgid "The domain name is too long."
-msgstr "Verkkotunnusnimi on liian pitkä."
-
-#: VirtualMailManager/VirtualMailManager.py:169
-#, python-format
-msgid "The domain name “%s” is invalid."
-msgstr "Verkkotunnusnimi “%s” on virheellinen."
-
-#: VirtualMailManager/VirtualMailManager.py:209
-msgid "Enter new password: "
-msgstr "Uusi salasana: "
-
-#: VirtualMailManager/VirtualMailManager.py:210
-msgid "Retype new password: "
-msgstr "Uusi salasana uudelleen: "
-
-#: VirtualMailManager/VirtualMailManager.py:212
-msgid "Sorry, passwords do not match"
-msgstr "Salasanat eivät täsmää"
-
-#: VirtualMailManager/VirtualMailManager.py:216
-msgid "Sorry, empty passwords are not permitted"
-msgstr "Tyhjät salasanat eivät ole sallittuja"
-
-#  Tässä argumentti saattaa olla hakemistonimi tai sitten virheilmoitus.
-#: VirtualMailManager/VirtualMailManager.py:265
-#: VirtualMailManager/VirtualMailManager.py:352
-#, python-format
-msgid "No such directory: %s"
-msgstr "Ei löydy hakemistoa: %s"
-
-#: VirtualMailManager/VirtualMailManager.py:340
-msgid "Found \"..\" in home directory path."
-msgstr "Löytyi ”..” kotihakemistopolussa."
-
-#: VirtualMailManager/VirtualMailManager.py:348
-msgid "Owner/group mismatch in home directory detected."
-msgstr "Kotihakemiston omistaja ja ryhmä eivät täsmää."
-
-#: VirtualMailManager/VirtualMailManager.py:364
-msgid "FATAL: \"..\" in domain directory path detected."
-msgstr "VAKAVA VIRHE: havaittu ”..” verkkotunnushakemistopolkussa."
-
-#: VirtualMailManager/VirtualMailManager.py:370
-msgid "FATAL: group mismatch in domain directory detected"
-msgstr "VAKAVA VIRHE: havaittu ryhmätäsmäämättömyys verkkotunnushakemistossa"
-
-#  Tässä on ilmeisesti kirjoitusvirhe (Configurtion -> Configuration).
-#: VirtualMailManager/VirtualMailManager.py:457
-#, python-format
-msgid ""
-"Configurtion error: \"%s\"\n"
-"(in section \"connfig\", option \"done\") see also: vmm.cfg(5)\n"
-msgstr ""
-"Asetusvirhe: ”%s”\n"
-"(lohkossa ”connfig”, valitsin ”done”) katso myös: vmm.cfg(5)\n"
-
-#: VirtualMailManager/VirtualMailManager.py:477
-#, python-format
-msgid "Invalid section: “%s”"
+msgid "Invalid section: '%s'"
 msgstr "Virheellinen lohko: ’%s’"
 
-#: VirtualMailManager/VirtualMailManager.py:487
-#: VirtualMailManager/VirtualMailManager.py:497
-#: VirtualMailManager/VirtualMailManager.py:516
-#: VirtualMailManager/VirtualMailManager.py:624
-#: VirtualMailManager/VirtualMailManager.py:655
+#: VirtualMailManager/cli/main.py:32 VirtualMailManager/cli/main.py:65
+#: VirtualMailManager/cli/main.py:68 VirtualMailManager/cli/subcommands.py:629
+#: VirtualMailManager/cli/subcommands.py:649
 #, python-format
-msgid "Invalid argument: “%s”"
-msgstr "Virheellinen argumentti: “%s“"
+msgid "Error: %s"
+msgstr "Virhe: %s"
 
-#: VirtualMailManager/VirtualMailManager.py:520
-msgid ""
-"The keyword “detailed” is deprecated and will be removed in a future release.\n"
-"   Please use the keyword “full” to get full details."
-msgstr ""
-"Avainsana “detailed” on vanhentunut ja poistetaan tulevassa julkaisussa.\n"
-"   Saat kaikki yksityiskohdat käyttämällä avainsanaa “full”."
+#: VirtualMailManager/cli/main.py:41
+msgid "You must specify a subcommand at least."
+msgstr "Sinun on määriteltävä vähintään alikomento."
 
-#: VirtualMailManager/VirtualMailManager.py:593
+#: VirtualMailManager/cli/main.py:53
 #, python-format
-msgid "The pattern “%s” contains invalid characters."
-msgstr "Säännöllinen lauseke “%s” sisältää virheellisiä merkkejä."
+msgid "Unknown subcommand: '%s'"
+msgstr "Tuntematon alikomento: ’%s’"
 
-#: VirtualMailManager/VirtualMailManager.py:619
+#. TP: We have to cry, because root has killed/interrupted vmm
+#. with Ctrl+C or Ctrl+D.
+#: VirtualMailManager/cli/main.py:62
+msgid "Ouch!"
+msgstr "Auh!"
+
+#: VirtualMailManager/cli/main.py:71
 #, python-format
-msgid "The destination account/alias “%s” doesn't exists yet."
-msgstr "Kohdetili/-alias “%s” ei ole vielä olemassa."
+msgid "Error: Unknown section: '%s'"
+msgstr "Virhe: Tuntematon lohko: ’%s’"
 
-#  Alla "directory" ja "raeson" ovat muuttujia, jotka korvautuvat suorituksen yhteydessä koodilla.
-#: VirtualMailManager/VirtualMailManager.py:636
+#: VirtualMailManager/cli/main.py:74
 #, python-format
-msgid ""
-"The account has been successfully deleted from the database.\n"
-"    But an error occurred while deleting the following directory:\n"
-"    “%(directory)s”\n"
-"    Reason: %(raeson)s"
-msgstr ""
-"Tili on poistettu onnistuneesti tietokannasta.\n"
-"    Mutta tapahtui virhe, kun poistettiin seuraavaa hakemistoa:\n"
-"    “%(directory)s”\n"
-"    Syy: %(raeson)s"
+msgid "Error: No option '%(option)s' in section: '%(section)s'"
+msgstr "Virhe: Ei valitsinta ’%(option)s’ lohkossa: ’%(section)s’"
 
-#: VirtualMailManager/VirtualMailManager.py:676
-msgid "Account doesn't exists"
-msgstr "Tiliä ei ole"
+#: VirtualMailManager/cli/main.py:77
+msgid "Warnings:"
+msgstr "Varoitukset:"
 
-#: VirtualMailManager/VirtualMailManager.py:692
-#: VirtualMailManager/VirtualMailManager.py:702
-msgid ""
-"The service name “managesieve” is deprecated and will be removed\n"
-"   in a future release.\n"
-"   Please use the service name “sieve” instead."
-msgstr ""
-"Palvelunimi “managesieve” on vanhentunut ja poistetaan\n"
-"   tulevassa julkaisussa.\n"
-"   Käytä sen sijaan palvelunimeä “sieve”."
-
-#: VirtualMailManager/ext/Postconf.py:44
+#: VirtualMailManager/cli/subcommands.py:78
 #, python-format
-msgid "The value “%s” looks not like a valid postfix configuration parameter name."
-msgstr "Arvo “%s” ei näytä olevan kelvollinen postfix-asetusparametrinimi."
+msgid "Plan A failed ... trying Plan B: %(subcommand)s %(object)s"
+msgstr "Suunnitelma A epäonnistui ... yritetään suunnitelmaa B: %(subcommand)s %(object)s"
 
-#: vmm:34
+#: VirtualMailManager/cli/subcommands.py:92
+msgid "Missing alias address and destination."
+msgstr "Puuttuva aliasosoite ja -kohde."
+
+#: VirtualMailManager/cli/subcommands.py:95
+#: VirtualMailManager/cli/subcommands.py:453
+msgid "Missing destination address."
+msgstr "Puuttuva kohdeosoite."
+
+#: VirtualMailManager/cli/subcommands.py:102
+#: VirtualMailManager/cli/subcommands.py:112
+msgid "Missing alias address."
+msgstr "Puuttuva aliasosoite."
+
+#: VirtualMailManager/cli/subcommands.py:134
+#: VirtualMailManager/cli/subcommands.py:168
+msgid "Missing alias domain name and destination domain name."
+msgstr "Puuttuva aliasverkkotunnusnimi ja kohdeverkkotunnusnimi."
+
+#: VirtualMailManager/cli/subcommands.py:137
+#: VirtualMailManager/cli/subcommands.py:171
+msgid "Missing destination domain name."
+msgstr "Puuttuva kohdeverkkotunnuksen nimi."
+
+#: VirtualMailManager/cli/subcommands.py:145
+#: VirtualMailManager/cli/subcommands.py:152
+msgid "Missing alias domain name."
+msgstr "Puuttuva aliasverkkotunnuksen nimi."
+
+#: VirtualMailManager/cli/subcommands.py:179
+msgid "Missing option name."
+msgstr "Puuttuva valitsinnimi."
+
+#: VirtualMailManager/cli/subcommands.py:195
+msgid "Missing option and new value."
+msgstr "Puuttuva valitsin ja uusi arvo."
+
+#: VirtualMailManager/cli/subcommands.py:197
+msgid "Missing new configuration value."
+msgstr "Puuuttuva uusi asetusarvo."
+
+#: VirtualMailManager/cli/subcommands.py:213
+#: VirtualMailManager/cli/subcommands.py:229
+#: VirtualMailManager/cli/subcommands.py:242
+#: VirtualMailManager/cli/subcommands.py:331
+msgid "Missing domain name."
+msgstr "Puuttuva verkkotunnusnimi."
+
+#: VirtualMailManager/cli/subcommands.py:219
 #, python-format
-msgid ""
-"Usage: %s SUBCOMMAND OBJECT ARGS*\n"
-"  short long\n"
-"  subcommand               object             args (* = optional)\n"
-msgstr ""
-"Käyttö: %s ALIKOMENTO OBJEKTI ARGUMENTIT*\n"
-"  lyhyt pitkä\n"
-"  alikomento               objekti             argumentti (* = valinnainen)\n"
+msgid "Creating account for postmaster@%s"
+msgstr "Luodaan tili postmaster@%s-osoitteelle"
 
-#: vmm:73 vmm:84 vmm:494
-msgid "Error"
-msgstr "Virhe"
+#: VirtualMailManager/cli/subcommands.py:235
+#: VirtualMailManager/cli/subcommands.py:249
+#: VirtualMailManager/cli/subcommands.py:322
+#: VirtualMailManager/cli/subcommands.py:343
+#: VirtualMailManager/cli/subcommands.py:372
+#: VirtualMailManager/cli/subcommands.py:509
+#: VirtualMailManager/cli/subcommands.py:522 VirtualMailManager/handler.py:453
+#: VirtualMailManager/handler.py:466 VirtualMailManager/handler.py:481
+#: VirtualMailManager/handler.py:510 VirtualMailManager/handler.py:674
+#, python-format
+msgid "Invalid argument: '%s'"
+msgstr "Virheellinen argumentti: ’%s’"
 
-#: vmm:111
-msgid "information"
-msgstr "tiedot"
+#: VirtualMailManager/cli/subcommands.py:267
+#: VirtualMailManager/cli/subcommands.py:273
+msgid "Domain"
+msgstr "Verkkotunnus"
 
-#: vmm:121
-msgid "Available"
-msgstr "Käytettävissä"
+#: VirtualMailManager/cli/subcommands.py:275
+#: VirtualMailManager/cli/subcommands.py:284
+msgid "accounts"
+msgstr "tilit"
 
-#: vmm:124 vmm:223 vmm:229
+#: VirtualMailManager/cli/subcommands.py:277
+#: VirtualMailManager/cli/subcommands.py:283
+#: VirtualMailManager/cli/subcommands.py:831
 msgid "alias domains"
 msgstr "aliasverkkotunnukset"
 
-#: vmm:134 vmm:145 vmm:169
+#: VirtualMailManager/cli/subcommands.py:279
+#: VirtualMailManager/cli/subcommands.py:285
+msgid "aliases"
+msgstr "aliakset"
+
+#: VirtualMailManager/cli/subcommands.py:281
+#: VirtualMailManager/cli/subcommands.py:286
+msgid "relocated users"
+msgstr "sijoitetut käyttäjät"
+
+#: VirtualMailManager/cli/subcommands.py:292
+msgid "Missing domain name and storage value."
+msgstr "Puuttuva verkkotunnusnimi ja tallennusarvo."
+
+#: VirtualMailManager/cli/subcommands.py:295
+#: VirtualMailManager/cli/subcommands.py:582
+msgid "Missing storage value."
+msgstr "Puuttuva tallennusarvo."
+
+#: VirtualMailManager/cli/subcommands.py:301
+#: VirtualMailManager/cli/subcommands.py:586
+#, python-format
+msgid "Invalid storage value: '%s'"
+msgstr "Virheellinen argumentti: ’%s’"
+
+#: VirtualMailManager/cli/subcommands.py:311
+#, python-format
+msgid "Neither a valid number of messages nor the keyword 'force': '%s'"
+msgstr "Ei ole kelvollinen viestien lukumäärä eikä avainsana ’force’: ’%s’"
+
+#: VirtualMailManager/cli/subcommands.py:319
+#: VirtualMailManager/cli/subcommands.py:595
+#, python-format
+msgid "Not a valid number of messages: '%s'"
+msgstr "Viestien lukumäärä ei ole kelvollinen: ’%s’"
+
+#: VirtualMailManager/cli/subcommands.py:354
+#: VirtualMailManager/cli/subcommands.py:609
+#, python-format
+msgid "Invalid service arguments: %s"
+msgstr "Virheelliset palveluargumentit: %s"
+
+#: VirtualMailManager/cli/subcommands.py:363
+msgid "Missing domain name and new transport."
+msgstr "Puuttuva verkkotunnusnimi ja uusi siirto."
+
+#: VirtualMailManager/cli/subcommands.py:366
+msgid "Missing new transport."
+msgstr "Puuttuva uusi siirto."
+
+#: VirtualMailManager/cli/subcommands.py:380
+msgid "Missing UID."
+msgstr "Puuttuva käyttäjätunniste."
+
+#: VirtualMailManager/cli/subcommands.py:381
+#: VirtualMailManager/cli/subcommands.py:545
+#: VirtualMailManager/cli/subcommands.py:551
+msgid "Account"
+msgstr "Tilit"
+
+#: VirtualMailManager/cli/subcommands.py:396
+#, python-format
+msgid "Unknown help topic: '%s'"
+msgstr "Tuntematon opasteaihe: ’%s’"
+
+#: VirtualMailManager/cli/subcommands.py:409
+msgid "List of available subcommands:"
+msgstr "Käytettävissä olevien alikomentojen luettelo:"
+
+#: VirtualMailManager/cli/subcommands.py:430
+msgid "Usable encoding suffixes:"
+msgstr "Käyttökelpoiset koodausloppuliitteet:"
+
+#: VirtualMailManager/cli/subcommands.py:430
+msgid "Usable password schemes:"
+msgstr "Käyttökelpoiset salasanakaavat:"
+
+#: VirtualMailManager/cli/subcommands.py:451
+msgid "Missing relocated address and destination."
+msgstr "Puuttuva sijoitusosoite ja -kohde."
+
+#: VirtualMailManager/cli/subcommands.py:460
+#: VirtualMailManager/cli/subcommands.py:467
+msgid "Missing relocated address."
+msgstr "Puuttuva sijoitusosoite."
+
+#: VirtualMailManager/cli/subcommands.py:490
+#: VirtualMailManager/cli/subcommands.py:503
+#: VirtualMailManager/cli/subcommands.py:516
+#: VirtualMailManager/cli/subcommands.py:568
+#: VirtualMailManager/cli/subcommands.py:603
+msgid "Missing e-mail address."
+msgstr "Puuttuva sähköpostiosoite."
+
+#: VirtualMailManager/cli/subcommands.py:497
+#, python-format
+msgid "Generated password: %s"
+msgstr "Tuotettu salasana: %s"
+
+#: VirtualMailManager/cli/subcommands.py:552
+msgid "alias addresses"
+msgstr "aliasosoitteet"
+
+#: VirtualMailManager/cli/subcommands.py:558
+msgid "Missing e-mail address and user's name."
+msgstr "Puuttuva sähköpostiosoite ja käyttäjän nimi."
+
+#: VirtualMailManager/cli/subcommands.py:561
+msgid "Missing user's name."
+msgstr "Puuttuva käyttäjän nimi."
+
+#: VirtualMailManager/cli/subcommands.py:579
+msgid "Missing e-mail address and storage value."
+msgstr "Puuttuva sähköpostiosoite ja käyttäjän nimi."
+
+#: VirtualMailManager/cli/subcommands.py:617
+msgid "Missing e-mail address and transport."
+msgstr "Puuttuva sähköpostiosoite ja siirto."
+
+#: VirtualMailManager/cli/subcommands.py:620
+msgid "Missing transport."
+msgstr "Puuttuva siirto."
+
+#: VirtualMailManager/cli/subcommands.py:630
+msgid "usage: "
+msgstr "käyttö: "
+
+#. TP: Please adjust translated words like the original text.
+#. (It's a table header.) Extract from usage text:
+#. usage: vmm subcommand arguments
+#. short long
+#. subcommand                arguments
+#.
+#. da    domainadd           fqdn [transport]
+#. dd    domaindelete        fqdn [force]
+#: VirtualMailManager/cli/subcommands.py:640
+#, python-format
+msgid ""
+"usage: %s subcommand arguments\n"
+"  short long\n"
+"  subcommand                arguments\n"
+msgstr ""
+"käyttö: %s alikomento argumentit\n"
+"  lyhyt pitkä\n"
+"  alikomento                argumentit\n"
+
+#: VirtualMailManager/cli/subcommands.py:659
+msgid "from"
+msgstr "kohteesta"
+
+#. TP: The words 'from', 'version' and 'on' are used in
+#. the version information, e.g.:
+#. vmm, version 0.5.2 (from 09/09/09)
+#. Python 2.5.4 on FreeBSD
+#: VirtualMailManager/cli/subcommands.py:659
+msgid "version"
+msgstr "versio"
+
+#: VirtualMailManager/cli/subcommands.py:662
+msgid "on"
+msgstr "kohteessa"
+
+#: VirtualMailManager/cli/subcommands.py:664
+msgid "is free software and comes with ABSOLUTELY NO WARRANTY."
+msgstr "on vapaa ohjelmisto ja tulee EHDOTTOMASTI ILMAN TAKUUTA."
+
+#: VirtualMailManager/cli/subcommands.py:672
+msgid "uid"
+msgstr "käyttäjätunniste"
+
+#: VirtualMailManager/cli/subcommands.py:673
+msgid "get the address of the user with the given UID"
+msgstr "hae käyttäjän osoite annetulla käyttäjätunnuksella"
+
+#: VirtualMailManager/cli/subcommands.py:674
+#: VirtualMailManager/cli/subcommands.py:684
+msgid "address [password]"
+msgstr "osoite [salasana]"
+
+#: VirtualMailManager/cli/subcommands.py:675
+msgid "create a new e-mail user with the given address"
+msgstr "luo uusi sähköpostikäyttäj annetulla osoitteella"
+
+#: VirtualMailManager/cli/subcommands.py:677
+#: VirtualMailManager/cli/subcommands.py:704
+#: VirtualMailManager/cli/subcommands.py:744
+#: VirtualMailManager/cli/subcommands.py:746
+msgid "address"
+msgstr "osoite"
+
+#: VirtualMailManager/cli/subcommands.py:678
+msgid "delete the specified user"
+msgstr "poista määritelty käyttäjä"
+
+#: VirtualMailManager/cli/subcommands.py:679
+msgid "address [details]"
+msgstr "osoite [yksityiskohdat]"
+
+#: VirtualMailManager/cli/subcommands.py:680
+msgid "display information about the given address"
+msgstr "näytä tietoja annetusta osoitteesta"
+
+#: VirtualMailManager/cli/subcommands.py:681
+msgid "address name"
+msgstr "osoitenimi"
+
+#: VirtualMailManager/cli/subcommands.py:682
+msgid "set or update the real name for an address"
+msgstr "aseta tai päivitä osoitteen todellinen nimi"
+
+#: VirtualMailManager/cli/subcommands.py:685
+msgid "update the password for the given address"
+msgstr "päivitä annetun osoitteen salasana"
+
+#: VirtualMailManager/cli/subcommands.py:687
+msgid "address storage [messages]"
+msgstr "osoitetallennus [viestit]"
+
+#: VirtualMailManager/cli/subcommands.py:688
+msgid "update the quota limit for the given address"
+msgstr "päivitä annetun osoitteen kiintiöraja"
+
+#: VirtualMailManager/cli/subcommands.py:690
+msgid "address [service ...]"
+msgstr "osoite [palvelu ...]"
+
+#: VirtualMailManager/cli/subcommands.py:691
+msgid "enables the specified services and disables all not specified services"
+msgstr "ottaa käyttöön määritellyt palvelut ja ottaa pois käytöstä määrittelemättömät palvelut"
+
+#: VirtualMailManager/cli/subcommands.py:694
+msgid "address transport"
+msgstr "osoitesiirto"
+
+#: VirtualMailManager/cli/subcommands.py:695
+msgid "update the transport of the given address"
+msgstr "päivitä annetun osoitteen siirto"
+
+#: VirtualMailManager/cli/subcommands.py:697
+msgid "address destination ..."
+msgstr "osoitekohde ..."
+
+#: VirtualMailManager/cli/subcommands.py:698
+msgid "create a new alias e-mail address with one or more destinations"
+msgstr "luo uusi aliassähköpostiosoite yhdellä tai useammalla kohteella"
+
+#: VirtualMailManager/cli/subcommands.py:701
+msgid "address [destination]"
+msgstr "osoite [kohde]"
+
+#: VirtualMailManager/cli/subcommands.py:702
+msgid "delete the specified alias e-mail address or one of its destinations"
+msgstr "poista määritellyn aliaksen sähköpostiosoite tai yksi sen kohteista"
+
+#: VirtualMailManager/cli/subcommands.py:705
+msgid "show the destination(s) of the specified alias"
+msgstr "näytä määritellyn aliaksen kohteet"
+
+#: VirtualMailManager/cli/subcommands.py:708
+#: VirtualMailManager/cli/subcommands.py:717
+msgid "fqdn destination"
+msgstr "fqdn-kohde"
+
+#: VirtualMailManager/cli/subcommands.py:709
+msgid "create a new alias for an existing domain"
+msgstr "luotu uusi alias olemassaolevaan verkkotunnukseen"
+
+#: VirtualMailManager/cli/subcommands.py:711
+#: VirtualMailManager/cli/subcommands.py:714
+#: VirtualMailManager/cli/subcommands.py:723
+msgid "fqdn"
+msgstr "fqdn"
+
+#: VirtualMailManager/cli/subcommands.py:712
+msgid "delete the specified alias domain"
+msgstr "poista määritelty aliasverkkotunnus"
+
+#: VirtualMailManager/cli/subcommands.py:715
+msgid "show the destination of the given alias domain"
+msgstr "näytä annetun aliasverkkotunnuksen kohde"
+
+#: VirtualMailManager/cli/subcommands.py:718
+msgid "assign the given alias domain to an other domain"
+msgstr "liitä annettu aliasverkkotunnus toiseen verkkotunnukseen"
+
+#: VirtualMailManager/cli/subcommands.py:720
+msgid "fqdn [transport]"
+msgstr "fqdn [siirto]"
+
+#: VirtualMailManager/cli/subcommands.py:721
+msgid "create a new domain"
+msgstr "luo uusi verkkotunnus"
+
+#: VirtualMailManager/cli/subcommands.py:724
+msgid "delete the given domain and all its alias domains"
+msgstr "poista annettu verkkotunnus ja kaikki sen aliasverkkotunnukset"
+
+#: VirtualMailManager/cli/subcommands.py:725
+msgid "fqdn [details]"
+msgstr "fqdn [yksityiskohdat]"
+
+#: VirtualMailManager/cli/subcommands.py:726
+msgid "display information about the given domain"
+msgstr "näytä tiedot annetusta verkkotunnuksesta"
+
+#: VirtualMailManager/cli/subcommands.py:728
+msgid "fqdn storage [messages]"
+msgstr "fqdn-tallennus [viestit]"
+
+#: VirtualMailManager/cli/subcommands.py:729
+msgid "update the quota limit of the specified domain"
+msgstr "päivitä määritellyn verkkotunnuksen kiintiöraja"
+
+#: VirtualMailManager/cli/subcommands.py:731
+msgid "fqdn [service ...]"
+msgstr "fqdn [palvelu ...]"
+
+#: VirtualMailManager/cli/subcommands.py:732
+msgid "enables the specified services and disables all not specified services of the given domain"
+msgstr "ottaa käyttöön määritellyt palvelut ja ottaa pois käytöstä kaikki määrittelemättömät annetun verkkotunnuksen palvelut"
+
+#: VirtualMailManager/cli/subcommands.py:735
+msgid "fqdn transport"
+msgstr "fqdn-siirto"
+
+#: VirtualMailManager/cli/subcommands.py:736
+msgid "update the transport of the specified domain"
+msgstr "päivitä määritellyn verkkotunnuksen siirto"
+
+#: VirtualMailManager/cli/subcommands.py:737
+msgid "[pattern]"
+msgstr "[malli]"
+
+#: VirtualMailManager/cli/subcommands.py:738
+msgid "list all domains / search domains by pattern"
+msgstr "luettele kaikki mallin mukaiset verkkotunnukset / hakuverkkotunnukset"
+
+#: VirtualMailManager/cli/subcommands.py:741
+msgid "address newaddress"
+msgstr "osoite newaddress"
+
+#: VirtualMailManager/cli/subcommands.py:742
+msgid "create a new record for a relocated user"
+msgstr "luo uusi tietue sijoitettavalle käyttäjälle"
+
+#: VirtualMailManager/cli/subcommands.py:745
+msgid "delete the record of the relocated user"
+msgstr "poista sijoitetun käyttäjän tietue"
+
+#: VirtualMailManager/cli/subcommands.py:747
+msgid "print information about a relocated user"
+msgstr "tulosta tiedot sijoitetusta käyttäjästä"
+
+#: VirtualMailManager/cli/subcommands.py:749
+msgid "option"
+msgstr "valitsin"
+
+#: VirtualMailManager/cli/subcommands.py:750
+msgid "show the actual value of the configuration option"
+msgstr "näytä asetusvalitsimen todellinen arvo"
+
+#: VirtualMailManager/cli/subcommands.py:751
+msgid "option value"
+msgstr "valitsinarvo"
+
+#: VirtualMailManager/cli/subcommands.py:752
+msgid "set a new value for the configuration option"
+msgstr "aseta asetusvalitsimelle uusi arvo"
+
+#: VirtualMailManager/cli/subcommands.py:753
+msgid "[section]"
+msgstr "[lohko]"
+
+#: VirtualMailManager/cli/subcommands.py:754
+msgid "start interactive configuration modus"
+msgstr "aloita vuorovaikutteinen asetustila"
+
+#: VirtualMailManager/cli/subcommands.py:756
+msgid "lists all usable password schemes and password encoding suffixes"
+msgstr "luettelee kaikki käytettävät salasanakaavat ja salasanakoodausloppuliitteet"
+
+#: VirtualMailManager/cli/subcommands.py:758
+msgid "[subcommand]"
+msgstr "[alikomento]"
+
+#: VirtualMailManager/cli/subcommands.py:759
+msgid "show a help overview or help for the given subcommand"
+msgstr "näytä opasteyhteenveto tai opaste annetusta alikomennosta"
+
+#: VirtualMailManager/cli/subcommands.py:761
+msgid "show version and copyright information"
+msgstr "näytä versio ja copyright-tiedot"
+
+#: VirtualMailManager/cli/subcommands.py:809
+#, python-format
+msgid "[%(percent)s%%] %(used)s/%(limit)s"
+msgstr "[%(percent)s%%] %(used)s/%(limit)s"
+
+#. TP: used in e.g. 'Domain information' or 'Account information'
+#: VirtualMailManager/cli/subcommands.py:815
+msgid "information"
+msgstr "tiedot"
+
+#. TP: used in e.g. 'Existing alias addresses' or 'Existing accounts'
+#: VirtualMailManager/cli/subcommands.py:828
+msgid "Existing"
+msgstr "Olemassa oleva"
+
+#: VirtualMailManager/cli/subcommands.py:841
+#: VirtualMailManager/cli/subcommands.py:883
 msgid "\tNone"
 msgstr "\tEi mitään"
 
-#: vmm:138
+#: VirtualMailManager/cli/subcommands.py:846
 msgid "Alias information"
 msgstr "Aliastiedot"
 
-#: vmm:140
+#: VirtualMailManager/cli/subcommands.py:848
 #, python-format
 msgid "\tMail for %s will be redirected to:"
 msgstr "\tSähköposti %s ohjataan edelleen osoitteeseen:"
 
-#: vmm:149
+#: VirtualMailManager/cli/subcommands.py:855
 msgid "Relocated information"
 msgstr "Sijaintitiedot"
 
 #  Alla "addr" ja "dest" ovat muuttujia, jotka korvautuvat suorituksen yhteydessä koodilla.
-#: vmm:151
+#: VirtualMailManager/cli/subcommands.py:857
 #, python-format
-msgid "\tUser “%(addr)s” has moved to “%(dest)s”"
-msgstr "\tKäyttäjä “%(addr)s” on siirtynyt kohteeseen “%(dest)s”"
+msgid "\tUser '%(addr)s' has moved to '%(dest)s'"
+msgstr "\tKäyttäjä ’%(addr)s’ on siirretty kohteeseen ’%(dest)s’"
 
-#: vmm:164
-msgid "Available domains"
-msgstr "Käytettävissä olevat verkkotunnukset"
-
-#: vmm:166
+#: VirtualMailManager/cli/subcommands.py:872
 msgid "Matching domains"
 msgstr "Täsmäävät verkkotunnukset"
 
-#: vmm:180
+#: VirtualMailManager/cli/subcommands.py:874
+msgid "Existing domains"
+msgstr "Olemassaolevat verkkotunnukset"
+
+#: VirtualMailManager/cli/subcommands.py:889
 msgid "Alias domain information"
 msgstr "Aliasverkkotunnustiedot"
 
 #  Alla "alias" ja "domain" ovat muuttujia, jotka korvautuvat suorituksen yhteydessä koodilla.
-#: vmm:186
+#: VirtualMailManager/cli/subcommands.py:894
 #, python-format
 msgid ""
 "\tThe alias domain %(alias)s belongs to:\n"
@@ -529,116 +804,474 @@ msgstr ""
 "\tAliasverkkotunnus %(alias)s kuuluu kohteeseen:\n"
 "\t    * %(domain)s"
 
-#: vmm:197 vmm:205 vmm:213
-msgid "Missing domain name."
-msgstr "Puuttuva verkkotunnusnimi."
+#: VirtualMailManager/common.py:63
+#, python-format
+msgid "No such file: '%s'"
+msgstr "Ei löydy tiedostoa: ’%s’"
 
-#: vmm:215 vmm:219
-msgid "Domain"
-msgstr "Verkkotunnus"
+#: VirtualMailManager/common.py:66
+#, python-format
+msgid "File is not executable: '%s'"
+msgstr "Tiedosto ei ole suoritettava tiedosto: ’%s’"
 
-#: vmm:221 vmm:230
-msgid "accounts"
-msgstr "tilit"
+#: VirtualMailManager/common.py:82
+msgid "GiB"
+msgstr "gibitavua"
 
-#: vmm:225 vmm:231
-msgid "aliases"
-msgstr "aliakset"
+#: VirtualMailManager/common.py:82
+msgid "TiB"
+msgstr "tebitavua"
 
-#: vmm:227 vmm:232
-msgid "relocated users"
-msgstr "sijoitetut käyttäjät"
+#: VirtualMailManager/common.py:83
+msgid "KiB"
+msgstr "kibitavua"
 
-#: vmm:236
-msgid "Missing domain name and new transport."
-msgstr "Puuttuva verkkotunnusnimi ja uusi siirto."
+#: VirtualMailManager/common.py:83
+msgid "MiB"
+msgstr "mebitavua"
 
-#: vmm:238
-msgid "Missing new transport."
-msgstr "Puuttuva uusi siirto."
+#. TP: e.g.: '%(size)s %(prefix)s' -> '118.30 MiB'
+#: VirtualMailManager/common.py:87
+#, python-format
+msgid "%(size)s %(prefix)s"
+msgstr "%(size)s %(prefix)s"
 
-#: vmm:247 vmm:262
-msgid "Missing alias domain name and target domain name."
-msgstr "Puuttuva aliasverkkotunnusnimi ja kohdeverkkotunnusnimi."
+#: VirtualMailManager/config.py:89
+#, python-format
+msgid "Not a boolean: '%s'"
+msgstr "Ei ole boolean-arvo: ’%s’"
 
-#: vmm:249 vmm:264
-msgid "Missing target domain name."
-msgstr "Puuttuva kohdeverkkotunnuksen nimi."
+#: VirtualMailManager/config.py:127
+#, python-format
+msgid "Bad format: '%s' - expected: section.option"
+msgstr "Väärä muoto: ’%s’ - odotettiin: lohko.valitsin"
 
-#: vmm:255 vmm:270
-msgid "Missing alias domain name."
-msgstr "Puuttuva aliasverkkotunnuksen nimi."
+#: VirtualMailManager/config.py:380
+#, python-format
+msgid "* Section: %s\n"
+msgstr "* Lohko: %s\n"
 
-#: vmm:276 vmm:285 vmm:293 vmm:323 vmm:331 vmm:339
-msgid "Missing e-mail address."
-msgstr "Puuttuva sähköpostiosoite."
+#: VirtualMailManager/config.py:390 VirtualMailManager/config.py:398
+#, python-format
+msgid "Check of configuration file %s failed.\n"
+msgstr "Asetustiedoston %s tarkistus epäonnistui.\n"
 
-#: vmm:301
-msgid "alias addresses"
-msgstr "aliasosoitteet"
+#: VirtualMailManager/config.py:392
+msgid "Missing options, which have no default value.\n"
+msgstr "Puuttuu valitsimia, joilla ei ole oletusarvoa.\n"
 
-#  Tässä saattaa olla kirjoitusvirhe. Pitäisi ehkä olla "user's name".
-#: vmm:307
-msgid "Missing e-mail address and users name."
-msgstr "Puuttuva sähköpostiosoite ja käyttäjien nimi."
+#: VirtualMailManager/config.py:400 VirtualMailManager/config.py:402
+msgid "Invalid configuration values.\n"
+msgstr "Virheelliset asetusarvot.\n"
 
-#  Tässä saattaa olla kirjoitusvirhe. Pitäisi ehkä olla "user's name".
-#: vmm:309
-msgid "Missing users name."
-msgstr "Puuttuva käyttäjien nimi."
+#: VirtualMailManager/config.py:441 VirtualMailManager/config.py:525
+#, python-format
+msgid "Not a valid Dovecot version: '%s'"
+msgstr "Ei ole kelvollinen Dovecot-versio: ’%s’"
 
-#: vmm:315
-msgid "Missing e-mail address and transport."
-msgstr "Puuttuva sähköpostiosoite ja siirto."
+#: VirtualMailManager/config.py:447 VirtualMailManager/config.py:482
+#, python-format
+msgid "Unsupported database module: '%s'"
+msgstr "Tukematon tietokantamoduuli: ’%s’"
 
-#: vmm:317
-msgid "Missing transport."
-msgstr "Puuttuva siirto."
+#: VirtualMailManager/config.py:452 VirtualMailManager/config.py:490
+#, python-format
+msgid "Unknown pgsql SSL mode: '%s'"
+msgstr "Tuntematon pgsql SSL -tila: ’%s’"
 
-#: vmm:348
-msgid "Missing alias address and destination."
-msgstr "Puuttuva aliasosoite ja -kohde."
+#: VirtualMailManager/config.py:459 VirtualMailManager/config.py:503
+#: VirtualMailManager/maillocation.py:70
+#, python-format
+msgid "Unsupported mailbox format: '%s'"
+msgstr "Tukematon sähköpostilaatikkomuoto: ’%s’"
 
-#: vmm:350 vmm:373
-msgid "Missing destination address."
-msgstr "Puuttuva kohdeosoite."
+#  Tässä argumentti saattaa olla hakemistonimi tai sitten virheilmoitus.
+#: VirtualMailManager/config.py:475 VirtualMailManager/handler.py:283
+#: VirtualMailManager/handler.py:357 VirtualMailManager/handler.py:362
+#: VirtualMailManager/handler.py:390
+#, python-format
+msgid "No such directory: %s"
+msgstr "Ei löydy hakemistoa: %s"
 
-#: vmm:356 vmm:362
-msgid "Missing alias address"
-msgstr "Puuttuva aliasosoite"
+#: VirtualMailManager/config.py:514
+#, python-format
+msgid "Not a valid size value: '%s'"
+msgstr "Ei ole kelvollinen kokoarvo: ’%s’"
 
-#: vmm:371
-msgid "Missing relocated address and destination."
-msgstr "Puuttuva sijoitusosoite ja -kohde."
+#: VirtualMailManager/domain.py:78
+#, python-format
+msgid "The domain '%s' is an alias domain."
+msgstr "Verkkotunnus ’%s’ on aliasverkkotunnus."
 
-#: vmm:379 vmm:387
-msgid "Missing relocated address"
-msgstr "Puuttuva sijoitusosoite"
+#: VirtualMailManager/domain.py:108
+#, python-format
+msgid "There are %(account_count)u accounts, %(alias_count)u aliases and %(relocated_count)u relocated users."
+msgstr "On %(account_count)u -tiliä, %(alias_count)u -aliasta ja %(relocated_count)u sijoitettua käyttäjää."
 
-#: vmm:393
-msgid "Missing userid"
-msgstr "Puuttuva käyttäjätunniste"
+#: VirtualMailManager/domain.py:123
+#, python-format
+msgid "The domain '%s' already exists."
+msgstr "Verkkotunnus ’%s’ on jo olemassa."
 
-#: vmm:406
-msgid "Warnings:"
-msgstr "Varoitukset:"
+#: VirtualMailManager/domain.py:437
+msgid "The domain name is too long"
+msgstr "Verkkotunnusnimi on liian pitkä"
 
-#: vmm:412
-msgid "from"
-msgstr "kohteesta"
+#: VirtualMailManager/domain.py:439
+#, python-format
+msgid "The domain name '%s' is invalid"
+msgstr "Verkkotunnusnimi ’%s’ on virheellinen"
 
-#: vmm:412
-msgid "version"
-msgstr "versio"
+#: VirtualMailManager/emailaddress.py:73
+#, python-format
+msgid "Missing the '@' sign in address: '%s'"
+msgstr "Merkki ’@’ puuttuu sähköpostiosoitteesta: ’%s’."
 
-#: vmm:414
-msgid "on"
-msgstr "kohteessa"
+#: VirtualMailManager/emailaddress.py:76
+#, python-format
+msgid "Too many '@' signs in address: '%s'"
+msgstr "Liian monta ’@’-merkkiä sähköpostiosoitteessa: ’%s’."
 
-#: vmm:488
-msgid "Unknown subcommand"
-msgstr "Tuntematon alikomento"
+#: VirtualMailManager/emailaddress.py:79
+#, python-format
+msgid "Missing local-part in address: '%s'"
+msgstr "Puuttuu paikallisosa osoitteessa: ’%s’"
 
-#: vmm:491
-msgid "Ouch"
-msgstr "Auh"
+#: VirtualMailManager/emailaddress.py:82
+#, python-format
+msgid "Missing domain name in address: '%s'"
+msgstr "Puuttuu verkkotunnusnimi osoitteessa: ’%s’"
+
+#: VirtualMailManager/emailaddress.py:145
+#, python-format
+msgid "The local-part '%s' is too long."
+msgstr "Paikallisosa ’%s’ on liian pitkä."
+
+#  Alla "l_part" ja "i_chars" ovat muuttujia, jotka korvautuvat suorituksen yhteydessä koodilla.
+#: VirtualMailManager/emailaddress.py:150
+#, python-format
+msgid "The local-part '%(l_part)s' contains invalid characters: %(i_chars)s"
+msgstr "Paikallisosa ’%(l_part)s’ sisältää virheellisiä merkkejä: %(i_chars)s"
+
+#: VirtualMailManager/ext/postconf.py:84
+#, python-format
+msgid "The value '%s' does not look like a valid postfix configuration parameter name."
+msgstr "Arvo ’%s’ ei näytä olevan kelvollinen postfix-asetusparametrinimi."
+
+#: VirtualMailManager/handler.py:56
+msgid "an account"
+msgstr "tili"
+
+#: VirtualMailManager/handler.py:57
+msgid "an alias"
+msgstr "alias"
+
+#: VirtualMailManager/handler.py:58
+msgid "a relocated user"
+msgstr "sijoitettu käyttäjä"
+
+#: VirtualMailManager/handler.py:84
+msgid ""
+"You are not root.\n"
+"\tGood bye!\n"
+msgstr ""
+"Et ole root-käyttäjä.\n"
+"\tNäkemiin!\n"
+
+#: VirtualMailManager/handler.py:104
+#, python-format
+msgid "Could not find '%(cfg_file)s' in: '%(cfg_path)s'"
+msgstr "Ei voiru löytää ’%(cfg_file)s’ kohteessa: ’%(cfg_path)s’"
+
+#  Alla "perms" ja "file" ovat muuttujia, jotka korvautuvat suorituksen yhteydessä koodilla. Lainausmerkit jätettiin paikallistamatta, koska ne saattavat olla skriptin toiminnan kannalta kriittisiä.
+#: VirtualMailManager/handler.py:115
+#, python-format
+msgid ""
+"wrong permissions for '%(file)s': %(perms)s\n"
+"`chmod 0600 %(file)s` would be great."
+msgstr ""
+"korjaa käyttöoikeudet tiedostolle ’%(file)s’: %(perms)s\n"
+"’chmod 0600 %(file)s’ olisi erinomainen."
+
+#: VirtualMailManager/handler.py:135
+#, python-format
+msgid ""
+"'%(path)s' is not a directory.\n"
+"(%(cfg_file)s: section 'misc', option 'base_directory')"
+msgstr ""
+"’%(path)s’ ei ole hakemisto.\n"
+"(%(cfg_file)s: lohko ’misc’, valitsin ’base_directory’)"
+
+#: VirtualMailManager/handler.py:144
+#, python-format
+msgid ""
+"\n"
+"(%(cfg_file)s: section 'bin', option '%(option)s')"
+msgstr ""
+"\n"
+"(%(cfg_file)s: lohko ’bin’, valitsin ’%(option)s’)"
+
+#: VirtualMailManager/handler.py:158 VirtualMailManager/handler.py:165
+#, python-format
+msgid "Unable to import database module '%s'."
+msgstr "Ei kyetä tuomaan tietokantamoduulia ’%s’."
+
+#. TP: %(a_type)s will be one of: 'an account', 'an alias' or
+#. 'a relocated user'
+#: VirtualMailManager/handler.py:244
+#, python-format
+msgid "There is already %(a_type)s with the address '%(address)s'."
+msgstr "On jo %(a_type)s osoitteessa ’%(address)s’."
+
+#: VirtualMailManager/handler.py:297
+#, python-format
+msgid "'%s' is not a directory."
+msgstr "’%s’ ei ole hakemisto."
+
+#: VirtualMailManager/handler.py:300
+#, python-format
+msgid "The file/directory '%s' already exists."
+msgstr "Tiedosto/hakemisto ’%s’ on jo olemassa."
+
+#: VirtualMailManager/handler.py:329
+msgid "Skipped mailbox folders:"
+msgstr "Ohitettiin sähköpostilaatikkokansiot:"
+
+#: VirtualMailManager/handler.py:349
+#, python-format
+msgid "UID '%(uid)u' and/or GID '%(gid)u' are less than %(min_uid)u/%(min_gid)u."
+msgstr "Käyttäjätunniste ’%(uid)u’ ja/tai käyttäjätunniste ’%(gid)u’ ovat pienempiä kuin %(min_uid)u/%(min_gid)u."
+
+#: VirtualMailManager/handler.py:354 VirtualMailManager/handler.py:387
+#, python-format
+msgid "Found \"..\" in domain directory path: %s"
+msgstr "Löytyi ”..” verkkotunnuksen hakemistopolussa: %s"
+
+#: VirtualMailManager/handler.py:367
+msgid "Detected owner/group mismatch in home directory."
+msgstr "Havaittu omistaja-/ryhmätäsmäämättömyys kotihakemistossa."
+
+#: VirtualMailManager/handler.py:383
+#, python-format
+msgid "GID '%(gid)u' is less than '%(min_gid)u'."
+msgstr "Käyttäjätunniste ’%(gid)u’ on pienempi kuin ’%(min_gid)u’."
+
+#: VirtualMailManager/handler.py:394
+#, python-format
+msgid "Detected group mismatch in domain directory: %s"
+msgstr "Havaittu ryhmätäsmäämättömyys verkkotunnushakemistossa: %s"
+
+#: VirtualMailManager/handler.py:470 VirtualMailManager/handler.py:748
+#, python-format
+msgid "Unknown service: '%s'"
+msgstr "Tuntematon palvelu: ’%s’"
+
+#: VirtualMailManager/handler.py:587
+#, python-format
+msgid "The pattern '%s' contains invalid characters."
+msgstr "Säännöllinen lauseke ’%s’ sisältää virheellisiä merkkejä."
+
+#: VirtualMailManager/handler.py:614
+msgid "Ignored destination addresses:"
+msgstr "Ohitetut kohdeosoitteet:"
+
+#: VirtualMailManager/handler.py:619 VirtualMailManager/handler.py:769
+#, python-format
+msgid "The destination account/alias '%s' does not exist."
+msgstr "Kohdetili/-alias ’%s’ ei ole olemassa."
+
+#  Alla "directory" ja "reason" ovat muuttujia, jotka korvautuvat suorituksen yhteydessä koodilla.
+#: VirtualMailManager/handler.py:641
+#, python-format
+msgid ""
+"The account has been successfully deleted from the database.\n"
+"    But an error occurred while deleting the following directory:\n"
+"    '%(directory)s'\n"
+"    Reason: %(reason)s"
+msgstr ""
+"Tili on poistettu onnistuneesti tietokannasta.\n"
+"    Mutta tapahtui virhe, kun poistettiin seuraavaa hakemistoa:\n"
+"    ’%(directory)s’\n"
+"    Syy: %(reason)s"
+
+#: VirtualMailManager/handler.py:712
+#, python-format
+msgid "Could not accept name: '%s'"
+msgstr "Ei voitu hyväksyä nimeä: ’%s’"
+
+#: VirtualMailManager/handler.py:735
+#, python-format
+msgid "Could not accept transport: '%s'"
+msgstr "Ei voitu hyväksyä siirtoa: ’%s’"
+
+#: VirtualMailManager/handler.py:779 VirtualMailManager/relocated.py:98
+#: VirtualMailManager/relocated.py:105
+#, python-format
+msgid "The relocated user '%s' does not exist."
+msgstr "Sijoitettua käyttäjää ’%s’ ei ole olemassa."
+
+#: VirtualMailManager/mailbox.py:260
+#, python-format
+msgid "Failed to create mailboxes: %r\n"
+msgstr "Sähköpostilaatikoiden luominen epäonnistui: %r\n"
+
+#: VirtualMailManager/maillocation.py:74
+msgid "Empty directory name"
+msgstr "Tyhjä hakemistonimi"
+
+#: VirtualMailManager/maillocation.py:76
+#, python-format
+msgid "Directory name is too long: '%s'"
+msgstr "Verkkotunnusnimi on liian pitkä: ’%s’"
+
+#: VirtualMailManager/password.py:388
+#, python-format
+msgid "Unsupported password scheme: '%s'"
+msgstr "Tukematon salasanakaava: ’%s’"
+
+#: VirtualMailManager/password.py:391
+#, python-format
+msgid "The password scheme '%(scheme)s' requires Dovecot >= v%(version)s."
+msgstr "Salasanakaava '%(scheme)s' vaatii Dovecot >= v%(version)s."
+
+#: VirtualMailManager/password.py:397
+msgid "Encoding suffixes for password schemes require Dovecot >= v1.1.alpha1."
+msgstr "Koodausloppuliitteet salasanakaavoille vaativat Dovecot >= v1.1.alpha1."
+
+#: VirtualMailManager/password.py:400
+#, python-format
+msgid "Unsupported password encoding: '%s'"
+msgstr "Tukematon salasanakoodaus: ’%s’"
+
+#: VirtualMailManager/relocated.py:71
+msgid "Address and destination are identical."
+msgstr "Osoite ja kohde ovat identtisiä."
+
+#: VirtualMailManager/relocated.py:75
+#, python-format
+msgid "The relocated user '%s' already exists."
+msgstr "Sijoitettu käyttäjä ’%s’ on jo olemassa."
+
+#~ msgid "There is already a relocated user with the address “%s”."
+#~ msgstr "On jo sijoitettu käyttäjä osoitteella “%s”."
+
+#~ msgid "There is already an account with address “%s”."
+#~ msgstr "On jo olemassa tili osoitteella “%s”."
+
+#~ msgid "No destination address for alias denoted."
+#~ msgstr "Aliakselle ei ole osoitettu kohdeosoitetta."
+
+#  Alla "a" ja "d" ovat muuttujia, jotka korvautuvat suorituksen yhteydessä koodilla.
+#~ msgid "The alias “%(a)s” with destination “%(d)s” already exists."
+#~ msgstr "Alias “%(a)s” kohteella “%(d)s” on jo olemassa."
+
+#  Alla "a" ja "d" ovat muuttujia, jotka korvautuvat suorituksen yhteydessä koodilla.
+#~ msgid "The alias “%(a)s” with destination “%(d)s” doesn't exists."
+#~ msgstr "Alias “%(a)s” kohteella “%(d)s” ei ole olemassa."
+
+#~ msgid "missing options in section %s:\n"
+#~ msgstr "puuttuvia valitsimia lohkossa %s:\n"
+
+#~ msgid "There are accounts and aliases."
+#~ msgstr "On tilejä ja aliaksia."
+
+#~ msgid "There are accounts."
+#~ msgstr "Tilejä on."
+
+#~ msgid "There are aliases."
+#~ msgstr "Aliaksia on."
+
+#~ msgid "“%s” looks not like an e-mail address."
+#~ msgstr "“%s” ei näytä sähköpostiosoitteelta."
+
+#~ msgid "No localpart specified."
+#~ msgstr "Paikallisosaa ei ole määritelty."
+
+#~ msgid "Either mid or maillocation must be specified."
+#~ msgstr "Joko mid-tunniste tai sähköpostisijainti on määriteltävä."
+
+#~ msgid "mid must be an int/long."
+#~ msgstr "tunnisteen mid on oltava tyypiltään int/long."
+
+#~ msgid ""
+#~ "Invalid folder name “%s”, it may consist only of\n"
+#~ "1 - 20 single byte characters (A-Z, a-z, 0-9 and _)."
+#~ msgstr ""
+#~ "Virheellinen kansionimi “%s”, se voi sisältää vain\n"
+#~ "1 - 20 yhden tavun mittaisia merkkejä (A-Z, a-z, 0-9 ja _)."
+
+#~ msgid "Unknown mid specified."
+#~ msgstr "Tuntematon mid-määritelty."
+
+#~ msgid "No destination address for relocated user denoted."
+#~ msgstr "Sijoitetulle käyttäjälle ei ole osoitettu kohdeosoitetta."
+
+#~ msgid "tid must be an int/long."
+#~ msgstr "tunnisteen tid on oltava tyypiltään int/long."
+
+#~ msgid "Unknown tid specified."
+#~ msgstr "Tuntematon tid-siirtotunniste määritelty."
+
+#~ msgid "No “vmm.cfg” found in: /root:/usr/local/etc:/etc"
+#~ msgstr "Tiedostoa “vmm.cfg” ei löytynyt hakemistoista: /root:/usr/local/etc:/etc"
+
+#  Alla "options" on muuttuja, joka korvautuu suorituksen yhteydessä koodilla.
+#~ msgid ""
+#~ "“%(binary)s” doesn't exists.\n"
+#~ "(vmm.cfg: section \"bin\", option \"%(option)s\")"
+#~ msgstr ""
+#~ "“%(binary)s” ei ole olemassa.\n"
+#~ "(vmm.cfg: lohko ”bin”, valitsin ”%(option)s”)"
+
+#  Alla "options" on muuttuja, joka korvautuu suorituksen yhteydessä koodilla.
+#~ msgid ""
+#~ "“%(binary)s” is not executable.\n"
+#~ "(vmm.cfg: section \"bin\", option \"%(option)s\")"
+#~ msgstr ""
+#~ "“%(binary)s” ei ole suoritettava tiedosto.\n"
+#~ "(vmm.cfg: lohko ”bin”, valitsin ”%(option)s”)"
+
+#~ msgid "FATAL: \"..\" in domain directory path detected."
+#~ msgstr "VAKAVA VIRHE: havaittu ”..” verkkotunnushakemistopolkussa."
+
+#  Tässä on ilmeisesti kirjoitusvirhe (Configurtion -> Configuration).
+#~ msgid ""
+#~ "Configurtion error: \"%s\"\n"
+#~ "(in section \"connfig\", option \"done\") see also: vmm.cfg(5)\n"
+#~ msgstr ""
+#~ "Asetusvirhe: ”%s”\n"
+#~ "(lohkossa ”connfig”, valitsin ”done”) katso myös: vmm.cfg(5)\n"
+
+#~ msgid ""
+#~ "The keyword “detailed” is deprecated and will be removed in a future release.\n"
+#~ "   Please use the keyword “full” to get full details."
+#~ msgstr ""
+#~ "Avainsana “detailed” on vanhentunut ja poistetaan tulevassa julkaisussa.\n"
+#~ "   Saat kaikki yksityiskohdat käyttämällä avainsanaa “full”."
+
+#~ msgid "Account doesn't exists"
+#~ msgstr "Tiliä ei ole"
+
+#~ msgid ""
+#~ "The service name “managesieve” is deprecated and will be removed\n"
+#~ "   in a future release.\n"
+#~ "   Please use the service name “sieve” instead."
+#~ msgstr ""
+#~ "Palvelunimi “managesieve” on vanhentunut ja poistetaan\n"
+#~ "   tulevassa julkaisussa.\n"
+#~ "   Käytä sen sijaan palvelunimeä “sieve”."
+
+#~ msgid ""
+#~ "Usage: %s SUBCOMMAND OBJECT ARGS*\n"
+#~ "  short long\n"
+#~ "  subcommand               object             args (* = optional)\n"
+#~ msgstr ""
+#~ "Käyttö: %s ALIKOMENTO OBJEKTI ARGUMENTIT*\n"
+#~ "  lyhyt pitkä\n"
+#~ "  alikomento               objekti             argumentti (* = valinnainen)\n"
+
+#~ msgid "Available"
+#~ msgstr "Käytettävissä"
+
+#~ msgid "Available domains"
+#~ msgstr "Käytettävissä olevat verkkotunnukset"

@@ -7,10 +7,7 @@ LANG=C
 PATH=/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 PREFIX=/usr/local
 
-PF_CONFDIR=$(postconf -h config_directory)
-PF_GID=$(id -g $(postconf -h mail_owner))
-POSTCONF=$(which postconf)
-DOVECOT_VERS=$(dovecot --version | awk -F . '{print $1 $2}')
+DOVECOT_VERS=$(dovecot --version | awk '{print $1}')
 LOCALE_DIR=${PREFIX}/share/locale
 DOC_DIR=${PREFIX}/share/doc/vmm
 if [ ${PREFIX} = "/usr" ]; then
@@ -18,10 +15,9 @@ if [ ${PREFIX} = "/usr" ]; then
 else
     MANDIR=${PREFIX}/man
 fi
-DOCS="ChangeLog COPYING NEWS INSTALL README"
+DOCS="ChangeLog Configure.Dovecot_2 COPYING INSTALL NEWS README"
 
 INSTALL_OPTS="-g 0 -o 0 -p"
-INSTALL_OPTS_CF="-b -m 0640 -g ${PF_GID} -o 0 -p"
 
 if [ $(id -u) -ne 0 ]; then
     echo "Run this script as root."
@@ -29,7 +25,7 @@ if [ $(id -u) -ne 0 ]; then
 fi
 
 # update config file before installing the new files.
-./update_config_0.4.x-0.5.py ${POSTCONF} ${DOVECOT_VERS:-10}
+./update_config.py ${DOVECOT_VERS:-'1.2.11'}
 rv=$?
 if [ $rv -eq 2 ]; then
 	echo "please run the install.sh script"
@@ -38,12 +34,18 @@ elif [ $rv -eq 3 ]; then
     echo "please read the upgrade instructions at http://vmm.localdomain.org/"
     exit 1
 elif [ $rv -ne 0 ]; then
-    echo "Sorry, something went wrong. Please file a bug:"
-    echo "https://sourceforge.net/tracker/?group_id=213727"
+    echo "Sorry, something went wrong. Please file a bug at:"
+    echo "https://bitbucket.org/pvo/vmm/issues"
     exit 1
 fi
 
-python setup.py -q install --prefix ${PREFIX}
+# remove old CamelCase files
+if [ -f /tmp/vmm_inst_dir ] ; then
+    rm -rf `cat /tmp/vmm_inst_dir`
+    rm -f /tmp/vmm_inst_dir
+fi
+
+python setup.py -q install --force --prefix ${PREFIX}
 python setup.py clean --all >/dev/null
 
 install -m 0700 ${INSTALL_OPTS} vmm ${PREFIX}/sbin
@@ -58,14 +60,6 @@ for po in $(ls -1 *.po); do
 done
 cd - >/dev/null
 
-# remove misplaced manual pages
-if [ -f /usr/local/share/man/man1/vmm.1 ]; then
-    rm -f /usr/local/share/man/man1/vmm.1
-fi
-if [ -f /usr/local/share/man/man5/vmm.cfg.5 ]; then
-    rm -f /usr/local/share/man/man5/vmm.cfg.5
-fi
-
 # install manual pages
 cd man
 [ -d ${MANDIR}/man1 ] || mkdir -m 0755 -p ${MANDIR}/man1
@@ -74,7 +68,7 @@ install -m 0644 ${INSTALL_OPTS} man1/vmm.1 ${MANDIR}/man1
 [ -d ${MANDIR}/man5 ] || mkdir -m 0755 -p ${MANDIR}/man5
 install -m 0644 ${INSTALL_OPTS} man5/vmm.cfg.5 ${MANDIR}/man5
 
-for l in $(find . -maxdepth 1 -mindepth 1 -type d \! -name man\? \! -name .svn)
+for l in $(find . -maxdepth 1 -mindepth 1 -type d \! -name man\?)
 do
     for s in man1 man5; do
         [ -d ${MANDIR}/${l}/${s} ] || mkdir -m 0755 -p ${MANDIR}/${l}/${s}

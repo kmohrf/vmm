@@ -16,7 +16,7 @@ if [ ${PREFIX} = "/usr" ]; then
 else
     MANDIR=${PREFIX}/man
 fi
-DOCS="ChangeLog COPYING INSTALL README"
+DOCS="ChangeLog Configure.Dovecot_2 COPYING INSTALL NEWS README"
 
 INSTALL_OPTS="-g 0 -o 0 -p"
 INSTALL_OPTS_CF="-b -m 0640 -g ${PF_GID} -o 0 -p"
@@ -26,7 +26,7 @@ if [ $(id -u) -ne 0 ]; then
     exit 1
 fi
 
-python setup.py -q install --prefix ${PREFIX}
+python setup.py -q install --force --prefix ${PREFIX}
 python setup.py clean --all >/dev/null
 
 install -b -m 0600 ${INSTALL_OPTS} vmm.cfg ${PREFIX}/etc/
@@ -50,7 +50,7 @@ install -m 0644 ${INSTALL_OPTS} man1/vmm.1 ${MANDIR}/man1
 [ -d ${MANDIR}/man5 ] || mkdir -m 0755 -p ${MANDIR}/man5
 install -m 0644 ${INSTALL_OPTS} man5/vmm.cfg.5 ${MANDIR}/man5
 
-for l in $(find . -maxdepth 1 -mindepth 1 -type d \! -name man\? \! -name .svn)
+for l in $(find . -maxdepth 1 -mindepth 1 -type d \! -name man\?)
 do
     for s in man1 man5; do
         [ -d ${MANDIR}/${l}/${s} ] || mkdir -m 0755 -p ${MANDIR}/${l}/${s}

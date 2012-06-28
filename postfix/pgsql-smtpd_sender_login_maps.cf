@@ -15,4 +15,4 @@ dbname = mailsys
 # 	* line 26: function postfix_smtpd_sender_login_map + comment above
 #
 # The SQL query template used to search the database
-#query = SELECT login FROM postfix_smtpd_sender_login_map('%u', '%d')
+query = SELECT login FROM postfix_smtpd_sender_login_map('%u', '%d')

@@ -5,3 +5,12 @@ syntax: glob
 *.py?
 .*.swp
 .swp
+doc/build
+build
+debian/vmm
+debian/*.log
+debian/*.debhelper
+debian/files
+debian/*substvars
+.pc
+*.egg-info

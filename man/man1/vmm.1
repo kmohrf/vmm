@@ -1,423 +1,977 @@
-.TH "VMM" "1" "17 Aug 2009" "Pascal Volk"
+.TH "VMM" "1" "2012-04-15" "vmm 0.6" "vmm"
 .SH NAME
 vmm \- command line tool to manage email domains/accounts/aliases
+.\" -----------------------------------------------------------------------
 .SH SYNOPSIS
 .B vmm
-\fIsubcommand\fP \fIobject\fP [ \fIargs\fP ]
+.IR subcommand " [" "argument ..." ]
+.\" -----------------------------------------------------------------------
 .SH DESCRIPTION
-\fBvmm\fP (Virtual Mail Manager) is a command line tool for
-administrators/postmasters to manage domains, accounts and aliases. It's
-designed for Dovecot and Postfix with a PostgreSQL backend.
-.SH SUBCOMMANDS
-Each subcommand has both a long and a short form. Both forms are case sensitive.
-.SS GENERAL SUBCOMMANDS
+.B vmm
+(a virtual mail manager) is the easy to use command line tool for
+administrators and postmasters to manage (alias) domains, accounts, aliases
+and relocated users.
+It allows you to simply and quickly administer your mail server.
+.br
+It's designed for Dovecot and Postfix with a PostgreSQL backend.
+.PP
+Each
+.I subcommand
+has both a long and a short form.
+The short form is shown enclosed in parentheses.
+Both forms are case sensitive.
+.PP
+Most of the
+.IR subcommand s
+take one or more
+.IR argument s.
+.\" -----------------------------------------------------------------------
+.SH ARGUMENTS
+.TP 12
+.I address
+The complete e\-mail address
+.RI ( local\-part @ fqdn )
+of an user account, alias address or relocated user.
+.\" --------------------------
 .TP
-\fBconfigure\fP (\fBcf\fP) [ \fIsection\fP ]
+.I destination
+Is either an e\-mail
+.I address
+when used with
+.IR "ALIAS SUBCOMMANDS" .
+Or a
+.I fqdn
+when used with
+.IR "ALIASDOMAIN SUBCOMMANDS" .
+.\" --------------------------
+.TP
+.I fqdn
+The fully qualified domain name \- without the trailing dot \- of a domain
+or alias domain.
+.\" --------------------------
+.TP
+.I messages
+An integer value which specifies a quota limit in number of messages.
+.B 0
+(zero) means unlimited \- no quota limit for the number of messages.
+.\" --------------------------
+.TP
+.I option
+is the name of a configuration option, prefixed with the section name and a
+dot.
+For example:
+.IB misc . transport
+.br
+All configuration options are described in
+.BR vmm.cfg (5).
+.\" --------------------------
+.TP
+.I service
+The name of a service, commonly used with Dovecot.
+Supported services are:
+.BR imap ", " pop3 ", " sieve " and " smtp .
+.\" --------------------------
+.TP
+.I storage
+Specifies a quota limit in bytes.
+One of the following prefixes can be appended to the integer value:
+.BR b " (bytes), " k " (kilobytes), " M " (megabytes) or " G
+(gigabytes).
+.B 0
+(zero) means unlimited \- no quota limit in bytes.
+.\" --------------------------
+.TP
+.I transport
+A transport for Postfix, written as:
+.IB transport :
+or
+.IB transport :\c
+.IR nexthop .
+See
+.BR transport (5)
+for more details.
+.\" -----------------------------------------------------------------------
+.SH GENERAL SUBCOMMANDS
+.SS configget (cg)
+.BI "vmm configget" " option"
+.PP
+This subcommand is used to display the actual value of the given
+configuration
+.IR option .
+.PP
+Example:
+.PP
+.nf
+.B vmm configget misc.crypt_sha512_rounds
+misc.crypt_sha512_rounds = 5000
+.fi
+.\" ------------------------------------
+.SS configset (cs)
+.B vmm configset
+.I option value
+.PP
+Use this subcommand to set or update a single configuration option's value.
+.I option
+is the configuration option,
+.I value
+is the
+.IR option 's
+new value.
+.IP Note:
+This subcommand will create a new
+.I vmm.cfg
+without any comments.
+Your current configuration file will be backed as
+.IR vmm.cfg.bak .
+.PP
+Example:
+.PP
+.nf
+.B vmm configget domain.transport
+domain.transport = dovecot:
+.B vmm configset domain.transport lmtp:unix:private/dovecot\-lmtp
+.B vmm cg domain.transport
+domain.transport = lmtp:unix:private/dovecot\-lmtp
+.fi
+.\" ------------------------------------
+.SS configure (cf)
+.B vmm configure
+.RI [ section ]
+.PP
 Starts the interactive configuration for all configuration sections.
-.br
-If the optional argument \fIsection\fP is given, only the configuration options
-from the given section will be displayed and will be configurable. The following
-sections are available:
+.PP
+In this process the currently set value of each option will be displayed in
+square brackets.
+If no value is configured, the default value of each option will be
+displayed in square brackets.
+Press the return key, to accept the displayed value.
+.PP
+If the optional argument
+.I section
+is given, only the configuration options from the given section will be
+displayed and will be configurable.
+The following sections are available:
 .RS
-.PD 0
+.TP 10
+.B account
+Account settings
 .TP
--
-.B
-database
+.B bin
+Paths to external binaries
 .TP
--
-.B
-maildir
+.B database
+Database settings
 .TP
--
-.B
-services
+.B domain
+Domain settings
 .TP
--
-.B
-domdir
+.B mailbox
+Mailbox settings
 .TP
--
-.B
-bin
-.TP
--
-.B
-misc
-.PD
+.B misc
+Miscellaneous settings
 .RE
-.LP
+.PP
+All configuration options are described in
+.BR vmm.cfg (5).
+.IP Note:
+This subcommand will create a new
+.I vmm.cfg
+without any comments.
+Your current configuration file will be backed as
+.IR vmm.cfg.bak .
+.PP
+Example:
 .PP
 .nf
-        Example:
+.B vmm configure mailbox
+Using configuration file: /usr/local/etc/vmm.cfg
 
-        \fBvmm configure services\fP
-        Using configuration file: /usr/local/etc/vmm.cfg
-
-        * Config section: “services”
-        Enter new value for option pop3 [True]: 
-        Enter new value for option smtp [True]: 
-        Enter new value for option imap [True]: 
-        Enter new value for option sieve [True]: false
+* Configuration section: `mailbox'
+Enter new value for option folders [Drafts:Sent:Templates:Trash]:
+Enter new value for option format [maildir]: mdbox
+Enter new value for option subscribe [True]:
+Enter new value for option root [Maildir]: mdbox
 .fi
+.\" ------------------------------------
+.SS getuser (gu)
+.BI "vmm getuser" " uid"
 .PP
-.TP
-\fBgetuser\fP (\fBgu\fP) \fIuserid\fP
-If only the userid is available, for example from process list, the subcommand
-\fBgetuser\fP will show the user's address.
+If only the
+.I uid
+is available, for example from process list, the subcommand
+.B getuser
+will show the user's address.
+.PP
+Example:
 .PP
 .nf
-        Example:
-
-        \fBvmm getuser 70004\fP
-        Account information
-        -------------------
-                UID............: 70004
-                GID............: 70000
-                Address........: c.user@example.com
+.B vmm getuser 79876
+Account information
+-------------------
+        UID............: 79876
+        GID............: 70704
+        Address........: a.user@example.com
 .fi
-.\"
-.TP
-\fBlistdomains\fP (\fBld\fP) [ \fIpattern\fP ]
-This subcommand lists all available domains. All domain names will be prefixed
-either with '[+]', if the domain is a primary domain, or with '[-]', if it is
-an alias domain name. The output can be limited with an optional \fIpattern\fP.
+.\" ------------------------------------
+.SS help (h)
+.B vmm help
+.RI [ subcommand ]
+.PP
+Prints a list of available subcommands with a short description to stdout.
+When a
+.I subcommand
+was given, help for that
+.I subcommand
+will be displayed.
+After this
+.B vmm
+exits.
+.\" ------------------------------------
+.SS listdomains (ld)
+.B vmm listdomains
+.RI [ pattern ]
+.PP
+This subcommand lists all available domains.
+All domain names will be prefixed either with `[+]', if the domain is a
+primary domain, or with `[-]', if it is an alias domain name.
+The output can be limited with an optional
+.IR pattern .
+.PP
+To perform a wild card search, the % character can be used at the start
+and/or the end of the
+.IR pattern .
+.PP
+Example:
+.PP
+.nf
+.B vmm listdomains %example%
+Matching domains
+----------------
+        [+] example.com
+        [\-]     e.g.example.com
+        [\-]     example.name
+        [+] example.net
+        [+] example.org
+.fi
+.\" ------------------------------------
+.SS listpwschemes (lp)
+.B vmm listpwschemes
+.PP
+This subcommand lists all password schemes which could be used in the
+.I vmm.cfg
+as value of the
+.I misc.password_scheme
+option.
+The output varies, depending on the used Dovecot version and the system's
+libc.
 .br
-To perform a wild card search, the % character can be used at the start and/or
-the end of the \fIpattern\fP.
+When your Dovecot installation isn't too old, you will see additionally a
+few usable encoding suffixes.
+One of them can be appended to the password scheme.
+.PP
+Example:
 .PP
 .nf
-        Example:
+.B vmm listpwschemes
+Usable password schemes
+-----------------------
+        CRYPT SHA512-CRYPT LDAP-MD5 DIGEST-MD5 SHA256 SHA512 SSHA512
+        SKEY SSHA NTLM RPA MD5-CRYPT HMAC-MD5 SHA1 PLAIN SHA CRAM-MD5
+        SSHA256 MD5 LANMAN CLEARTEXT PLAIN-MD5 PLAIN-MD4 OTP SMD5
+        SHA256-CRYPT
 
-        \fBvmm listdomains %example%\fP
-        Matching domains
-        ----------------
-                [+] example.com
-                [-]     e.g.example.com
-                [-]     example.name
-                [+] example.net
-                [+] example.org
+Usable encoding suffixes
+------------------------
+        .B64 .BASE64 .HEX
 .fi
-.\"
-.TP
-\fBhelp\fP (\fBh\fP)
-Prints all available commands to stdout. After this \fBvmm\fP exits.
-.TP
-\fBversion\fP (\fBv\fP)
-Prints the version information from \fBvmm\fP.
-.\"
-.SS DOMAIN SUBCOMMANDS
-.TP
-\fBdomainadd\fP (\fBda\fP) \fIdomain\fP [ \fItransport\fP ]
-Adds the new \fIdomain\fP into the database.
-.br
-If the optional argument \fItransport\fP is given, it will overwrite the
-default transport from \fBvmm.cfg\fP (misc/transport). The specified transport
+.\" ------------------------------------
+.SS version (v)
+.B vmm version
+.PP
+Prints
+.BR vmm 's
+version and copyright information to stdout.
+After this
+.B vmm
+exits.
+.\" -----------------------------------------------------------------------
+.SH DOMAIN SUBCOMMANDS
+.SS domainadd (da)
+.B vmm domainadd
+.IR fqdn " [" transport ]
+.PP
+Adds the new domain into the database and creates the domain directory.
+.PP
+If the optional argument
+.I transport
+is given, it will override the default transport
+.RI ( domain.transport ") from " vmm.cfg .
+The specified
+.I transport
 will be the default transport for all new accounts in this domain.
 .PP
-.nf
-        Examples:
-
-        \fBvmm domainadd support.example.com smtp:mx1.example.com
-        vmm domainadd sales.example.com\fP
-.fi
-.TP
-\fBdomaininfo\fP (\fBdi\fP) \fIdomain\fP [ \fIdetails\fP ]
-This subcommand shows some information about the given \fIdomain\fP.
-.br
-For a more detailed information about the \fIdomain\fP the optional argument
-\fIdetails\fP can be specified. A possible \fIdetails\fP value may be one of
-the following five keywords:
+Configuration\-related behavior:
 .RS
-.PD 0
 .TP
+.I domain.auto_postmaster
+When that option is set to
+.BR true " (default) " vmm
+will automatically create the postmaster account for the new domain and
+prompt for
+.BI postmaster@ fqdn\c
+\(aqs password.
+.TP
+.I account.random_password
+When the value of that option is also set to
+.BR true ", " vmm
+will automatically create the postmaster account for the new domain and
+print the generated postmaster password to stdout.
+.RE
+.PP
+Examples:
+.PP
+.nf
+.B vmm domainadd support.example.com smtp:[mx1.example.com]:2025
+Creating account for postmaster@support.example.com
+Enter new password:
+Retype new password:
+.B vmm cs account.random_password true
+.B vmm domainadd sales.example.com
+Creating account for postmaster@sales.example.com
+Generated password: pLJUQ6Xg_z
+.fi
+.\" ------------------------------------
+.SS domaindelete (dd)
+.BI "vmm domaindelete " fqdn
+.RB [ force ]
+.PP
+This subcommand deletes the domain specified by
+.IR fqdn .
+.PP
+If there are accounts, aliases and/or relocated users assigned to the given
+domain,
+.B vmm
+will abort the requested operation and show an error message.
+If you know, what you are doing, you can specify the optional keyword
+.BR force .
+.PP
+If you really always know what you are doing, edit your
+.I vmm.cfg
+and set the option
+.I domain.force_deletion
+to
+.BR true .
+.\" ------------------------------------
+.SS domaininfo (di)
+.B vmm domaininfo
+.IR fqdn \ [ details ]
+.PP
+This subcommand shows some information about the given domain.
+.PP
+For a more detailed information about the domain the optional argument
+.I details
+can be specified.
+A possible
+.I details
+value can be one of the following five keywords:
+.RS
+.TP 14
 .B accounts
-to list all existing accounts
+to list the e\-mail addresses of all existing user accounts
 .TP
 .B aliasdomains
-to list all assigned alias domains
+to list all assigned alias domain names
 .TP
 .B aliases
-to list all available aliases addresses
+to list all available alias e\-mail addresses
 .TP
 .B relocated
-to list all relocated users
+to list the e\-mail addresses of all relocated users
+.TP
+.B catchall
+to list all catch\-all destinations
 .TP
 .B full
 to list all information mentioned above
-.PD
 .RE
-.LP
+.PP
+Example:
+.PP
 .nf
-        Example:
-
-        \fBvmm domaininfo sales.example.com\fP
-        Domain information
-        ------------------
-                Domainname.....: sales.example.com
-                GID............: 70002
-                Transport......: dovecot:
-                Domaindir......: /home/mail/5/70002
-                Aliasdomains...: 0
-                Accounts.......: 0
-                Aliases........: 0
-                Relocated......: 0
-
+.B vmm domaininfo sales.example.com
+Domain information
+------------------
+        Domain Name......: sales.example.com
+        GID..............: 70708
+        Domain Directory.: /srv/mail/c/70708
+        Quota Limit/User.: Storage: 500.00 MiB; Messages: 10,000
+        Active Services..: IMAP SIEVE
+        Transport........: lmtp:unix:private/dovecot-lmtp
+        Alias Domains....: 0
+        Accounts.........: 1
+        Aliases..........: 0
+        Relocated........: 0
+        Catch-All Dests..: 1
 .fi
-.TP
-\fBdomaintransport\fP (\fBdt\fP) \fIdomain\fP \fItransport\fP [ \fIforce\fP ]
+.\" ------------------------------------
+.SS domainquota (dq)
+.B vmm domainquota
+.IR "fqdn storage" " [" messages ]
+.RB [ force ]
+.PP
+This subcommand is used to configure a new quota limit for the accounts of
+the domain - not for the domain itself.
+.PP
+The default quota limit for accounts is defined in the
+.IR vmm.cfg " (" domain.quota_bytes " and " domain.quota_messages ).
+.PP
+The new quota limit will affect only those accounts for which the limit
+has not been overridden. If you want to restore the default to all accounts,
+you may pass the keyword
+.BR force .
+.br
+When the argument
+.I messages
+was omitted the default number of messages
+.B 0
+(zero) will be applied.
+.PP
+Example:
+.PP
+.nf
+.B vmm domainquota example.com 1g force
+.fi
+.\" ------------------------------------
+.SS domainservices (ds)
+.B vmm domainservices
+.IR fqdn " [" "service ..." ]
+.RB [ force ]
+.PP
+To define which services could be used by the users of the domain \(em with
+the given
+.I fqdn
+\(em use this subcommand.
+.PP
+Each specified
+.I service
+will be enabled/usable.
+All other services will be deactivated/unusable.
+Possible service names are: 
+.BR  imap ", " pop3 ", " sieve " and " smtp .
+.br
+The new service set will affect only those accounts for which the set has not
+been overridden. If you want to restore the default to all accounts, you may
+pass the keyword
+.BR force .
+.\" ------------------------------------
+.SS domaintransport (dt)
+.BI "vmm domaintransport" " fqdn transport"
+.RB [ force ]
+.PP
 A new transport for the indicated domain can be set with this subcommand.
+.PP
+The new transport will affect only those accounts for which the transport has
+not been overridden. If you want to restore the default to all accounts, you
+may pass the keyword
+.BR force .
+.PP
+Example:
+.PP
+.nf
+.B vmm domaintransport support.example.com dovecot:
+.fi
+.\" ------------------------------------
+.SS domainnote (do)
+.BI "vmm domainnote" " fqdn"
+.RI [ note ]
+.PP
+With this subcommand, it is possible to attach a note to the specified
+domain. Without an argument, an existing note is removed.
+.PP
+Example:
+.PP
+.nf
+.B vmm do example.com Belongs to Robert
+.fi
+.\" -----------------------------------------------------------------------
+.SH ALIAS DOMAIN SUBCOMMANDS
+An alias domain is an alias for a domain that was previously added with the
+subcommand
+.BR domainadd .
+All accounts, aliases and relocated users from the domain will be also
+available in the alias domain.
 .br
-If the additional keyword '\fBforce\fP' is given all account specific transport
-settings will be overwritten.
+In the following is to be assumed that example.net is an alias for
+example.com.
+.PP
+Postfix will not accept erroneously e\-mails for unknown.user@example.net
+and bounce them back later to the mostly faked sender.
+Postfix will immediately reject all e\-mails addressed to nonexistent
+users.
 .br
-Otherwise this setting will affect only new created accounts.
+This behavior is ensured as long as you use the recommended database
+queries in your
+.I $config_directory/pgsql\-*.cf
+configuration files.
+.\" ------------------------------------
+.SS aliasdomainadd (ada)
+.BI "vmm aliasdomainadd" " fqdn destination"
+.PP
+This subcommand adds the new alias domain
+.RI ( fqdn )
+to the
+.I destination
+domain that should be aliased.
+.PP
+Example:
 .PP
 .nf
-        Example:
-
-        \fBvmm domaintransport support.example.com dovecot:\fP
+.B vmm aliasdomainadd example.net example.com
 .fi
-.TP
-\fBdomaindelete\fP (\fBdd\fP) \fIdomain\fP [ \fIdelalias\fP | \fIdeluser\fP | \fIdelall\fP ]
-This subcommand deletes the specified \fIdomain\fP.
-.br
-If there are accounts and/or aliases assigned to the given domain, \fBvmm\fP
-will abort the requested operation and show an error message. If you know, what
-you are doing, you can specify one of the following keywords: '\fBdelalias\fP', '\fBdeluser\fP' or '\fBdelall\fP'.
-.br
-
-If you really always know what you are doing, edit your \fBvmm.cfg\fP and set
-the option \fIforcedel\fP, in section \fImisc\fP, to true.
-.\"
-.SS ALIAS DOMAIN SUBCOMMANDS
-.TP
-\fBaliasdomainaddd\fP (\fBada\fP) \fIaliasdomain\fP \fItargetdomain\fP
-This subcommand adds the new \fIaliasdomain\fP to the \fItargetdomain\fP that
-should be aliased.
+.\" ------------------------------------
+.SS aliasdomaindelete (add)
+.BI "vmm aliasdomaindelete" " fqdn"
+.PP
+Use this subcommand if the alias domain
+.I fqdn
+should be removed.
+.PP
+Example:
 .PP
 .nf
-        Example:
-
-        \fBvmm aliasdomainadd example.name example.com\fP
+.B vmm aliasdomaindelete e.g.example.com
 .fi
-.TP
-\fBaliasdomaininfo (\fBadi\fP) \fIaliasdomain\fP
-This subcommand shows to which domain the \fIaliasdomain\fP is assigned to.
+.\" ------------------------------------
+.SS aliasdomaininfo (adi)
+.BI "vmm aliasdomaininfo" " fqdn"
+.PP
+This subcommand shows to which domain the alias domain
+.I fqdn
+is assigned to.
+.PP
+Example:
 .PP
 .nf
-        Example:
-
-        \fBvmm aliasdomaininfo example.name\fP
-        Alias domain information
-        ------------------------
-                The alias domain example.name belongs to:
-                    * example.com
+.B vmm adi example.net
+Alias domain information
+------------------------
+        The alias domain example.net belongs to:
+            * example.com
 .fi
-.TP
-\fBaliasdomainswitch\fP (\fBads\fP) \fIaliasdomain\fP \fItargetdomain\fP
-If the target of the existing \fIaliasdomain\fP should be switched to another
-\fItargetdomain\fP use this subcommand.
+.\" ------------------------------------
+.SS aliasdomainswitch (ads)
+.BI "vmm aliasdomainswitch" " fqdn destination"
+.PP
+If the destination of the existing alias domain
+.I fqdn
+should be switched to another
+.I destination
+use this subcommand.
+.nf
+.PP
+Example:
+.PP
+.B vmm aliasdomainswitch example.name example.org
+.fi
+.\" -----------------------------------------------------------------------
+.SH ACCOUNT SUBCOMMANDS
+.SS useradd (ua)
+.B vmm useradd
+.IR address " [" password ]
+.PP
+Use this subcommand to create a new e\-mail account for the given
+.IR address .
+.PP
+If the
+.I password
+is not provided,
+.B vmm
+will prompt for it interactively.
+When no
+.I password
+is provided and
+.I account.random_password
+is set to
+.BR true ", " vmm
+will generate a random password and print it to stdout after the account
+has been created.
+.PP
+Examples:
 .PP
 .nf
-        Example:
-
-        \fBvmm aliasdomainswitch example.name example.org\fP
+.B vmm ua d.user@example.com \(dqA 5ecR3t P4s5\(rs/\(rs/0rd\(dq
+.B vmm useradd e.user@example.com
+Enter new password:
+Retype new password:
 .fi
-.TP
-\fBaliasdomaindelete\fP (\fBadd\fP) \fIaliasdomain\fP
-Use this subcommand if the alias domain \fIaliasdomain\fP should be removed.
+.\" ------------------------------------
+.SS userdelete (ud)
+.BI "vmm userdelete" " address"
+.RB [ force ]
 .PP
-.nf
-        Example:
-
-        \fBvmm aliasdomaindelete e.g.example.com\fP
-.fi
-.\"
-.SS ACCOUNT SUBCOMMANDS
-.TP
-\fBuseradd\fP (\fBua\fP) \fIaddress\fP [ \fIpassword\fP ]
-Use this subcommand to create a new email account for the given \fIaddress\fP.
-.br
-If the \fIpassword\fP is not provided, \fBvmm\fP will prompt for it
-interactively.
+Use this subcommand to delete the account with the given
+.IR address .
 .PP
-.nf
-        Examples:
-
-        \fBvmm ua d.user@example.com 'A 5ecR3t P4s5\\/\\/0rd'\fP
-        \fBvmm ua e.user@example.com\fP
-        Enter new password:
-        Retype new password:
-.fi
-.TP
-\fBuserinfo\fP (\fBui\fP) \fIaddress\fP [ \fIdetails\fP ]
+If there are one or more aliases with an identical destination address,
+.B vmm
+will abort the requested operation and show an error message.
+To prevent this, specify the optional keyword
+.BR force .
+.\" ------------------------------------
+.SS userinfo (ui)
+.B "vmm userinfo"
+.IR address " [" details ]
+.PP
 This subcommand displays some information about the account specified by
-\fIaddress\fP.
-.br
-If the optional argument \fIdetails\fP is given some more information will be
-displayed.
-.br
-Possible values for \fIdetails\fP are:
+.IR address .
+.PP
+If the optional argument
+.I details
+is given some more information will be displayed.
+Possible values for
+.I details
+are:
 .RS
-.PD 0
-.TP 
+.TP 8
 .B aliases
-to list all alias addresses with the destination \fIaddress\fP
+to list all alias addresses with the destination
+.I address
 .TP
 .B du
-to display the disk usage of users maildir
+to display the disk usage of the user's mail directory.
+In order to summarize the disk usage each time the this subcommand is
+executed automatically, set
+.I account.disk_usage
+in your
+.I vmm.cfg
+to
+.BR true .
 .TP
 .B full
 to list all information mentioned above
-.PD
 .RE
-.LP
-.TP
-\fBusername\fP (\fBun\fP) \fIaddress\fP \fI'Users Name'\fP
-The user's real name can be set/updated with this subcommand.
+.PP
+Example:
 .PP
 .nf
-        Example:
-
-        \fBvmm un d.user@example.com 'John Doe'\fP
+.B vmm ui d.user@example.com
+Account information
+-------------------
+        Address..........: d.user@example.com
+        Name.............: None
+        UID..............: 79881
+        GID..............: 70704
+        Home.............: /srv/mail/2/70704/79881
+        Mail_Location....: mdbox:~/mdbox
+        Quota Storage....: [  0.00%] 0/500.00 MiB
+        Quota Messages...: [  0.00%] 0/10,000
+        Transport........: lmtp:unix:private/dovecot-lmtp
+        SMTP.............: disabled
+        POP3.............: disabled
+        IMAP.............: enabled
+        SIEVE............: enabled
 .fi
-.TP
-\fBuserpassword\fP (\fBup\fP) \fIaddress\fP [ \fIpassword\fP ]
-The \fIpassword\fP from an account can be updated with this subcommand.
+.\" ------------------------------------
+.SS username (un)
+.BI "vmm username" " address"
+.RI [ name ]
+.PP
+The user's real
+.I name
+can be set/updated with this subcommand.
+.PP
+If no
+.I name
+is given, the value stored for the account is erased.
+.PP
+Example:
+.PP
+.nf
+.B vmm un d.user@example.com \(dqJohn Doe\(dq
+.fi
+.\" ------------------------------------
+.SS userpassword (up)
+.BI "vmm userpassword" " address"
+.RI [ password ]
+.PP
+The password of an account can be updated with this subcommand.
+.PP
+If no
+.I password
+was provided,
+.B vmm
+will prompt for it interactively.
+.PP
+Example:
+.PP
+.nf
+.B vmm up d.user@example.com \(dqA |\(rs/|0r3 5ecur3 P4s5\(rs/\(rs/0rd?\(dq
+.fi
+.\" ------------------------------------
+.SS usernote (uo)
+.BI "vmm usernote" " address"
+.RI [ note ]
+.PP
+With this subcommand, it is possible to attach a note to the specified
+account. Without an argument, an existing note is removed.
+.PP
+Example:
+.PP
+.nf
+.B vmm uo d.user@example.com Only needed until end of May 2012
+.fi
+.\" ------------------------------------
+.SS userquota (uq)
+.BI "vmm userquota" " address storage"
+.RI [ messages ]
+.PP
+This subcommand is used to set a new quota limit for the given account.
+.PP
+When the argument
+.I messages
+was omitted the default number of messages
+.B 0
+(zero) will be applied.
+.PP
+Instead of
+.I transport
+pass 'domain' to remove the account\-specific override, causing the
+domain's value to be in effect.
+.PP
+Example:
+.PP
+.nf
+.B vmm userquota d.user@example.com 750m
+.fi
+.\" ------------------------------------
+.SS userservices (us)
+.B vmm userservices
+.IR address " [" "service ..." ]
+.PP
+To grant a user access to the specified services, use this command.
+.PP
+All omitted services will be deactivated/unusable for the user with the
+given
+.IR address .
+.PP
+Instead of
+.I transport
+pass 'domain' to remove the account\-specific override, causing the
+domain's value to be in effect.
+.PP
+Example:
+.PP\
+.nf
+.B vmm userservices d.user@example.com SMTP IMAP
+.\" ------------------------------------
+.SS usertransport (ut)
+.BI "vmm usertransport" " address transport"
+.PP
+A different
+.I transport
+for an account can be specified with this subcommand.
+.PP
+Instead of
+.I transport
+pass 'domain' to remove the account\-specific override, causing the
+domain's value to be in effect.
+.PP
+Example:
 .br
-If the \fIpassword\fP is not provided, \fBvmm\fP will prompt for it
-interactively.
+Assumed you want to use Dovecot's
+.BR dsync (1)
+to convert a user's mailbox from Maildir format to mdbox format, you
+can tell Postfix to retry later.
 .PP
 .nf
-        Example:
-
-        \fBvmm up d.user@example.com 'A |\\/|0r3 5ecur3 P4s5\\/\\/0rd?'\fP
+.B vmm ut d.user@example.com \(dqretry:4.0.0 Mailbox being migrated\(dq
+# convert the mailbox ... then set the transport to Dovecot's lmtp
+.B vmm ut d.user@example.com lmtp:unix:private/dovecot\-lmtp
 .fi
-.TP
-\fBusertransport\fP (\fBut\fP) \fIaddress\fP \fItransport\fP
-A different transport for an account can be specified with this subcommand.
+.\" -----------------------------------------------------------------------
+.SH ALIAS SUBCOMMANDS
+.SS aliasadd (aa)
+.BI "vmm aliasadd" " address destination ..."
+.PP
+This subcommand is used to create a new alias
+.I address
+with one or more
+.I destination
+addresses.
+.PP
+Within the destination address, the placeholders
+.IR %n ,
+.IR %d ,
+and
+.IR %=
+will be replaced by the local part, the domain, or the email address with '@'
+replaced by '=' respectively. In combination with alias domains, this enables
+domain\-specific destinations.
+.PP
+Examples:
 .PP
 .nf
-        Example:
-
-        \fBvmm ut d.user@example.com smtp:pc105.it.example.com\fP
+.B vmm aliasadd john.doe@example.com d.user@example.com
+.B vmm aa support@example.com d.user@example.com e.user@example.com
+.B vmm aa postmaster@example.com postmaster+%d@example.org
 .fi
-.TP
-\fBuserdisable\fP (\fBu0\fP) \fIaddress\fP [ \fIservice\fP ]
-If a user shouldn't have access to one or all services you can restrict the 
-access with this subcommand.
-.br
-If neither a \fIservice\fP nor the keyword '\fIall\fP' is given all services
-(\fIsmtp\fP, \fIpop3\fP, \fIimap\fP, and \fIsieve\fP) will be disabled for the
-account with the specified \fIaddress\fP. Otherwise only the specified 
-\fIservice\fP will be restricted.
+.\" ------------------------------------
+.SS aliasdelete (ad)
+.BI "vmm aliasdelete" " address"
+.RI [ destination ]
+.PP
+Use this subcommand to delete the alias with the given
+.IR address .
+.PP
+If the optional
+.I destination
+address is given, only this
+destination will be removed from the alias.
+.PP
+Example:
 .PP
 .nf
-        Examples:
-
-        \fBvmm u0 b.user@example.com imap\fP
-        \fBvmm userdisable c.user@example.com\fP
+.B vmm ad support@example.com d.user@example.com
 .fi
-.TP
-\fBuserenable\fP (\fBu1\fP) \fIaddress\fP [ \fIservice\fP ]
-To allow access to one or all restricted services use this subcommand.
-.br
-If neither a \fIservice\fP nor the keyword '\fIall\fP' is given all services
-(\fIsmtp\fP, \fIpop3\fP, \fIimap\fP, and \fIsieve\fP) will be enabled for the
-account with the specified \fIaddress\fP. Otherwise only the specified 
-\fIservice\fP will be enabled.
+.\" ------------------------------------
+.SS aliasinfo (ai)
+.BI "vmm aliasinfo" " address"
 .PP
-.TP
-\fBuserdelete\fP (\fBud\fP) \fIaddress\fP [ \fIdelalias\fP ]
-Use this subcommand to delete the account with the given \fIaddress\fP.
-.br
-If there are one or more aliases with an identical destination address,
-\fBvmm\fP will abort the requested operation and show an error message. To
-prevent this, specify the optional keyword '\fIdelalias\fP'.
-.\"
-.SS ALIAS SUBCOMMANDS
-.TP
-\fBaliasadd\fP (\fBaa\fP) \fIalias\fP \fItarget\fP
-This subcommand is used to create a new alias.
+Information about the alias with the given
+.I address
+can be displayed with this subcommand.
+.PP
+Example:
 .PP
 .nf
-        Examples:
-
-        \fBvmm aliasadd john.doe@example.com d.user@example.com\fP
-        \fBvmm aa support@example.com d.user@example.com\fP
-        \fBvmm aa support@example.com e.user@example.com\fP
+.B vmm aliasinfo support@example.com
+Alias information
+-----------------
+        Mail for support@example.com will be redirected to:
+             * e.user@example.com
 .fi
-.TP
-\fBaliasinfo\fP (\fBai\fP) \fIalias\fP
-Information about an alias can be displayed with this subcommand.
+.\" -----------------------------------------------------------------------
+.SH RELOCATED SUBCOMMANDS
+.SS relocatedadd (ra)
+.BI "vmm relocatedadd" " address newaddress"
 .PP
-.nf
-        Example:
-
-        \fBvmm aliasinfo support@example.com\fP
-        Alias information
-        -----------------
-                Mail for support@example.com will be redirected to:
-                     * d.user@example.com
-                     * e.user@example.com
-.fi
-.TP
-\fBaliasdelete\fP (\fBad\fP) \fIalias\fP [ \fItarget\fP ]
-Use this subcommand to delete the \fIalias\fP.
-.br
-If the optional destination address \fItarget\fP is given, only this
-destination will be removed from the \fIalias\fP.
-.PP
-.nf
-        Example:
-
-        \fBvmm ad support@example.com d.user@example.com\fP
-.fi
-.\"
-.SS RELOCATED SUBCOMMANDS
-.TP
-\fBrelocatedadd\fP (\fBra\fP) \fIold_address\fP \fInew_address\fP
 A new relocated user can be created with this subcommand.
-.br
-\fIold_address\fP is the users ex-email address, for example b.user@example.com,
-and \fInew_address\fP points to the new email address where the user can be
-reached.
+.PP
+.I address
+is the user's ex\-email address, for example b.user@example.com, and
+.I newaddress
+points to the new email address where the user can be reached.
+.PP
+Example:
 .PP
 .nf
-        Example:
-
-        \fBvmm relocatedadd b.user@example.com b-user@company.tld\fP
+.B vmm relocatedadd b.user@example.com b\-user@company.tld
 .fi
-.TP
-\fBrelocatedinfo\fP (\fBri\fP) \fIold_address\fP
-This subcommand shows the new address of the relocated user with the 
-\fIold_address\fP.
+.\" ------------------------------------
+.SS relocatedinfo (ri)
+.BI "vmm relocatedinfo " address
+.PP
+This subcommand shows the new address of the relocated user with the given
+.IR address .
+.PP
+Example:
 .PP
 .nf
-        Example:
-
-        \fBvmm relocatedinfo b.user@example.com\fP
-        Relocated information
-        ---------------------
-                User “b.user@example.com” has moved to “b-user@company.tld”
+.B vmm relocatedinfo b.user@example.com
+Relocated information
+---------------------
+        User `b.user@example.com' has moved to `b\-user@company.tld'
 .fi
-.TP
-\fBrelocateddelete\fP (\fBrd\fP) \fIold_address\fP
-Use this subcommand in order to delete the relocated user with the
-\fIold_address\fP.
+.\" ------------------------------------
+.SS relocateddelete (rd)
+.BI "vmm relocateddelete " address
+.PP
+Use this subcommand in order to delete the relocated user with the given
+.IR address .
+.PP
+Example:
 .PP
 .nf
-        Example:
-
-        \fBvmm relocateddelete b.user@example.com\fP
+.B vmm relocateddelete b.user@example.com
 .fi
-.\"
+.\" -----------------------------------------------------------------------
+.SH CATCH\-ALL SUBCOMMANDS
+.SS catchalladd (caa)
+.BI "vmm catchalladd" " fqdn destination ..."
+.PP
+This subcommand allows to specify destination addresses for a domain, which
+shall receive mail addressed to unknown local parts within that domain.
+Those catch\-all aliases hence \(dqcatch all\(dq mail to any address in the
+domain (unless a more specific alias, mailbox or relocated entry exists).
+.PP
+WARNING: Catch\-all addresses can cause mail server flooding because
+spammers like to deliver mail to all possible combinations of names, e.g.
+to all addresses between abba@example.org and zztop@example.org.
+.PP
+Example:
+.PP
+.nf
+.B vmm catchalladd example.com user@example.org
+.fi
+.\" ------------------------------------
+.SS catchallinfo (cai)
+.BI "vmm catchallinfo " fqdn
+.PP
+This subcommand displays information about catch\-all aliases defined for
+a domain.
+.PP
+Example:
+.PP
+.nf
+.B vmm catchallinfo example.com
+Catch-all information
+---------------------
+  Mail to unknown localparts in domain example.com will be sent to:
+         * user@example.org
+.fi
+.\" ------------------------------------
+.SS catchalldelete (cad)
+.BI "vmm catchalldelete " fqdn
+.RI [ destination ]
+.PP
+With this subcommand, catch\-all aliases defined for a domain can be
+removed, either all of them, or a single one if specified explicitly.
+.PP
+Example:
+.PP
+.nf
+.B vmm catchalldelete example.com user@example.com
+.fi
+.\" -----------------------------------------------------------------------
 .SH FILES
-/usr/local/etc/vmm.cfg
+.TP
+.I /root/vmm.cfg
+will be used when found.
+.TP
+.I /usr/local/etc/vmm.cfg
+will be used when the above file doesn't exist.
+.TP
+.I /etc/vmm.cfg
+will be used when none of the both above mentioned files exists.
+.\" -----------------------------------------------------------------------
 .SH SEE ALSO
-vmm.cfg(5), configuration file for vmm
-.SH AUTHOR
-\fBvmm\fP and its man pages were written by Pascal Volk
-<\fIneverseen@users.sourceforge.net\fP> and are licensed under the terms of the
-BSD License.
+.BR dsync (1),
+.BR transport (5),
+.BR vmm.cfg (5)
+.\" -----------------------------------------------------------------------
+.SH INTERNET RESOURCES
+.TP
+Wiki
+http://vmm.localdomain.org/
+.TP
+Project site
+http://sf.net/projects/vmm/
+.TP
+Bug tracker
+https://bitbucket.org/pvo/vmm/issues
+.\" -----------------------------------------------------------------------
+.SH COPYING
+vmm and its manual pages were written by Pascal Volk <user+vmm AT
+localhost.localdomain.org> and are licensed under the terms of the BSD
+License.

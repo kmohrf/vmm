@@ -1,4 +1,3 @@
-
 - Aliases
     - avoid looping aliases
 
@@ -8,3 +7,33 @@
         + aliases
         + destinations/alias
         + alias domains
+
+Database:
+   public.users.digestmd5: add "character varying(48)"
+	Outlook will love it. (`doveadm pw -s DIGEST-MD5.hex -p 1 -u 0`)
+
+- Non-root usage [madduck@madduck.net]:
+    - Provide /usr/share/vmm/vmm-{mkdirs,rmdirs,du} setuid wrappers that do
+      precisely what they have to and no more. The should probably even call
+      /usr/share/vmm/vmm-wrapper-helper as unprivileged user to parse the
+      arguments, match them with the database and obtain the actual data to
+      process, e.g. email@add.ress → home directory mapping from the DB, or
+      obtaining the set of precreatable maildirs from the config.
+
+    - configset and configure need root, it is questionable whether these
+      can/should be wrapped, as they will be disabled anyway for Debian, and
+      they are root-like activities (unlike day-to-day postmaster work).
+
+    - Pascal suggested to use hooks:
+      07 23:36 <Faxe> zwei config settings handle_dir in domain und account
+      07 23:37 <Faxe> und dann post-{domain,user}add scripte, die den wrapper aufrufen
+
+- relay_domains management [madduck@madduck.net]:
+    - should be in a separate table
+
+- default aliases [madduck@madduck.net]
+    - it should be possible to define a set of default aliases and their
+      destinations for a domain, e.g. postmaster@ and abuse@. For most
+      flexibility, there ought to be a m:n table connecting domains to sets of
+      default aliases. These aliases then get treated like normal aliases
+      unless they are overridden by a real alias.

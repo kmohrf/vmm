@@ -1,69 +1,104 @@
 Installation Prerequisites
 You should already have installed and configured Postfix, Dovecot and
 PostgreSQL.
-You have to install Python and pyPgSQL* to use the Virtual Mail Manager.
-If you want to store the passwords as PLAIN-MD4 digest you have also to install
-python-crypto <http://www.amk.ca/python/code/crypto.html>.
 
-* = http://pypgsql.sourceforge.net/ (Debian: python-pgsql)
+The Virtual Mail Manager depends on:
+    - Python (>= 2.4.0)
+    - Psycopg 2¹ or pyPgSQL²
+
+If you are using Python <= 2.5.0:
+    - if you want to store your users' passwords as PLAIN-MD4 digest in
+      the database, vmm will try to use Crypto.Hash.MD4 from PyCrypto³.
+    - if you are using Dovecot >= v1.1.0 and you want to store your users'
+      passwords as SHA256 or SSHA256 hashes, vmm will try to use
+      Crypto.Hash.SHA256 from PyCrypto². For SHA256/SSHA256 you should have
+      at least use PyCrypto in version 2.1.0alpha1.
+
+    When the Crypto.Hash module couldn't be imported, vmm will use
+    dovecotpw/doveadm, if the misc.password_scheme setting in the vmm.cfg
+    is set to PLAIN-MD4, SHA256 or SSHA256
+
+[1] Psycopg: <http://initd.org/psycopg/> (Debian: python-psycopg2)
+[2] pyPgSQL: <http://pypgsql.sourceforge.net/> (Debian: python-pgsql)
+[3] PyCrypto: <http://www.pycrypto.org/> (Debian: python-crypto)
+
+
+Create additionally a user and groups for improved security
+  We will create the system user `doveauth'. This user is used in the
+  authentication process. On a Debian GNU/Linux System use this command:
+
+	adduser --system --home /nonexistent --no-create-home --group \
+	--disabled-login --gecos "Dovecot IMAP/POP3 authentication user" \
+	doveauth
+
+  This will create the doveauth user and group.
+  For Dovecot >= 2.0 we create also the group `dovemail'. Dovecot will assign
+  this group to all Dovecot processes.
+  On a Debian GNU/Linux bases system run:
+
+	addgroup --system dovemail
 
 
 Configuring PostgreSQL
+(for more details see: http://vmm.localdomain.org/PreparingPostgreSQL)
 
-* /etc/postgresql/8.2/main/pg_hba.conf
+* /etc/postgresql/8.4/main/pg_hba.conf
+  [ if you prefer to connect via TCP/IP ]
     # IPv4 local connections:
     host    mailsys     +mailsys    127.0.0.1/32          md5
+  [ if you want to connect through a local Unix-domain socket ]
+    # "local" is for Unix domain socket connections only
+    local   mailsys     +mailsys                          md5
 
     # reload configuration
-    /etc/init.d/postgresql-8.2 force-reload
+    /etc/init.d/postgresql-8.4 force-reload
 
-* Create a DB user if necessary:
-    DB Superuser:
+* Create a database superuser if necessary:
+    # as root run: su - postgres
+    # if you have sudo privileges run: sudo su - postgres
+    # create your superuser, which will be able to create users and databases
     createuser -s -d -r -E -e -P $USERNAME
-    DB User:
-    createuser -d -E -e -P $USERNAME
 
-* Create Database and db users for Postfix and Dovecot
+* As superuser create the database and db users for vmm, Postfix and Dovecot
     connecting to PostgreSQL:
     psql template1
 
-    # create database
-    CREATE DATABASE mailsys ENCODING 'UTF8';
+    # create users, group and the database
+    CREATE ROLE vmm LOGIN ENCRYPTED PASSWORD 'DB PASSWORD for vmm';
+    CREATE ROLE dovecot LOGIN ENCRYPTED password 'DB PASSWORD for Dovecot';
+    CREATE ROLE postfix LOGIN ENCRYPTED password 'DB PASSWORD for Postfix';
+    CREATE ROLE mailsys WITH USER postfix, dovecot, vmm;
+    CREATE DATABASE mailsys WITH OWNER vmm ENCODING 'UTF8';
+    \q
+
     # connect to the new database
-    \c mailsys
+    psql mailsys vmm -W -h 127.0.0.1
     # either import the database structure for Dovecot v1.0.x/v1.1.x
-    \i /path/to/create_tables.pgsql
-    # or import the database structure for Dovecot v1.2.x
-    \i /path/to/create_tables-dovecot-1.2.x.pgsql
-
-    # create users and group
-    CREATE USER postfix ENCRYPTED password 'DB PASSWORD for Postfix';
-    CREATE USER dovecot ENCRYPTED password 'DB PASSWORD for Dovecot';
-    CREATE ROLE mailsys WITH USER postfix, dovecot;
-
-    # set permissions
-    GRANT SELECT ON dovecot_password, dovecot_user TO dovecot;
-    GRANT SELECT ON postfix_alias, postfix_gid, postfix_maildir,
-    postfix_relocated, postfix_transport, postfix_uid TO postfix;
-
+    \i vmm-y.x.z/pgsql/create_tables.pgsql
+    # or import the database structure for Dovecot v1.2.x/v2.x
+    \i vmm-x.y.z/pgsql/create_tables-dovecot-1.2.x.pgsql
     # leave psql
     \q
+
+    # set permissions for your Dovecot and Postfix users
+    # see python set-permissions.py -h for details
+    python vmm-x.y.z/pgsql/set-permissions.py -a -H 127.0.0.1 -U vmm
 
 Create directory for your mails
   mkdir /srv/mail
   cd /srv/mail/
   mkdir 0 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n o p q r s t u v w x y z
   chmod 771 /srv/mail
-  chgrp -R mail /srv/mail
   chmod 751 /srv/mail/*
 
-Configuring Dovecot
+
+For Dovecot >= 2.0 read the file Configure.Dovecot_2
+Configuring Dovecot v1.x
 
 * /etc/dovecot/dovecot.conf
     # all your other settings
     #disable_plaintext_auth = no
     mail_location = maildir:~/Maildir
-    mail_privileged_group = mail
     first_valid_uid = 70000
     first_valid_gid = 70000
     protocol lda {
@@ -77,14 +112,14 @@ Configuring Dovecot
       userdb sql {
         args = /etc/dovecot/dovecot-sql.conf
       }
-      user = nobody
+      user = doveauth
       socket listen {
         master {
           path = /var/run/dovecot/auth-master
           mode = 0600
         }
         client {
-          path = /var/spool/postfix/private/auth
+          path = /var/spool/postfix/private/dovecot-auth
           mode = 0660
           user = postfix
           group = postfix
@@ -95,11 +130,14 @@ Configuring Dovecot
 * /etc/dovecot/dovecot-sql.conf
     driver = pgsql
     connect = host=localhost dbname=mailsys user=dovecot password=$Dovecot_PASS
-    default_pass_scheme = PLAIN
-    password_query = SELECT "user", password FROM dovecot_password WHERE "user"='%Lu' AND %Ls
-    user_query = SELECT home, uid, gid, 'maildir:'||mail AS mail FROM dovecot_user WHERE userid = '%Lu'
+    default_pass_scheme = CRAM-MD5
+    password_query = SELECT userid AS "user", password FROM dovecotpassword('%Ln', '%Ld') WHERE %Ls
+    user_query = SELECT home, uid, gid, mail FROM dovecotuser('%Ln', '%Ld')
 
 Provide a root SETUID copy of Dovecot's deliver agent for Postfix
+
+/!\ Only required with Dovecot v.1.x.
+    With Dovecot >= v2.0 use Dovecot's lmtp!
 
     mkdir -p /usr/local/lib/dovecot
     chmod 700 /usr/local/lib/dovecot
@@ -114,10 +152,11 @@ Start or restart Dovecot
 
 
 Configuring Postfix's master.cf
-
+    
+/!\ Only required with Dovecot v.1.x.
     # Add Dovecot's deliver agent
     dovecot   unix  -       n       n       -       -       pipe
-      flags=DRhu user=nobody argv=/usr/local/lib/dovecot/deliver -f ${sender} -d ${user}@${nexthop} -n -m ${extension}
+      flags=DORhu user=nobody argv=/usr/local/lib/dovecot/deliver -f ${sender} -d ${user}@${nexthop} -n -m ${extension}
 
 
 
@@ -125,23 +164,28 @@ Configuring Postfix's main.cf
     # relocated users from the database
     #relocated_maps = pgsql:/etc/postfix/pgsql-relocated_maps.cf
 
+    # transport settings from our database
+    transport_maps = pgsql:/etc/postfix/pgsql-transport_maps.cf
+
     # virtual domains
     virtual_mailbox_domains = pgsql:/etc/postfix/pgsql-virtual_mailbox_domains.cf
     virtual_alias_maps = pgsql:/etc/postfix/pgsql-virtual_alias_maps.cf
-    transport_maps = pgsql:/etc/postfix/pgsql-transport.cf
     virtual_minimum_uid = 70000
     virtual_uid_maps = pgsql:/etc/postfix/pgsql-virtual_uid_maps.cf
     virtual_gid_maps = pgsql:/etc/postfix/pgsql-virtual_gid_maps.cf
     virtual_mailbox_base = /
     virtual_mailbox_maps = pgsql:/etc/postfix/pgsql-virtual_mailbox_maps.cf
 
-    # dovecot LDA
-    dovecot_destination_recipient_limit = 1
-    virtual_transport = dovecot:
+    # dovecot LDA (only recommended with Dovecot v1.x)
+    #dovecot_destination_recipient_limit = 1
+    #virtual_transport = dovecot:
+
+    # dovecot lmtp
+    virtual_transport = lmtp:unix:private/dovecot-lmtp
 
     # dovecot SASL
     smtpd_sasl_type = dovecot
-    smtpd_sasl_path = private/auth
+    smtpd_sasl_path = private/dovecot-auth
     smtpd_sasl_auth_enable = yes
     # Keep smtpd_sasl_local_domain identical to Dovecot's auth_default_realm:
     # empty. Both are empty by default. Let it commented out.
@@ -159,17 +203,23 @@ Configuring Postfix's main.cf
 
 Installing the Virtual Mail Manager and configure the rest
 
-    Installing from SVN or vmm-x.y.z.tar.bz2
-    after checking out from svn or extracting the archive change into the new
-    directory and type:
+    Installing from Mercurial or vmm-x.y.z.tar.gz
+    after cloning from the hg repo or extracting the archive change into the
+    new directory and type:
         ./install.sh
     edit all the pgsql-*.cf files in /etc/postfix
 
     reload postfix
 
     # configure the Virtual Mail Manager
+    # vmm.cfg(5) - configuration file for vmm
+    #
+    # For Dovecot v1.x use 'dovecot:' as domain.transport
+    # When using Dovecot v2.x use 'lmtp:unix:private/dovecot-lmtp' as
+    # domain.transport
     vmm configure
 
     # for help type
+    # vmm(1) - command line tool to manage email domains/accounts/aliases
     vmm help
 
