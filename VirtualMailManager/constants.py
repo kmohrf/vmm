@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (c) 2007 - 2011, Pascal Volk
+# Copyright (c) 2007 - 2012, Pascal Volk
 # See COPYING for distribution information.
 """
     VirtualMailManager.constants
@@ -18,7 +18,7 @@ AUTHOR = 'Pascal Volk <user+vmm@localhost.localdomain.org>'
 RELDATE = '2009-09-09'
 VERSION = '0.5.2'
 __author__ = AUTHOR
-__copyright__ = 'Copyright (c) 2007-2011 %s' % __author__
+__copyright__ = 'Copyright (c) 2007-2012 %s' % __author__
 __date__ = RELDATE
 __version__ = VERSION
 
