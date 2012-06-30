@@ -118,7 +118,7 @@ vmm's source code is available from the Mercurial_ repositories:
 • mirror repositories
 
   ‣ ``https://bitbucket.org/pvo/vmm``
-  ‣ ``http://vmm.hg.sourceforge.net/hgweb/vmm/vmm``
+  ‣ ``http://hg.code.sf.net/p/vmm/code``
 
 Released versions are also available as gzip compressed tar archives at:
 https://sourceforge.net/projects/vmm/files/vmm/
