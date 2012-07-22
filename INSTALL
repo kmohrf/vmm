@@ -40,7 +40,8 @@ Create additionally a user and groups for improved security
 
 
 Configuring PostgreSQL
-(for more details see: http://vmm.localdomain.org/PreparingPostgreSQL)
+(for more details see:
+    http://vmm.localdomain.org/installation/postgresql_configuration.html)
 
 * /etc/postgresql/8.4/main/pg_hba.conf
   [ if you prefer to connect via TCP/IP ]
@@ -156,25 +157,29 @@ Configuring Postfix's master.cf
 /!\ Only required with Dovecot v.1.x.
     # Add Dovecot's deliver agent
     dovecot   unix  -       n       n       -       -       pipe
-      flags=DORhu user=nobody argv=/usr/local/lib/dovecot/deliver -f ${sender} -d ${user}@${nexthop} -n -m ${extension}
+      flags=DORhu user=nobody argv=/usr/local/lib/dovecot/deliver -f ${sender}
+      -d ${user}@${nexthop} -n -m ${extension}
 
 
 
 Configuring Postfix's main.cf
+    sql      = pgsql:${config_directory}/
+    proxysql = proxy:${sql}
+
     # relocated users from the database
-    #relocated_maps = pgsql:/etc/postfix/pgsql-relocated_maps.cf
+    #relocated_maps = ${proxysql}pgsql-relocated_maps.cf
 
     # transport settings from our database
-    transport_maps = pgsql:/etc/postfix/pgsql-transport_maps.cf
+    transport_maps = ${proxysql}pgsql-transport_maps.cf
 
     # virtual domains
-    virtual_mailbox_domains = pgsql:/etc/postfix/pgsql-virtual_mailbox_domains.cf
-    virtual_alias_maps = pgsql:/etc/postfix/pgsql-virtual_alias_maps.cf
+    virtual_mailbox_domains = ${proxysql}pgsql-virtual_mailbox_domains.cf
+    virtual_alias_maps = ${proxysql}pgsql-virtual_alias_maps.cf
     virtual_minimum_uid = 70000
-    virtual_uid_maps = pgsql:/etc/postfix/pgsql-virtual_uid_maps.cf
-    virtual_gid_maps = pgsql:/etc/postfix/pgsql-virtual_gid_maps.cf
+    virtual_uid_maps = ${sql}pgsql-virtual_uid_maps.cf
+    virtual_gid_maps = ${sql}pgsql-virtual_gid_maps.cf
     virtual_mailbox_base = /
-    virtual_mailbox_maps = pgsql:/etc/postfix/pgsql-virtual_mailbox_maps.cf
+    virtual_mailbox_maps = ${proxysql}pgsql-virtual_mailbox_maps.cf
 
     # dovecot LDA (only recommended with Dovecot v1.x)
     #dovecot_destination_recipient_limit = 1
