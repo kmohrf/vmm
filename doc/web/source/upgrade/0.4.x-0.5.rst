@@ -1,0 +1,140 @@
+======================
+Upgrading to vmm 0.5.x
+======================
+This page is valid only for vmm-0.4/vmm-0.4-r41 and vmm-0.5/vmm-0.5.1.
+If you are using vmm-0.3.x please upgrade first to
+`vmm-0.4-r41 <https://sourceforge.net/projects/vmm/files/vmm/0.4-r41>`_.
+
+Upgrading from vmm-0.4.x
+------------------------
+Database backup
+^^^^^^^^^^^^^^^
+It is always wise to back up your database from time to time.
+Particularly with regard to an impending structure modification.
+
+Example: Backing up the `mailsys` database with pg_dump_.
+
+.. code-block:: console
+
+ root@host:~# pg_dump -h localhost -U vmm -W mailsys > mailsys-0.4.sql
+
+Stopping Postfix and Dovecot
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Before updating the database you have to stop Postfix and Dovecot.
+
+.. code-block:: console
+
+ root@host:~# /etc/init.d/postfix stop
+ Stopping Postfix Mail Transport Agent: postfix.
+ root@host:~# /etc/init.d/dovecot stop
+ Stopping IMAP/POP3 mail server: dovecot.
+
+Database update
+^^^^^^^^^^^^^^^
+Connect as your `vmm` database user to your database.
+
+.. code-block:: console
+
+ root@host:~# psql mailsys vmm -W -h localhost
+
+In the PostgreSQL interactive terminal you have to run the following
+commands to perform the update.
+
+.. code-block:: postgresql-console
+
+ mailsys=> \i /path/to/vmm-0.5.2/update_tables_0.4.x-0.5.pgsql
+ mailsys=> GRANT SELECT ON postfix_alias TO postfix;
+ mailsys=> \q
+
+.. _database-update-for-dovecot-v1-2-x:
+
+Database update for Dovecot v1.2.x
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+When you are already using Dovecot v1.2.x, you have to perform one or two
+**additional** database updates.
+
+.. code-block:: postgresql-console
+
+ mailsys=> \i /path/to/vmm-0.5.2/update_tables_0.5.x_for_dovecot-1.2.x.pgsql
+ mailsys=> GRANT SELECT ON dovecot_password TO dovecot;
+ mailsys=> -- If you are using the function dovecotpassword() in the
+ mailsys=> -- password_query setting of your dovecot-sql.conf update it also:
+ mailsys=> \i /path/to/vmm-0.5.2/update_types_and_functions_0.5.x_for_dovecot-1.2.x.pgsql
+ mailsys=> \q
+
+.. _adjusting-permissions-of-the-setuid-root-deliver-copy:
+
+Adjusting permissions of the setuid root deliver copy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Starting with Dovecot version 1.2.0 the LDA ``deliver`` will no longer
+work, if the binary has the setuid-root bit set **and** it's executable
+for everyone.
+Independent of the directory permissions, where the ``deliver`` binary
+is located.
+For this reason you have to adjust the permission of the ``deliver`` binary.
+
+.. code-block:: console
+
+ root@host:~# chown root:`id -g nobody` /usr/local/lib/dovecot/deliver
+ root@host:~# chmod u+s,o-rwx /usr/local/lib/dovecot/deliver
+
+.. _check-update-postfix-master-cf:
+
+Check/update Postfix' master.cf
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In prior setups the service *dovecot* was configured slightly different.
+If you have set the command attribute user to ``nobody:mail``, either
+remove the group *mail* or replace it with the group *nobody* or *nogroup*.
+The second line of the service *dovecot* entry should look similar to this::
+
+ flags=DORhu user=nobody argv=/usr/local/lib/dovecot/deliver …
+
+Start Dovecot and Postfix again
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+After a successfully update start Dovecot and Postfix again.
+
+.. code-block:: console
+
+ root@host:~# /etc/init.d/dovecot start
+ Starting IMAP/POP3 mail server: dovecot.
+ root@host:~# /etc/init.d/postfix start
+ Starting Postfix Mail Transport Agent: postfix.
+
+Upgrade vmm
+^^^^^^^^^^^
+Finally execute the ``upgrade.sh`` script to install the new code and
+update your ``/usr/local/etc/vmm.cfg``.
+
+.. code-block:: console
+
+ root@host:~# cd /path/to/vmm-0.5.2
+ root@host:/path/to/vmm-0.5.2# ./upgrade.sh
+
+ Please have a look at your /usr/local/etc/vmm.cfg
+ and verify the value from option 'postconf' in section 'bin'.
+
+ root@host:/path/to/vmm-0.5.2#
+
+Upgrading from vmm-0.5.x
+------------------------
+Upgrade vmm
+^^^^^^^^^^^
+When you have already installed vmm-0.5 or vmm-0.5.1 only a single step is
+necessary to update your vmm installation.
+cd in the source directory and execute the ``upgrade.sh`` script.
+That's it.
+
+.. code-block:: console
+
+ root@host:~# cd /path/to/vmm-0.5.2
+ root@host:/path/to/vmm-0.5.2# ./upgrade.sh
+ root@host:/path/to/vmm-0.5.2#
+
+When you are already using Dovecot ≧ v1.2.0, you should also respect
+following points:
+
+ ‣ :ref:`database-update-for-dovecot-v1-2-x`
+ ‣ :ref:`adjusting-permissions-of-the-setuid-root-deliver-copy`
+ ‣ :ref:`check-update-postfix-master-cf`
+
+.. include:: ../ext_references.rst

@@ -1,0 +1,122 @@
+======================
+Upgrading to vmm 0.6.x
+======================
+This document describes the procedure to upgrade a vmm-0.5.2 installation
+to version 0.6.x
+
+If you still have installed vmm-0.4/vmm-0.4-r41 you have to proceed this
+step first:
+
+ ‣ :doc:`0.4.x-0.5`
+
+Upgrading from vmm-0.5.2
+------------------------
+
+Stop Postfix and Dovecot
+^^^^^^^^^^^^^^^^^^^^^^^^
+Before updating your database layout you have to stop Postfix and Dovecot.
+
+.. code-block:: console
+
+ root@host:~# /etc/init.d/postfix stop
+ Stopping Postfix Mail Transport Agent: postfix.
+ root@host:~# /etc/init.d/dovecot stop
+ Stopping IMAP/POP3 mail server: dovecot.
+
+Create a database backup
+^^^^^^^^^^^^^^^^^^^^^^^^
+It is always wise to back up your database from time to time.
+Particularly with regard to an impending structure modification.
+
+
+Example: Backing up the `mailsys` database with pg_dump_.
+
+.. code-block:: console
+
+ user@host:~$ pg_dump -h localhost -U vmm -W mailsys > mailsys-0.5.2.sql
+
+Database update
+^^^^^^^^^^^^^^^
+Connect as your `vmm` database user to your database.
+
+.. code-block:: console
+
+ user@host:~$ psql mailsys vmm -W -h localhost
+
+In the PostgreSQL interactive terminal you have to run one of the following
+commands to perform the update.
+
+Dovecot v1.2.x/v2.0.x/v2.1.x
+""""""""""""""""""""""""""""
+.. code-block:: postgresql-console
+
+ mailsys=> \i /path/to/vmm-0.6.0/pgsql/update_tables_0.5.x-0.6-dovecot-1.2.x.pgsql
+ mailsys=> \q
+
+Dovecot v1.0.x/v1.1.x
+"""""""""""""""""""""
+.. code-block:: postgresql-console
+
+ mailsys=> \i /path/to/vmm-0.6.0/pgsql/update_tables_0.5.x-0.6.pgsql
+ mailsys=> \q
+
+Set database permissions
+^^^^^^^^^^^^^^^^^^^^^^^^
+.. include:: ../pgsql_set_permissionspermissions.rst
+
+Start Dovecot and Postfix again
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. warning:: All the views (*dovecot_…* and *postfix_…*) have been
+   replaced by database functions.
+   So you have to adjust all your ``postfix/pgsql-*.cf`` files and also your
+   ``/etc/dovecot/dovecot-sql.conf`` or ``/etc/dovecot/dovecot-sql.conf.ext``.
+
+   See the `vmm-0.6.0/postfix/pgsql-*.cf` files and
+   :ref:`Dovecot configuration <dovecot-sql-conf-ext>`/`dovecot-sql.conf.ext`
+   or :ref:`Dovecot configuration <dovecot-sql-conf>`/`dovecot-sql-conf`.
+
+After a successfully update start Dovecot and Postfix again.
+
+.. code-block:: console
+
+ root@host:~# /etc/init.d/dovecot start
+ Starting IMAP/POP3 mail server: dovecot.
+ root@host:~# /etc/init.d/postfix start
+ Starting Postfix Mail Transport Agent: postfix.
+
+Upgrade vmm
+^^^^^^^^^^^
+Finally execute the :file:`upgrade.sh` script.
+This will install the new code and also update your :file:`vmm.cfg`.
+
+.. code-block:: console
+
+ root@host:~# cd /path/to/vmm-0.6.0
+ root@host:/path/to/vmm-0.6.0# ./upgrade.sh
+ Please have a look at your configuration: /usr/local/etc/vmm.cfg
+ This are your Modified/Renamed/New settings:
+ R   account.delete_directory = false
+ R   account.directory_mode = 448
+ R   account.disk_usage = false
+ R   domain.delete_directory = false
+ R   domain.directory_mode = 504
+ R   domain.force_deletion = false
+ R   domain.imap = true
+ R   domain.pop3 = true
+ R   domain.sieve = true
+ R   domain.smtp = true
+ R   domain.transport = dovecot:
+ R   mailbox.folders = Drafts:Sent:Templates:Trash
+ R   mailbox.root = Maildir
+ R   misc.base_directory = /srv/mail
+ M   misc.dovecot_version = 2.1.7
+ R   misc.dovecot_version = 2.1.7
+ R   misc.password_scheme = PLAIN
+
+ Removed section "config" with option "done" (obsolte)
+
+ Removed option "gid_mail" from section "misc" (obsolte)
+
+
+.. include:: ../ext_references.rst
