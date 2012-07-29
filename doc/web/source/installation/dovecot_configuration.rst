@@ -24,6 +24,7 @@ Use :command:`dovecot -n | head -n 1` to locate your :file:`dovecot.conf`.
 .. note:: Please modify the `postmaster_address` to meet your specific needs.
 
 .. code-block:: text
+ :emphasize-lines: 7
 
  # all your other settings
  #disable_plaintext_auth = no
@@ -231,6 +232,7 @@ conf.d/15-lda.conf
 .. note:: Please modify the `postmaster_address` to meet your specific needs.
 
 .. code-block:: text
+ :emphasize-lines: 1
 
  postmaster_address = postmaster@YOUR-DOMAIN.TLD
  recipient_delimiter = +

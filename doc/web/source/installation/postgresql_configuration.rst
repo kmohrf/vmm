@@ -22,7 +22,10 @@ For TCP/IP connections
 Add a line like the following to your :file:`pg_hba.conf` if you want to
 connect via a TCP/IP connection to the PostgreSQL server.
 Make sure to adjust the CIDR address if PostgreSQL is running on a
-different system::
+different system:
+
+.. code-block:: text
+ :emphasize-lines: 2
 
  # IPv4 local connections:
  host    mailsys     +mailsys    127.0.0.1/32          md5
@@ -30,7 +33,10 @@ different system::
 For Unix-domain socket connections
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 If you want to use PostgreSQL's local Unix domain socket for database
-connections add a line like the second one to your :file:`pg_hba.conf`::
+connections add a line like the second one to your :file:`pg_hba.conf`:
+
+.. code-block:: text
+ :emphasize-lines: 2
 
  # "local" is for Unix domain socket connections only
  local   mailsys     +mailsys                    md5
