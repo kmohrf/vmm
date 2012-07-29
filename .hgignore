@@ -5,7 +5,6 @@ syntax: glob
 *.py?
 .*.swp
 .swp
-doc/build
 build
 debian/vmm
 debian/*.log
