@@ -221,7 +221,7 @@ def search_addresses(dbh, typelimit=None, lpattern=None, llike=False,
         queries.append('SELECT gid, local_part, %d AS type FROM users'
                        % TYPE_ACCOUNT)
     if typelimit & TYPE_ALIAS:
-        queries.append('SELECT gid, address as local_part, %d AS type '
+        queries.append('SELECT DISTINCT gid, address as local_part, %d AS type '
                        'FROM alias' % TYPE_ALIAS)
     if typelimit & TYPE_RELOCATED:
         queries.append('SELECT gid, address as local_part, %d AS type '
