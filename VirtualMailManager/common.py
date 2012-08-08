@@ -251,7 +251,7 @@ def search_addresses(dbh, typelimit=None, lpattern=None, llike=False,
     gids = []
     daddrs = {}
     for gid, address, addrtype, aliasdomain in result:
-        if gid not in gids:
+        if gid not in daddrs:
             gids.append(gid)
             daddrs[gid] = []
         daddrs[gid].append((address, addrtype, aliasdomain))
