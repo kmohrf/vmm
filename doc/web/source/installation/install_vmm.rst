@@ -60,6 +60,7 @@ The initial :doc:`../vmm.cfg` is also well documented.
 Ready, set, go!
 ---------------
 For a list of available subcommands execute :command:`vmm help`.
-For details about the subcommands see :manpage:`vmm(1)`.
+For details about the subcommands see :manpage:`vmm(1)` or continue reading
+at :doc:`../howto`.
 
 .. include:: ../ext_references.rst

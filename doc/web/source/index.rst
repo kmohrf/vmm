@@ -36,6 +36,7 @@ Contents
    download
    install
    upgrade
+   howto
 
 * :ref:`search`
 
