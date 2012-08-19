@@ -168,4 +168,4 @@ Example:
 
 .. code-block:: console
 
- root@host:~# ut c.user@example.com [pc105.it.example.com]
+ root@host:~# ut c.user@example.com smtp:[pc105.it.example.com]
