@@ -943,9 +943,10 @@ def _print_info(ctx, info, title):
         else:
             w_std(u'\t%s: %s' % (key.title().ljust(17, u'.'), info[key]))
     print
-    note = info.get('note', None)
-    if note is not None:
-        _print_note(note)
+    note = info.get('note')
+    if note:
+        _print_note(note + '\n')
+
 
 def _print_note(note):
     msg = _(u'Note')
