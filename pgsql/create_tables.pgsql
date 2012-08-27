@@ -6,9 +6,9 @@ CREATE SEQUENCE transport_id;
 
 CREATE SEQUENCE mailboxformat_id;
 
-CREATE SEQUENCE quotalimit_id;
-
 CREATE SEQUENCE maillocation_id;
+
+CREATE SEQUENCE quotalimit_id;
 
 CREATE SEQUENCE service_set_id;
 
@@ -101,7 +101,7 @@ FALSE	FALSE	FALSE	FALSE
 CREATE TABLE domain_data (
     gid         bigint NOT NULL DEFAULT nextval('domain_gid'),
     qid         bigint NOT NULL DEFAULT 1, -- default quota limit
-    ssid        bigint NOT NULL DEFAULT 1, -- default service_set
+    ssid        bigint NOT NULL DEFAULT 1, -- default service set
     tid         bigint NOT NULL DEFAULT 1, -- default transport
     domaindir   varchar(40) NOT NULL, --/srv/mail/$RAND/4294967294
     note        text NULL DEFAULT NULL,

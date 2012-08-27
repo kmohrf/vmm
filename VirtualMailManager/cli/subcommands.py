@@ -16,6 +16,7 @@ from time import strftime, strptime
 
 from VirtualMailManager import ENCODING
 from VirtualMailManager.cli import get_winsize, prog, w_err, w_std
+from VirtualMailManager.cli.clihelp import help_msgs
 from VirtualMailManager.common import human_size, size_in_bytes, \
      version_str, format_domain_default
 from VirtualMailManager.constants import __copyright__, __date__, \
@@ -48,6 +49,10 @@ cmd_map = {}
 class Command(object):
     """Container class for command information."""
     __slots__ = ('name', 'alias', 'func', 'args', 'descr')
+    FMT_HLP_USAGE = """
+usage: %(prog)s %(name)s %(args)s
+       %(prog)s %(alias)s %(args)s
+"""
 
     def __init__(self, name, alias, func, args, descr):
         """Create a new Command instance.
@@ -75,6 +80,25 @@ class Command(object):
     def usage(self):
         """the command's usage info."""
         return u'%s %s %s' % (prog, self.name, self.args)
+
+    def help_(self):
+        old_ii = txt_wrpr.initial_indent
+        old_si = txt_wrpr.subsequent_indent
+
+        txt_wrpr.subsequent_indent = (len(self.name) + 2) * ' '
+        w_std(txt_wrpr.fill('%s: %s' % (self.name, self.descr)))
+
+        info = Command.FMT_HLP_USAGE % dict(alias=self.alias, args=self.args,
+                                            name=self.name, prog=prog)
+        w_std(info)
+
+        txt_wrpr.initial_indent = txt_wrpr.subsequent_indent = ' '
+        try:
+            [w_std(txt_wrpr.fill(_(para)) + '\n') for para
+                    in help_msgs[self.name]]
+        except KeyError:
+            w_err(1, "'help %s' not yet documented." % self.name,
+                  'see also: vmm(1)')
 
 
 class RunContext(object):
@@ -443,8 +467,8 @@ def help_(ctx):
             else:
                 usage(INVALID_ARGUMENT, _(u"Unknown help topic: '%s'") %
                       ctx.args[2], ctx.scmd)
-        # FIXME
-        w_err(1, "'help %s' not yet implemented." % topic, 'see also: vmm(1)')
+        if topic != u'help':
+            return cmd_map[topic].help_()
 
     old_ii = txt_wrpr.initial_indent
     old_si = txt_wrpr.subsequent_indent
