@@ -109,7 +109,7 @@ class ServiceSet(object):
                ' AND '.join('%s = %s' %
                (k, str(v).upper()) for k, v in self._services.iteritems()))
         if self._sieve_col == 'managesieve':
-            sql.replace('sieve', self._sieve_col)
+            sql = sql.replace('sieve', self._sieve_col)
         dbc = self._dbh.cursor()
         dbc.execute(sql)
         result = dbc.fetchone()
@@ -141,8 +141,6 @@ class ServiceSet(object):
         sql = ('INSERT INTO service_set (ssid, smtp, pop3, imap, %s) ' %
                (self._sieve_col,) +
                'VALUES (%(ssid)s, %(smtp)s, %(pop3)s, %(imap)s, %(sieve)s)')
-        if self._sieve_col == 'managesieve':
-            sql.replace('sieve', self._sieve_col)
         self._set_ssid()
         values = {'ssid': self._ssid}
         values.update(self._services)
