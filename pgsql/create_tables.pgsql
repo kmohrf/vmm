@@ -353,7 +353,6 @@ AS $$
                                   FROM domain_name
                                  WHERE domainname = the_domain)
                AND local_part = localpart
-               AND service_set.ssid = users.ssid
                AND users.gid = domain_data.gid
                AND CASE WHEN
                   users.ssid IS NOT NULL
