@@ -60,6 +60,8 @@ Dovecot v1.0.x/v1.1.x
  mailsys=> \i /path/to/vmm-0.6.0/pgsql/update_tables_0.5.x-0.6.pgsql
  mailsys=> \q
 
+.. _set-database-permissions:
+
 Set database permissions
 ^^^^^^^^^^^^^^^^^^^^^^^^
 .. include:: ../pgsql_set_permissionspermissions.rst
@@ -118,5 +120,29 @@ This will install the new code and also update your :file:`vmm.cfg`.
 
  Removed option "gid_mail" from section "misc" (obsolte)
 
+
+Upgrade to Dovecot ≧ v1.2.beta2
+-------------------------------
+When you are upgrading your old Dovecot (< v.1.2.beta2) to a newer version,
+≧ v1.2.beta2, you also have to update the database layout.
+After you have backed up your database, you have to apply the changes from
+the file :file:`dovecot_update_v1.2+.pgsql` to your database.
+(The file is currently only available from hg:
+`dovecot_update_v1.2+.pgsql <http://hg.localdomain.org/vmm/raw-file/bb23693e5fc9/pgsql/dovecot_update_v1.2%2B.pgsql>`_)
+
+Connect as your `vmm` database user to your database.
+
+.. code-block:: console
+
+ user@host:~$ psql mailsys vmm -W -h localhost
+
+Then do the database update:
+
+.. code-block:: postgresql-console
+
+ mailsys=> \i /path/to/dovecot_update_v1.2+.pgsql
+ mailsys=> \q
+
+Finally :ref:`set-database-permissions`.
 
 .. include:: ../ext_references.rst
