@@ -1058,9 +1058,9 @@ def _print_address_list(which, dids, addresses, matching):
     if addresses:
         if which & (which - 1) == 0:
             # only one type is requested, so no type indicator
-            _trans = { TYPE_ACCOUNT   : _('')
-                     , TYPE_ALIAS     : _('')
-                     , TYPE_RELOCATED : _('')
+            _trans = { TYPE_ACCOUNT   : ''
+                     , TYPE_ALIAS     : ''
+                     , TYPE_RELOCATED : ''
                      }
         else:
             _trans = { TYPE_ACCOUNT   : _('u')
