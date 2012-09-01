@@ -295,13 +295,15 @@ def domain_info(ctx):
         q_limit = u'Storage: %(bytes)s; Messages: %(messages)s'
         if not details:
             info['bytes'] = human_size(info['bytes'])
-            info['messages'] = locale.format('%d', info['messages'], True)
+            info['messages'] = locale.format('%d', info['messages'],
+                                             True).decode(ENCODING, 'replace')
             info['quota limit/user'] = q_limit % info
             _print_info(ctx, info, _(u'Domain'))
         else:
             info[0]['bytes'] = human_size(info[0]['bytes'])
             info[0]['messages'] = locale.format('%d', info[0]['messages'],
-                                                True)
+                                                True).decode(ENCODING,
+                                                             'replace')
             info[0]['quota limit/user'] = q_limit % info[0]
             _print_info(ctx, info[0], _(u'Domain'))
             if details == u'accounts':
@@ -917,8 +919,10 @@ def _format_quota_usage(limit, used, human=False, domaindefault=False):
         }
     else:
         q_usage = {
-            'used': locale.format('%d', used, True),
-            'limit': locale.format('%d', limit, True),
+            'used': locale.format('%d', used, True).decode(ENCODING,
+                                                           'replace'),
+            'limit': locale.format('%d', limit, True).decode(ENCODING,
+                                                             'replace'),
         }
     if limit:
         q_usage['percent'] = locale.format('%6.2f', 100. / limit * used, True)

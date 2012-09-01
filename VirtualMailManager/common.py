@@ -86,7 +86,7 @@ def human_size(size):
             # TP: e.g.: '%(size)s %(prefix)s' -> '118.30 MiB'
             return _(u'%(size)s %(prefix)s') % {
                     'size': locale.format('%.2f', float(size) / multiply,
-                                          True),
+                                          True).decode(ENCODING, 'replace'),
                     'prefix': prefix}
 
 
