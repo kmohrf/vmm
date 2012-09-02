@@ -790,8 +790,7 @@ def update_cmd_map():
     'usertransport': cmd('usertransport', 'ut', user_transport,
                          'address transport | address domain',
                          _(u'update the transport of the given address')),
-    'usernote': cmd('usernote', 'uo', user_note,
-                    'address note',
+    'usernote': cmd('usernote', 'uo', user_note, 'address [note]',
                     _(u'update the note of the given address')),
     # Alias commands
     'aliasadd': cmd('aliasadd', 'aa', alias_add, 'address destination ...',
@@ -842,8 +841,7 @@ def update_cmd_map():
     'domaintransport': cmd('domaintransport', 'dt', domain_transport,
                            'fqdn transport [force]',
                            _(u'update the transport of the specified domain')),
-    'domainnote': cmd('domainnote', 'do', domain_note,
-                      'fqdn note',
+    'domainnote': cmd('domainnote', 'do', domain_note, 'fqdn [note]',
                       _(u'update the note of the given domain')),
     # List commands
     'listdomains': cmd('listdomains', 'ld', list_domains, '[pattern]',
