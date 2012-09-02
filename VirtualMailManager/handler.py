@@ -813,7 +813,7 @@ The account has been successfully deleted from the database.
         if not acc:
             raise VMMError(_(u"The account '%s' does not exist.") %
                         acc.address, NO_SUCH_ACCOUNT)
-        if bytes_ == 'default':
+        if bytes_ == 'domain':
             quotalimit = None
         else:
             if not all(isinstance(i, (int, long)) for i in (bytes_, messages)):
@@ -832,7 +832,7 @@ The account has been successfully deleted from the database.
         if not acc:
             raise VMMError(_(u"The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
-        if transport == 'default':
+        if transport == 'domain':
             transport = None
         else:
             transport = Transport(self._dbh, transport=transport)
@@ -844,7 +844,7 @@ The account has been successfully deleted from the database.
         if not acc:
             raise VMMError(_(u"The account '%s' does not exist.") %
                         acc.address, NO_SUCH_ACCOUNT)
-        if len(services) == 1 and services[0] == 'default':
+        if len(services) == 1 and services[0] == 'domain':
             serviceset = None
         else:
             kwargs = dict.fromkeys(SERVICES, False)
