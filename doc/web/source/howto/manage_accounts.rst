@@ -97,22 +97,6 @@ Example:
 
  root@host:~# vmm un d.user@example.com "John Doe"
 
-userpassword
-------------
-Syntax:
- | **vmm userpassword** *address* [*password*]
- | **vmm up** *address* [*password*]
-
-The password of an account can be updated with this subcommand.
-
-If no *password* was provided, :command:`vmm` will prompt for it interactively.
-
-Example:
-
-.. code-block:: console
-
- root@host:~# vmm up d.user@example.com "A |\/|0r3 5ecur3 P4s5\/\/0rd?"
-
 usernote
 --------
 Syntax:
@@ -130,6 +114,22 @@ Example:
  root@host:~# vmm uo d.user@example.com Only needed until end of May 2012
 
 .. versionadded:: 0.6.0
+
+userpassword
+------------
+Syntax:
+ | **vmm userpassword** *address* [*password*]
+ | **vmm up** *address* [*password*]
+
+The password of an account can be updated with this subcommand.
+
+If no *password* was provided, :command:`vmm` will prompt for it interactively.
+
+Example:
+
+.. code-block:: console
+
+ root@host:~# vmm up d.user@example.com "A |\/|0r3 5ecur3 P4s5\/\/0rd?"
 
 userquota
 ---------
@@ -152,6 +152,26 @@ Example:
  root@host:~# userquota d.user@example.com 750m
 
 .. versionadded:: 0.6.0
+
+userservices
+------------
+Syntax:
+ | **vmm userservices** *address* [*service ...*]
+ | **vmm us** *address* [*service ...*]
+
+To grant a user access to the specified services, use this command.
+
+All omitted services will be deactivated/unusable for the user with the
+given *address*.
+
+Instead of *service* pass **domain** to remove the account-specific override,
+causing the domain's value to be in effect.
+
+Example:
+
+.. code-block:: console
+
+ root@host:~# userservices d.user@example.com SMTP IMAP
 
 usertransport
 -------------
