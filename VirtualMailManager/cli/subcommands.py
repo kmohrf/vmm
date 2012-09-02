@@ -800,7 +800,7 @@ def update_cmd_map():
                       _(u'delete the specified user')),
     'userinfo': cmd('userinfo', 'ui', user_info, 'address [details]',
                     _(u'display information about the given address')),
-    'username': cmd('username', 'un', user_name, 'address name',
+    'username': cmd('username', 'un', user_name, 'address [name]',
                     _(u'set or update the real name for an address')),
     'userpassword': cmd('userpassword', 'up', user_password,
                         'address [password]',
