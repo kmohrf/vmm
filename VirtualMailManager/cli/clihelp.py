@@ -206,7 +206,7 @@ relocated user with the given <address>."""),),
 addresses for a domain, which shall receive mail addressed to unknown
 local-parts within that domain. Those catch-all aliases hence "catch all" mail
 to any address in the domain (unless a more specific alias, mailbox or
-relocated entry exists)."""),
+relocated user exists)."""),
 _(u"""WARNING: Catch-all addresses can cause mail server flooding because
 spammers like to deliver mail to all possible combinations of names, e.g.
 to all addresses between abba@example.org and zztop@example.org."""),),

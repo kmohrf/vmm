@@ -66,7 +66,7 @@ class CatchallAlias(object):
         if dcount == limit or dcount + count_new > limit:
             failed = True
             errmsg = _(
-u"""Cannot add %(count_new)i new destination(s) to catchall alias for
+u"""Cannot add %(count_new)i new destination(s) to catch-all alias for
 domain '%(domain)s'. Currently this alias expands into %(count)i/%(limit)i
 recipients. %(count_new)i additional destination(s) will render this alias
 unusable.
@@ -74,7 +74,7 @@ Hint: Increase Postfix' virtual_alias_expansion_limit""")
         elif dcount > limit:
             failed = True
             errmsg = _(
-u"""Cannot add %(count_new)i new destination(s) to catchall alias for
+u"""Cannot add %(count_new)i new destination(s) to catch-all alias for
 domain '%(domain)s'. This alias already exceeds its expansion limit (%(count)i/%(limit)i).
 So its unusable, all messages addressed to this alias will be bounced.
 Hint: Delete some destination addresses.""")
@@ -143,11 +143,11 @@ Hint: Delete some destination addresses.""")
         alias."""
         assert isinstance(destination, EmailAddress)
         if not self._dests:
-            raise AErr(_(u"There are no catchall aliases defined for "
+            raise AErr(_(u"There are no catch-all aliases defined for "
                          u"domain '%s'.") % self._domain, NO_SUCH_ALIAS)
         if not destination in self._dests:
             raise AErr(_(u"The address '%(addr)s' is not a destination of "
-                         u"the catchall alias for domain '%(domain)s'.")
+                         u"the catch-all alias for domain '%(domain)s'.")
                        % {'addr': destination, 'domain': self._domain},
                        NO_SUCH_ALIAS)
         self._delete(destination)
@@ -156,14 +156,14 @@ Hint: Delete some destination addresses.""")
     def get_destinations(self):
         """Returns an iterator for all destinations of the catchall alias."""
         if not self._dests:
-            raise AErr(_(u"There are no catchall aliases defined for "
+            raise AErr(_(u"There are no catch-all aliases defined for "
                          u"domain '%s'.") % self._domain, NO_SUCH_ALIAS)
         return iter(self._dests)
 
     def delete(self):
         """Deletes all catchall destinations for the domain."""
         if not self._dests:
-            raise AErr(_(u"There are no catchall aliases defined for "
+            raise AErr(_(u"There are no catch-all aliases defined for "
                          u"domain '%s'.") % self._domain, NO_SUCH_ALIAS)
         self._delete()
         del self._dests[:]

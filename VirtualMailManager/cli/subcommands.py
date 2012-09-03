@@ -216,7 +216,7 @@ def catchall_add(ctx):
 def catchall_delete(ctx):
     """delete the specified destination or all of the catchall destination"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _(u'Missing domain name.'), ctx.scmd)
     elif ctx.argc < 4:
         ctx.hdlr.catchall_delete(ctx.args[2].lower())
     else:
@@ -226,7 +226,7 @@ def catchall_delete(ctx):
 def catchall_info(ctx):
     """show the catchall destination(s) of the specified domain"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _(u'Missing domain name.'), ctx.scmd)
     address = ctx.args[2].lower()
     _print_catchall_info(address, ctx.hdlr.catchall_info(address))
 
@@ -258,7 +258,7 @@ def config_set(ctx):
 
 
 def configure(ctx):
-    """start interactive configuration modus"""
+    """start interactive configuration mode"""
     if ctx.argc < 3:
         ctx.hdlr.configure()
     else:
@@ -801,7 +801,7 @@ def update_cmd_map():
     'userinfo': cmd('userinfo', 'ui', user_info, 'address [details]',
                     _(u'display information about the given address')),
     'username': cmd('username', 'un', user_name, 'address [name]',
-                    _(u'set or update the real name for an address')),
+                    _(u'set, update or delete the real name for an address')),
     'userpassword': cmd('userpassword', 'up', user_password,
                         'address [password]',
                         _(u'update the password for the given address')),
@@ -816,7 +816,7 @@ def update_cmd_map():
                          'address transport | address domain',
                          _(u'update the transport of the given address')),
     'usernote': cmd('usernote', 'uo', user_note, 'address [note]',
-                    _(u'update the note of the given address')),
+                    _(u'set, update or delete the note of the given address')),
     # Alias commands
     'aliasadd': cmd('aliasadd', 'aa', alias_add, 'address destination ...',
                     _(u'create a new alias e-mail address with one or more '
@@ -867,7 +867,7 @@ def update_cmd_map():
                            'fqdn transport [force]',
                            _(u'update the transport of the specified domain')),
     'domainnote': cmd('domainnote', 'do', domain_note, 'fqdn [note]',
-                      _(u'update the note of the given domain')),
+                     _(u'set, update or delete the note of the given domain')),
     # List commands
     'listdomains': cmd('listdomains', 'ld', list_domains, '[pattern]',
                       _(u'list all domains or search for domains by pattern')),
@@ -878,7 +878,8 @@ def update_cmd_map():
     'listaliases': cmd('listaliases', 'la', list_aliases, '[pattern]',
                       _(u'list all aliases or search for aliases by pattern')),
     'listrelocated': cmd('listrelocated', 'lr', list_relocated, '[pattern]',
-                      _(u'list all relocated entries or search for entries by pattern')),
+                         _(u'list all relocated users or search for relocated '
+                           u'users by pattern')),
     # Relocated commands
     'relocatedadd': cmd('relocatedadd', 'ra', relocated_add,
                         'address newaddress',
@@ -894,7 +895,7 @@ def update_cmd_map():
     'configset': cmd('configset', 'cs', config_set, 'option value',
                       _('set a new value for the configuration option')),
     'configure': cmd('configure', 'cf', configure, '[section]',
-                     _(u'start interactive configuration modus')),
+                     _(u'start interactive configuration mode')),
     'listpwschemes': cmd('listpwschemes', 'lp', list_pwschemes, '',
                          _(u'lists all usable password schemes and password '
                            u'encoding suffixes')),
@@ -1020,7 +1021,7 @@ def _print_catchall_info(domain, destinations):
     """Print the catchall destinations of a domain"""
     title = _(u'Catch-all information')
     w_std(title, u'-' * len(title))
-    w_std(_(u'\tMail to unknown localparts in domain %s will be sent to:')
+    w_std(_(u'\tMail to unknown local-parts in domain %s will be sent to:')
           % domain)
     w_std(*(u'\t     * %s' % dest for dest in destinations))
     print
@@ -1064,13 +1065,13 @@ def _print_address_list(which, dids, addresses, matching):
     """Print a list of (matching) addresses."""
     _trans = { TYPE_ACCOUNT                  : _('user accounts')
              , TYPE_ALIAS                    : _('aliases')
-             , TYPE_RELOCATED                : _('relocated entries')
+             , TYPE_RELOCATED                : _('relocated users')
              , TYPE_ACCOUNT | TYPE_ALIAS
                  : _('user accounts and aliases')
              , TYPE_ACCOUNT | TYPE_RELOCATED
-                 : _('user accounts and relocated entries')
+                 : _('user accounts and relocated users')
              , TYPE_ALIAS | TYPE_RELOCATED
-                 : _('aliases and relocated entries')
+                 : _('aliases and relocated users')
              , TYPE_ACCOUNT | TYPE_ALIAS | TYPE_RELOCATED : _('addresses')
              }
     try:

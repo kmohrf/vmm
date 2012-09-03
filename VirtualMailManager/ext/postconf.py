@@ -82,7 +82,7 @@ class Postconf(object):
         If not, a VMMError will be raised."""
         if not self.__class__._parameter_re.match(parameter):
             raise VMMError(_(u"The value '%s' does not look like a valid "
-                             u"postfix configuration parameter name.") %
+                             u"Postfix configuration parameter name.") %
                            parameter, VMM_ERROR)
 
     def _expand_vars(self):
