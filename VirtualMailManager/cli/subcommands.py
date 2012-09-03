@@ -957,6 +957,7 @@ def _format_quota_usage(limit, used, human=False, domaindefault=False):
         fmt = format_domain_default
     else:
         fmt = lambda s: s
+    # TP: e.g.: [  0.00%] 21.09 KiB/1.00 GiB
     return fmt(_(u'[%(percent)s%%] %(used)s/%(limit)s') % q_usage)
 
 
@@ -1091,6 +1092,8 @@ def _print_address_list(which, dids, addresses, matching):
                      , TYPE_RELOCATED : ''
                      }
         else:
+            # TP: the letters 'u', 'a' and 'r' are abbreviations of user,
+            # alias and relocated user
             _trans = { TYPE_ACCOUNT   : _('u')
                      , TYPE_ALIAS     : _('a')
                      , TYPE_RELOCATED : _('r')

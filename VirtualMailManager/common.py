@@ -79,6 +79,7 @@ def human_size(size):
         raise ValueError("'size' must be a positive long or int.")
     if size < 1024:
         return str(size)
+    # TP: abbreviations of gibibyte, tebibyte kibibyte and mebibyte
     prefix_multiply = ((_(u'TiB'), 1 << 40), (_(u'GiB'), 1 << 30),
                        (_(u'MiB'), 1 << 20), (_(u'KiB'), 1 << 10))
     for prefix, multiply in prefix_multiply:
@@ -188,6 +189,9 @@ def version_str(version):
 
 def format_domain_default(domaindata):
     """Format info output when the value displayed is the domain default."""
+    # TP: [domain default] indicates that a user's setting is the same as
+    # configured in the user's domain.
+    # e.g.: [  0.84%] 42/5,000 [domain default]
     return _(u'%s [domain default]') % domaindata
 
 
