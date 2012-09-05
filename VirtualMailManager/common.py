@@ -187,6 +187,7 @@ def version_str(version):
     _version_cache[version] = version_string
     return version_string
 
+
 def format_domain_default(domaindata):
     """Format info output when the value displayed is the domain default."""
     # TP: [domain default] indicates that a user's setting is the same as
@@ -218,19 +219,19 @@ def search_addresses(dbh, typelimit=None, lpattern=None, llike=False,
     type, and boolean indicating whether the address stems from an alias
     domain.
     """
-    if typelimit == None:
+    if typelimit is None:
             typelimit = TYPE_ACCOUNT | TYPE_ALIAS | TYPE_RELOCATED
     queries = []
     if typelimit & TYPE_ACCOUNT:
         queries.append('SELECT gid, local_part, %d AS type FROM users'
                        % TYPE_ACCOUNT)
     if typelimit & TYPE_ALIAS:
-        queries.append('SELECT DISTINCT gid, address as local_part, %d AS type '
-                       'FROM alias' % TYPE_ALIAS)
+        queries.append('SELECT DISTINCT gid, address as local_part, '
+                       '%d AS type FROM alias' % TYPE_ALIAS)
     if typelimit & TYPE_RELOCATED:
         queries.append('SELECT gid, address as local_part, %d AS type '
                        'FROM relocated' % TYPE_RELOCATED)
-    sql  = "SELECT gid, local_part || '@' || domainname AS address, "
+    sql = "SELECT gid, local_part || '@' || domainname AS address, "
     sql += 'type, NOT is_primary AS from_aliasdomain FROM ('
     sql += ' UNION '.join(queries)
     sql += ') a JOIN domain_name USING (gid)'
@@ -241,7 +242,8 @@ def search_addresses(dbh, typelimit=None, lpattern=None, llike=False,
         if like:
             match = 'LIKE'
         else:
-            if not pattern: continue
+            if not pattern:
+                continue
             match = '='
         sql += ' %s %s %s %%s' % (nextkw, field, match)
         sqlargs.append(pattern)

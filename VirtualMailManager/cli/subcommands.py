@@ -539,9 +539,11 @@ def list_users(ctx):
     """list all user accounts / search user accounts by pattern"""
     return list_addresses(ctx, TYPE_ACCOUNT)
 
+
 def list_aliases(ctx):
     """list all aliases / search aliases by pattern"""
     return list_addresses(ctx, TYPE_ALIAS)
+
 
 def list_relocated(ctx):
     """list all relocated records / search relocated records by pattern"""
@@ -644,8 +646,10 @@ def user_info(ctx):
         if details in (None, 'du'):
             info['quota storage'] = _format_quota_usage(info['ql_bytes'],
                     info['uq_bytes'], True, info['ql_domaindefault'])
-            info['quota messages'] = _format_quota_usage(info['ql_messages'],
-                    info['uq_messages'], domaindefault=info['ql_domaindefault'])
+            info['quota messages'] = \
+                _format_quota_usage(info['ql_messages'],
+                                    info['uq_messages'],
+                                    domaindefault=info['ql_domaindefault'])
             _print_info(ctx, info, _(u'Account'))
         else:
             info[0]['quota storage'] = _format_quota_usage(info[0]['ql_bytes'],
@@ -848,7 +852,8 @@ def update_cmd_map():
                        _(u'delete the specified catch-all destination or all '
                          u'of a domain\'s destinations')),
     'catchallinfo': cmd('catchallinfo', 'cai', catchall_info, 'fqdn',
-                     _(u'show the catch-all destination(s) of the specified domain')),
+                        _(u'show the catch-all destination(s) of the '
+                          u'specified domain')),
     # Domain commands
     'domainadd': cmd('domainadd', 'da', domain_add, 'fqdn [transport]',
                      _(u'create a new domain')),
@@ -872,9 +877,11 @@ def update_cmd_map():
     'listdomains': cmd('listdomains', 'ld', list_domains, '[pattern]',
                       _(u'list all domains or search for domains by pattern')),
     'listaddresses': cmd('listaddresses', 'll', list_addresses, '[pattern]',
-                      _(u'list all addresses or search for addresses by pattern')),
+                         _(u'list all addresses or search for addresses by '
+                           u'pattern')),
     'listusers': cmd('listusers', 'lu', list_users, '[pattern]',
-                      _(u'list all user accounts or search for accounts by pattern')),
+                     _(u'list all user accounts or search for accounts by '
+                       u'pattern')),
     'listaliases': cmd('listaliases', 'la', list_aliases, '[pattern]',
                       _(u'list all aliases or search for aliases by pattern')),
     'listrelocated': cmd('listrelocated', 'lr', list_relocated, '[pattern]',
@@ -990,6 +997,7 @@ def _print_note(note):
     txt_wrpr.subsequent_indent = old_si
     txt_wrpr.initial_indent = old_ii
 
+
 def _print_list(alist, title):
     """Print a list."""
     # TP: used in e.g. 'Existing alias addresses' or 'Existing accounts'
@@ -1064,17 +1072,15 @@ def _print_domain_list(dids, domains, matching):
 
 def _print_address_list(which, dids, addresses, matching):
     """Print a list of (matching) addresses."""
-    _trans = { TYPE_ACCOUNT                  : _('user accounts')
-             , TYPE_ALIAS                    : _('aliases')
-             , TYPE_RELOCATED                : _('relocated users')
-             , TYPE_ACCOUNT | TYPE_ALIAS
-                 : _('user accounts and aliases')
-             , TYPE_ACCOUNT | TYPE_RELOCATED
-                 : _('user accounts and relocated users')
-             , TYPE_ALIAS | TYPE_RELOCATED
-                 : _('aliases and relocated users')
-             , TYPE_ACCOUNT | TYPE_ALIAS | TYPE_RELOCATED : _('addresses')
-             }
+    _trans = {
+        TYPE_ACCOUNT: _('user accounts'),
+        TYPE_ALIAS: _('aliases'),
+        TYPE_RELOCATED: _('relocated users'),
+        TYPE_ACCOUNT | TYPE_ALIAS: _('user accounts and aliases'),
+        TYPE_ACCOUNT | TYPE_RELOCATED: _('user accounts and relocated users'),
+        TYPE_ALIAS | TYPE_RELOCATED: _('aliases and relocated users'),
+        TYPE_ACCOUNT | TYPE_ALIAS | TYPE_RELOCATED: _('addresses'),
+    }
     try:
         if matching:
             title = _(u'Matching %s') % _trans[which]
@@ -1087,17 +1093,15 @@ def _print_address_list(which, dids, addresses, matching):
     if addresses:
         if which & (which - 1) == 0:
             # only one type is requested, so no type indicator
-            _trans = { TYPE_ACCOUNT   : ''
-                     , TYPE_ALIAS     : ''
-                     , TYPE_RELOCATED : ''
-                     }
+            _trans = {TYPE_ACCOUNT: '', TYPE_ALIAS: '', TYPE_RELOCATED: ''}
         else:
             # TP: the letters 'u', 'a' and 'r' are abbreviations of user,
             # alias and relocated user
-            _trans = { TYPE_ACCOUNT   : _('u')
-                     , TYPE_ALIAS     : _('a')
-                     , TYPE_RELOCATED : _('r')
-                     }
+            _trans = {
+                TYPE_ACCOUNT: _('u'),
+                TYPE_ALIAS: _('a'),
+                TYPE_RELOCATED: _('r'),
+            }
         for did in dids:
             for addr, atype, aliasdomain in addresses[did]:
                 if aliasdomain:

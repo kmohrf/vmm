@@ -142,10 +142,10 @@ class LazyConfig(RawConfigParser):
         elif not section in self._cfg:
             raise NoSectionError(section)
         else:
-            return ((k, self._cfg[section][k].default) \
+            return ((k, self._cfg[section][k].default)
                     for k in self._cfg[section].iterkeys())
         # still here? Get defaults and merge defaults with configured setting
-        defaults = dict((k, self._cfg[section][k].default) \
+        defaults = dict((k, self._cfg[section][k].default)
                         for k in self._cfg[section].iterkeys())
         defaults.update(sect)
         if '__name__' in defaults:
@@ -435,25 +435,25 @@ class Config(LazyConfig):
         if not miss_vers:
             value = self.get('misc', 'dovecot_version')
             if not VERSION_RE.match(value):
-                self._missing['misc'] = ['version: ' +\
+                self._missing['misc'] = ['version: ' +
                         _(u"Not a valid Dovecot version: '%s'") % value]
         # section database
         db_err = []
         value = self.dget('database.module').lower()
         if value not in DB_MODULES:
-            db_err.append('module: ' + \
+            db_err.append('module: ' +
                           _(u"Unsupported database module: '%s'") % value)
         if value == 'psycopg2':
             value = self.dget('database.sslmode')
             if value not in DB_SSL_MODES:
-                db_err.append('sslmode: ' + \
+                db_err.append('sslmode: ' +
                               _(u"Unknown pgsql SSL mode: '%s'") % value)
         if db_err:
             self._missing['database'] = db_err
         # section mailbox
         value = self.dget('mailbox.format')
         if not known_format(value):
-            self._missing['mailbox'] = ['format: ' +\
+            self._missing['mailbox'] = ['format: ' +
                               _(u"Unsupported mailbox format: '%s'") % value]
         # section domain
         try:

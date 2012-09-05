@@ -462,8 +462,8 @@ class Domain(object):
         """Returns a list with all catchall e-mail addresses of the domain."""
         self._chk_state()
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT DISTINCT destination FROM catchall WHERE gid = %s ORDER '
-                    'BY destination', (self._gid,))
+        dbc.execute('SELECT DISTINCT destination FROM catchall WHERE gid = %s '
+                    'ORDER BY destination', (self._gid,))
         addresses = dbc.fetchall()
         dbc.close()
         return addresses

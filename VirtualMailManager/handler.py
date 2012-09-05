@@ -56,6 +56,7 @@ OTHER_TYPES = {
     TYPE_RELOCATED: (_(u'a relocated user'), RELOCATED_EXISTS),
 }
 
+
 class Handler(object):
     """Wrapper class to simplify the access on all the stuff from
     VirtualMailManager"""
@@ -621,7 +622,8 @@ class Handler(object):
                     checkp = lpattern
                 if len(checkp) > 0 and re.search(RE_LOCALPART, checkp):
                     raise VMMError(_(u"The pattern '%s' contains invalid "
-                                     u"characters.") % pattern, LOCALPART_INVALID)
+                                     u"characters.") % pattern,
+                                   LOCALPART_INVALID)
             else:
                 # else just match on domains
                 # (or should that be local part, I don't know…)
@@ -658,8 +660,8 @@ class Handler(object):
         alias = self._get_alias(aliasaddress)
         if not alias:
             self._is_other_address(alias.address, TYPE_ALIAS)
-        destinations = [DestinationEmailAddress(addr, self._dbh) \
-                for addr in targetaddresses]
+        destinations = [DestinationEmailAddress(addr, self._dbh)
+                        for addr in targetaddresses]
         warnings = []
         destinations = alias.add_destinations(destinations, warnings)
         if warnings:
@@ -724,8 +726,8 @@ The account has been successfully deleted from the database.
         """Creates a new `CatchallAlias` entry for the given *domain* with
         the given *targetaddresses*."""
         catchall = self._get_catchall(domain)
-        destinations = [DestinationEmailAddress(addr, self._dbh) \
-                for addr in targetaddresses]
+        destinations = [DestinationEmailAddress(addr, self._dbh)
+                        for addr in targetaddresses]
         warnings = []
         destinations = catchall.add_destinations(destinations, warnings)
         if warnings:

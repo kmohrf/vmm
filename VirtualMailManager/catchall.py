@@ -74,8 +74,9 @@ Hint: Increase Postfix' virtual_alias_expansion_limit""")
         elif dcount > limit:
             failed = True
             errmsg = _(
-u"""Cannot add %(count_new)i new destination(s) to catch-all alias for
-domain '%(domain)s'. This alias already exceeds its expansion limit (%(count)i/%(limit)i).
+u"""Cannot add %(count_new)i new destination(s) to catch-all alias for domain
+'%(domain)s'. This alias already exceeds its expansion limit \
+(%(count)i/%(limit)i).
 So its unusable, all messages addressed to this alias will be bounced.
 Hint: Delete some destination addresses.""")
         if failed:

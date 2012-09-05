@@ -353,7 +353,8 @@ class Account(object):
                 not self._mail.postfix:
                 raise AErr(_(u"Invalid transport '%(transport)s' for mailbox "
                              u"format '%(mbfmt)s'.") %
-                           {'transport': transport, 'mbfmt': self._mail.mbformat},
+                           {'transport': transport,
+                            'mbfmt': self._mail.mbformat},
                            INVALID_MAIL_LOCATION)
             transport = transport.tid
         self._update_tables('tid', transport)
