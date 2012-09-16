@@ -15,7 +15,9 @@ from random import choice
 from VirtualMailManager.constants import \
      ACCOUNT_AND_ALIAS_PRESENT, DOMAIN_ALIAS_EXISTS, DOMAIN_EXISTS, \
      DOMAIN_INVALID, DOMAIN_TOO_LONG, NO_SUCH_DOMAIN, VMM_ERROR
+from VirtualMailManager.common import validate_transport
 from VirtualMailManager.errors import VMMError, DomainError as DomErr
+from VirtualMailManager.maillocation import MailLocation
 from VirtualMailManager.pycompat import all, any
 from VirtualMailManager.quotalimit import QuotaLimit
 from VirtualMailManager.serviceset import ServiceSet
@@ -247,6 +249,10 @@ class Domain(object):
         """
         self._chk_state(False)
         assert isinstance(transport, Transport)
+        validate_transport(transport,
+                           MailLocation(self._dbh,
+                                        mbfmt=cfg_dget('mailbox.format'),
+                                        directory=cfg_dget('mailbox.root')))
         self._transport = transport
 
     def set_note(self, note):
@@ -367,6 +373,10 @@ class Domain(object):
         assert isinstance(transport, Transport)
         if not force and transport == self._transport:
             return
+        validate_transport(transport,
+                           MailLocation(self._dbh,
+                                        mbfmt=cfg_dget('mailbox.format'),
+                                        directory=cfg_dget('mailbox.root')))
         self._update_tables_ref('tid', transport.tid, force)
         self._transport = transport
 
