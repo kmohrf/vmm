@@ -14,8 +14,8 @@ import re
 import stat
 
 from VirtualMailManager import ENCODING
-from VirtualMailManager.constants import NOT_EXECUTABLE, NO_SUCH_BINARY, \
-     TYPE_ACCOUNT, TYPE_ALIAS, TYPE_RELOCATED
+from VirtualMailManager.constants import INVALID_MAIL_LOCATION, \
+     NOT_EXECUTABLE, NO_SUCH_BINARY, TYPE_ACCOUNT, TYPE_ALIAS, TYPE_RELOCATED
 from VirtualMailManager.errors import VMMError
 
 VERSION_RE = re.compile(r'^(\d+)\.(\d+)\.(?:(\d+)|(alpha|beta|rc)(\d+))$')
@@ -119,6 +119,27 @@ def size_in_bytes(size):
         except ValueError:
             raise ValueError('Not a valid size value: %r' % size)
         return num
+
+
+def validate_transport(transport, maillocation):
+    """Checks if the `transport` is usable for the given `maillocation`.
+
+    Throws a `VMMError` if the chosen `transport` is unable to write
+    messages in the `maillocation`'s mailbox format.
+
+    Arguments:
+
+    `transport` : VirtualMailManager.transport.Transport
+      a Transport object
+    `maillocation` : VirtualMailManager.maillocation.MailLocation
+      a MailLocation object
+    """
+    if transport.transport in ('virtual', 'virtual:') and \
+      not maillocation.postfix:
+        raise VMMError(_(u"Invalid transport '%(transport)s' for mailbox "
+                         u"format '%(mbfmt)s'.") %
+                       {'transport': transport.transport,
+                        'mbfmt': maillocation.mbformat}, INVALID_MAIL_LOCATION)
 
 
 def version_hex(version_string):

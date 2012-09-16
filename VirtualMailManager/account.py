@@ -14,6 +14,7 @@ from VirtualMailManager.constants import \
      ACCOUNT_EXISTS, ACCOUNT_MISSING_PASSWORD, ALIAS_PRESENT, \
      INVALID_ARGUMENT, INVALID_MAIL_LOCATION, NO_SUCH_ACCOUNT, \
      NO_SUCH_DOMAIN, VMM_ERROR
+from VirtualMailManager.common import validate_transport
 from VirtualMailManager.domain import Domain
 from VirtualMailManager.emailaddress import EmailAddress
 from VirtualMailManager.errors import VMMError, AccountError as AErr
@@ -125,12 +126,7 @@ class Account(object):
                        'version': version_str(maillocation.dovecot_version)},
                        INVALID_MAIL_LOCATION)
         transport = self._transport or self._domain.transport
-        if not maillocation.postfix and \
-          transport.transport.lower() in ('virtual:', 'virtual'):
-            raise AErr(_(u"Invalid transport '%(transport)s' for mailbox "
-                         u"format '%(mbfmt)s'.") %
-                       {'transport': transport,
-                        'mbfmt': maillocation.mbformat}, INVALID_MAIL_LOCATION)
+        validate_transport(transport, maillocation)
         self._mail = maillocation
         self._set_uid()
 
@@ -350,13 +346,7 @@ class Account(object):
         self._transport = transport
         if transport is not None:
             assert isinstance(transport, Transport)
-            if transport.transport.lower() in ('virtual', 'virtual:') and \
-                not self._mail.postfix:
-                raise AErr(_(u"Invalid transport '%(transport)s' for mailbox "
-                             u"format '%(mbfmt)s'.") %
-                           {'transport': transport,
-                            'mbfmt': self._mail.mbformat},
-                           INVALID_MAIL_LOCATION)
+            validate_transport(transport, self._mail)
             transport = transport.tid
         self._update_tables('tid', transport)
 
