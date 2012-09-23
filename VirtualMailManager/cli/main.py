@@ -62,6 +62,8 @@ def run(argv):
         w_err(EX_USER_INTERRUPT, '', _(u'Ouch!'), '')
     except errors.VMMError, err:
         if err.code != DATABASE_ERROR:
+            if handler.has_warnings():
+                w_err(0, _(u'Warnings:'), *handler.get_warnings())
             w_err(err.code, _(u'Error: %s') % err.msg)
         w_err(err.code, unicode(err.msg, ENCODING, 'replace'))
     except (BadOptionError, ConfigValueError), err:
