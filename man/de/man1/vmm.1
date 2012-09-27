@@ -1,4 +1,4 @@
-.TH "VMM" "1" "2012-08-12" "vmm 0.6" "vmm"
+.TH "VMM" "1" "2012-09-27" "vmm 0.6" "vmm"
 .SH NAME
 vmm \- Kommandozeilenprogramm zur Verwaltung von E\-Mail\-Domains/\-Konten
 und \-Aliase.
@@ -853,15 +853,15 @@ Beispiele:
 .\" ------------------------------------
 .SS aliasdelete (ad)
 .BI "vmm aliasdelete" " address"
-.RI [ destination ]
+.RI [ destination " ...]"
 .PP
 Verwenden Sie diesen Unterbefehl um den Alias mit der angegebenen Adresse
 zu löschen.
 .PP
-Wurde eine optionale
+Wurden eine oder mehrere optionale
 .I destination
-angegeben, so wird nur diese
-.I destination
+Adressen angegeben, so werden nur diese
+.IR destination s
 vom angegebenen Alias entfernt.
 .PP
 Beispiel:
@@ -972,11 +972,13 @@ Catch-all Informationen
 .\" ------------------------------------
 .SS catchalldelete (cad)
 .BI "vmm catchalldelete " fqdn
-.RI [ destination ]
+.RI [ destination " ...]"
 .PP
 Mit diesem Unterbefehl werden Catch\-all Aliase einer Domain wieder
-gelöscht, entweder nur das angegebene Alias, oder alle, wenn keines
-angegeben wurde.
+gelöscht,
+entweder nur das/die angegebene(n) Alias(e), oder alle, wenn keine
+.I destination
+Adresse angegeben wurde.
 .PP
 Beispiel:
 .PP

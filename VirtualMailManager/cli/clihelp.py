@@ -193,6 +193,11 @@ _(u"""Within the destination address, the placeholders '%n', '%d', and '%='
 will be replaced by the local part, the domain, or the email address with '@'
 replaced by '=' respectively. In combination with alias domains, this enables
 domain-specific destinations."""),),
+    # TP: description of subcommand aliasdelete
+    'aliasdelete': (_(u"""This subcommand is used to delete one or multiple
+<destination>s from the alias with the given <address>."""),
+_(u"""When no <destination> address was specified the alias with all its
+destinations will be deleted."""),),
     # TP: description of subcommand aliasinfo
     'aliasinfo': (_(u"""Information about the alias with the given <address>
 can be displayed with this subcommand."""),),
@@ -222,8 +227,8 @@ to all addresses between abba@example.org and zztop@example.org."""),),
 aliases defined for the domain <fqdn>."""),),
     # TP: description of subcommand catchalldelete
     'catchalldelete': (_(u"""With this subcommand, catch-all aliases defined
-for a domain can be removed, either all of them, or a single one if specified
-explicitly."""),),
+for a domain can be removed, either all of them, or those <destination>s which
+were specified explicitly."""),),
 }
 
 del _

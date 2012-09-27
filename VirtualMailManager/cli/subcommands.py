@@ -133,7 +133,7 @@ def alias_delete(ctx):
     elif ctx.argc < 4:
         ctx.hdlr.alias_delete(ctx.args[2].lower())
     else:
-        ctx.hdlr.alias_delete(ctx.args[2].lower(), ctx.args[3])
+        ctx.hdlr.alias_delete(ctx.args[2].lower(), ctx.args[3:])
 
 
 def alias_info(ctx):
@@ -220,7 +220,7 @@ def catchall_delete(ctx):
     elif ctx.argc < 4:
         ctx.hdlr.catchall_delete(ctx.args[2].lower())
     else:
-        ctx.hdlr.catchall_delete(ctx.args[2].lower(), ctx.args[3])
+        ctx.hdlr.catchall_delete(ctx.args[2].lower(), ctx.args[3:])
 
 
 def catchall_info(ctx):
@@ -826,7 +826,7 @@ def update_cmd_map():
                     _(u'create a new alias e-mail address with one or more '
                       u'destinations')),
     'aliasdelete': cmd('aliasdelete', 'ad', alias_delete,
-                       'address [destination]',
+                       'address [destination ...]',
                        _(u'delete the specified alias e-mail address or one '
                          u'of its destinations')),
     'aliasinfo': cmd('aliasinfo', 'ai', alias_info, 'address',
@@ -848,7 +848,7 @@ def update_cmd_map():
                        _(u'add one or more catch-all destinations for a '
                          u'domain')),
     'catchalldelete': cmd('catchalldelete', 'cad', catchall_delete,
-                       'fqdn [destination]',
+                       'fqdn [destination ...]',
                        _(u'delete the specified catch-all destination or all '
                          u'of a domain\'s destinations')),
     'catchallinfo': cmd('catchallinfo', 'cai', catchall_info, 'fqdn',

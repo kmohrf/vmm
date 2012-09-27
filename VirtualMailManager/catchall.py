@@ -84,18 +84,19 @@ Hint: Delete some destination addresses.""")
                                  'limit': limit, 'count_new': count_new},
                        ALIAS_EXCEEDS_EXPANSION_LIMIT)
 
-    def _delete(self, destination=None):
-        """Deletes a destination from the catchall alias, if ``destination``
-        is not ``None``.  If ``destination`` is None, the catchall alias with
-        all its destination addresses will be deleted.
+    def _delete(self, destinations=None):
+        """Delete one ore multiple destinations from the catchall alias, if
+        ``destinations`` is not ``None``.  If ``destinations`` is None, the
+        catchall alias with all its destination addresses will be deleted.
 
         """
         dbc = self._dbh.cursor()
-        if not destination:
+        if not destinations:
             dbc.execute('DELETE FROM catchall WHERE gid = %s', (self._gid,))
         else:
-            dbc.execute('DELETE FROM catchall WHERE gid = %s '
-                        'AND destination = %s', (self._gid, str(destination)))
+            dbc.executemany('DELETE FROM catchall WHERE gid = %d AND '
+                            'destination = %%s' % self._gid,
+                            ((str(dest),) for dest in destinations))
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
@@ -139,20 +140,28 @@ Hint: Delete some destination addresses.""")
         self._dests.extend(destinations)
         return destinations
 
-    def del_destination(self, destination):
-        """Deletes the specified ``destination`` address from the catchall
-        alias."""
-        assert isinstance(destination, EmailAddress)
+    def del_destinations(self, destinations, warnings=None):
+        """Deletes the specified ``destinations`` from the catchall alias."""
+        destinations = set(destinations)
+        assert destinations and \
+                all(isinstance(dest, EmailAddress) for dest in destinations)
+        if not warnings is None:
+            assert isinstance(warnings, list)
         if not self._dests:
             raise AErr(_(u"There are no catch-all aliases defined for "
                          u"domain '%s'.") % self._domain, NO_SUCH_ALIAS)
-        if not destination in self._dests:
-            raise AErr(_(u"The address '%(addr)s' is not a destination of "
-                         u"the catch-all alias for domain '%(domain)s'.")
-                       % {'addr': destination, 'domain': self._domain},
+        unknown = destinations.difference(set(self._dests))
+        if unknown:
+            destinations.intersection_update(set(self._dests))
+            if not warnings is None:
+                warnings.extend(unknown)
+        if not destinations:
+            raise AErr(_(u"No suitable destinations left to remove from the "
+                         u"catch-all alias of domain '%s'.") % self._domain,
                        NO_SUCH_ALIAS)
-        self._delete(destination)
-        self._dests.remove(destination)
+        self._delete(destinations)
+        for destination in destinations:
+            self._dests.remove(destination)
 
     def get_destinations(self):
         """Returns an iterator for all destinations of the catchall alias."""

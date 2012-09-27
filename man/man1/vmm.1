@@ -1,4 +1,4 @@
-.TH "VMM" "1" "2012-09-02" "vmm 0.6" "vmm"
+.TH "VMM" "1" "2012-09-27" "vmm 0.6" "vmm"
 .SH NAME
 vmm \- command line tool to manage email domains/accounts/aliases
 .\" -----------------------------------------------------------------------
@@ -821,15 +821,16 @@ Examples:
 .\" ------------------------------------
 .SS aliasdelete (ad)
 .BI "vmm aliasdelete" " address"
-.RI [ destination ]
+.RI [ destination " ...]"
 .PP
-Use this subcommand to delete the alias with the given
+This subcommand is used to delete one or multiple
+.IR  destination s
+from the alias with the given
 .IR address .
 .PP
-If the optional
+When no
 .I destination
-address is given, only this
-destination will be removed from the alias.
+address was specified the alias with all its destinations will be deleted.
 .PP
 Example:
 .PP
@@ -935,10 +936,12 @@ Catch-all information
 .\" ------------------------------------
 .SS catchalldelete (cad)
 .BI "vmm catchalldelete " fqdn
-.RI [ destination ]
+.RI [ destination " ...]"
 .PP
 With this subcommand, catch\-all aliases defined for a domain can be
-removed, either all of them, or a single one if specified explicitly.
+removed, either all of them, or those
+.IR destination s
+which were specified explicitly.
 .PP
 Example:
 .PP

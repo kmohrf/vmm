@@ -711,16 +711,27 @@ The account has been successfully deleted from the database.
             raise VMMError(_(u"The alias '%s' does not exist.") %
                            alias.address, NO_SUCH_ALIAS)
 
-    def alias_delete(self, aliasaddress, targetaddress=None):
+    def alias_delete(self, aliasaddress, targetaddresses=None):
         """Deletes the `Alias` *aliasaddress* with all its destinations from
-        the database. If *targetaddress* is not ``None``, only this
-        destination will be removed from the alias."""
+        the database. If *targetaddresses* is not ``None``, only the given
+        destinations will be removed from the alias."""
         alias = self._get_alias(aliasaddress)
-        if targetaddress is None:
+        error = None
+        if targetaddresses is None:
             alias.delete()
         else:
-            alias.del_destination(DestinationEmailAddress(targetaddress,
-                                                          self._dbh))
+            destinations = [DestinationEmailAddress(addr, self._dbh)
+                            for addr in targetaddresses]
+            warnings = []
+            try:
+                alias.del_destinations(destinations, warnings)
+            except VMMError, err:
+                error = err
+            if warnings:
+                self._warnings.append(_('Ignored destination addresses:'))
+                self._warnings.extend(('  * %s' % w for w in warnings))
+            if error:
+                raise error
 
     def catchall_add(self, domain, *targetaddresses):
         """Creates a new `CatchallAlias` entry for the given *domain* with
@@ -744,16 +755,27 @@ The account has been successfully deleted from the database.
         instances) for the `CatchallAlias` with the given *domain*."""
         return self._get_catchall(domain).get_destinations()
 
-    def catchall_delete(self, domain, targetaddress=None):
+    def catchall_delete(self, domain, targetaddresses=None):
         """Deletes the `CatchallAlias` for domain *domain* with all its
-        destinations from the database. If *targetaddress* is not ``None``,
-        only this destination will be removed from the alias."""
+        destinations from the database.  If *targetaddresses* is not
+        ``None``,  only those destinations will be removed from the alias."""
         catchall = self._get_catchall(domain)
-        if targetaddress is None:
+        error = None
+        if targetaddresses is None:
             catchall.delete()
         else:
-            catchall.del_destination(DestinationEmailAddress(targetaddress,
-                                                             self._dbh))
+            destinations = [DestinationEmailAddress(addr, self._dbh)
+                            for addr in targetaddresses]
+            warnings = []
+            try:
+                catchall.del_destinations(destinations, warnings)
+            except VMMError, err:
+                error = err
+            if warnings:
+                self._warnings.append(_('Ignored destination addresses:'))
+                self._warnings.extend(('  * %s' % w for w in warnings))
+            if error:
+                raise error
 
     def user_info(self, emailaddress, details=None):
         """Wrapper around Account.get_info(...)"""
