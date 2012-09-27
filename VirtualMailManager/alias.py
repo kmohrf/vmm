@@ -42,7 +42,8 @@ class Alias(object):
         """Loads all known destination addresses into the _dests list."""
         dbc = self._dbh.cursor()
         dbc.execute('SELECT destination FROM alias WHERE gid = %s AND '
-                    'address = %s', (self._gid, self._addr.localpart))
+                    'address = %s ORDER BY destination',
+                    (self._gid, self._addr.localpart))
         dests = dbc.fetchall()
         if dbc.rowcount > 0:
             self._dests.extend(DestAddr(dest[0], self._dbh) for dest in dests)
