@@ -44,6 +44,20 @@ Your current configuration file will be backed as vmm.cfg.bak."""),),
     # TP: description of subcommand getuser
     'getuser': (_(u"""If only the <uid> is available, for example from process
 list, the subcommand getuser will show the user's address."""),),
+    # TP: description of subcommand listaddresses
+    'listaddresses': (_(u"""This command lists all defined addresses.
+Addresses belonging to alias-domains are prefixed with a '-', addresses of
+regular domains with a '+'. Additionally, the letters 'u', 'a', and 'r'
+indicate the type of each address: user, alias and relocated respectively.
+The output can be limited with an optional <pattern>."""),
+_(u"""To perform a wild card search, the % character can be used at the start
+and/or the end of the <pattern>."""),),
+    # TP: description of subcommand listaliases
+    'listaliases': (_(u"""This command lists all defined aliases. Aliases
+belonging to alias-domains are prefixed with a '-', addresses of regular
+domains with a '+'. The output can be limited with an optional <pattern>."""),
+_(u"""To perform a wild card search, the % character can be used at the start
+and/or the end of the <pattern>."""),),
     # TP: description of subcommand listdomains
     'listdomains': (_(u"""This subcommand lists all available domains. All
 domain names will be prefixed either with `[+]', if the domain is a primary
@@ -59,6 +73,19 @@ libc."""),
 _(u"""When your Dovecot installation isn't too old, you will see additionally
 a few usable encoding suffixes. One of them can be appended to the password
 scheme."""),),
+    # TP: description of subcommand listrelocated
+    'listrelocated': (_(u"""This command lists all defined relocated addresses.
+Relocated entries belonging to alias-domains are prefixed with a '-', addresses
+of regular domains with a '+'. The output can be limited with an optional
+<pattern>."""),
+_(u"""To perform a wild card search, the % character can be used at the start
+and/or the end of the <pattern>."""),),
+    # TP: description of subcommand listusers
+    'listusers': (_(u"""This command lists all user accounts. User accounts
+belonging to alias-domains are prefixed with a '-', addresses of regular
+domains with a '+'. The output can be limited with an optional <pattern>."""),
+_(u"""To perform a wild card search, the % character can be used at the start
+and/or the end of the pattern."""),),
     # TP: description of subcommand version
     'version': (_(u"""Prints vmm's version and copyright information to stdout.
 After this vmm exits."""),),
