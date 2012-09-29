@@ -123,6 +123,62 @@ Prints a list of available subcommands with a short description to stdout.
 When a *subcommand* was given, help for that *subcommand* will be displayed.
 After this :command:`vmm` exits.
 
+listaddresses
+-------------
+Syntax:
+ | **vmm listaddresses** [*pattern*]
+ | **vmm ll** [*pattern*]
+
+This command lists all defined addresses. Addresses belonging to
+alias-domains are prefixed with a '-', addresses of regular domains with
+a '+'.
+Additionally, the letters 'u', 'a', and 'r' indicate the type of each
+address: user, alias and relocated respectively. The output can be limited
+with an optional *pattern*.
+
+To perform a wild card search, the **%** character can be used at the start
+and/or the end of the *pattern*.
+
+Example:
+
+.. code-block:: console
+
+ root@host:~# vmm ll example.com
+ Matching addresses
+ ------------------
+         [u+] a.user@example.com
+         [r+] b.user@example.com
+         [u+] d.user@example.com
+         [u+] john.doe@example.com
+         [u+] postmaster@example.com
+         [a+] support@example.com
+
+.. versionadded:: 0.6.0
+
+listaliases
+-----------
+Syntax:
+ | **vmm listaliases** [*pattern*]
+ | **vmm la** [*pattern*]
+
+This command lists all defined aliases. Aliases belonging to alias-domains
+are prefixed with a '-', addresses of regular domains with a '+'.
+The output can be limited with an optional *pattern*.
+
+To perform a wild card search, the **%** character can be used at the start
+and/or the end of the *pattern*.
+
+Example:
+
+.. code-block:: console
+
+ root@host:~# vmm listaliases example.com
+ Matching aliases
+ ----------------
+         [+] support@example.com
+
+.. versionadded:: 0.6.0
+
 listdomains
 -----------
 Syntax:
@@ -180,6 +236,59 @@ Example:
  Usable encoding suffixes
  ------------------------
          .B64 .BASE64 .HEX
+
+.. versionadded:: 0.6.0
+
+listrelocated
+-------------
+Syntax:
+ | **vmm listrelocated** [*pattern*]
+ | **vmm lr** [*pattern*]
+
+This command lists all defined relocated addresses.
+Relocated entries belonging to alias-domains are prefixed with a '-',
+addresses of regular domains with a '+'.
+The output can be limited with an optional *pattern*.
+
+To perform a wild card search, the **%** character can be used at the start
+and/or the end of the *pattern*.
+
+Example:
+
+.. code-block:: console
+
+ root@host:~# vmm listrelocated example.com
+ Matching relocated users
+ ------------------------
+         [+] b.user@example.com
+
+.. versionadded:: 0.6.0
+
+listusers
+---------
+Syntax:
+ | **vmm listusers** [*pattern*]
+ | **vmm lu** [*pattern*]
+
+This command lists all user accounts.
+User accounts belonging to alias-domains are prefixed with a '-', addresses
+of regular domains with a '+'.
+The output can be limited with an optional *pattern*.
+
+To perform a wild card search, the **%** character can be used at the start
+and/or the end of the *pattern*.
+
+Example:
+
+.. code-block:: console
+
+ root@host:~# vmm listusers example.com
+ Matching user accounts
+ ----------------------
+         [+] a.user@example.com
+         [+] d.user@example.com
+         [+] john.doe@example.com
+         [+] postmaster@example.com
 
 .. versionadded:: 0.6.0
 

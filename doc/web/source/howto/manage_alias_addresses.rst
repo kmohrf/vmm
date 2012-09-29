@@ -26,19 +26,23 @@ Example:
 aliasdelete
 -----------
 Syntax:
- | **vmm aliasdelete** *address* [*destination*]
- | **vmm ad** *address* [*destination*]
+ | **vmm aliasdelete** *address* [*destination* ...]
+ | **vmm ad** *address* [*destination* ...]
 
-Use this subcommand to delete the alias with the given *address*.
+This subcommand is used to delete one or multiple *destination*\ s from the
+alias with the given *address*.
 
-If the optional *destination* address is given, only this destination will
-be removed from the alias.
+When no *destination* address was specified the alias with all its
+destinations will be deleted.
 
 Example:
 
 .. code-block:: console
 
  root@host:~# vmm ad support@example.com d.user@example.com
+
+.. versionchanged:: 0.6.1
+   Accept multiple destinations.
 
 aliasinfo
 ---------

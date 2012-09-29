@@ -28,11 +28,11 @@ Example:
 catchalldelete
 --------------
 Syntax:
- | **vmm catchalldelete** *fqdn* [*destination*]
- | **vmm cad** *fqdn* [*destination*]
+ | **vmm catchalldelete** *fqdn* [*destination* ...]
+ | **vmm cad** *fqdn* [*destination* ...]
 
 With this subcommand, catch-all aliases defined for a domain can be removed,
-either all of them, or a single one if specified explicitly.
+either all of them, or those *destination*\ s which were specified explicitly.
 
 Example:
 
@@ -41,6 +41,9 @@ Example:
  root@host:~# vmm catchalldelete example.com user@example.com
 
 .. versionadded:: 0.6.0
+
+.. versionchanged:: 0.6.1
+   Accept multiple destinations.
 
 catchallinfo
 ------------
