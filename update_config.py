@@ -8,18 +8,26 @@ os.sys.path.remove(os.sys.path[0])
 from time import time
 from ConfigParser import ConfigParser
 from shutil import copy2
+
+pre_060 = False
+
 try:
     from VirtualMailManager.constants.VERSION import VERSION
+    pre_060 = True
 except ImportError:
-    os.sys.stderr.write('error: no pre 0.6.0 version information found\n')
-    raise SystemExit(2)
+    try:
+        from VirtualMailManager.constants import VERSION
+    except ImportError:
+        os.sys.stderr.write('error: no vmm version information found\n')
+        raise SystemExit(2)
 
 # we have to remove the old CamelCase files
-import VirtualMailManager
-vmm_inst_dir = os.path.dirname(VirtualMailManager.__file__)
-tmp_info = open('/tmp/vmm_inst_dir', 'w')
-tmp_info.write(vmm_inst_dir)
-tmp_info.close()
+if pre_060:
+    import VirtualMailManager
+    vmm_inst_dir = os.path.dirname(VirtualMailManager.__file__)
+    tmp_info = open('/tmp/vmm_inst_dir', 'w')
+    tmp_info.write(vmm_inst_dir)
+    tmp_info.close()
 
 try:
     import psycopg2
@@ -27,6 +35,7 @@ except ImportError:
     has_psycopg2 = False
 else:
     has_psycopg2 = True
+
 
 def get_config_file():
     f = None
@@ -41,16 +50,19 @@ def get_config_file():
         os.sys.stderr.write('error: vmm.cfg not found\n')
         raise SystemExit(2)
 
+
 def update(cp):
     if VERSION == '0.5.2':
         upd_052(cp)
     elif VERSION == '0.6.0':
-        os.sys.stdout.write('info: nothing to do for version %s\n' % VERSION)
+        os.sys.stdout.write('info: vmm.cfg: nothing to do for version %s\n' %
+                            VERSION)
         return
     else:
-        os.sys.stderr.write(
-            'error: the version %s is not supported by this script\n' % VERSION)
+        os.sys.stderr.write('error: the version %s is not supported by this '
+                            'script\n' % VERSION)
         raise SystemExit(3)
+
 
 def get_cfg_parser(cf):
     fh = open(cf, 'r')
@@ -59,16 +71,19 @@ def get_cfg_parser(cf):
     fh.close()
     return cp
 
+
 def update_cfg_file(cp, cf):
-    copy2(cf, cf+'.bak.'+str(time()))
+    copy2(cf, cf + '.bak.' + str(time()))
     fh = open(cf, 'w')
     cp.write(fh)
     fh.close()
+
 
 def add_sections(cp, sections):
     for section in sections:
         if not cp.has_section(section):
             cp.add_section(section)
+
 
 def move_option(cp, src, dst):
     ds, do = dst.split('.')
@@ -77,6 +92,7 @@ def move_option(cp, src, dst):
         cp.set(ds, do, cp.get(ss, so))
         cp.remove_option(ss, so)
         sect_opt.append((dst, 'R'))
+
 
 def add_option(cp, dst, val):
     ds, do = dst.split('.')
@@ -99,6 +115,7 @@ def set_dovecot_version(cp):
 def get_option(cp, src):
     ss, so = src.split('.')
     return cp.get(ss, so)
+
 
 def upd_052(cp):
     global had_config
@@ -144,7 +161,7 @@ if __name__ == '__main__':
     if len(sect_opt):
         update_cfg_file(cp, cf)
         sect_opt.sort()
-        print 'Please have a look at your configuration: %s' %cf
+        print 'Please have a look at your configuration: %s' % cf
         print 'This are your Modified/Renamed/New settings:'
         for s_o, st in sect_opt:
             print '%s   %s = %s' % (st, s_o, get_option(cp, s_o))
