@@ -80,5 +80,24 @@ If you have installed vmm 0.5.2 you have to proceed this steps:
     * start Dovecot and Postfix again
 
 
+If you have installed vmm 0.6.0 you have to proceed this steps:
+
+    * Database fixes:
+	- Due to an error in usertransport's argument parsing, it is
+	  possible that some users' transport-ID points to the erroneous
+	  transport 'domain'. To fix that error in your database, execute
+	  the following SQL statement:
+
+	   UPDATE users SET tid = NULL
+   	    WHERE tid = (SELECT tid FROM transport WHERE transport = 'domain');
+
+	- If you are using Dovecot < v1.2.0:
+	  You have to replace the database FUNCTION dovecotpassword().
+	  (see file: pgsql/create_tables.pgsql)
+	  The service_set.ssid was selected unconditionally. This may cause
+	  an empty result, which will make logins impossible.
+
+    * execute upgrade.sh
+
 else
      * read INSTALL
