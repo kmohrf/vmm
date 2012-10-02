@@ -255,6 +255,89 @@ Matching domains
         [+] example.org
 .fi
 .\" ------------------------------------
+.SS listaddresses (ll)
+.B vmm listaddresses
+.RI [ pattern ]
+.PP
+This command lists all defined addresses. Addresses belonging to
+alias-domains are prefixed with a '-', addresses of regular domains with
+a '+'. Additionally, the letters 'u', 'a', and 'r' indicate the type of
+each address: user, alias and relocated respectively.
+The output can be limited with an optional
+.IR pattern .
+.PP
+To perform a wild card search, the % character can be used at the start
+and/or the end of the
+.IR pattern .
+.PP
+Example:
+.PP
+.nf
+.B vmm listaddresses example.com
+.B vmm listaddresses %master@%
+.\" ------------------------------------
+.SS listaliases (la)
+.B vmm listaliases
+.RI [ pattern ]
+.PP
+This command lists all defined aliases. Aliases belonging to
+alias-domains are prefixed with a '-', addresses of regular domains with
+a '+'.
+The output can be limited with an optional
+.IR pattern .
+.PP
+To perform a wild card search, the % character can be used at the start
+and/or the end of the
+.IR pattern .
+.PP
+Example:
+.PP
+.nf
+.B vmm listaliases example.com
+.B vmm listaliases %master@%
+.\" ------------------------------------
+.SS listrelocated (lr)
+.B vmm listrelocated
+.RI [ pattern ]
+.PP
+This command lists all defined relocated addresses. Relocated entries
+belonging to alias-domains are prefixed with a '-', addresses of regular
+domains with
+a '+'.
+The output can be limited with an optional
+.IR pattern .
+.PP
+To perform a wild card search, the % character can be used at the start
+and/or the end of the
+.IR pattern .
+.PP
+Example:
+.PP
+.nf
+.B vmm listrelocated example.com
+.B vmm listrelocated %master@%
+.\" ------------------------------------
+.SS listusers (lu)
+.B vmm listusers
+.RI [ pattern ]
+.PP
+This command lists all user accounts. User accounts belonging to
+alias-domains are prefixed with a '-', addresses of regular
+domains with
+a '+'.
+The output can be limited with an optional
+.IR pattern .
+.PP
+To perform a wild card search, the % character can be used at the start
+and/or the end of the
+.IR pattern .
+.PP
+Example:
+.PP
+.nf
+.B vmm listusers example.com
+.B vmm listusers %master@%
+.\" ------------------------------------
 .SS listpwschemes (lp)
 .B vmm listpwschemes
 .PP

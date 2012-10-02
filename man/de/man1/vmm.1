@@ -267,6 +267,76 @@ Beispiel:
         [+] sales.example.com
 .fi
 .\" ------------------------------------
+.SS listaddresses (ll)
+.B vmm listaddresses
+.RI [ pattern ]
+.PP
+Verwenden Sie diesen Unterbefehl, um alle Adressen anzuzeigen.
+Einträge regulärer Domains werden mit einem '+' gekennzeichnet, Einträge
+von Alias-Domains mit einem '-'. Zudem wird jedem Eintrag ein 'u', 'a',
+oder 'r' vorangestellt, welche den Eintrag als Benutzerkonto, Alias oder
+Relocated User identifizieren.
+.PP
+Mit dem optionalen Muster können Sie die Ausgabe einschränken. Akzeptiert
+wird entweder eine Domain oder ein SQL-Muster (% als Wildcard).
+.PP
+Beispiel:
+.PP
+.nf
+.B vmm listaddresses example.com
+.B vmm listaddresses %master@%
+.\" ------------------------------------
+.SS listaliases (la)
+.B vmm listaliases
+.RI [ pattern ]
+.PP
+Verwenden Sie diesen Unterbefehl, um alle Aliase anzuzeigen. Reguläre
+Aliase werden mit einem '+' gekennzeichnet, Aliase in Alias-Domains mit
+einem '-'.
+.PP
+Mit dem optionalen Muster können Sie die Ausgabe einschränken. Akzeptiert
+wird entweder eine Domain oder ein SQL-Muster (% als Wildcard).
+.PP
+Beispiel:
+.PP
+.nf
+.B vmm listaliases example.com
+.B vmm listaliases %master@%
+.\" ------------------------------------
+.SS listrelocated (lr)
+.B vmm listrelocated
+.RI [ pattern ]
+.PP
+Verwenden Sie diesen Unterbefehl, um alle Relocated Users anzuzeigen.
+Einträge regulärer Domains werden mit einem '+' gekennzeichnet, Einträge
+von Alias-Domains mit einem '-'.
+.PP
+Mit dem optionalen Muster können Sie die Ausgabe einschränken. Akzeptiert
+wird entweder eine Domain oder ein SQL-Muster (% als Wildcard).
+.PP
+Beispiel:
+.PP
+.nf
+.B vmm listrelocated example.com
+.B vmm listrelocated %master@%
+.\" ------------------------------------
+.SS listusers (lu)
+.B vmm listusers
+.RI [ pattern ]
+.PP
+Verwenden Sie diesen Unterbefehl, um alle Benutzerkonten anzuzeigen.
+Reguläre Benutzerkonten werden mit einem '+' gekennzeichnet, Benutzerkonten
+in Alias-Domains mit einem '-'.
+.PP
+Mit dem optionalen Muster können Sie die Ausgabe einschränken. Akzeptiert
+wird entweder eine Domain oder ein SQL-Muster (% als Wildcard).
+.PP
+Beispiel:
+.PP
+.nf
+.B vmm listusers example.com
+.B vmm listusers %master@%
+.\" ------------------------------------
 .SS listpwschemes (lp)
 .B vmm listpwschemes
 .PP
