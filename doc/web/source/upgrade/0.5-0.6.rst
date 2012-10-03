@@ -50,14 +50,14 @@ Dovecot v1.2.x/v2.0.x/v2.1.x
 """"""""""""""""""""""""""""
 .. code-block:: postgresql-console
 
- mailsys=> \i /path/to/vmm-0.6.0/pgsql/update_tables_0.5.x-0.6-dovecot-1.2.x.pgsql
+ mailsys=> \i /path/to/vmm-0.6.1/pgsql/update_tables_0.5.x-0.6-dovecot-1.2.x.pgsql
  mailsys=> \q
 
 Dovecot v1.0.x/v1.1.x
 """""""""""""""""""""
 .. code-block:: postgresql-console
 
- mailsys=> \i /path/to/vmm-0.6.0/pgsql/update_tables_0.5.x-0.6.pgsql
+ mailsys=> \i /path/to/vmm-0.6.1/pgsql/update_tables_0.5.x-0.6.pgsql
  mailsys=> \q
 
 .. _set-database-permissions:
@@ -74,7 +74,7 @@ Start Dovecot and Postfix again
    So you have to adjust all your ``postfix/pgsql-*.cf`` files and also your
    ``/etc/dovecot/dovecot-sql.conf`` or ``/etc/dovecot/dovecot-sql.conf.ext``.
 
-   See the `vmm-0.6.0/postfix/pgsql-*.cf` files and
+   See the `vmm-0.6.1/postfix/pgsql-*.cf` files and
    :ref:`Dovecot configuration <dovecot-sql-conf-ext>`/`dovecot-sql.conf.ext`
    or :ref:`Dovecot configuration <dovecot-sql-conf>`/`dovecot-sql-conf`.
 
@@ -94,8 +94,8 @@ This will install the new code and also update your :file:`vmm.cfg`.
 
 .. code-block:: console
 
- root@host:~# cd /path/to/vmm-0.6.0
- root@host:/path/to/vmm-0.6.0# ./upgrade.sh
+ root@host:~# cd /path/to/vmm-0.6.1
+ root@host:/path/to/vmm-0.6.1# ./upgrade.sh
  Please have a look at your configuration: /usr/local/etc/vmm.cfg
  This are your Modified/Renamed/New settings:
  R   account.delete_directory = false
@@ -120,6 +120,63 @@ This will install the new code and also update your :file:`vmm.cfg`.
 
  Removed option "gid_mail" from section "misc" (obsolte)
 
+
+Upgrading from vmm-0.6.0
+------------------------
+
+Database fixes
+^^^^^^^^^^^^^^
+Due to an error in :ref:`usertransport`'s argument parsing, it is possible
+that some users' transport-ID points to the erroneous transport *domain*.
+To fix that error in your database, execute the following SQL statement:
+
+.. code-block:: psql
+
+ UPDATE users SET tid = NULL
+  WHERE tid = (SELECT tid FROM transport WHERE transport = 'domain');
+
+If you are using Dovecot < v.1.2.0, you have to replace the database
+function *dovecotpassword()*.
+The *service_set.ssid* was selected unconditionally.
+This may cause an empty result, which will make logins impossible.
+To replace the function execute the following SQL statement:
+
+.. code-block:: psql
+
+ CREATE OR REPLACE FUNCTION dovecotpassword(
+     IN localpart varchar, IN the_domain varchar) RETURNS SETOF dovecotpassword
+ AS $$
+     DECLARE
+         record dovecotpassword;
+         userid varchar(320) := localpart || '@' || the_domain;
+     BEGIN
+         FOR record IN
+             SELECT userid, passwd, smtp, pop3, imap, managesieve
+               FROM users, service_set, domain_data
+              WHERE users.gid = (SELECT gid
+                                   FROM domain_name
+                                  WHERE domainname = the_domain)
+                AND local_part = localpart
+                AND users.gid = domain_data.gid
+                AND CASE WHEN
+                   users.ssid IS NOT NULL
+                   THEN
+                     service_set.ssid = users.ssid
+                   ELSE
+                     service_set.ssid = domain_data.ssid
+                   END
+             LOOP
+                 RETURN NEXT record;
+             END LOOP;
+         RETURN;
+     END;
+ $$ LANGUAGE plpgsql STABLE
+ RETURNS NULL ON NULL INPUT
+ EXTERNAL SECURITY INVOKER;
+
+Upgrade vmm
+^^^^^^^^^^^
+Execute the :file:`upgrade.sh`, in order to install the updated code.
 
 Upgrade to Dovecot ≧ v1.2.beta2
 -------------------------------

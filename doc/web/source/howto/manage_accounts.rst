@@ -173,6 +173,8 @@ Example:
 
  root@host:~# userservices d.user@example.com SMTP IMAP
 
+.. _usertransport:
+
 usertransport
 -------------
 Syntax:

@@ -5,6 +5,7 @@ Release history of vmm
 =========== ============ ======================================================
 Version     Release Date Download URL
 =========== ============ ======================================================
+vmm-0.6.1   Oct 03 2012  https://sourceforge.net/projects/vmm/files/vmm/0.6.1
 vmm-0.6.0   Jun 28 2012  https://sourceforge.net/projects/vmm/files/vmm/0.6.0
 vmm-0.5.2   Sep 09 2009  https://sourceforge.net/projects/vmm/files/vmm/0.5.2
 vmm-0.5.1   Aug 12 2009  https://sourceforge.net/projects/vmm/files/vmm/0.5.1

@@ -98,14 +98,14 @@ Dovecot v1.2.x/v2.0.x/v2.1.x
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. code-block:: postgresql-console
 
- mailsys=> \i /path/to/vmm-0.6.0/pgsql/create_tables-dovecot-1.2.x.pgsql
+ mailsys=> \i /path/to/vmm-0.6.1/pgsql/create_tables-dovecot-1.2.x.pgsql
  mailsys=> \q
 
 Dovecot v1.0.x/v1.1.x
 ^^^^^^^^^^^^^^^^^^^^^
 .. code-block:: postgresql-console
 
- mailsys=> \i /path/to/vmm-0.6.0/pgsql/create_tables.pgsql
+ mailsys=> \i /path/to/vmm-0.6.1/pgsql/create_tables.pgsql
  mailsys=> \q
 
 Set database permissions

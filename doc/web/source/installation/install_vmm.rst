@@ -2,19 +2,19 @@
 Installing vmm
 ==============
 After you've prepared everything, it's time to install vmm.
-Change into the :file:`vmm-0.6.0` directory an execute the
+Change into the :file:`vmm-0.6.1` directory an execute the
 :file:`install.sh` script.
 You can adjust the installation prefix by modifying line 8 of the script.
 
 .. code-block:: console
 
- root@host:~# cd /path/to/vmm-0.6.0
- root@host:/path/to/vmm-0.6.0# ./install.sh
+ root@host:~# cd /path/to/vmm-0.6.1
+ root@host:/path/to/vmm-0.6.1# ./install.sh
 
  Don't forget to edit /usr/local/etc/vmm.cfg - or run: vmm cf
  and /etc/postfix/pgsql-*.cf files.
 
- root@host:/path/to/vmm-0.6.0#
+ root@host:/path/to/vmm-0.6.1#
 
 pgsql-\*.cf files
 -----------------

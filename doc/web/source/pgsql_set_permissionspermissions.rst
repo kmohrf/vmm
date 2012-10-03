@@ -3,7 +3,7 @@ database users.
 
 .. code-block:: console
 
- user@host:~$ python /path/to/vmm-0.6.0/pgsql/set-permissions.py -h
+ user@host:~$ python /path/to/vmm-0.6.1/pgsql/set-permissions.py -h
  Usage: set-permissions.py OPTIONS
  
  Set permissions for Dovecot and Postfix in the vmm database.
@@ -27,7 +27,7 @@ database users.
    -M USER, --postfix=USER
                          Database user name of the Postfix (MTA)  database
                          user. Default: postfix
- user@host:~$ python /path/to/vmm-0.6.0/pgsql/set-permissions.py -a -H 127.0.0.1 -U vmm
+ user@host:~$ python /path/to/vmm-0.6.1/pgsql/set-permissions.py -a -H 127.0.0.1 -U vmm
  Password: 
  user@host:~$ 
 
