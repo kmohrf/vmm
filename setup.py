@@ -7,7 +7,7 @@ import os
 from distutils.core import setup
 from distutils.dist import DistributionMetadata
 
-VERSION = '0.6.0'
+VERSION = '0.6.1'
 
 descr = 'Tool to manage mail domains/accounts/aliases for Dovecot and Postfix'
 long_description = """

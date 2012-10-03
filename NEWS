@@ -1,3 +1,17 @@
+v0.6.1	2012-10-03  Pascal Volk <user+vmm@localhost.localdomain.org>
+
+	* Added help messages for `vmm help <subcommand>`
+	* Updated translations: Dutch
+	+ aliasinfo: Print list of destinations sorted.
+	+ aliasdelete, catchalldelete: Accept multiple destinations.
+	+ Improved 'address searching' (by Martin F. Krafft).
+	+ Added file pgsql/dovecot_update_v1.2+.pgsql. Use this if you are
+	  upgrading your old Dovecot installation to v1.2.0 or newer.
+	- Fixed UnicodeDecodeErrors which may occur with some locales.
+	- `user{quota,services,transport} … domain` didn't work as expected.
+	- Fixed pgsql FUNCTION dovecotpassword() for Dovecot < v1.2.0.
+	  (see UPGRADE for instructions how to fix the last both problems)
+
 v0.6.0	2012-06-28  Pascal Volk <user+vmm@localhost.localdomain.org>
 
 	* Now vmm supports Dovecot v.2.0.x and v2.1.x

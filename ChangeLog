@@ -1,3 +1,406 @@
+=== 0.6.1 ===
+2012-10-03  Pascal Volk  <user@localhost.localdomain.org>
+
+	* doc/web/source/conf.py, doc/web/source/download.rst,
+	doc/web/source/howto/manage_accounts.rst,
+	doc/web/source/installation/install_vmm.rst,
+	doc/web/source/installation/postgresql_configuration.rst,
+	doc/web/source/pgsql_set_permissionspermissions.rst,
+	doc/web/source/release_history.rst,
+	doc/web/source/substitutions.rst,
+	doc/web/source/upgrade/0.5-0.6.rst:
+	doc/web: Updated documentation for vmm-0.6.1.
+	[f151defe7078] [tip]
+
+2012-10-02  martin f. krafft  <madduck@madduck.net>
+
+	* man/de/man1/vmm.1, man/man1/vmm.1:
+	Add list* commands to manpages
+	[ac27f89fad86]
+
+2012-10-01  Pascal Volk  <user@localhost.localdomain.org>
+
+	* UPGRADE:
+	UPGRADE: Added procedure for updating from v0.6.0.
+	[e1fc4a3075de]
+
+2012-09-30  Pascal Volk  <user@localhost.localdomain.org>
+
+	* update_config.py:
+	update_config: Updated to work with version 0.6.0.
+
+	Fixed some PEP8 related issues.
+	[d7101e496795]
+
+2012-09-29  Pascal Volk  <user@localhost.localdomain.org>
+
+	* doc/web/source/howto/general_subcommands.rst,
+	doc/web/source/howto/manage_alias_addresses.rst,
+	doc/web/source/howto/manage_catch-all_addresses.rst:
+	doc/web: Updated and extended documentation.
+
+	Updated description of subcommands aliasdelete and catchalldelete.
+	Added description of subcommands listaddresses, listaliases,
+	listrelocated and listusers.
+	[e60b8ed5fd35]
+
+	* VirtualMailManager/cli/clihelp.py:
+	VMM/cli/clihelp: Added missing help messages.
+
+	Added descriptions of subcommands listaddresses, listaliases,
+	listrelocated and listusers.
+	[d8b60e53334f]
+
+2012-09-27  Pascal Volk  <user@localhost.localdomain.org>
+
+	* po/nl.po:
+	po: Updated Dutch translation (translated by Erwin Poeze).
+	[ca882a1ff90b]
+
+	* VirtualMailManager/alias.py:
+	VMM/alias: Load destination addresses sorted.
+
+	This produces sorted output for the aliasinfo subcommand.
+	[4ec5c015b7aa]
+
+	* VirtualMailManager/alias.py, VirtualMailManager/catchall.py,
+	VirtualMailManager/cli/clihelp.py,
+	VirtualMailManager/cli/subcommands.py,
+	VirtualMailManager/handler.py, man/de/man1/vmm.1, man/man1/vmm.1:
+	VMM: {alias,catchall}delete: Accept multiple destinations.
+	[d8736bb80bdc]
+
+2012-09-24  Pascal Volk  <user@localhost.localdomain.org>
+
+	* po/nl.po:
+	po: Updated Dutch translation (translated by Erwin Poeze).
+	[9eecf0160c39]
+
+2012-09-23  Pascal Volk  <user@localhost.localdomain.org>
+
+	* VirtualMailManager/cli/main.py:
+	VMM/cli/main: Check if we have warnings before exiting.
+
+	If so, print them and exit afterwards.
+	[996bfcae49b0]
+
+2012-09-16  Pascal Volk  <user@localhost.localdomain.org>
+
+	* VirtualMailManager/domain.py:
+	VMM/domain: Enabled transport-validation.
+
+	Validate the transport also in Domain.set_transport() and
+	Domain.update_transport().
+	[5882bfdf83e8]
+
+	* VirtualMailManager/account.py, VirtualMailManager/common.py:
+	VMM: Moved transport-validation to common.
+	[1ec3497a6733]
+
+2012-09-15  Pascal Volk  <user@localhost.localdomain.org>
+
+	* VirtualMailManager/account.py:
+	VMM/account: Fixed account's transport check.
+
+	Make sure that 'virtual:' isn't used as transport when the mailbox-
+	format is set to mdbox or sdbox.
+	[7b3494f1a2ef]
+
+2012-09-12  Pascal Volk  <user@localhost.localdomain.org>
+
+	* po/nl.po:
+	po: Updated Dutch translation (translated by Erwin Poeze).
+	[924535664ecc]
+
+2012-09-05  Pascal Volk  <user@localhost.localdomain.org>
+
+	* VirtualMailManager/account.py, VirtualMailManager/catchall.py,
+	VirtualMailManager/cli/subcommands.py, VirtualMailManager/common.py,
+	VirtualMailManager/config.py, VirtualMailManager/domain.py,
+	VirtualMailManager/handler.py:
+	PEP8: Fixed all PEP8 related issues.
+	[8e9b0046bc8f]
+
+2012-09-03  Pascal Volk  <user@localhost.localdomain.org>
+
+	* po/vmm.pot:
+	po: Regenerated vmm.pot
+	[b6c4e77046b9]
+
+	* VirtualMailManager/cli/clihelp.py,
+	VirtualMailManager/cli/subcommands.py, VirtualMailManager/common.py:
+	Added a few comments for the Translation Project.
+	[56ec275911f2]
+
+	* VirtualMailManager/catchall.py, VirtualMailManager/cli/clihelp.py,
+	VirtualMailManager/cli/subcommands.py,
+	VirtualMailManager/ext/postconf.py:
+	VMM: Corrected/updated some msgids.
+
+	Unified some messages and corrected a few typos.
+	[0ed93eb8b364]
+
+2012-09-02  Pascal Volk  <user@localhost.localdomain.org>
+
+	* VirtualMailManager/cli/subcommands.py:
+	VMM/cli/subcommands: Corrected username's usage string.
+
+	username's name argument is optional.
+	[46454ff9d441]
+
+	* VirtualMailManager/cli/clihelp.py,
+	VirtualMailManager/cli/subcommands.py:
+	VMM/cli: Activated help subcommand.
+
+	Implemented Command.help_(), which reads the command's help message
+	from cli.clihelp.
+	[ab97727357a4]
+
+	* VirtualMailManager/handler.py:
+	VMM/handler: Fixed user{quota,services,transport} subcommands. The
+	subcommands user{quota,services,transport} actually failed with the
+	arguments '<address> domain'. This is part II of changeset
+	a75923ce2842
+	[b994444f7dee]
+
+	* doc/web/source/howto/manage_accounts.rst:
+	doc/web: Added missing userservices description. Fixed order of
+	subcommand listing.
+	[7fdc4b2d4640]
+
+	* man/man1/vmm.1:
+	man: Typo-fix.
+	[981f02b2d4c5]
+
+	* VirtualMailManager/cli/subcommands.py:
+	VMM/cli/subcommands: Corrected two usage strings. domainnote's and
+	usernote's note argument is optional.
+	[af88f01e5bfa]
+
+2012-09-01  Pascal Volk  <user@localhost.localdomain.org>
+
+	* VirtualMailManager/cli/subcommands.py, VirtualMailManager/common.py:
+	VMM: Decode localized numbers to the current encoding. That avoids
+	UnicodeDecodeErrors since locale.format(%d) may return localized
+	numbers, which contain NO-BREAK SPACE as the thousands separator.
+	[463b10c258d9]
+
+2012-08-28  Pascal Volk  <user@localhost.localdomain.org>
+
+	* VirtualMailManager/cli/subcommands.py:
+	VMM/cli/subcommands: Don't mark empty strings as translatable.
+	gettext('') returns the header entry with meta information, not the
+	empty string.
+	[0571f45501da]
+
+	* doc/web/source/upgrade/0.5-0.6.rst:
+	doc/web: Added description 'Upgrade to Dovecot ≧ v1.2.beta2'.
+	[82e722f35aab]
+
+2012-08-27  Pascal Volk  <user@localhost.localdomain.org>
+
+	* pgsql/dovecot_update_v1.2+.pgsql:
+	pgsql: Added dovecot_update_v1.2+.pgsql. Use this file when you are
+	upgrading your Dovecot installation to a version >= 1.2.beta2.
+	[bb23693e5fc9]
+
+	* VirtualMailManager/cli/subcommands.py:
+	VMM/cli/subcommands: Reverted accidentally committed help() code.
+	[c79fdce49908]
+
+	* VirtualMailManager/cli/subcommands.py, pgsql/create_tables.pgsql:
+	pgsql/create_tables.pgsql: Eliminated two unnecessary differences.
+	Yeah, cosmetic only.
+	[607aa5c2acc4]
+
+	* pgsql/create_tables.pgsql, pgsql/update_tables_0.5.x-0.6.pgsql:
+	pgsql: Don't select service_set.ssid in dovecotpassword()
+	unconditional. This may cause an empty result, which will make
+	logins impossible.
+	[86b967c0f1a1]
+
+	* VirtualMailManager/serviceset.py:
+	VMM/serviceset: Fixed a conditional ProgrammingError. Affects only
+	setups with Dovecot < v1.2.beta2. Actually the SQL query in method
+	ServiceSet._load_by_services wasn't updated.
+
+	Removed unnecessary code, which would have also produced a
+	ProgrammingError, if it would have been correct.
+	[cdbe200c0ecc]
+
+2012-08-23  Pascal Volk  <user@localhost.localdomain.org>
+
+	* VirtualMailManager/cli/subcommands.py:
+	VMM/cli/subcommands: Added 'missing' newline below domain notes.
+	This patch contains also a small code cleanup and PEP8-fix.
+	[3dc1764c23d2]
+
+2012-08-19  Pascal Volk  <user@localhost.localdomain.org>
+
+	* doc/web/source/howto/manage_accounts.rst:
+	doc/web: Added the transport filed to the usertransport example.
+	[ef384bc8fde6]
+
+2012-08-12  Pascal Volk  <user@localhost.localdomain.org>
+
+	* doc/web/source/howto.rst,
+	doc/web/source/howto/general_subcommands.rst,
+	doc/web/source/howto/manage_accounts.rst,
+	doc/web/source/howto/manage_alias_addresses.rst,
+	doc/web/source/howto/manage_alias_domains.rst, doc/web/source/howto
+	/manage_catch-all_addresses.rst,
+	doc/web/source/howto/manage_domains.rst,
+	doc/web/source/howto/manage_relocated_users.rst,
+	doc/web/source/index.rst,
+	doc/web/source/installation/install_vmm.rst:
+	doc/web: Added the 'Howto'. The reStructuredText version of vmm.1,
+	in multiple parts.
+	[2b165e90e225]
+
+	* man/de/man1/vmm.1, man/man1/vmm.1:
+	man/{de/}man1: A few more corrections.
+	[9d343514b832]
+
+	* man/de/man1/vmm.1, man/man1/vmm.1:
+	man/{de/}man1: Small corrections for domaininfo's description.
+	[60907fc875f7]
+
+	* man/de/man5/vmm.cfg.5, man/man5/vmm.cfg.5:
+	man/{de/}man5: s/Wiki/Homepage/g
+	[dcde0010cdf8]
+
+2012-08-11  Pascal Volk  <user@localhost.localdomain.org>
+
+	* man/de/man1/vmm.1, man/man1/vmm.1:
+	man/{de/}man1: s/Wiki/Homepage/g
+	[8767ec854084]
+
+2012-08-08  martin f. krafft  <madduck@debian.org>
+
+	* VirtualMailManager/common.py:
+	VMM/common: Improve search_address complexity Checking the
+	dictionary (a hash) for existence of a key is likely to be
+	O(log(n)), while checking a list is O(n). Therefore, to increase
+	performance, this patch changes the check accordingly.
+	[cd1200d06700]
+
+2012-08-07  Pascal Volk  <user@localhost.localdomain.org>
+
+	* doc/web/source/_static/vmm.cfg:
+	doc/web: Refreshed vmm.cfg
+	[ffd24974ed68]
+
+	* vmm.cfg:
+	vmm.cfg: Updated/improved comments.
+	[f9a2327f57a6]
+
+2012-08-07  martin f. krafft  <madduck@debian.org>
+
+	* VirtualMailManager/common.py:
+	If an alias has multiple destinations, multiple records exist, due
+	to the nature of the database. address_list would then return the
+	same alias multiple times, which does not add any information, eats
+	screen space and is potentially confusing.
+
+	Therefore, we SELECT DISTINCTly from the alias table.
+
+	Signed-off-by: martin f. krafft <madduck@debian.org>
+	--- VirtualMailManager/common.py | 2 +- 1 file changed, 1
+	insertion(+), 1 deletion(-)
+	[a479c38931c4]
+
+	* VirtualMailManager/common.py:
+	Due to the UNION query in address_list, the assumption that the list
+	of gids received from the database would be continuous does not
+	hold.
+
+	To prevent addresses for domains with multiple entry types from
+	being listed, it is necessary to check the list of domain gids for
+	every entry.
+
+	Signed-off-by: martin f. krafft <madduck@debian.org>
+	--- VirtualMailManager/common.py | 4 +--- 1 file changed, 1
+	insertion(+), 3 deletions(-)
+	[605f8c115711]
+
+2012-07-29  Pascal Volk  <user@localhost.localdomain.org>
+
+	* doc/web/source/installation/dovecot_configuration.rst,
+	doc/web/source/installation/postgresql_configuration.rst:
+	doc/web: Emphasized a few lines of Dovecot/PostgreSQL configuration
+	file excerpts.
+	[9c138471d569]
+
+	* .hgignore:
+	.hgignore: "doc/build" is no longer required.
+	[b62210b96ea7]
+
+	* doc/web/Makefile, doc/web/source/_static/local.conf,
+	doc/web/source/_static/vmm.cfg, doc/web/source/_static/vmm_logo.png,
+	doc/web/source/_templates/layout.html, doc/web/source/conf.py,
+	doc/web/source/download.rst, doc/web/source/ext_references.rst,
+	doc/web/source/features.rst, doc/web/source/index.rst,
+	doc/web/source/install.rst,
+	doc/web/source/installation/dovecot_configuration.rst,
+	doc/web/source/installation/install_vmm.rst,
+	doc/web/source/installation/postfix_configuration.rst,
+	doc/web/source/installation/postgresql_configuration.rst,
+	doc/web/source/installation/prerequisites.rst,
+	doc/web/source/installation/system_preparation.rst,
+	doc/web/source/pgsql_set_permissionspermissions.rst,
+	doc/web/source/release_history.rst,
+	doc/web/source/substitutions.rst, doc/web/source/upgrade.rst,
+	doc/web/source/upgrade/0.4.x-0.5.rst,
+	doc/web/source/upgrade/0.5-0.6.rst, doc/web/source/vmm.cfg.rst:
+	doc: Added source of http://vmm.localdomain.org/.
+	[be0906181a10]
+
+	* doc/Makefile, doc/api/Makefile, doc/api/source/conf.py,
+	doc/api/source/index.rst, doc/api/source/vmm.rst,
+	doc/api/source/vmm_alias.rst, doc/api/source/vmm_config.rst,
+	doc/api/source/vmm_constants_error.rst,
+	doc/api/source/vmm_emailaddress.rst, doc/api/source/vmm_errors.rst,
+	doc/api/source/vmm_relocated.rst, doc/source/conf.py,
+	doc/source/index.rst, doc/source/vmm.rst, doc/source/vmm_alias.rst,
+	doc/source/vmm_config.rst, doc/source/vmm_constants_error.rst,
+	doc/source/vmm_emailaddress.rst, doc/source/vmm_errors.rst,
+	doc/source/vmm_relocated.rst:
+	doc: Moved API documentation to doc/api.
+	[20141b967c0b]
+
+2012-07-22  Pascal Volk  <user@localhost.localdomain.org>
+
+	* INSTALL:
+	INSTALL: Updated PostgreSQL configuration URL. Use ${sql} and
+	${proxysql} expressions in the main.cf description.
+	[4f9079dd4b65]
+
+2012-07-01  Pascal Volk  <user@localhost.localdomain.org>
+
+	* README:
+	README: Substituted a few words.
+	[0be27a75776a]
+
+2012-06-30  Pascal Volk  <user@localhost.localdomain.org>
+
+	* README:
+	README: Updated URL of the hg repository@sf.net.
+	[f9e6e0a237f0]
+
+	* man/man1/vmm.1:
+	man: Deleted erroneous placed backslash.
+	[9acf628bf0be]
+
+2012-06-28  Pascal Volk  <user@localhost.localdomain.org>
+
+	* .hgtags:
+	Added tag vmm-0.6.0 for changeset 3238c58d01ae
+	[0643c25121b5]
+
+	* ChangeLog, NEWS, VirtualMailManager/constants.py, setup.py:
+	Released vmm-0.6.0
+	[3238c58d01ae] [vmm-0.6.0]
+
 === 0.6.0 ===
 2012-06-28  Pascal Volk  <user@localhost.localdomain.org>
 
