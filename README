@@ -120,6 +120,10 @@ vmm's source code is available from the Mercurial_ repositories:
   ‣ ``https://bitbucket.org/pvo/vmm``
   ‣ ``http://hg.code.sf.net/p/vmm/code``
 
+The Debian project is hosting the Git repository of vmm:
+
+• ``git://anonscm.debian.org/collab-maint/vmm.git``
+
 Released versions are also available as gzip compressed tar archives at:
 https://sourceforge.net/projects/vmm/files/vmm/
 
