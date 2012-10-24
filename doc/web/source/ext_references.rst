@@ -27,11 +27,11 @@
 .. _integrity: http://en.wikipedia.org/wiki/Data_integrity
 .. _issue tracker: https://bitbucket.org/pvo/vmm/issues
 .. _mxDateTime: http://www.egenix.com/products/python/mxBase/mxDateTime/
- http://www.postgresql.org/docs/current/static/auth-pg-hba-conf.html
 .. _mxTools: http://www.egenix.com/products/python/mxBase/mxTools/
 .. _passdb: http://wiki.dovecot.org/PasswordDatabase
 .. _pg_dump: http://www.postgresql.org/docs/current/static/app-pgdump.html
 .. _pg_hba.conf: \
+ http://www.postgresql.org/docs/current/static/auth-pg-hba-conf.html
 .. _pgsql_table(5): http://www.postfix.org/pgsql_table.5.html
 .. _pipe(8): http://www.postfix.org/pipe.8.html
 .. _pyPgSQL: http://pypgsql.sourceforge.net/
