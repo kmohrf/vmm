@@ -269,7 +269,7 @@ conf.d/90-quota.conf
 
  # uncomment if you want to use the quota plugin
  #plugin {
- #  quota = dict:user:%{uid}::proxy::quota
+ #  quota = dict:user:%{uid}:proxy::quota
  #  quota_rule = *:storage=0:messages=0
  #  quota_rule2 = Trash:storage=+100M
  #}
