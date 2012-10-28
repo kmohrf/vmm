@@ -13,8 +13,10 @@ LOCALE_DIR=${PREFIX}/share/locale
 DOC_DIR=${PREFIX}/share/doc/vmm
 if [ ${PREFIX} = "/usr" ]; then
     MANDIR=${PREFIX}/share/man
+    SYSCONFDIR=/etc
 else
     MANDIR=${PREFIX}/man
+    SYSCONFDIR=${PREFIX}/etc
 fi
 DOCS="ChangeLog Configure.Dovecot_2 COPYING INSTALL NEWS README"
 
@@ -29,7 +31,8 @@ fi
 python setup.py -q install --force --prefix ${PREFIX}
 python setup.py clean --all >/dev/null
 
-install -b -m 0600 ${INSTALL_OPTS} vmm.cfg ${PREFIX}/etc/
+[ -d ${SYSCONFDIR} ] || mkdir -m 0755 -p ${SYSCONFDIR}
+install -b -m 0600 ${INSTALL_OPTS} vmm.cfg ${SYSCONFDIR}/
 install ${INSTALL_OPTS_CF} postfix/pgsql-*.cf ${PF_CONFDIR}/
 install -m 0700 ${INSTALL_OPTS} vmm ${PREFIX}/sbin
 
