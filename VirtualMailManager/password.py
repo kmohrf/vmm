@@ -337,6 +337,7 @@ _scheme_info = {
     'PLAIN-MD4': (_md4_hash, 0x10000f00),
     'PLAIN-MD5': (_md5_hash, 0x10000f00),
     'RPA': (_dovecotpw, 0x10000f00),
+    'SCRAM-SHA-1': (_dovecotpw, 0x20200a01),
     'SHA': (_sha1_hash, 0x10000f00),
     'SHA1': (_sha1_hash, 0x10000f00),
     'SHA256': (_sha256_hash, 0x10100a01),
