@@ -54,8 +54,8 @@ mentioned below will be created when vmm will be installed.
   permit_sasl_authenticated
   reject_unauth_destination
 
-mater.cf
---------
+master.cf
+---------
 .. note:: This step is only necessary if you are still using Dovecot v\ **1**.x
 
 Add the service `dovecot` to Postfix's master process configuration file.
