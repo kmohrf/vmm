@@ -92,16 +92,15 @@ Applied use-Flags (/etc/portage/package.use)::
  net-mail/dovecot postgres -pam pop3d sieve
  dev-db/postgresql-server -perl
 
-OpenBSD
-^^^^^^^
-Packages or build from ports:
- ‣ postfix
- ‣ dovecot
+OpenBSD (5.x)
+^^^^^^^^^^^^^
+Packages
+ ‣ postfix-2.x.y-pgsql
+ ‣ dovecot-2.x.y and dovecot-postgresql-2.x.y
  ‣ postgresql-client
- ‣ python and py-mxDateTime optionally py-crypto
+ ‣ python-2.7.x, py-psycopg2 and optionally py-crypto
 
-Build from source:
- ‣ pyPgSQL_
+Or build the above mentioned software from ports.
 
 openSUSE Linux
 ^^^^^^^^^^^^^^
