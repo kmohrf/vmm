@@ -15,14 +15,11 @@
         schemes, encodings = list_schemes()
 """
 
+import hashlib
+
 from crypt import crypt
 from random import SystemRandom
 from subprocess import Popen, PIPE
-
-try:
-    import hashlib
-except ImportError:
-    from VirtualMailManager.pycompat import hashlib
 
 from VirtualMailManager import ENCODING
 from VirtualMailManager.emailaddress import EmailAddress
@@ -30,7 +27,6 @@ from VirtualMailManager.common import get_unicode, version_str
 from VirtualMailManager.constants import VMM_ERROR
 from VirtualMailManager.errors import VMMError
 
-COMPAT = hasattr(hashlib, 'compat')
 SALTCHARS = './0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 PASSWDCHARS = '._-+#*23456789abcdefghikmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ'
 DEFAULT_B64 = (None, 'B64', 'BASE64')
@@ -81,33 +77,17 @@ def _dovecotpw(password, scheme, encoding):
 
 def _md4_new():
     """Returns an new MD4-hash object if supported by the hashlib or
-    provided by PyCrypto - other `None`.
+    provided by PyCrypto - otherwise `None`.
     """
     try:
         return hashlib.new('md4')
     except ValueError, err:
         if str(err) == 'unsupported hash type':
-            if not COMPAT:
-                try:
-                    from Crypto.Hash import MD4
-                    return MD4.new()
-                except ImportError:
-                    return None
-        else:
-            raise
-
-
-def _sha256_new(data=''):
-    """Returns a new sha256 object from the hashlib.
-
-    Returns `None` if the PyCrypto in pycompat.hashlib is too old."""
-    if not COMPAT:
-        return hashlib.sha256(data)
-    try:
-        return hashlib.new('sha256', data)
-    except ValueError, err:
-        if str(err) == 'unsupported hash type':
-            return None
+            try:
+                from Crypto.Hash import MD4
+                return MD4.new()
+            except ImportError:
+                return None
         else:
             raise
 
@@ -248,26 +228,22 @@ def _sha1_hash(password, scheme, encoding):
 
 def _sha256_hash(password, scheme, encoding):
     """Generates SHA256 hashes."""
-    sha256 = _sha256_new(password)
-    if sha256:
-        if encoding in DEFAULT_B64:
-            digest = sha256.digest().encode('base64').rstrip()
-        else:
-            digest = sha256.hexdigest()
-        return _format_digest(digest, scheme, encoding)
-    return _dovecotpw(password, scheme, encoding)
+    sha256 = hashlib.sha256(password)
+    if encoding in DEFAULT_B64:
+        digest = sha256.digest().encode('base64').rstrip()
+    else:
+        digest = sha256.hexdigest()
+    return _format_digest(digest, scheme, encoding)
 
 
 def _sha512_hash(password, scheme, encoding):
     """Generates SHA512 hashes."""
-    if not COMPAT:
-        sha512 = hashlib.sha512(password)
-        if encoding in DEFAULT_B64:
-            digest = sha512.digest().encode('base64').replace('\n', '')
-        else:
-            digest = sha512.hexdigest()
-        return _format_digest(digest, scheme, encoding)
-    return _dovecotpw(password, scheme, encoding)
+    sha512 = hashlib.sha512(password)
+    if encoding in DEFAULT_B64:
+        digest = sha512.digest().encode('base64').replace('\n', '')
+    else:
+        digest = sha512.hexdigest()
+    return _format_digest(digest, scheme, encoding)
 
 
 def _smd5_hash(password, scheme, encoding):
@@ -296,30 +272,25 @@ def _ssha1_hash(password, scheme, encoding):
 
 def _ssha256_hash(password, scheme, encoding):
     """Generates SSHA256 (salted SHA256) hashes."""
-    sha256 = _sha256_new(password)
-    if sha256:
-        salt = _get_salt(SALTED_ALGO_SALT_LEN)
-        sha256.update(salt)
-        if encoding in DEFAULT_B64:
-            digest = (sha256.digest() + salt).encode('base64').rstrip()
-        else:
-            digest = sha256.hexdigest() + salt.encode('hex')
-        return _format_digest(digest, scheme, encoding)
-    return _dovecotpw(password, scheme, encoding)
+    sha256 = hashlib.sha256(password)
+    salt = _get_salt(SALTED_ALGO_SALT_LEN)
+    sha256.update(salt)
+    if encoding in DEFAULT_B64:
+        digest = (sha256.digest() + salt).encode('base64').rstrip()
+    else:
+        digest = sha256.hexdigest() + salt.encode('hex')
+    return _format_digest(digest, scheme, encoding)
 
 
 def _ssha512_hash(password, scheme, encoding):
     """Generates SSHA512 (salted SHA512) hashes."""
-    if not COMPAT:
-        salt = _get_salt(SALTED_ALGO_SALT_LEN)
-        sha512 = hashlib.sha512(password + salt)
-        if encoding in DEFAULT_B64:
-            digest = (sha512.digest() + salt).encode('base64').replace('\n',
-                                                                       '')
-        else:
-            digest = sha512.hexdigest() + salt.encode('hex')
-        return _format_digest(digest, scheme, encoding)
-    return _dovecotpw(password, scheme, encoding)
+    salt = _get_salt(SALTED_ALGO_SALT_LEN)
+    sha512 = hashlib.sha512(password + salt)
+    if encoding in DEFAULT_B64:
+        digest = (sha512.digest() + salt).encode('base64').replace('\n', '')
+    else:
+        digest = sha512.hexdigest() + salt.encode('hex')
+    return _format_digest(digest, scheme, encoding)
 
 _scheme_info = {
     'CLEARTEXT': (_clear_hash, 0x10000f00),
