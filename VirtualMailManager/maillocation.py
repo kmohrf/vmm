@@ -12,7 +12,6 @@
 
 from VirtualMailManager.constants import MAILLOCATION_INIT
 from VirtualMailManager.errors import MailLocationError as MLErr
-from VirtualMailManager.pycompat import all
 
 
 __all__ = ('MailLocation', 'known_format')

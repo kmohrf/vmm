@@ -9,8 +9,6 @@
     domains and accounts.
 """
 
-from VirtualMailManager.pycompat import any
-
 _ = lambda msg: msg
 
 

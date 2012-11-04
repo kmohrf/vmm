@@ -18,7 +18,6 @@ from VirtualMailManager.constants import \
 from VirtualMailManager.common import validate_transport
 from VirtualMailManager.errors import VMMError, DomainError as DomErr
 from VirtualMailManager.maillocation import MailLocation
-from VirtualMailManager.pycompat import all, any
 from VirtualMailManager.quotalimit import QuotaLimit
 from VirtualMailManager.serviceset import ServiceSet
 from VirtualMailManager.transport import Transport

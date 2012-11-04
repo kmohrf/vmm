@@ -37,7 +37,6 @@ from VirtualMailManager.emailaddress import DestinationEmailAddress, \
 from VirtualMailManager.errors import \
      DomainError, NotRootError, PermissionError, VMMError
 from VirtualMailManager.mailbox import new as new_mailbox
-from VirtualMailManager.pycompat import all, any
 from VirtualMailManager.quotalimit import QuotaLimit
 from VirtualMailManager.relocated import Relocated
 from VirtualMailManager.serviceset import ServiceSet, SERVICES
