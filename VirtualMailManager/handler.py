@@ -615,10 +615,7 @@ class Handler(object):
                 dpattern = parts[1]
                 dlike = dpattern.startswith('%') or dpattern.endswith('%')
 
-                if llike:
-                    checkp = lpattern.strip('%')
-                else:
-                    checkp = lpattern
+                checkp = lpattern.strip('%') if llike else lpattern
                 if len(checkp) > 0 and re.search(RE_LOCALPART, checkp):
                     raise VMMError(_(u"The pattern '%s' contains invalid "
                                      u"characters.") % pattern,
@@ -629,10 +626,7 @@ class Handler(object):
                 dpattern = parts[0]
                 dlike = dpattern.startswith('%') or dpattern.endswith('%')
 
-            if dlike:
-                checkp = dpattern.strip('%')
-            else:
-                checkp = dpattern
+            checkp = dpattern.strip('%') if dlike else dpattern
             if len(checkp) > 0 and not re.match(RE_DOMAIN_SEARCH, checkp):
                 raise VMMError(_(u"The pattern '%s' contains invalid "
                                  u"characters.") % pattern, DOMAIN_INVALID)
@@ -855,10 +849,8 @@ The account has been successfully deleted from the database.
         if not acc:
             raise VMMError(_(u"The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
-        if transport == 'domain':
-            transport = None
-        else:
-            transport = Transport(self._dbh, transport=transport)
+        transport = None if transport == 'domain' \
+                         else Transport(self._dbh, transport=transport)
         acc.update_transport(transport)
 
     def user_services(self, emailaddress, *services):

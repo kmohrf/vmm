@@ -86,11 +86,7 @@ class Account(object):
             self._uid, _mid, _qid, _ssid, _tid, _note = result
 
             def load_helper(ctor, own, field, dbresult):
-                #  Py25: cur = None if own is None else getattr(own, field)
-                if own is None:
-                    cur = None
-                else:
-                    cur = getattr(own, field)
+                cur = None if own is None else getattr(own, field)
                 if cur != dbresult:
                     kwargs = {field: dbresult}
                     if dbresult is None:
@@ -248,22 +244,15 @@ class Account(object):
         self._prepare(MailLocation(self._dbh, mbfmt=cfg_dget('mailbox.format'),
                                    directory=cfg_dget('mailbox.root')))
         dbc = self._dbh.cursor()
-        qid = ssid = tid = None
-        if self._qlimit:
-            qid = self._qlimit.qid
-        if self._services:
-            ssid = self._services.ssid
-        if self._transport:
-            tid = self._transport.tid
         dbc.execute('INSERT INTO users (local_part, passwd, uid, gid, mid, '
                     'qid, ssid, tid, note) '
                     'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)',
                     (self._addr.localpart,
                      pwhash(self._passwd, user=self._addr), self._uid,
-                     self._domain.gid, self._mail.mid, qid, ssid, tid,
-#                     self._qlimit.qid if self._qlimit else None,
-#                     self._services.ssid if self._services else None,
-#                     self._transport.tid if self._transport else None,
+                     self._domain.gid, self._mail.mid,
+                     self._qlimit.qid if self._qlimit else None,
+                     self._services.ssid if self._services else None,
+                     self._transport.tid if self._transport else None,
                      self._note))
         self._dbh.commit()
         dbc.close()

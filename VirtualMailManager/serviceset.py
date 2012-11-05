@@ -131,10 +131,7 @@ class ServiceSet(object):
         self._ssid = result[0]
         #self._services.update(zip(SERVICES, result[1:]))
         for key, value in zip(SERVICES, result[1:]):  # pyPgSQL compatible
-            if value:
-                self._services[key] = True
-            else:
-                self._services[key] = False
+            self._services[key] = True if value else False
 
     def _save(self):
         """Store a new service_set in the database."""

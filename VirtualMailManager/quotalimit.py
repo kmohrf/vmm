@@ -52,14 +52,8 @@ class QuotaLimit(object):
         else:
             bytes_, msgs = kwargs.get('bytes'), kwargs.get('messages')
             assert all(isinstance(i, (int, long)) for i in (bytes_, msgs))
-            if bytes_ < 0:
-                self._bytes = -bytes_
-            else:
-                self._bytes = bytes_
-            if msgs < 0:
-                self._messages = -msgs
-            else:
-                self._messages = msgs
+            self._bytes = -bytes_ if bytes_ < 0 else bytes_
+            self._messages = -msgs if msgs < 0 else msgs
             self._load_by_limit()
 
     @property

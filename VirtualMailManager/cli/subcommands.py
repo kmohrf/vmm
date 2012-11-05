@@ -959,11 +959,7 @@ def _format_quota_usage(limit, used, human=False, domaindefault=False):
         q_usage['percent'] = locale.format('%6.2f', 100. / limit * used, True)
     else:
         q_usage['percent'] = locale.format('%6.2f', 0, True)
-    #  Py25: fmt = format_domain_default if domaindefault else lambda s: s
-    if domaindefault:
-        fmt = format_domain_default
-    else:
-        fmt = lambda s: s
+    fmt = format_domain_default if domaindefault else lambda s: s
     # TP: e.g.: [  0.00%] 21.09 KiB/1.00 GiB
     return fmt(_(u'[%(percent)s%%] %(used)s/%(limit)s') % q_usage)
 
@@ -1054,10 +1050,7 @@ def _format_domain(domain, main=True):
 
 def _print_domain_list(dids, domains, matching):
     """Print a list of (matching) domains/alias domains."""
-    if matching:
-        title = _(u'Matching domains')
-    else:
-        title = _(u'Existing domains')
+    title = _(u'Matching domains') if matching else _(u'Existing domains')
     w_std(title, '-' * len(title))
     if domains:
         for did in dids:
