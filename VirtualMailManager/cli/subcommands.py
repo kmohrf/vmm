@@ -502,17 +502,12 @@ def list_domains(ctx):
 
 def list_pwschemes(ctx_unused):
     """Prints all usable password schemes and password encoding suffixes."""
-    # TODO: Remove trailing colons from keys.
-    # For now it is to late, the translators has stared their work
-    keys = (_(u'Usable password schemes:'), _(u'Usable encoding suffixes:'))
+    keys = (_(u'Usable password schemes'), _(u'Usable encoding suffixes'))
     old_ii, old_si = txt_wrpr.initial_indent, txt_wrpr.subsequent_indent
     txt_wrpr.initial_indent = txt_wrpr.subsequent_indent = '\t'
     txt_wrpr.width = txt_wrpr.width - 8
 
     for key, value in zip(keys, list_schemes()):
-        if key.endswith(':'):  # who knows … (see TODO above)
-            #key = key.rpartition(':')[0]
-            key = key[:-1]  # This one is for Py24
         w_std(key, len(key) * '-')
         w_std('\n'.join(txt_wrpr.wrap(' '.join(value))), '')
 
