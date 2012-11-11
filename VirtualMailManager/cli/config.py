@@ -89,8 +89,7 @@ class CliConfig(Config):
     def _save_changes(self):
         """Writes changes to the configuration file."""
         copy2(self._cfg_filename, self._cfg_filename + '.bak')
-        self._cfg_file = open(self._cfg_filename, 'w')
-        self.write(self._cfg_file)
-        self._cfg_file.close()
+        with open(self._cfg_filename, 'w') as self._cfg_file:
+            self.write(self._cfg_file)
 
 del _

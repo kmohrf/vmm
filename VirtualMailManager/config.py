@@ -357,14 +357,11 @@ class Config(LazyConfig):
         Raises a ConfigError if the configuration syntax is
         invalid.
         """
-        try:
-            self._cfg_file = open(self._cfg_filename, 'r')
-            self.readfp(self._cfg_file)
-        except (MissingSectionHeaderError, ParsingError), err:
-            raise ConfigError(str(err), CONF_ERROR)
-        finally:
-            if self._cfg_file and not self._cfg_file.closed:
-                self._cfg_file.close()
+        with open(self._cfg_filename, 'r') as self._cfg_file:
+            try:
+                self.readfp(self._cfg_file)
+            except (MissingSectionHeaderError, ParsingError), err:
+                raise ConfigError(str(err), CONF_ERROR)
 
     def check(self):
         """Performs a configuration check.

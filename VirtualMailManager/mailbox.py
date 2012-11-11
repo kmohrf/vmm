@@ -206,11 +206,9 @@ class Maildir(Mailbox):
         """Writes all created mailboxes to the subscriptions file."""
         if not self._boxes:
             return
-        subscriptions = open('subscriptions', 'w')
-        subscriptions.write('\n'.join(self._boxes))
-        subscriptions.write('\n')
-        subscriptions.flush()
-        subscriptions.close()
+        with open('subscriptions', 'w') as subscriptions:
+            subscriptions.write('\n'.join(self._boxes))
+            subscriptions.write('\n')
         os.chown('subscriptions', self._user.uid, self._user.gid)
         os.chmod('subscriptions', self.__class__.FILE_MODE)
         del self._boxes[:]
