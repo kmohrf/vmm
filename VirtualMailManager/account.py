@@ -57,7 +57,7 @@ class Account(object):
             # TP: Hm, what “quotation marks” should be used?
             # If you are unsure have a look at:
             # http://en.wikipedia.org/wiki/Quotation_mark,_non-English_usage
-            raise AErr(_(u"The domain '%s' does not exist.") %
+            raise AErr(_("The domain '%s' does not exist.") %
                        self._addr.domainname, NO_SUCH_DOMAIN)
         self._uid = 0
         self._mail = None
@@ -69,7 +69,7 @@ class Account(object):
         self._new = True
         self._load()
 
-    def __nonzero__(self):
+    def __bool__(self):
         """Returns `True` if the Account is known, `False` if it's new."""
         return not self._new
 
@@ -116,8 +116,8 @@ class Account(object):
         information in the database.
         """
         if maillocation.dovecot_version > cfg_dget('misc.dovecot_version'):
-            raise AErr(_(u"The mailbox format '%(mbfmt)s' requires Dovecot "
-                         u">= v%(version)s.") % {
+            raise AErr(_("The mailbox format '%(mbfmt)s' requires Dovecot "
+                         ">= v%(version)s.") % {
                        'mbfmt': maillocation.mbformat,
                        'version': version_str(maillocation.dovecot_version)},
                        INVALID_MAIL_LOCATION)
@@ -159,7 +159,7 @@ class Account(object):
         """Raise an AccountError if the Account is new - not yet saved in the
         database."""
         if self._new:
-            raise AErr(_(u"The account '%s' does not exist.") % self._addr,
+            raise AErr(_("The account '%s' does not exist.") % self._addr,
                        NO_SUCH_ACCOUNT)
 
     @property
@@ -215,10 +215,10 @@ class Account(object):
           The password for the new Account.
         """
         if not self._new:
-            raise AErr(_(u"The account '%s' already exists.") % self._addr,
+            raise AErr(_("The account '%s' already exists.") % self._addr,
                        ACCOUNT_EXISTS)
-        if not isinstance(password, basestring) or not password:
-            raise AErr(_(u"Could not accept password: '%s'") % password,
+        if not isinstance(password, str) or not password:
+            raise AErr(_("Could not accept password: '%s'") % password,
                        ACCOUNT_MISSING_PASSWORD)
         self._passwd = password
 
@@ -230,16 +230,16 @@ class Account(object):
         `note` : basestring or None
           The note, or None to remove
         """
-        assert note is None or isinstance(note, basestring)
+        assert note is None or isinstance(note, str)
         self._note = note
 
     def save(self):
         """Save the new Account in the database."""
         if not self._new:
-            raise AErr(_(u"The account '%s' already exists.") % self._addr,
+            raise AErr(_("The account '%s' already exists.") % self._addr,
                        ACCOUNT_EXISTS)
         if not self._passwd:
-            raise AErr(_(u"No password set for account: '%s'") % self._addr,
+            raise AErr(_("No password set for account: '%s'") % self._addr,
                        ACCOUNT_MISSING_PASSWORD)
         self._prepare(MailLocation(self._dbh, mbfmt=cfg_dget('mailbox.format'),
                                    directory=cfg_dget('mailbox.root')))
@@ -271,7 +271,7 @@ class Account(object):
           The new value of the attribute.
         """
         if field not in ('name', 'password', 'note'):
-            raise AErr(_(u"Unknown field: '%s'") % field, INVALID_ARGUMENT)
+            raise AErr(_("Unknown field: '%s'") % field, INVALID_ARGUMENT)
         self._chk_state()
         dbc = self._dbh.cursor()
         if field == 'password':
@@ -293,8 +293,8 @@ class Account(object):
           the new quota limit of the domain.
         """
         if cfg_dget('misc.dovecot_version') < 0x10102f00:
-            raise VMMError(_(u'PostgreSQL-based dictionary quota requires '
-                             u'Dovecot >= v1.1.2.'), VMM_ERROR)
+            raise VMMError(_('PostgreSQL-based dictionary quota requires '
+                             'Dovecot >= v1.1.2.'), VMM_ERROR)
         self._chk_state()
         if quotalimit == self._qlimit:
             return
@@ -353,7 +353,7 @@ class Account(object):
             fmt = format_domain_default
 
         ret = {}
-        for service, state in services.iteritems():
+        for service, state in services.items():
             # TP: A service (e.g. pop3 or imap) may be enabled/usable or
             # disabled/unusable for a user.
             ret[service] = fmt((_('disabled'), _('enabled'))[state])
@@ -376,7 +376,7 @@ class Account(object):
         info = dbc.fetchone()
         dbc.close()
         if info:
-            info = dict(zip(('name', 'uq_bytes', 'uq_messages'), info))
+            info = dict(list(zip(('name', 'uq_bytes', 'uq_messages'), info)))
             info.update(self._get_info_serviceset())
             info['address'] = self._addr
             info['gid'] = self._domain.gid
@@ -395,7 +395,7 @@ class Account(object):
             info['uid'] = self._uid
             return info
         # nearly impossible‽
-        raise AErr(_(u"Could not fetch information for account: '%s'") %
+        raise AErr(_("Could not fetch information for account: '%s'") %
                    self._addr, NO_SUCH_ACCOUNT)
 
     def get_aliases(self):
@@ -439,8 +439,8 @@ class Account(object):
             a_count = self._count_aliases()
             if a_count > 0:
                 dbc.close()
-                raise AErr(_(u"There are %(count)d aliases with the "
-                             u"destination address '%(address)s'.") %
+                raise AErr(_("There are %(count)d aliases with the "
+                             "destination address '%(address)s'.") %
                            {'count': a_count, 'address': self._addr},
                            ALIAS_PRESENT)
             dbc.execute('DELETE FROM users WHERE uid = %s', (self._uid,))
@@ -466,11 +466,11 @@ def get_account_by_uid(uid, dbh):
       a database connection for the database access.
     """
     try:
-        uid = long(uid)
+        uid = int(uid)
     except ValueError:
-        raise AErr(_(u'UID must be an int/long.'), INVALID_ARGUMENT)
+        raise AErr(_('UID must be an int/long.'), INVALID_ARGUMENT)
     if uid < 1:
-        raise AErr(_(u'UID must be greater than 0.'), INVALID_ARGUMENT)
+        raise AErr(_('UID must be greater than 0.'), INVALID_ARGUMENT)
     dbc = dbh.cursor()
     dbc.execute("SELECT local_part||'@'|| domain_name.domainname AS address, "
                 "uid, users.gid, note FROM users LEFT JOIN domain_name ON "
@@ -479,9 +479,9 @@ def get_account_by_uid(uid, dbh):
     info = dbc.fetchone()
     dbc.close()
     if not info:
-        raise AErr(_(u"There is no account with the UID: '%d'") % uid,
+        raise AErr(_("There is no account with the UID: '%d'") % uid,
                    NO_SUCH_ACCOUNT)
-    info = dict(zip(('address', 'uid', 'gid', 'note'), info))
+    info = dict(list(zip(('address', 'uid', 'gid', 'note'), info)))
     return info
 
 del _, cfg_dget

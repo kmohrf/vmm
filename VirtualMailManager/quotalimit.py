@@ -42,16 +42,16 @@ class QuotaLimit(object):
         self._bytes = 0
         self._messages = 0
 
-        for key in kwargs.iterkeys():
+        for key in kwargs.keys():
             if key not in self.__class__._kwargs:
                 raise ValueError('unrecognized keyword: %r' % key)
         qid = kwargs.get('qid')
         if qid is not None:
-            assert isinstance(qid, (int, long))
+            assert isinstance(qid, int)
             self._load_by_qid(qid)
         else:
             bytes_, msgs = kwargs.get('bytes'), kwargs.get('messages')
-            assert all(isinstance(i, (int, long)) for i in (bytes_, msgs))
+            assert all(isinstance(i, int) for i in (bytes_, msgs))
             self._bytes = -bytes_ if bytes_ < 0 else bytes_
             self._messages = -msgs if msgs < 0 else msgs
             self._load_by_limit()

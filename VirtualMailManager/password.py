@@ -51,7 +51,7 @@ _ = lambda msg: msg
 cfg_dget = lambda option: None
 _sys_rand = SystemRandom()
 _choice = _sys_rand.choice
-_get_salt = lambda s_len: ''.join(_choice(SALTCHARS) for x in xrange(s_len))
+_get_salt = lambda s_len: ''.join(_choice(SALTCHARS) for x in range(s_len))
 
 
 def _dovecotpw(password, scheme, encoding):
@@ -81,7 +81,7 @@ def _md4_new():
     """
     try:
         return hashlib.new('md4')
-    except ValueError, err:
+    except ValueError as err:
         if str(err) == 'unsupported hash type':
             try:
                 from Crypto.Hash import MD4
@@ -330,7 +330,7 @@ def list_schemes():
     be empty.
     """
     dcv = cfg_dget('misc.dovecot_version')
-    schemes = (k for (k, v) in _scheme_info.iteritems() if v[1] <= dcv)
+    schemes = (k for (k, v) in _scheme_info.items() if v[1] <= dcv)
     encodings = ('.B64', '.BASE64', '.HEX') if dcv >= 0x10100a01 else ()
     return schemes, encodings
 
@@ -350,23 +350,23 @@ def verify_scheme(scheme):
       * depends on a newer Dovecot version
       * has a unknown encoding suffix
     """
-    assert isinstance(scheme, basestring), 'Not a str/unicode: %r' % scheme
+    assert isinstance(scheme, str), 'Not a str/unicode: %r' % scheme
     scheme_encoding = scheme.upper().split('.')
     scheme = scheme_encoding[0]
     if scheme not in _scheme_info:
-        raise VMMError(_(u"Unsupported password scheme: '%s'") % scheme,
+        raise VMMError(_("Unsupported password scheme: '%s'") % scheme,
                        VMM_ERROR)
     if cfg_dget('misc.dovecot_version') < _scheme_info[scheme][1]:
-        raise VMMError(_(u"The password scheme '%(scheme)s' requires Dovecot "
-                         u">= v%(version)s.") % {'scheme': scheme,
+        raise VMMError(_("The password scheme '%(scheme)s' requires Dovecot "
+                         ">= v%(version)s.") % {'scheme': scheme,
                        'version': version_str(_scheme_info[scheme][1])},
                        VMM_ERROR)
     if len(scheme_encoding) > 1:
         if cfg_dget('misc.dovecot_version') < 0x10100a01:
-            raise VMMError(_(u'Encoding suffixes for password schemes require '
-                             u'Dovecot >= v1.1.alpha1.'), VMM_ERROR)
+            raise VMMError(_('Encoding suffixes for password schemes require '
+                             'Dovecot >= v1.1.alpha1.'), VMM_ERROR)
         if scheme_encoding[1] not in ('B64', 'BASE64', 'HEX'):
-            raise VMMError(_(u"Unsupported password encoding: '%s'") %
+            raise VMMError(_("Unsupported password encoding: '%s'") %
                            scheme_encoding[1], VMM_ERROR)
         encoding = scheme_encoding[1]
     else:
@@ -381,9 +381,9 @@ def pwhash(password, scheme=None, user=None):
     be used for the hash generation.  When 'DIGEST-MD5' is used as scheme,
     also an EmailAddress instance must be given as *user* argument.
     """
-    if not isinstance(password, basestring):
+    if not isinstance(password, str):
         raise TypeError('Password is not a string: %r' % password)
-    if isinstance(password, unicode):
+    if isinstance(password, str):
         password = password.encode(ENCODING)
     password = password.strip()
     if not password:

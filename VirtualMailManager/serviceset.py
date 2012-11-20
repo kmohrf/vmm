@@ -65,12 +65,12 @@ class ServiceSet(object):
         else:
             self._sieve_col = 'sieve'
 
-        for key in kwargs.iterkeys():
+        for key in kwargs.keys():
             if key not in self.__class__._kwargs:
                 raise ValueError('unrecognized keyword: %r' % key)
             if key == 'ssid':
                 assert not isinstance(kwargs[key], bool) and \
-                       isinstance(kwargs[key], (int, long)) and kwargs[key] > 0
+                       isinstance(kwargs[key], int) and kwargs[key] > 0
                 self._load_by_ssid(kwargs[key])
                 break
             else:
@@ -101,13 +101,13 @@ class ServiceSet(object):
 
     def __repr__(self):
         return '%s(%s, %s)' % (self.__class__.__name__, self._dbh,
-                  ', '.join('%s=%r' % s for s in self._services.iteritems()))
+                  ', '.join('%s=%r' % s for s in self._services.items()))
 
     def _load_by_services(self):
         """Try to load the service_set by it's service combination."""
         sql = ('SELECT ssid FROM service_set WHERE %s' %
                ' AND '.join('%s = %s' %
-               (k, str(v).upper()) for k, v in self._services.iteritems()))
+               (k, str(v).upper()) for k, v in self._services.items()))
         if self._sieve_col == 'managesieve':
             sql = sql.replace('sieve', self._sieve_col)
         dbc = self._dbh.cursor()

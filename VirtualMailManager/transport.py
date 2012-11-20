@@ -32,10 +32,10 @@ class Transport(object):
         self._tid = 0
         assert any((tid, transport))
         if tid:
-            assert not isinstance(tid, bool) and isinstance(tid, (int, long))
+            assert not isinstance(tid, bool) and isinstance(tid, int)
             self._load_by_id(tid)
         else:
-            assert isinstance(transport, basestring)
+            assert isinstance(transport, str)
             self._transport = transport
             self._load_by_name()
 

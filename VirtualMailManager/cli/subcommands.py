@@ -79,7 +79,7 @@ usage: %(prog)s %(name)s %(args)s
     @property
     def usage(self):
         """the command's usage info."""
-        return u'%s %s %s' % (prog, self.name, self.args)
+        return '%s %s %s' % (prog, self.name, self.args)
 
     def help_(self):
         """Print the Command's help message to stdout."""
@@ -98,19 +98,19 @@ usage: %(prog)s %(name)s %(args)s
             [w_std(txt_wrpr.fill(_(para)) + '\n') for para
                     in help_msgs[self.name]]
         except KeyError:
-            w_err(1, _(u"Subcommand '%s' is not yet documented." % self.name),
+            w_err(1, _("Subcommand '%s' is not yet documented." % self.name),
                   'see also: vmm(1)')
 
 
 class RunContext(object):
     """Contains all information necessary to run a subcommand."""
     __slots__ = ('argc', 'args', 'cget', 'hdlr', 'scmd')
-    plan_a_b = _(u'Plan A failed ... trying Plan B: %(subcommand)s %(object)s')
+    plan_a_b = _('Plan A failed ... trying Plan B: %(subcommand)s %(object)s')
 
     def __init__(self, argv, handler, command):
         """Create a new RunContext"""
         self.argc = len(argv)
-        self.args = [unicode(arg, ENCODING) for arg in argv]
+        self.args = [str(arg, ENCODING) for arg in argv]
         self.cget = handler.cfg_dget
         self.hdlr = handler
         self.scmd = command
@@ -119,17 +119,17 @@ class RunContext(object):
 def alias_add(ctx):
     """create a new alias e-mail address"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing alias address and destination.'),
+        usage(EX_MISSING_ARGS, _('Missing alias address and destination.'),
               ctx.scmd)
     elif ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u'Missing destination address.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing destination address.'), ctx.scmd)
     ctx.hdlr.alias_add(ctx.args[2].lower(), *ctx.args[3:])
 
 
 def alias_delete(ctx):
     """delete the specified alias e-mail address or one of its destinations"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing alias address.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing alias address.'), ctx.scmd)
     elif ctx.argc < 4:
         ctx.hdlr.alias_delete(ctx.args[2].lower())
     else:
@@ -139,18 +139,18 @@ def alias_delete(ctx):
 def alias_info(ctx):
     """show the destination(s) of the specified alias"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing alias address.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing alias address.'), ctx.scmd)
     address = ctx.args[2].lower()
     try:
         _print_aliase_info(address, ctx.hdlr.alias_info(address))
-    except VMMError, err:
+    except VMMError as err:
         if err.code is ACCOUNT_EXISTS:
-            w_err(0, ctx.plan_a_b % {'subcommand': u'userinfo',
+            w_err(0, ctx.plan_a_b % {'subcommand': 'userinfo',
                   'object': address})
             ctx.scmd = ctx.args[1] = 'userinfo'
             user_info(ctx)
         elif err.code is RELOCATED_EXISTS:
-            w_err(0, ctx.plan_a_b % {'subcommand': u'relocatedinfo',
+            w_err(0, ctx.plan_a_b % {'subcommand': 'relocatedinfo',
                   'object': address})
             ctx.scmd = ctx.args[1] = 'relocatedinfo'
             relocated_info(ctx)
@@ -161,10 +161,10 @@ def alias_info(ctx):
 def aliasdomain_add(ctx):
     """create a new alias for an existing domain"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing alias domain name and destination '
-                                 u'domain name.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing alias domain name and destination '
+                                 'domain name.'), ctx.scmd)
     elif ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u'Missing destination domain name.'),
+        usage(EX_MISSING_ARGS, _('Missing destination domain name.'),
               ctx.scmd)
     ctx.hdlr.aliasdomain_add(ctx.args[2].lower(), ctx.args[3].lower())
 
@@ -172,19 +172,19 @@ def aliasdomain_add(ctx):
 def aliasdomain_delete(ctx):
     """delete the specified alias domain"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing alias domain name.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing alias domain name.'), ctx.scmd)
     ctx.hdlr.aliasdomain_delete(ctx.args[2].lower())
 
 
 def aliasdomain_info(ctx):
     """show the destination of the given alias domain"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing alias domain name.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing alias domain name.'), ctx.scmd)
     try:
         _print_aliasdomain_info(ctx.hdlr.aliasdomain_info(ctx.args[2].lower()))
-    except VMMError, err:
+    except VMMError as err:
         if err.code is ALIASDOMAIN_ISDOMAIN:
-            w_err(0, ctx.plan_a_b % {'subcommand': u'domaininfo',
+            w_err(0, ctx.plan_a_b % {'subcommand': 'domaininfo',
                   'object': ctx.args[2].lower()})
             ctx.scmd = ctx.args[1] = 'domaininfo'
             domain_info(ctx)
@@ -195,10 +195,10 @@ def aliasdomain_info(ctx):
 def aliasdomain_switch(ctx):
     """assign the given alias domain to an other domain"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing alias domain name and destination '
-                                 u'domain name.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing alias domain name and destination '
+                                 'domain name.'), ctx.scmd)
     elif ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u'Missing destination domain name.'),
+        usage(EX_MISSING_ARGS, _('Missing destination domain name.'),
               ctx.scmd)
     ctx.hdlr.aliasdomain_switch(ctx.args[2].lower(), ctx.args[3].lower())
 
@@ -206,17 +206,17 @@ def aliasdomain_switch(ctx):
 def catchall_add(ctx):
     """create a new catchall alias e-mail address"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain and destination.'),
+        usage(EX_MISSING_ARGS, _('Missing domain and destination.'),
               ctx.scmd)
     elif ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u'Missing destination address.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing destination address.'), ctx.scmd)
     ctx.hdlr.catchall_add(ctx.args[2].lower(), *ctx.args[3:])
 
 
 def catchall_delete(ctx):
     """delete the specified destination or all of the catchall destination"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain name.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing domain name.'), ctx.scmd)
     elif ctx.argc < 4:
         ctx.hdlr.catchall_delete(ctx.args[2].lower())
     else:
@@ -226,7 +226,7 @@ def catchall_delete(ctx):
 def catchall_info(ctx):
     """show the catchall destination(s) of the specified domain"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain name.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing domain name.'), ctx.scmd)
     address = ctx.args[2].lower()
     _print_catchall_info(address, ctx.hdlr.catchall_info(address))
 
@@ -234,7 +234,7 @@ def catchall_info(ctx):
 def config_get(ctx):
     """show the actual value of the configuration option"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u"Missing option name."), ctx.scmd)
+        usage(EX_MISSING_ARGS, _("Missing option name."), ctx.scmd)
 
     noop = lambda option: option
     opt_formater = {
@@ -250,9 +250,9 @@ def config_get(ctx):
 def config_set(ctx):
     """set a new value for the configuration option"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing option and new value.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing option and new value.'), ctx.scmd)
     if ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u'Missing new configuration value.'),
+        usage(EX_MISSING_ARGS, _('Missing new configuration value.'),
               ctx.scmd)
     ctx.hdlr.cfg_set(ctx.args[2].lower(), ctx.args[3])
 
@@ -268,15 +268,15 @@ def configure(ctx):
 def domain_add(ctx):
     """create a new domain"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain name.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing domain name.'), ctx.scmd)
     elif ctx.argc < 4:
         ctx.hdlr.domain_add(ctx.args[2].lower())
     else:
         ctx.hdlr.domain_add(ctx.args[2].lower(), ctx.args[3])
     if ctx.cget('domain.auto_postmaster'):
-        w_std(_(u'Creating account for postmaster@%s') % ctx.args[2].lower())
+        w_std(_('Creating account for postmaster@%s') % ctx.args[2].lower())
         ctx.scmd = 'useradd'
-        ctx.args = [prog, ctx.scmd, u'postmaster@' + ctx.args[2].lower()]
+        ctx.args = [prog, ctx.scmd, 'postmaster@' + ctx.args[2].lower()]
         ctx.argc = 3
         user_add(ctx)
 
@@ -284,84 +284,84 @@ def domain_add(ctx):
 def domain_delete(ctx):
     """delete the given domain and all its alias domains"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain name.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing domain name.'), ctx.scmd)
     elif ctx.argc < 4:
         ctx.hdlr.domain_delete(ctx.args[2].lower())
     elif ctx.args[3].lower() == 'force':
         ctx.hdlr.domain_delete(ctx.args[2].lower(), True)
     else:
-        usage(INVALID_ARGUMENT, _(u"Invalid argument: '%s'") % ctx.args[3],
+        usage(INVALID_ARGUMENT, _("Invalid argument: '%s'") % ctx.args[3],
               ctx.scmd)
 
 
 def domain_info(ctx):
     """display information about the given domain"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain name.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing domain name.'), ctx.scmd)
     if ctx.argc < 4:
         details = None
     else:
         details = ctx.args[3].lower()
         if details not in ('accounts', 'aliasdomains', 'aliases', 'full',
                            'relocated', 'catchall'):
-            usage(INVALID_ARGUMENT, _(u"Invalid argument: '%s'") % details,
+            usage(INVALID_ARGUMENT, _("Invalid argument: '%s'") % details,
                   ctx.scmd)
     try:
         info = ctx.hdlr.domain_info(ctx.args[2].lower(), details)
-    except VMMError, err:
+    except VMMError as err:
         if err.code is DOMAIN_ALIAS_EXISTS:
-            w_err(0, ctx.plan_a_b % {'subcommand': u'aliasdomaininfo',
+            w_err(0, ctx.plan_a_b % {'subcommand': 'aliasdomaininfo',
                   'object': ctx.args[2].lower()})
             ctx.scmd = ctx.args[1] = 'aliasdomaininfo'
             aliasdomain_info(ctx)
         else:
             raise
     else:
-        q_limit = u'Storage: %(bytes)s; Messages: %(messages)s'
+        q_limit = 'Storage: %(bytes)s; Messages: %(messages)s'
         if not details:
             info['bytes'] = human_size(info['bytes'])
             info['messages'] = locale.format('%d', info['messages'],
                                              True).decode(ENCODING, 'replace')
             info['quota limit/user'] = q_limit % info
-            _print_info(ctx, info, _(u'Domain'))
+            _print_info(ctx, info, _('Domain'))
         else:
             info[0]['bytes'] = human_size(info[0]['bytes'])
             info[0]['messages'] = locale.format('%d', info[0]['messages'],
                                                 True).decode(ENCODING,
                                                              'replace')
             info[0]['quota limit/user'] = q_limit % info[0]
-            _print_info(ctx, info[0], _(u'Domain'))
-            if details == u'accounts':
-                _print_list(info[1], _(u'accounts'))
-            elif details == u'aliasdomains':
-                _print_list(info[1], _(u'alias domains'))
-            elif details == u'aliases':
-                _print_list(info[1], _(u'aliases'))
-            elif details == u'relocated':
-                _print_list(info[1], _(u'relocated users'))
-            elif details == u'catchall':
-                _print_list(info[1], _(u'catch-all destinations'))
+            _print_info(ctx, info[0], _('Domain'))
+            if details == 'accounts':
+                _print_list(info[1], _('accounts'))
+            elif details == 'aliasdomains':
+                _print_list(info[1], _('alias domains'))
+            elif details == 'aliases':
+                _print_list(info[1], _('aliases'))
+            elif details == 'relocated':
+                _print_list(info[1], _('relocated users'))
+            elif details == 'catchall':
+                _print_list(info[1], _('catch-all destinations'))
             else:
-                _print_list(info[1], _(u'alias domains'))
-                _print_list(info[2], _(u'accounts'))
-                _print_list(info[3], _(u'aliases'))
-                _print_list(info[4], _(u'relocated users'))
-                _print_list(info[5], _(u'catch-all destinations'))
+                _print_list(info[1], _('alias domains'))
+                _print_list(info[2], _('accounts'))
+                _print_list(info[3], _('aliases'))
+                _print_list(info[4], _('relocated users'))
+                _print_list(info[5], _('catch-all destinations'))
 
 
 def domain_quota(ctx):
     """update the quota limit of the specified domain"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain name and storage value.'),
+        usage(EX_MISSING_ARGS, _('Missing domain name and storage value.'),
               ctx.scmd)
     if ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u'Missing storage value.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing storage value.'), ctx.scmd)
     messages = 0
     force = None
     try:
         bytes_ = size_in_bytes(ctx.args[3])
     except (ValueError, TypeError):
-        usage(INVALID_ARGUMENT, _(u"Invalid storage value: '%s'") %
+        usage(INVALID_ARGUMENT, _("Invalid storage value: '%s'") %
               ctx.args[3], ctx.scmd)
     if ctx.argc < 5:
         pass
@@ -371,18 +371,18 @@ def domain_quota(ctx):
         except ValueError:
             if ctx.args[4].lower() != 'force':
                 usage(INVALID_ARGUMENT,
-                      _(u"Neither a valid number of messages nor the keyword "
-                        u"'force': '%s'") % ctx.args[4], ctx.scmd)
+                      _("Neither a valid number of messages nor the keyword "
+                        "'force': '%s'") % ctx.args[4], ctx.scmd)
             force = 'force'
     else:
         try:
             messages = int(ctx.args[4])
         except ValueError:
             usage(INVALID_ARGUMENT,
-                  _(u"Not a valid number of messages: '%s'") % ctx.args[4],
+                  _("Not a valid number of messages: '%s'") % ctx.args[4],
                   ctx.scmd)
         if ctx.args[5].lower() != 'force':
-            usage(INVALID_ARGUMENT, _(u"Invalid argument: '%s'") % ctx.args[5],
+            usage(INVALID_ARGUMENT, _("Invalid argument: '%s'") % ctx.args[5],
                   ctx.scmd)
         force = 'force'
     ctx.hdlr.domain_quotalimit(ctx.args[2].lower(), bytes_, messages, force)
@@ -391,7 +391,7 @@ def domain_quota(ctx):
 def domain_services(ctx):
     """allow all named service and block the uncredited."""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain name.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing domain name.'), ctx.scmd)
     services = []
     force = False
     if ctx.argc is 3:
@@ -403,7 +403,7 @@ def domain_services(ctx):
         elif arg == 'force':
             force = True
         else:
-            usage(INVALID_ARGUMENT, _(u"Invalid argument: '%s'") % arg,
+            usage(INVALID_ARGUMENT, _("Invalid argument: '%s'") % arg,
                   ctx.scmd)
     else:
         services.extend([service.lower() for service in ctx.args[3:-1]])
@@ -414,7 +414,7 @@ def domain_services(ctx):
             services.append(arg)
         unknown = [service for service in services if service not in SERVICES]
         if unknown:
-            usage(INVALID_ARGUMENT, _(u'Invalid service arguments: %s') %
+            usage(INVALID_ARGUMENT, _('Invalid service arguments: %s') %
                   ' '.join(unknown), ctx.scmd)
     ctx.hdlr.domain_services(ctx.args[2].lower(), (None, 'force')[force],
                              *services)
@@ -423,16 +423,16 @@ def domain_services(ctx):
 def domain_transport(ctx):
     """update the transport of the specified domain"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain name and new transport.'),
+        usage(EX_MISSING_ARGS, _('Missing domain name and new transport.'),
               ctx.scmd)
     if ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u'Missing new transport.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing new transport.'), ctx.scmd)
     if ctx.argc < 5:
         ctx.hdlr.domain_transport(ctx.args[2].lower(), ctx.args[3])
     else:
         force = ctx.args[4].lower()
         if force != 'force':
-            usage(INVALID_ARGUMENT, _(u"Invalid argument: '%s'") % force,
+            usage(INVALID_ARGUMENT, _("Invalid argument: '%s'") % force,
                   ctx.scmd)
         ctx.hdlr.domain_transport(ctx.args[2].lower(), ctx.args[3], force)
 
@@ -440,7 +440,7 @@ def domain_transport(ctx):
 def domain_note(ctx):
     """update the note of the given domain"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain name.'),
+        usage(EX_MISSING_ARGS, _('Missing domain name.'),
               ctx.scmd)
     elif ctx.argc < 4:
         note = None
@@ -452,8 +452,8 @@ def domain_note(ctx):
 def get_user(ctx):
     """get the address of the user with the given UID"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing UID.'), ctx.scmd)
-    _print_info(ctx, ctx.hdlr.user_by_uid(ctx.args[2]), _(u'Account'))
+        usage(EX_MISSING_ARGS, _('Missing UID.'), ctx.scmd)
+    _print_info(ctx, ctx.hdlr.user_by_uid(ctx.args[2]), _('Account'))
 
 
 def help_(ctx):
@@ -463,14 +463,14 @@ def help_(ctx):
         if hlptpc in cmd_map:
             topic = hlptpc
         else:
-            for scmd in cmd_map.itervalues():
+            for scmd in cmd_map.values():
                 if scmd.alias == hlptpc:
                     topic = scmd.name
                     break
             else:
-                usage(INVALID_ARGUMENT, _(u"Unknown help topic: '%s'") %
+                usage(INVALID_ARGUMENT, _("Unknown help topic: '%s'") %
                       ctx.args[2], ctx.scmd)
-        if topic != u'help':
+        if topic != 'help':
             return cmd_map[topic].help_()
 
     old_ii = txt_wrpr.initial_indent
@@ -478,10 +478,9 @@ def help_(ctx):
     txt_wrpr.initial_indent = ' '
     # len(max(_overview.iterkeys(), key=len)) #Py25
     txt_wrpr.subsequent_indent = 20 * ' '
-    order = cmd_map.keys()
-    order.sort()
+    order = sorted(list(cmd_map.keys()))
 
-    w_std(_(u'List of available subcommands:') + '\n')
+    w_std(_('List of available subcommands:') + '\n')
     for key in order:
         w_std('\n'.join(txt_wrpr.wrap('%-18s %s' % (key, cmd_map[key].descr))))
 
@@ -502,7 +501,7 @@ def list_domains(ctx):
 
 def list_pwschemes(ctx_unused):
     """Prints all usable password schemes and password encoding suffixes."""
-    keys = (_(u'Usable password schemes'), _(u'Usable encoding suffixes'))
+    keys = (_('Usable password schemes'), _('Usable encoding suffixes'))
     old_ii, old_si = txt_wrpr.initial_indent, txt_wrpr.subsequent_indent
     txt_wrpr.initial_indent = txt_wrpr.subsequent_indent = '\t'
     txt_wrpr.width = txt_wrpr.width - 8
@@ -549,35 +548,35 @@ def relocated_add(ctx):
     """create a new record for a relocated user"""
     if ctx.argc < 3:
         usage(EX_MISSING_ARGS,
-              _(u'Missing relocated address and destination.'), ctx.scmd)
+              _('Missing relocated address and destination.'), ctx.scmd)
     elif ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u'Missing destination address.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing destination address.'), ctx.scmd)
     ctx.hdlr.relocated_add(ctx.args[2].lower(), ctx.args[3])
 
 
 def relocated_delete(ctx):
     """delete the record of the relocated user"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing relocated address.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing relocated address.'), ctx.scmd)
     ctx.hdlr.relocated_delete(ctx.args[2].lower())
 
 
 def relocated_info(ctx):
     """print information about a relocated user"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing relocated address.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing relocated address.'), ctx.scmd)
     relocated = ctx.args[2].lower()
     try:
         _print_relocated_info(addr=relocated,
                               dest=ctx.hdlr.relocated_info(relocated))
-    except VMMError, err:
+    except VMMError as err:
         if err.code is ACCOUNT_EXISTS:
-            w_err(0, ctx.plan_a_b % {'subcommand': u'userinfo',
+            w_err(0, ctx.plan_a_b % {'subcommand': 'userinfo',
                   'object': relocated})
             ctx.scmd = ctx.args[1] = 'userinfoi'
             user_info(ctx)
         elif err.code is ALIAS_EXISTS:
-            w_err(0, ctx.plan_a_b % {'subcommand': u'aliasinfo',
+            w_err(0, ctx.plan_a_b % {'subcommand': 'aliasinfo',
                   'object': relocated})
             ctx.scmd = ctx.args[1] = 'aliasinfo'
             alias_info(ctx)
@@ -588,50 +587,50 @@ def relocated_info(ctx):
 def user_add(ctx):
     """create a new e-mail user with the given address"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing e-mail address.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing e-mail address.'), ctx.scmd)
     elif ctx.argc < 4:
         password = None
     else:
         password = ctx.args[3]
     gen_pass = ctx.hdlr.user_add(ctx.args[2].lower(), password)
     if ctx.argc < 4 and gen_pass:
-        w_std(_(u"Generated password: %s") % gen_pass)
+        w_std(_("Generated password: %s") % gen_pass)
 
 
 def user_delete(ctx):
     """delete the specified user"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing e-mail address.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing e-mail address.'), ctx.scmd)
     elif ctx.argc < 4:
         ctx.hdlr.user_delete(ctx.args[2].lower())
     elif ctx.args[3].lower() == 'force':
         ctx.hdlr.user_delete(ctx.args[2].lower(), True)
     else:
-        usage(INVALID_ARGUMENT, _(u"Invalid argument: '%s'") % ctx.args[3],
+        usage(INVALID_ARGUMENT, _("Invalid argument: '%s'") % ctx.args[3],
               ctx.scmd)
 
 
 def user_info(ctx):
     """display information about the given address"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing e-mail address.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing e-mail address.'), ctx.scmd)
     if ctx.argc < 4:
         details = None
     else:
         details = ctx.args[3].lower()
         if details not in ('aliases', 'du', 'full'):
-            usage(INVALID_ARGUMENT, _(u"Invalid argument: '%s'") % details,
+            usage(INVALID_ARGUMENT, _("Invalid argument: '%s'") % details,
                   ctx.scmd)
     try:
         info = ctx.hdlr.user_info(ctx.args[2].lower(), details)
-    except VMMError, err:
+    except VMMError as err:
         if err.code is ALIAS_EXISTS:
-            w_err(0, ctx.plan_a_b % {'subcommand': u'aliasinfo',
+            w_err(0, ctx.plan_a_b % {'subcommand': 'aliasinfo',
                   'object': ctx.args[2].lower()})
             ctx.scmd = ctx.args[1] = 'aliasinfo'
             alias_info(ctx)
         elif err.code is RELOCATED_EXISTS:
-            w_err(0, ctx.plan_a_b % {'subcommand': u'relocatedinfo',
+            w_err(0, ctx.plan_a_b % {'subcommand': 'relocatedinfo',
                   'object': ctx.args[2].lower()})
             ctx.scmd = ctx.args[1] = 'relocatedinfo'
             relocated_info(ctx)
@@ -645,7 +644,7 @@ def user_info(ctx):
                 _format_quota_usage(info['ql_messages'],
                                     info['uq_messages'],
                                     domaindefault=info['ql_domaindefault'])
-            _print_info(ctx, info, _(u'Account'))
+            _print_info(ctx, info, _('Account'))
         else:
             info[0]['quota storage'] = _format_quota_usage(info[0]['ql_bytes'],
                     info[0]['uq_bytes'], True, info[0]['ql_domaindefault'])
@@ -653,14 +652,14 @@ def user_info(ctx):
                 _format_quota_usage(info[0]['ql_messages'],
                                     info[0]['uq_messages'],
                                     domaindefault=info[0]['ql_domaindefault'])
-            _print_info(ctx, info[0], _(u'Account'))
-            _print_list(info[1], _(u'alias addresses'))
+            _print_info(ctx, info[0], _('Account'))
+            _print_list(info[1], _('alias addresses'))
 
 
 def user_name(ctx):
     """set or update the real name for an address"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u"Missing e-mail address and user's name."),
+        usage(EX_MISSING_ARGS, _("Missing e-mail address and user's name."),
               ctx.scmd)
     elif ctx.argc < 4:
         name = None
@@ -672,7 +671,7 @@ def user_name(ctx):
 def user_password(ctx):
     """update the password for the given address"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing e-mail address.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing e-mail address.'), ctx.scmd)
     elif ctx.argc < 4:
         password = None
     else:
@@ -683,7 +682,7 @@ def user_password(ctx):
 def user_note(ctx):
     """update the note of the given address"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing e-mail address.'),
+        usage(EX_MISSING_ARGS, _('Missing e-mail address.'),
               ctx.scmd)
     elif ctx.argc < 4:
         note = None
@@ -695,15 +694,15 @@ def user_note(ctx):
 def user_quota(ctx):
     """update the quota limit for the given address"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing e-mail address and storage value.'),
+        usage(EX_MISSING_ARGS, _('Missing e-mail address and storage value.'),
               ctx.scmd)
     elif ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u'Missing storage value.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing storage value.'), ctx.scmd)
     if ctx.args[3] != 'domain':
         try:
             bytes_ = size_in_bytes(ctx.args[3])
         except (ValueError, TypeError):
-            usage(INVALID_ARGUMENT, _(u"Invalid storage value: '%s'") %
+            usage(INVALID_ARGUMENT, _("Invalid storage value: '%s'") %
                   ctx.args[3], ctx.scmd)
     else:
         bytes_ = ctx.args[3]
@@ -714,7 +713,7 @@ def user_quota(ctx):
             messages = int(ctx.args[4])
         except ValueError:
             usage(INVALID_ARGUMENT,
-                  _(u"Not a valid number of messages: '%s'") % ctx.args[4],
+                  _("Not a valid number of messages: '%s'") % ctx.args[4],
                   ctx.scmd)
     ctx.hdlr.user_quotalimit(ctx.args[2].lower(), bytes_, messages)
 
@@ -722,13 +721,13 @@ def user_quota(ctx):
 def user_services(ctx):
     """allow all named service and block the uncredited."""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing e-mail address.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing e-mail address.'), ctx.scmd)
     services = []
     if ctx.argc >= 4:
         services.extend([service.lower() for service in ctx.args[3:]])
         unknown = [service for service in services if service not in SERVICES]
         if unknown and ctx.args[3] != 'domain':
-            usage(INVALID_ARGUMENT, _(u'Invalid service arguments: %s') %
+            usage(INVALID_ARGUMENT, _('Invalid service arguments: %s') %
                   ' '.join(unknown), ctx.scmd)
     ctx.hdlr.user_services(ctx.args[2].lower(), *services)
 
@@ -736,10 +735,10 @@ def user_services(ctx):
 def user_transport(ctx):
     """update the transport of the given address"""
     if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing e-mail address and transport.'),
+        usage(EX_MISSING_ARGS, _('Missing e-mail address and transport.'),
               ctx.scmd)
     if ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u'Missing transport.'), ctx.scmd)
+        usage(EX_MISSING_ARGS, _('Missing transport.'), ctx.scmd)
     ctx.hdlr.user_transport(ctx.args[2].lower(), ctx.args[3])
 
 
@@ -748,8 +747,8 @@ def usage(errno, errmsg, subcommand=None):
     When errno > 0, sys,exit(errno) will interrupt the program.
     """
     if subcommand and subcommand in cmd_map:
-        w_err(errno, _(u"Error: %s") % errmsg,
-              _(u"usage: ") + cmd_map[subcommand].usage)
+        w_err(errno, _("Error: %s") % errmsg,
+              _("usage: ") + cmd_map[subcommand].usage)
 
     # TP: Please adjust translated words like the original text.
     # (It's a table header.) Extract from usage text:
@@ -759,16 +758,15 @@ def usage(errno, errmsg, subcommand=None):
     #
     #   da    domainadd           fqdn [transport]
     #   dd    domaindelete        fqdn [force]
-    u_head = _(u"""usage: %s subcommand arguments
+    u_head = _("""usage: %s subcommand arguments
   short long
   subcommand                arguments\n""") % prog
-    order = cmd_map.keys()
-    order.sort()
+    order = sorted(list(cmd_map.keys()))
     w_err(0, u_head)
     for key in order:
         scmd = cmd_map[key]
         w_err(0, '  %-5s %-19s %s' % (scmd.alias, scmd.name, scmd.args))
-    w_err(errno, '', _(u"Error: %s") % errmsg)
+    w_err(errno, '', _("Error: %s") % errmsg)
 
 
 def version(ctx_unused):
@@ -778,12 +776,12 @@ def version(ctx_unused):
     # the version information, e.g.:
     # vmm, version 0.5.2 (from 09/09/09)
     # Python 2.5.4 on FreeBSD
-        _(u'version'), __version__, _(u'from'),
+        _('version'), __version__, _('from'),
         strftime(locale.nl_langinfo(locale.D_FMT),
             strptime(__date__, '%Y-%m-%d')).decode(ENCODING, 'replace'),
-        os.sys.version.split()[0], _(u'on'), os.uname()[0],
+        os.sys.version.split()[0], _('on'), os.uname()[0],
         __copyright__, prog,
-        _(u'is free software and comes with ABSOLUTELY NO WARRANTY.')))
+        _('is free software and comes with ABSOLUTELY NO WARRANTY.')))
 
 
 def update_cmd_map():
@@ -792,119 +790,119 @@ def update_cmd_map():
     cmd_map.update({
     # Account commands
     'getuser': cmd('getuser', 'gu', get_user, 'uid',
-                   _(u'get the address of the user with the given UID')),
+                   _('get the address of the user with the given UID')),
     'useradd': cmd('useradd', 'ua', user_add, 'address [password]',
-                   _(u'create a new e-mail user with the given address')),
+                   _('create a new e-mail user with the given address')),
     'userdelete': cmd('userdelete', 'ud', user_delete, 'address [force]',
-                      _(u'delete the specified user')),
+                      _('delete the specified user')),
     'userinfo': cmd('userinfo', 'ui', user_info, 'address [details]',
-                    _(u'display information about the given address')),
+                    _('display information about the given address')),
     'username': cmd('username', 'un', user_name, 'address [name]',
-                    _(u'set, update or delete the real name for an address')),
+                    _('set, update or delete the real name for an address')),
     'userpassword': cmd('userpassword', 'up', user_password,
                         'address [password]',
-                        _(u'update the password for the given address')),
+                        _('update the password for the given address')),
     'userquota': cmd('userquota', 'uq', user_quota,
                      'address storage [messages] | address domain',
-                     _(u'update the quota limit for the given address')),
+                     _('update the quota limit for the given address')),
     'userservices': cmd('userservices', 'us', user_services,
                         'address [service ...] | address domain',
-                        _(u'enables the specified services and disables all '
-                          u'not specified services')),
+                        _('enables the specified services and disables all '
+                          'not specified services')),
     'usertransport': cmd('usertransport', 'ut', user_transport,
                          'address transport | address domain',
-                         _(u'update the transport of the given address')),
+                         _('update the transport of the given address')),
     'usernote': cmd('usernote', 'uo', user_note, 'address [note]',
-                    _(u'set, update or delete the note of the given address')),
+                    _('set, update or delete the note of the given address')),
     # Alias commands
     'aliasadd': cmd('aliasadd', 'aa', alias_add, 'address destination ...',
-                    _(u'create a new alias e-mail address with one or more '
-                      u'destinations')),
+                    _('create a new alias e-mail address with one or more '
+                      'destinations')),
     'aliasdelete': cmd('aliasdelete', 'ad', alias_delete,
                        'address [destination ...]',
-                       _(u'delete the specified alias e-mail address or one '
-                         u'of its destinations')),
+                       _('delete the specified alias e-mail address or one '
+                         'of its destinations')),
     'aliasinfo': cmd('aliasinfo', 'ai', alias_info, 'address',
-                     _(u'show the destination(s) of the specified alias')),
+                     _('show the destination(s) of the specified alias')),
     # AliasDomain commands
     'aliasdomainadd': cmd('aliasdomainadd', 'ada', aliasdomain_add,
                           'fqdn destination',
-                          _(u'create a new alias for an existing domain')),
+                          _('create a new alias for an existing domain')),
     'aliasdomaindelete': cmd('aliasdomaindelete', 'add', aliasdomain_delete,
-                             'fqdn', _(u'delete the specified alias domain')),
+                             'fqdn', _('delete the specified alias domain')),
     'aliasdomaininfo': cmd('aliasdomaininfo', 'adi', aliasdomain_info, 'fqdn',
-                         _(u'show the destination of the given alias domain')),
+                         _('show the destination of the given alias domain')),
     'aliasdomainswitch': cmd('aliasdomainswitch', 'ads', aliasdomain_switch,
-                             'fqdn destination', _(u'assign the given alias '
+                             'fqdn destination', _('assign the given alias '
                              'domain to an other domain')),
     # CatchallAlias commands
     'catchalladd': cmd('catchalladd', 'caa', catchall_add,
                        'fqdn destination ...',
-                       _(u'add one or more catch-all destinations for a '
-                         u'domain')),
+                       _('add one or more catch-all destinations for a '
+                         'domain')),
     'catchalldelete': cmd('catchalldelete', 'cad', catchall_delete,
                        'fqdn [destination ...]',
-                       _(u'delete the specified catch-all destination or all '
-                         u'of a domain\'s destinations')),
+                       _('delete the specified catch-all destination or all '
+                         'of a domain\'s destinations')),
     'catchallinfo': cmd('catchallinfo', 'cai', catchall_info, 'fqdn',
-                        _(u'show the catch-all destination(s) of the '
-                          u'specified domain')),
+                        _('show the catch-all destination(s) of the '
+                          'specified domain')),
     # Domain commands
     'domainadd': cmd('domainadd', 'da', domain_add, 'fqdn [transport]',
-                     _(u'create a new domain')),
+                     _('create a new domain')),
     'domaindelete': cmd('domaindelete', 'dd', domain_delete, 'fqdn [force]',
-                      _(u'delete the given domain and all its alias domains')),
+                      _('delete the given domain and all its alias domains')),
     'domaininfo': cmd('domaininfo', 'di', domain_info, 'fqdn [details]',
-                      _(u'display information about the given domain')),
+                      _('display information about the given domain')),
     'domainquota': cmd('domainquota', 'dq', domain_quota,
                        'fqdn storage [messages] [force]',
-                       _(u'update the quota limit of the specified domain')),
+                       _('update the quota limit of the specified domain')),
     'domainservices': cmd('domainservices', 'ds', domain_services,
                           'fqdn [service ...] [force]',
-                          _(u'enables the specified services and disables all '
-                            u'not specified services of the given domain')),
+                          _('enables the specified services and disables all '
+                            'not specified services of the given domain')),
     'domaintransport': cmd('domaintransport', 'dt', domain_transport,
                            'fqdn transport [force]',
-                           _(u'update the transport of the specified domain')),
+                           _('update the transport of the specified domain')),
     'domainnote': cmd('domainnote', 'do', domain_note, 'fqdn [note]',
-                     _(u'set, update or delete the note of the given domain')),
+                     _('set, update or delete the note of the given domain')),
     # List commands
     'listdomains': cmd('listdomains', 'ld', list_domains, '[pattern]',
-                      _(u'list all domains or search for domains by pattern')),
+                      _('list all domains or search for domains by pattern')),
     'listaddresses': cmd('listaddresses', 'll', list_addresses, '[pattern]',
-                         _(u'list all addresses or search for addresses by '
-                           u'pattern')),
+                         _('list all addresses or search for addresses by '
+                           'pattern')),
     'listusers': cmd('listusers', 'lu', list_users, '[pattern]',
-                     _(u'list all user accounts or search for accounts by '
-                       u'pattern')),
+                     _('list all user accounts or search for accounts by '
+                       'pattern')),
     'listaliases': cmd('listaliases', 'la', list_aliases, '[pattern]',
-                      _(u'list all aliases or search for aliases by pattern')),
+                      _('list all aliases or search for aliases by pattern')),
     'listrelocated': cmd('listrelocated', 'lr', list_relocated, '[pattern]',
-                         _(u'list all relocated users or search for relocated '
-                           u'users by pattern')),
+                         _('list all relocated users or search for relocated '
+                           'users by pattern')),
     # Relocated commands
     'relocatedadd': cmd('relocatedadd', 'ra', relocated_add,
                         'address newaddress',
-                        _(u'create a new record for a relocated user')),
+                        _('create a new record for a relocated user')),
     'relocateddelete': cmd('relocateddelete', 'rd', relocated_delete,
                            'address',
-                           _(u'delete the record of the relocated user')),
+                           _('delete the record of the relocated user')),
     'relocatedinfo': cmd('relocatedinfo', 'ri', relocated_info, 'address',
-                         _(u'print information about a relocated user')),
+                         _('print information about a relocated user')),
     # cli commands
     'configget': cmd('configget', 'cg', config_get, 'option',
                      _('show the actual value of the configuration option')),
     'configset': cmd('configset', 'cs', config_set, 'option value',
                       _('set a new value for the configuration option')),
     'configure': cmd('configure', 'cf', configure, '[section]',
-                     _(u'start interactive configuration mode')),
+                     _('start interactive configuration mode')),
     'listpwschemes': cmd('listpwschemes', 'lp', list_pwschemes, '',
-                         _(u'lists all usable password schemes and password '
-                           u'encoding suffixes')),
+                         _('lists all usable password schemes and password '
+                           'encoding suffixes')),
     'help': cmd('help', 'h', help_, '[subcommand]',
-                _(u'show a help overview or help for the given subcommand')),
+                _('show a help overview or help for the given subcommand')),
     'version': cmd('version', 'v', version, '',
-                   _(u'show version and copyright information')),
+                   _('show version and copyright information')),
     })
 
 
@@ -913,26 +911,26 @@ def _get_order(ctx):
     get a dict from the handler."""
     order = ()
     if ctx.scmd == 'domaininfo':
-        order = ((u'domain name', 0), (u'gid', 1), (u'domain directory', 0),
-                 (u'quota limit/user', 0), (u'active services', 0),
-                 (u'transport', 0), (u'alias domains', 0), (u'accounts', 0),
-                 (u'aliases', 0), (u'relocated', 0), (u'catch-all dests', 0))
+        order = (('domain name', 0), ('gid', 1), ('domain directory', 0),
+                 ('quota limit/user', 0), ('active services', 0),
+                 ('transport', 0), ('alias domains', 0), ('accounts', 0),
+                 ('aliases', 0), ('relocated', 0), ('catch-all dests', 0))
     elif ctx.scmd == 'userinfo':
-        if ctx.argc == 4 and ctx.args[3] != u'aliases' or \
+        if ctx.argc == 4 and ctx.args[3] != 'aliases' or \
            ctx.cget('account.disk_usage'):
-            order = ((u'address', 0), (u'name', 0), (u'uid', 1), (u'gid', 1),
-                     (u'home', 0), (u'mail_location', 0),
-                     (u'quota storage', 0), (u'quota messages', 0),
-                     (u'disk usage', 0), (u'transport', 0), (u'smtp', 1),
-                     (u'pop3', 1), (u'imap', 1), (u'sieve', 1))
+            order = (('address', 0), ('name', 0), ('uid', 1), ('gid', 1),
+                     ('home', 0), ('mail_location', 0),
+                     ('quota storage', 0), ('quota messages', 0),
+                     ('disk usage', 0), ('transport', 0), ('smtp', 1),
+                     ('pop3', 1), ('imap', 1), ('sieve', 1))
         else:
-            order = ((u'address', 0), (u'name', 0), (u'uid', 1), (u'gid', 1),
-                     (u'home', 0), (u'mail_location', 0),
-                     (u'quota storage', 0), (u'quota messages', 0),
-                     (u'transport', 0), (u'smtp', 1), (u'pop3', 1),
-                     (u'imap', 1), (u'sieve', 1))
+            order = (('address', 0), ('name', 0), ('uid', 1), ('gid', 1),
+                     ('home', 0), ('mail_location', 0),
+                     ('quota storage', 0), ('quota messages', 0),
+                     ('transport', 0), ('smtp', 1), ('pop3', 1),
+                     ('imap', 1), ('sieve', 1))
     elif ctx.scmd == 'getuser':
-        order = ((u'uid', 1), (u'gid', 1), (u'address', 0))
+        order = (('uid', 1), ('gid', 1), ('address', 0))
     return order
 
 
@@ -956,28 +954,28 @@ def _format_quota_usage(limit, used, human=False, domaindefault=False):
         q_usage['percent'] = locale.format('%6.2f', 0, True)
     fmt = format_domain_default if domaindefault else lambda s: s
     # TP: e.g.: [  0.00%] 21.09 KiB/1.00 GiB
-    return fmt(_(u'[%(percent)s%%] %(used)s/%(limit)s') % q_usage)
+    return fmt(_('[%(percent)s%%] %(used)s/%(limit)s') % q_usage)
 
 
 def _print_info(ctx, info, title):
     """Print info dicts."""
     # TP: used in e.g. 'Domain information' or 'Account information'
-    msg = u'%s %s' % (title, _(u'information'))
-    w_std(msg, u'-' * len(msg))
+    msg = '%s %s' % (title, _('information'))
+    w_std(msg, '-' * len(msg))
     for key, upper in _get_order(ctx):
         if upper:
-            w_std(u'\t%s: %s' % (key.upper().ljust(17, u'.'), info[key]))
+            w_std('\t%s: %s' % (key.upper().ljust(17, '.'), info[key]))
         else:
-            w_std(u'\t%s: %s' % (key.title().ljust(17, u'.'), info[key]))
-    print
+            w_std('\t%s: %s' % (key.title().ljust(17, '.'), info[key]))
+    print()
     note = info.get('note')
     if note:
         _print_note(note + '\n')
 
 
 def _print_note(note):
-    msg = _(u'Note')
-    w_std(msg, u'-' * len(msg))
+    msg = _('Note')
+    w_std(msg, '-' * len(msg))
     old_ii = txt_wrpr.initial_indent
     old_si = txt_wrpr.subsequent_indent
     txt_wrpr.initial_indent = txt_wrpr.subsequent_indent = '\t'
@@ -992,60 +990,60 @@ def _print_note(note):
 def _print_list(alist, title):
     """Print a list."""
     # TP: used in e.g. 'Existing alias addresses' or 'Existing accounts'
-    msg = u'%s %s' % (_(u'Existing'), title)
-    w_std(msg, u'-' * len(msg))
+    msg = '%s %s' % (_('Existing'), title)
+    w_std(msg, '-' * len(msg))
     if alist:
-        if title != _(u'alias domains'):
-            w_std(*(u'\t%s' % item for item in alist))
+        if title != _('alias domains'):
+            w_std(*('\t%s' % item for item in alist))
         else:
             for domain in alist:
                 if not domain.startswith('xn--'):
-                    w_std(u'\t%s' % domain)
+                    w_std('\t%s' % domain)
                 else:
-                    w_std(u'\t%s (%s)' % (domain, domain.decode('idna')))
-        print
+                    w_std('\t%s (%s)' % (domain, domain.decode('idna')))
+        print()
     else:
-        w_std(_(u'\tNone'), '')
+        w_std(_('\tNone'), '')
 
 
 def _print_aliase_info(alias, destinations):
     """Print the alias address and all its destinations"""
-    title = _(u'Alias information')
-    w_std(title, u'-' * len(title))
-    w_std(_(u'\tMail for %s will be redirected to:') % alias)
-    w_std(*(u'\t     * %s' % dest for dest in destinations))
-    print
+    title = _('Alias information')
+    w_std(title, '-' * len(title))
+    w_std(_('\tMail for %s will be redirected to:') % alias)
+    w_std(*('\t     * %s' % dest for dest in destinations))
+    print()
 
 
 def _print_catchall_info(domain, destinations):
     """Print the catchall destinations of a domain"""
-    title = _(u'Catch-all information')
-    w_std(title, u'-' * len(title))
-    w_std(_(u'\tMail to unknown local-parts in domain %s will be sent to:')
+    title = _('Catch-all information')
+    w_std(title, '-' * len(title))
+    w_std(_('\tMail to unknown local-parts in domain %s will be sent to:')
           % domain)
-    w_std(*(u'\t     * %s' % dest for dest in destinations))
-    print
+    w_std(*('\t     * %s' % dest for dest in destinations))
+    print()
 
 
 def _print_relocated_info(**kwargs):
     """Print the old and new addresses of a relocated user."""
-    title = _(u'Relocated information')
-    w_std(title, u'-' * len(title))
-    w_std(_(u"\tUser '%(addr)s' has moved to '%(dest)s'") % kwargs, '')
+    title = _('Relocated information')
+    w_std(title, '-' * len(title))
+    w_std(_("\tUser '%(addr)s' has moved to '%(dest)s'") % kwargs, '')
 
 
 def _format_domain(domain, main=True):
     """format (prefix/convert) the domain name."""
     if domain.startswith('xn--'):
-        domain = u'%s (%s)' % (domain, domain.decode('idna'))
+        domain = '%s (%s)' % (domain, domain.decode('idna'))
     if main:
-        return u'\t[+] %s' % domain
-    return u'\t[-]     %s' % domain
+        return '\t[+] %s' % domain
+    return '\t[-]     %s' % domain
 
 
 def _print_domain_list(dids, domains, matching):
     """Print a list of (matching) domains/alias domains."""
-    title = _(u'Matching domains') if matching else _(u'Existing domains')
+    title = _('Matching domains') if matching else _('Existing domains')
     w_std(title, '-' * len(title))
     if domains:
         for did in dids:
@@ -1055,7 +1053,7 @@ def _print_domain_list(dids, domains, matching):
                 w_std(*(_format_domain(a, False) for a in domains[did][1:]))
     else:
         w_std(_('\tNone'))
-    print
+    print()
 
 
 def _print_address_list(which, dids, addresses, matching):
@@ -1071,9 +1069,9 @@ def _print_address_list(which, dids, addresses, matching):
     }
     try:
         if matching:
-            title = _(u'Matching %s') % _trans[which]
+            title = _('Matching %s') % _trans[which]
         else:
-            title = _(u'Existing %s') % _trans[which]
+            title = _('Existing %s') % _trans[which]
         w_std(title, '-' * len(title))
     except KeyError:
         raise VMMError(_("Invalid address type for list: '%s'") % which,
@@ -1099,15 +1097,15 @@ def _print_address_list(which, dids, addresses, matching):
                 w_std('\t%s %s' % (leader, addr))
     else:
         w_std(_('\tNone'))
-    print
+    print()
 
 
 def _print_aliasdomain_info(info):
     """Print alias domain information."""
-    title = _(u'Alias domain information')
+    title = _('Alias domain information')
     for key in ('alias', 'domain'):
         if info[key].startswith('xn--'):
-            info[key] = u'%s (%s)' % (info[key], info[key].decode('idna'))
+            info[key] = '%s (%s)' % (info[key], info[key].decode('idna'))
     w_std(title, '-' * len(title),
           _('\tThe alias domain %(alias)s belongs to:\n\t    * %(domain)s') %
           info, '')

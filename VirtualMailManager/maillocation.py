@@ -55,29 +55,29 @@ class MailLocation(object):
         self._mbfmt = None
         self._mid = 0
 
-        for key in kwargs.iterkeys():
+        for key in kwargs.keys():
             if key not in self.__class__._kwargs:
                 raise ValueError('unrecognized keyword: %r' % key)
         mid = kwargs.get('mid')
         if mid:
-            assert isinstance(mid, (int, long))
+            assert isinstance(mid, int)
             self._load_by_mid(mid)
         else:
             args = kwargs.get('mbfmt'), kwargs.get('directory')
-            assert all(isinstance(arg, basestring) for arg in args)
+            assert all(isinstance(arg, str) for arg in args)
             if args[0].lower() not in _format_info:
-                raise MLErr(_(u"Unsupported mailbox format: '%s'") % args[0],
+                raise MLErr(_("Unsupported mailbox format: '%s'") % args[0],
                             MAILLOCATION_INIT)
             directory = args[1].strip()
             if not directory:
-                raise MLErr(_(u"Empty directory name"), MAILLOCATION_INIT)
+                raise MLErr(_("Empty directory name"), MAILLOCATION_INIT)
             if len(directory) > 20:
-                raise MLErr(_(u"Directory name is too long: '%s'") % directory,
+                raise MLErr(_("Directory name is too long: '%s'") % directory,
                             MAILLOCATION_INIT)
             self._load_by_names(args[0].lower(), directory)
 
     def __str__(self):
-        return u'%s:~/%s' % (self._mbfmt, self._directory)
+        return '%s:~/%s' % (self._mbfmt, self._directory)
 
     @property
     def directory(self):

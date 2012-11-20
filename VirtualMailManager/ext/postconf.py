@@ -81,8 +81,8 @@ class Postconf(object):
         """Check that the `parameter` looks like a configuration parameter.
         If not, a VMMError will be raised."""
         if not self.__class__._parameter_re.match(parameter):
-            raise VMMError(_(u"The value '%s' does not look like a valid "
-                             u"Postfix configuration parameter name.") %
+            raise VMMError(_("The value '%s' does not look like a valid "
+                             "Postfix configuration parameter name.") %
                            parameter, VMM_ERROR)
 
     def _expand_vars(self):
@@ -99,7 +99,7 @@ class Postconf(object):
 
     def _expand_multi_vars(self, old_new):
         """Replace all $vars in self._val with their values."""
-        for old, new in old_new.iteritems():
+        for old, new in old_new.items():
             self._val = self._val.replace('$' + old, new)
 
     def _read(self, parameter):

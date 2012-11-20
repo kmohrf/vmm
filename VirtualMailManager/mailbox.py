@@ -35,7 +35,7 @@ def _mbase64_encode(inp, dest):
 
 
 def _mbase64_to_unicode(mb64):
-    return unicode(a2b_base64(mb64.replace(',', '/') + '==='), 'utf-16be')
+    return str(a2b_base64(mb64.replace(',', '/') + '==='), 'utf-16be')
 
 
 def utf8_to_mutf7(src):
@@ -86,7 +86,7 @@ def mutf7_to_utf8(src):
 class Mailbox(object):
     """Base class of all mailbox classes."""
     __slots__ = ('_boxes', '_root', '_sep', '_user')
-    FILE_MODE = 0600
+    FILE_MODE = 0o600
     _ctrl_chr_re = re.compile('[\x00-\x1F\x7F-\x9F]')
     _box_name_re = re.compile('^[\x20-\x25\x27-\x7E]+$')
 
@@ -255,7 +255,7 @@ class SingleDbox(Mailbox):
         process = Popen(cmd_args, stderr=PIPE)
         stderr = process.communicate()[1]
         if process.returncode:
-            e_msg = _(u'Failed to create mailboxes: %r\n') % mailboxes
+            e_msg = _('Failed to create mailboxes: %r\n') % mailboxes
             raise VMMError(e_msg + stderr.strip(), VMM_ERROR)
 
     def create(self):
