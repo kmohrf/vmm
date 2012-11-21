@@ -16,6 +16,7 @@ import os
 import re
 
 from shutil import rmtree
+from stat import S_IRGRP, S_IROTH, S_IWGRP, S_IWOTH
 from subprocess import Popen, PIPE
 
 from VirtualMailManager.account import Account
@@ -104,16 +105,18 @@ class Handler(object):
 
     def _check_cfg_file(self):
         """Checks the configuration file, returns bool"""
+        GRPRW = S_IRGRP | S_IWGRP
+        OTHRW = S_IROTH | S_IWOTH
         self._find_cfg_file()
         fstat = os.stat(self._cfg_fname)
-        fmode = int(oct(fstat.st_mode & 0o777))
-        if fmode % 100 and fstat.st_uid != fstat.st_gid or \
-           fmode % 10 and fstat.st_uid == fstat.st_gid:
+        if (fstat.st_uid == fstat.st_gid and fstat.st_mode & OTHRW) or \
+           (fstat.st_uid != fstat.st_gid and fstat.st_mode & (GRPRW | OTHRW)):
             # TP: Please keep the backticks around the command. `chmod 0600 …`
             raise PermissionError(_("wrong permissions for '%(file)s': "
                                     "%(perms)s\n`chmod 0600 %(file)s` would "
                                     "be great.") % {'file': self._cfg_fname,
-                                  'perms': fmode}, CONF_WRONGPERM)
+                                  'perms': oct(fstat.st_mode)[-4:]},
+                                  CONF_WRONGPERM)
         else:
             return True
 
