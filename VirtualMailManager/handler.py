@@ -200,7 +200,6 @@ class Handler(object):
                         user=self._cfg.pget('database.user'),
                         password=self._cfg.pget('database.pass'))
                 self._dbh.set_client_encoding('utf8')
-                _db_mod.extensions.register_type(_db_mod.extensions.UNICODE)
                 dbc = self._dbh.cursor()
                 dbc.execute("SET NAMES 'UTF8'")
                 dbc.close()
