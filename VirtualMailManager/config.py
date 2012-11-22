@@ -84,8 +84,8 @@ class LazyConfig(RawConfigParser):
         """
         if isinstance(value, bool):
             return value
-        if value.lower() in self._boolean_states:
-            return self._boolean_states[value.lower()]
+        if value.lower() in self.BOOLEAN_STATES:
+            return self.BOOLEAN_STATES[value.lower()]
         else:
             raise ConfigValueError(_("Not a boolean: '%s'") %
                                    get_unicode(value))
@@ -104,9 +104,9 @@ class LazyConfig(RawConfigParser):
         tmp = self.get(section, option)
         if isinstance(tmp, bool):
             return tmp
-        if not tmp.lower() in self._boolean_states:
+        if not tmp.lower() in self.BOOLEAN_STATES:
             raise ValueError('Not a boolean: %s' % tmp)
-        return self._boolean_states[tmp.lower()]
+        return self.BOOLEAN_STATES[tmp.lower()]
 
     def _get_section_option(self, section_option):
         """splits ``section_option`` (section.option) in two parts and
