@@ -53,7 +53,7 @@ class Postconf(object):
         stderr = Popen((self._bin, '-e', parameter + '=' + str(value)),
                        stderr=PIPE).communicate()[1]
         if stderr:
-            raise VMMError(stderr.strip(), VMM_ERROR)
+            raise VMMError(stderr.strip().decode(), VMM_ERROR)
 
     def read(self, parameter, expand_vars=True):
         """Returns the parameters value.
@@ -107,8 +107,8 @@ class Postconf(object):
         stdout, stderr = Popen([self._bin, '-h', parameter], stdout=PIPE,
                                stderr=PIPE).communicate()
         if stderr:
-            raise VMMError(stderr.strip(), VMM_ERROR)
-        return stdout.strip()
+            raise VMMError(stderr.strip().decode(), VMM_ERROR)
+        return stdout.strip().decode()
 
     def _read_multi(self, parameters):
         """Ask postconf for multiple configuration parameters. Returns a dict
@@ -117,9 +117,9 @@ class Postconf(object):
         cmd.extend(parameter[1:] for parameter in parameters)
         stdout, stderr = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()
         if stderr:
-            raise VMMError(stderr.strip(), VMM_ERROR)
+            raise VMMError(stderr.strip().decode(), VMM_ERROR)
         par_val = {}
-        for line in stdout.splitlines():
+        for line in stdout.decode().splitlines():
             par, val = line.split(' = ')
             par_val[par] = val
         return par_val

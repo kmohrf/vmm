@@ -29,13 +29,14 @@ cfg_dget = lambda option: None
 
 def _mbase64_encode(inp, dest):
     if inp:
-        mb64 = b2a_base64(''.join(inp).encode('utf-16be'))
+        mb64 = b2a_base64(''.join(inp).encode('utf-16be')).decode()
         dest.append('&%s-' % mb64.rstrip('\n=').replace('/', ','))
         del inp[:]
 
 
 def _mbase64_to_unicode(mb64):
-    return str(a2b_base64(mb64.replace(',', '/') + '==='), 'utf-16be')
+    return str(a2b_base64(mb64.replace(',', '/').encode() + b'==='),
+               'utf-16be')
 
 
 def utf8_to_mutf7(src):
@@ -256,7 +257,7 @@ class SingleDbox(Mailbox):
         stderr = process.communicate()[1]
         if process.returncode:
             e_msg = _('Failed to create mailboxes: %r\n') % mailboxes
-            raise VMMError(e_msg + stderr.strip(), VMM_ERROR)
+            raise VMMError(e_msg + stderr.strip().decode(), VMM_ERROR)
 
     def create(self):
         """Create a dbox INBOX"""

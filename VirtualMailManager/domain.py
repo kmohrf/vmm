@@ -499,7 +499,7 @@ def check_domainname(domainname):
 
     """
     if not RE_DOMAIN.match(domainname):
-        domainname = domainname.encode('idna')
+        domainname = domainname.encode('idna').decode()
     if len(domainname) > 255:
         raise DomErr(_('The domain name is too long'), DOMAIN_TOO_LONG)
     if not RE_DOMAIN.match(domainname):

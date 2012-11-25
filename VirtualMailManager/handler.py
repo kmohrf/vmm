@@ -283,7 +283,7 @@ class Handler(object):
         """
         if lisdir(directory):
             return Popen([self._cfg.dget('bin.du'), "-hs", directory],
-                         stdout=PIPE).communicate()[0].split('\t')[0]
+                         stdout=PIPE).communicate()[0].decode().split('\t')[0]
         else:
             self._warnings.append(_('No such directory: %s') % directory)
             return 0
@@ -525,7 +525,7 @@ class Handler(object):
         dominfo = dom.get_info()
         if dominfo['domain name'].startswith('xn--'):
             dominfo['domain name'] += ' (%s)' % \
-                                      dominfo['domain name'].decode('idna')
+                         dominfo['domain name'].encode('utf-8').decode('idna')
         if details is None:
             return dominfo
         elif details == 'accounts':

@@ -87,7 +87,7 @@ def human_size(size):
             # TP: e.g.: '%(size)s %(prefix)s' -> '118.30 MiB'
             return _('%(size)s %(prefix)s') % {
                     'size': locale.format('%.2f', float(size) / multiply,
-                                          True).decode(ENCODING, 'replace'),
+                                          True),
                     'prefix': prefix}
 
 
@@ -197,7 +197,8 @@ def version_str(version):
     level = (version >> 8) & 0x0F
     serial = version & 0xFF
 
-    levels = dict(list(zip(list(_version_level.values()), list(_version_level.keys()))))
+    levels = dict(list(zip(list(_version_level.values()),
+                  list(_version_level.keys()))))
     if level == 0xF and not serial:
         version_string = '%u.%u.%u' % (major, minor, patch)
     elif level in levels and not patch:

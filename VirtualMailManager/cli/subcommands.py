@@ -110,7 +110,7 @@ class RunContext(object):
     def __init__(self, argv, handler, command):
         """Create a new RunContext"""
         self.argc = len(argv)
-        self.args = [str(arg, ENCODING) for arg in argv]
+        self.args = argv[:]  # will be moved to argparse
         self.cget = handler.cfg_dget
         self.hdlr = handler
         self.scmd = command
@@ -320,8 +320,7 @@ def domain_info(ctx):
         q_limit = 'Storage: %(bytes)s; Messages: %(messages)s'
         if not details:
             info['bytes'] = human_size(info['bytes'])
-            info['messages'] = locale.format('%d', info['messages'],
-                                             True).decode(ENCODING, 'replace')
+            info['messages'] = locale.format('%d', info['messages'], True)
             info['quota limit/user'] = q_limit % info
             _print_info(ctx, info, _('Domain'))
         else:
@@ -778,7 +777,7 @@ def version(ctx_unused):
     # Python 2.5.4 on FreeBSD
         _('version'), __version__, _('from'),
         strftime(locale.nl_langinfo(locale.D_FMT),
-            strptime(__date__, '%Y-%m-%d')).decode(ENCODING, 'replace'),
+            strptime(__date__, '%Y-%m-%d')),
         os.sys.version.split()[0], _('on'), os.uname()[0],
         __copyright__, prog,
         _('is free software and comes with ABSOLUTELY NO WARRANTY.')))
@@ -943,10 +942,8 @@ def _format_quota_usage(limit, used, human=False, domaindefault=False):
         }
     else:
         q_usage = {
-            'used': locale.format('%d', used, True).decode(ENCODING,
-                                                           'replace'),
-            'limit': locale.format('%d', limit, True).decode(ENCODING,
-                                                             'replace'),
+            'used': locale.format('%d', used, True),
+            'limit': locale.format('%d', limit, True),
         }
     if limit:
         q_usage['percent'] = locale.format('%6.2f', 100. / limit * used, True)
