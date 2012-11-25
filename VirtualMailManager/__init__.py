@@ -32,4 +32,4 @@ except locale.Error:
     locale.setlocale(locale.LC_ALL, 'C')
 ENCODING = locale.nl_langinfo(locale.CODESET)
 
-gettext.install('vmm', '/usr/local/share/locale', str=1)
+gettext.install('vmm', '/usr/local/share/locale')
