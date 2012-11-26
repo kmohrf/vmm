@@ -31,7 +31,8 @@ def w_std(*args):
     """Writes a line for each arg of *args*, encoded in the current
     ENCODING, to stdout.
     """
-    _std_write('\n'.join(arg.encode(ENCODING, 'replace').decode()
+    _std_write('\n'.join(arg.encode(ENCODING, 'replace').decode(ENCODING,
+                                                                'replace')
                for arg in args) + '\n')
 
 
@@ -41,7 +42,8 @@ def w_err(code, *args):
     This function optionally interrupts the program execution if *code*
     does not equal to 0. *code* will be used as the system exit status.
     """
-    _err_write('\n'.join(arg.encode(ENCODING, 'replace').decode()
+    _err_write('\n'.join(arg.encode(ENCODING, 'replace').decode(ENCODING,
+                                                                'replace')
                for arg in args) + '\n')
     if code:
         os.sys.exit(code)
