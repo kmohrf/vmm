@@ -78,18 +78,14 @@ def _dovecotpw(password, scheme, encoding):
 
 
 def _md4_new():
-    """Returns an new MD4-hash object if supported by the hashlib or
-    provided by PyCrypto - otherwise `None`.
+    """Returns an new MD4-hash object if supported by the hashlib -
+    otherwise `None`.
     """
     try:
         return hashlib.new('md4')
     except ValueError as err:
-        if str(err) == 'unsupported hash type':
-            try:
-                from Crypto.Hash import MD4
-                return MD4.new()
-            except ImportError:
-                return None
+        if err.args[0].startswith('unsupported hash type'):
+            return None
         else:
             raise
 
@@ -196,7 +192,8 @@ def _md5_hash(password, scheme, encoding, user=None):
             md5.update(user.localpart.encode() + b':' +
                        user.domainname.encode() + b':')
         else:
-            md5.update('%s::' % user)
+            raise VMMError('You will need Dovecot >= v1.2.0 for proper '
+                           'functioning digest-md5 authentication.', VMM_ERROR)
     md5.update(password)
     if (scheme in ('PLAIN-MD5', 'DIGEST-MD5') and encoding in DEFAULT_HEX) or \
        (scheme == 'LDAP-MD5' and encoding == 'HEX'):
@@ -355,7 +352,7 @@ def verify_scheme(scheme):
       * depends on a newer Dovecot version
       * has a unknown encoding suffix
     """
-    assert isinstance(scheme, str), 'Not a str/unicode: %r' % scheme
+    assert isinstance(scheme, str), 'Not a str: {!r}'.format(scheme)
     scheme_encoding = scheme.upper().split('.')
     scheme = scheme_encoding[0]
     if scheme not in _scheme_info:
@@ -388,9 +385,7 @@ def pwhash(password, scheme=None, user=None):
     """
     if not isinstance(password, str):
         raise TypeError('Password is not a string: %r' % password)
-    if isinstance(password, str):
-        password = password.encode(ENCODING)
-    password = password.strip()
+    password = password.encode(ENCODING).strip()
     if not password:
         raise ValueError("Could not accept empty password.")
     if scheme is None:
