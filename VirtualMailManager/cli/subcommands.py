@@ -507,7 +507,7 @@ def list_pwschemes(ctx_unused):
 
     for key, value in zip(keys, list_schemes()):
         w_std(key, len(key) * '-')
-        w_std('\n'.join(txt_wrpr.wrap(' '.join(value))), '')
+        w_std('\n'.join(txt_wrpr.wrap(' '.join(sorted(value)))), '')
 
     txt_wrpr.initial_indent, txt_wrpr.subsequent_indent = old_ii, old_si
     txt_wrpr.width = txt_wrpr.width + 8
