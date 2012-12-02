@@ -326,8 +326,7 @@ def domain_info(ctx):
         else:
             info[0]['bytes'] = human_size(info[0]['bytes'])
             info[0]['messages'] = locale.format('%d', info[0]['messages'],
-                                                True).decode(ENCODING,
-                                                             'replace')
+                                                True)
             info[0]['quota limit/user'] = q_limit % info[0]
             _print_info(ctx, info[0], _('Domain'))
             if details == 'accounts':
@@ -997,7 +996,8 @@ def _print_list(alist, title):
                 if not domain.startswith('xn--'):
                     w_std('\t%s' % domain)
                 else:
-                    w_std('\t%s (%s)' % (domain, domain.decode('idna')))
+                    w_std('\t%s (%s)' % (domain,
+                                        domain.encode('utf-8').decode('idna')))
         print()
     else:
         w_std(_('\tNone'), '')
@@ -1032,7 +1032,7 @@ def _print_relocated_info(**kwargs):
 def _format_domain(domain, main=True):
     """format (prefix/convert) the domain name."""
     if domain.startswith('xn--'):
-        domain = '%s (%s)' % (domain, domain.decode('idna'))
+        domain = '%s (%s)' % (domain, domain.encode('utf-8').decode('idna'))
     if main:
         return '\t[+] %s' % domain
     return '\t[-]     %s' % domain
@@ -1102,7 +1102,8 @@ def _print_aliasdomain_info(info):
     title = _('Alias domain information')
     for key in ('alias', 'domain'):
         if info[key].startswith('xn--'):
-            info[key] = '%s (%s)' % (info[key], info[key].decode('idna'))
+            info[key] = '%s (%s)' % (info[key],
+                                     info[key].encode(ENCODING).decode('idna'))
     w_std(title, '-' * len(title),
           _('\tThe alias domain %(alias)s belongs to:\n\t    * %(domain)s') %
           info, '')
