@@ -358,7 +358,7 @@ class Config(LazyConfig):
         Raises a ConfigError if the configuration syntax is
         invalid.
         """
-        with open(self._cfg_filename, 'r') as self._cfg_file:
+        with open(self._cfg_filename, 'r', encoding='utf-8') as self._cfg_file:
             try:
                 self.readfp(self._cfg_file)
             except (MissingSectionHeaderError, ParsingError) as err:
