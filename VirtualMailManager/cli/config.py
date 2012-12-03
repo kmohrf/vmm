@@ -10,6 +10,7 @@
 
 from configparser import RawConfigParser
 from shutil import copy2
+from string import Template
 
 from VirtualMailManager import ENCODING
 from VirtualMailManager.config import Config, ConfigValueError, LazyConfig
@@ -29,8 +30,8 @@ class CliConfig(Config):
     def configure(self, sections):
         """Interactive method for configuring all options of the given
         iterable ``sections`` object."""
-        input_fmt = _('Enter new value for option %(option)s '
-                      '[%(current_value)s]: ')
+        input_tpl = Template(_('Enter new value for option $option '
+                               '[$current_value]: '))
         failures = 0
 
         w_std(_('Using configuration file: %s\n') % self._cfg_filename)
@@ -39,8 +40,10 @@ class CliConfig(Config):
             for opt, val in self.items(section):
                 failures = 0
                 while True:
-                    newval = input(input_fmt.encode(ENCODING, 'replace') %
-                                       {'option': opt, 'current_value': val})
+                    if isinstance(val, str):
+                        val = val.encode(ENCODING, 'replace').decode(ENCODING)
+                    newval = input(input_tpl.substitute(option=opt,
+                                                        current_value=val))
                     if newval and newval != val:
                         try:
                             LazyConfig.set(self, '%s.%s' % (section, opt),
