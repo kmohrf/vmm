@@ -14,6 +14,7 @@ import re
 from binascii import a2b_base64, b2a_base64
 from subprocess import Popen, PIPE
 
+from VirtualMailManager import ENCODING
 from VirtualMailManager.account import Account
 from VirtualMailManager.common import lisdir
 from VirtualMailManager.errors import VMMError
@@ -257,7 +258,7 @@ class SingleDbox(Mailbox):
         stderr = process.communicate()[1]
         if process.returncode:
             e_msg = _('Failed to create mailboxes: %r\n') % mailboxes
-            raise VMMError(e_msg + stderr.strip().decode(), VMM_ERROR)
+            raise VMMError(e_msg + stderr.strip().decode(ENCODING), VMM_ERROR)
 
     def create(self):
         """Create a dbox INBOX"""
