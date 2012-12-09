@@ -18,7 +18,6 @@ from VirtualMailManager.constants import \
 from VirtualMailManager.common import validate_transport
 from VirtualMailManager.errors import VMMError, DomainError as DomErr
 from VirtualMailManager.maillocation import MailLocation
-from VirtualMailManager.pycompat import all, any
 from VirtualMailManager.quotalimit import QuotaLimit
 from VirtualMailManager.serviceset import ServiceSet
 from VirtualMailManager.transport import Transport
@@ -79,7 +78,7 @@ class Domain(object):
         dbc.close()
         if result:
             if not result[5]:
-                raise DomErr(_(u"The domain '%s' is an alias domain.") %
+                raise DomErr(_("The domain '%s' is an alias domain.") %
                              self._name, DOMAIN_ALIAS_EXISTS)
             self._gid, self._directory = result[0], result[4]
             self._qlimit = QuotaLimit(self._dbh, qid=result[1])
@@ -114,9 +113,9 @@ class Domain(object):
         result = result[0]
         if any(result):
             keys = ('account_count', 'alias_count', 'relocated_count')
-            raise DomErr(_(u'There are %(account_count)u accounts, '
-                           u'%(alias_count)u aliases and %(relocated_count)u '
-                           u'relocated users.') % dict(zip(keys, result)),
+            raise DomErr(_('There are %(account_count)u accounts, '
+                           '%(alias_count)u aliases and %(relocated_count)u '
+                           'relocated users.') % dict(list(zip(keys, result))),
                          ACCOUNT_AND_ALIAS_PRESENT)
 
     def _chk_state(self, must_exist=True):
@@ -126,10 +125,10 @@ class Domain(object):
           - or *must_exist* is `False` and the domain exists
         """
         if must_exist and self._new:
-            raise DomErr(_(u"The domain '%s' does not exist.") % self._name,
+            raise DomErr(_("The domain '%s' does not exist.") % self._name,
                          NO_SUCH_DOMAIN)
         elif not must_exist and not self._new:
-            raise DomErr(_(u"The domain '%s' already exists.") % self._name,
+            raise DomErr(_("The domain '%s' already exists.") % self._name,
                          DOMAIN_EXISTS)
 
     def _update_tables(self, column, value):
@@ -264,7 +263,7 @@ class Domain(object):
           The note, or None to remove
         """
         self._chk_state(False)
-        assert note is None or isinstance(note, basestring)
+        assert note is None or isinstance(note, str)
         self._note = note
 
     def save(self):
@@ -326,8 +325,8 @@ class Domain(object):
           enforce new quota limit for all accounts, default `False`
         """
         if cfg_dget('misc.dovecot_version') < 0x10102f00:
-            raise VMMError(_(u'PostgreSQL-based dictionary quota requires '
-                             u'Dovecot >= v1.1.2.'), VMM_ERROR)
+            raise VMMError(_('PostgreSQL-based dictionary quota requires '
+                             'Dovecot >= v1.1.2.'), VMM_ERROR)
         self._chk_state()
         assert isinstance(quotalimit, QuotaLimit)
         if not force and quotalimit == self._qlimit:
@@ -389,7 +388,7 @@ class Domain(object):
           the new note
         """
         self._chk_state()
-        assert note is None or isinstance(note, basestring)
+        assert note is None or isinstance(note, str)
         if note == self._note:
             return
         self._update_tables('note', note)
@@ -406,7 +405,7 @@ class Domain(object):
         dbc.close()
         keys = ('alias domains', 'accounts', 'aliases', 'relocated',
                 'catch-all dests')
-        info = dict(zip(keys, info))
+        info = dict(list(zip(keys, info)))
         info['gid'] = self._gid
         info['domain name'] = self._name
         info['transport'] = self._transport.transport
@@ -433,7 +432,7 @@ class Domain(object):
         dbc.close()
         accounts = []
         if users:
-            addr = u'@'.join
+            addr = '@'.join
             _dom = self._name
             accounts = [addr((account[0], _dom)) for account in users]
         return accounts
@@ -448,7 +447,7 @@ class Domain(object):
         dbc.close()
         aliases = []
         if addresses:
-            addr = u'@'.join
+            addr = '@'.join
             _dom = self._name
             aliases = [addr((alias[0], _dom)) for alias in addresses]
         return aliases
@@ -463,7 +462,7 @@ class Domain(object):
         dbc.close()
         relocated = []
         if addresses:
-            addr = u'@'.join
+            addr = '@'.join
             _dom = self._name
             relocated = [addr((address[0], _dom)) for address in addresses]
         return relocated
@@ -500,11 +499,11 @@ def check_domainname(domainname):
 
     """
     if not RE_DOMAIN.match(domainname):
-        domainname = domainname.encode('idna')
+        domainname = domainname.encode('idna').decode()
     if len(domainname) > 255:
-        raise DomErr(_(u'The domain name is too long'), DOMAIN_TOO_LONG)
+        raise DomErr(_('The domain name is too long'), DOMAIN_TOO_LONG)
     if not RE_DOMAIN.match(domainname):
-        raise DomErr(_(u"The domain name '%s' is invalid") % domainname,
+        raise DomErr(_("The domain name '%s' is invalid") % domainname,
                      DOMAIN_INVALID)
     return domainname
 

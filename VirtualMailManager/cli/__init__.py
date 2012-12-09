@@ -31,7 +31,9 @@ def w_std(*args):
     """Writes a line for each arg of *args*, encoded in the current
     ENCODING, to stdout.
     """
-    _std_write('\n'.join(a.encode(ENCODING, 'replace') for a in args) + '\n')
+    _std_write('\n'.join(arg.encode(ENCODING, 'replace').decode(ENCODING,
+                                                                'replace')
+               for arg in args) + '\n')
 
 
 def w_err(code, *args):
@@ -40,7 +42,9 @@ def w_err(code, *args):
     This function optionally interrupts the program execution if *code*
     does not equal to 0. *code* will be used as the system exit status.
     """
-    _err_write('\n'.join(a.encode(ENCODING, 'replace') for a in args) + '\n')
+    _err_write('\n'.join(arg.encode(ENCODING, 'replace').decode(ENCODING,
+                                                                'replace')
+               for arg in args) + '\n')
     if code:
         os.sys.exit(code)
 
@@ -75,24 +79,24 @@ def read_pass():
     Throws a VMMError after the third failure.
     """
     # TP: Please preserve the trailing space.
-    readp_msg0 = _(u'Enter new password: ').encode(ENCODING, 'replace')
+    readp_msg0 = _('Enter new password: ').encode(ENCODING, 'replace')
     # TP: Please preserve the trailing space.
-    readp_msg1 = _(u'Retype new password: ').encode(ENCODING, 'replace')
+    readp_msg1 = _('Retype new password: ').encode(ENCODING, 'replace')
     mismatched = True
     failures = 0
     while mismatched:
         if failures > 2:
-            raise VMMError(_(u'Too many failures - try again later.'),
+            raise VMMError(_('Too many failures - try again later.'),
                            VMM_TOO_MANY_FAILURES)
         clear0 = getpass(prompt=readp_msg0)
         clear1 = getpass(prompt=readp_msg1)
         if clear0 != clear1:
             failures += 1
-            w_err(0, _(u'Sorry, passwords do not match.'))
+            w_err(0, _('Sorry, passwords do not match.'))
             continue
         if not clear0:
             failures += 1
-            w_err(0, _(u'Sorry, empty passwords are not permitted.'))
+            w_err(0, _('Sorry, empty passwords are not permitted.'))
             continue
         mismatched = False
     return clear0

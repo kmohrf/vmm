@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 # Copyright (c) 2008 - 2012, Pascal Volk
 # See COPYING for distribution information.
@@ -6,7 +6,7 @@
 import os
 os.sys.path.remove(os.sys.path[0])
 from time import time
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 from shutil import copy2
 
 pre_060 = False
@@ -161,18 +161,20 @@ if __name__ == '__main__':
     if len(sect_opt):
         update_cfg_file(cp, cf)
         sect_opt.sort()
-        print 'Please have a look at your configuration: %s' % cf
-        print 'This are your Modified/Renamed/New settings:'
+        print('Please have a look at your configuration: %s' % cf)
+        print('This are your Modified/Renamed/New settings:')
         for s_o, st in sect_opt:
-            print '%s   %s = %s' % (st, s_o, get_option(cp, s_o))
+            print('%s   %s = %s' % (st, s_o, get_option(cp, s_o)))
         if had_config:
-            print '\nRemoved section "config" with option "done" (obsolte)'
+            print('\nRemoved section "config" with option "done" (obsolte)')
         if had_gid_mail:
-            print '\nRemoved option "gid_mail" from section "misc" (obsolte)\n'
+            print('\nRemoved option "gid_mail" from section "misc"',
+                  '(obsolte)\n')
         os.sys.exit(0)
     if had_config or had_gid_mail:
         update_cfg_file(cp, cf)
         if had_config:
-            print '\nRemoved section "config" with option "done" (obsolte)'
+            print('\nRemoved section "config" with option "done" (obsolte)')
         if had_gid_mail:
-            print '\nRemoved option "gid_mail" from section "misc" (obsolte)\n'
+            print('\nRemoved option "gid_mail" from section "misc"',
+                  '(obsolte)\n')
