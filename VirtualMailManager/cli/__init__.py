@@ -79,9 +79,9 @@ def read_pass():
     Throws a VMMError after the third failure.
     """
     # TP: Please preserve the trailing space.
-    readp_msg0 = _('Enter new password: ').encode(ENCODING, 'replace')
+    readp_msg0 = _('Enter new password: ')
     # TP: Please preserve the trailing space.
-    readp_msg1 = _('Retype new password: ').encode(ENCODING, 'replace')
+    readp_msg1 = _('Retype new password: ')
     mismatched = True
     failures = 0
     while mismatched:
