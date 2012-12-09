@@ -440,7 +440,7 @@ class Account(object):
         self._chk_state()
         dbc = self._dbh.cursor()
         if force:
-            dbc.execute('DELETE FROM users WHERE uid = %s', (self._uid),)
+            dbc.execute('DELETE FROM users WHERE uid = %s', (self._uid,))
             # delete also all aliases where the destination address is the same
             # as for this account.
             dbc.execute("DELETE FROM alias WHERE destination = %s",
