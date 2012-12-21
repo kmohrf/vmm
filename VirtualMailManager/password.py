@@ -295,6 +295,7 @@ def _ssha512_hash(password, scheme, encoding):
     return _format_digest(digest, scheme, encoding)
 
 _scheme_info = {
+    'CLEAR': (_clear_hash, 0x2010df00),
     'CLEARTEXT': (_clear_hash, 0x10000f00),
     'CRAM-MD5': (_dovecotpw, 0x10000f00),
     'CRYPT': (_crypt_hash, 0x10000f00),
