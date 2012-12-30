@@ -149,7 +149,7 @@ class Domain(object):
 
         `column` : basestring
           Name of the table column. Currently: qid, ssid and tid
-        `value` : long
+        `value` : int
           The referenced key
         `force` : bool
           reset existing users. Default: `False`

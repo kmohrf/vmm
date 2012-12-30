@@ -19,7 +19,7 @@ class ServiceSet(object):
 
     Each ServiceSet object provides following - read only - attributes:
 
-    `ssid` : long
+    `ssid` : int
       The id of the service set
     `smtp` : bool
       Boolean flag for service smtp
