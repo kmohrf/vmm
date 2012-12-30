@@ -15,4 +15,4 @@ if __name__ == '__main__':
     # Otherwise just remove /usr/local/sbin from sys.path
     sys.path.remove(sys.path[0])
     from VirtualMailManager.cli.main import run
-    sys.exit(run(sys.argv))
+    sys.exit(run())
