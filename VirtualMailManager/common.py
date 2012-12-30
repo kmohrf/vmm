@@ -74,9 +74,9 @@ def human_size(size):
         try:
             size = int(size)
         except ValueError:
-            raise TypeError("'size' must be a positive long or int.")
+            raise TypeError("'size' must be a positive integer.")
     if size < 0:
-        raise ValueError("'size' must be a positive long or int.")
+        raise ValueError("'size' must be a positive integer.")
     if size < 1024:
         return str(size)
     # TP: abbreviations of gibibyte, tebibyte kibibyte and mebibyte
@@ -92,7 +92,7 @@ def human_size(size):
 
 
 def size_in_bytes(size):
-    """Converts the string `size` to a long (size in bytes).
+    """Converts the string `size` to an integer (size in bytes).
 
     The string `size` can be suffixed with *b* (bytes), *k* (kilobytes),
     *M* (megabytes) or *G* (gigabytes).
@@ -183,14 +183,14 @@ def version_hex(version_string):
 def version_str(version):
     """Converts a Dovecot version previously converted with version_hex back to
     a string.
-    Raises a `TypeError` if *version* is not an int/long.
+    Raises a `TypeError` if *version* is not an integer.
     Raises a `ValueError` if *version* is an incorrect int version.
     """
     global _version_cache
     if version in _version_cache:
         return _version_cache[version]
     if not isinstance(version, int):
-        raise TypeError('Argument is not a int/long: %r', version)
+        raise TypeError('Argument is not a integer: %r', version)
     major = (version >> 28) & 0xFF
     minor = (version >> 20) & 0xFF
     patch = (version >> 12) & 0xFF

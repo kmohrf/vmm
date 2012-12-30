@@ -406,7 +406,7 @@ class Config(LazyConfig):
 
     def get_in_bytes(self, section, option):
         """Converts the size value (e.g.: 1024k) from the *option*'s
-        value to a long"""
+        value to a integer"""
         return size_in_bytes(self.get(section, option))
 
     def str(self, section, option):

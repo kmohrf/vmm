@@ -345,9 +345,9 @@ class Handler(object):
         `domdir` : basestring
           The directory of the domain the user belongs to
           (commonly AccountObj.domain.directory)
-        `uid` : int/long
+        `uid` : int
           The user's UID (commonly AccountObj.uid)
-        `gid` : int/long
+        `gid` : int
           The user's GID (commonly AccountObj.gid)
         """
         assert all(isinstance(xid, int) for xid in (uid, gid)) and \
@@ -382,7 +382,7 @@ class Handler(object):
 
         `domdir` : basestring
           The domain's directory (commonly DomainObj.directory)
-        `gid` : int/long
+        `gid` : int
           The domain's GID (commonly DomainObj.gid)
         """
         assert isinstance(domdir, str) and isinstance(gid, int)

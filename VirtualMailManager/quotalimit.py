@@ -32,7 +32,7 @@ class QuotaLimit(object):
 
         `qid` : int
           The id of a quota limit
-        `bytes` : long
+        `bytes` : int
           The quota limit in bytes.
         `messages` : int
           The quota limit in number of messages

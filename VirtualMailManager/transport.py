@@ -24,7 +24,7 @@ class Transport(object):
 
         Keyword arguments:
         dbh -- a pyPgSQL.PgSQL.connection
-        tid -- the id of a transport (int/long)
+        tid -- the id of a transport (int)
         transport -- the value of the transport (str)
 
         """

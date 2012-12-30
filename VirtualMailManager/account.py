@@ -133,7 +133,7 @@ class Account(object):
 
         `column` : basestring
           Name of the table column. Currently: qid, ssid and tid
-        `value` : long
+        `value` : int
           The referenced key
         """
         if column not in ('qid', 'ssid', 'tid'):
@@ -460,7 +460,7 @@ def get_account_by_uid(uid, dbh):
 
     Argument:
 
-    `uid` : long
+    `uid` : int
       The Account unique ID.
     `dbh` : pyPgSQL.PgSQL.Connection
       a database connection for the database access.
@@ -468,7 +468,7 @@ def get_account_by_uid(uid, dbh):
     try:
         uid = int(uid)
     except ValueError:
-        raise AErr(_('UID must be an int/long.'), INVALID_ARGUMENT)
+        raise AErr(_('UID must be an integer.'), INVALID_ARGUMENT)
     if uid < 1:
         raise AErr(_('UID must be greater than 0.'), INVALID_ARGUMENT)
     dbc = dbh.cursor()
