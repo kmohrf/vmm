@@ -19,12 +19,11 @@ from VirtualMailManager.constants import VMM_TOO_MANY_FAILURES
 from VirtualMailManager.errors import VMMError
 
 
-__all__ = ('prog', 'get_winsize', 'read_pass', 'w_err', 'w_std')
+__all__ = ('get_winsize', 'read_pass', 'w_err', 'w_std')
 
 _ = lambda msg: msg
 _std_write = os.sys.stdout.write
 _err_write = os.sys.stderr.write
-prog = os.path.basename(os.sys.argv[0])
 
 
 def w_std(*args):
