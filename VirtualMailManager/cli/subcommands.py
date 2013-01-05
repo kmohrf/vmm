@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (c) 2007 - 2012, Pascal Volk
+# Copyright (c) 2007 - 2013, Pascal Volk
 # See COPYING for distribution information.
 """
     VirtualMailManager.cli.subcommands
