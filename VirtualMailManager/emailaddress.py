@@ -16,7 +16,7 @@ from VirtualMailManager.constants import \
 from VirtualMailManager.errors import DomainError, EmailAddressError as EAErr
 
 
-RE_LOCALPART = re.compile(r"[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]")
+RE_LOCALPART = re.compile(r"[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]", re.ASCII)
 _ = lambda msg: msg
 
 

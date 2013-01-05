@@ -25,8 +25,8 @@ _ = lambda msg: msg
 class Postconf(object):
     """Wrapper class for Postfix's postconf."""
     __slots__ = ('_bin', '_val')
-    _parameter_re = re.compile(r'^\w+$')
-    _variables_re = re.compile(r'\$\b\w+\b')
+    _parameter_re = re.compile(r'^\w+$', re.ASCII)
+    _variables_re = re.compile(r'\$\b\w+\b', re.ASCII)
 
     def __init__(self, postconf_bin):
         """Creates a new Postconf instance.
