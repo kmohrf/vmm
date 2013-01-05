@@ -8,6 +8,8 @@
     VMM's configuration module for simplified configuration access.
 """
 
+import collections
+
 from configparser import \
      Error, MissingSectionHeaderError, NoOptionError, NoSectionError, \
      ParsingError, RawConfigParser
@@ -19,7 +21,6 @@ from VirtualMailManager.constants import CONF_ERROR
 from VirtualMailManager.errors import ConfigError, VMMError
 from VirtualMailManager.maillocation import known_format
 from VirtualMailManager.password import verify_scheme as _verify_scheme
-import collections
 
 DB_MODULES = ('psycopg2', 'pypgsql')
 DB_SSL_MODES = ('allow', 'disabled', 'prefer', 'require', 'verify-ca',
