@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding: utf-8
 # Copyright 2012, Pascal Volk
 # See COPYING for distribution information.
@@ -119,10 +119,10 @@ def set_permissions84(dbh, dc_vers, dovecot, postfix):
                 (dc_rw_tbls, db['dovecot']))
     dbc.execute('GRANT SELECT ON %s TO %s' % (dc_ro_tbls, db['dovecot']))
     dbc.execute('GRANT SELECT ON %s TO %s' % (pf_ro_tbls, db['postfix']))
-    for table, columns in db['dovecot_tbls'].iteritems():
+    for table, columns in db['dovecot_tbls'].items():
         dbc.execute('GRANT SELECT (%s) ON %s TO %s' % (columns, table,
                                                        db['dovecot']))
-    for table, columns in db['postfix_tbls'].iteritems():
+    for table, columns in db['postfix_tbls'].items():
         dbc.execute('GRANT SELECT (%s) ON %s TO %s' % (columns, table,
                                                        db['postfix']))
     dbc.close()

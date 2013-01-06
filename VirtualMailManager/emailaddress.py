@@ -16,7 +16,7 @@ from VirtualMailManager.constants import \
 from VirtualMailManager.errors import DomainError, EmailAddressError as EAErr
 
 
-RE_LOCALPART = re.compile(r"[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]")
+RE_LOCALPART = re.compile(r"[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]", re.ASCII)
 _ = lambda msg: msg
 
 
@@ -26,7 +26,7 @@ class EmailAddress(object):
 
     def __init__(self, address, _validate=True):
         """Creates a new instance from the string/unicode ``address``."""
-        assert isinstance(address, basestring)
+        assert isinstance(address, str)
         self._localpart = None
         self._domainname = None
         if _validate:
@@ -70,16 +70,16 @@ class EmailAddress(object):
         parts = address.split('@')
         p_len = len(parts)
         if p_len < 2:
-            raise EAErr(_(u"Missing the '@' sign in address: '%s'") % address,
+            raise EAErr(_("Missing the '@' sign in address: '%s'") % address,
                         INVALID_ADDRESS)
         elif p_len > 2:
-            raise EAErr(_(u"Too many '@' signs in address: '%s'") % address,
+            raise EAErr(_("Too many '@' signs in address: '%s'") % address,
                         INVALID_ADDRESS)
         if not parts[0]:
-            raise EAErr(_(u"Missing local-part in address: '%s'") % address,
+            raise EAErr(_("Missing local-part in address: '%s'") % address,
                         LOCALPART_INVALID)
         if not parts[1]:
-            raise EAErr(_(u"Missing domain name in address: '%s'") % address,
+            raise EAErr(_("Missing domain name in address: '%s'") % address,
                         DOMAIN_NO_NAME)
         self._localpart = check_localpart(parts[0])
         self._domainname = check_domainname(parts[1])
@@ -105,7 +105,7 @@ class DestinationEmailAddress(EmailAddress):
         if not _validate:
             try:
                 self._chk_address(address)
-            except DomainError, err:
+            except DomainError as err:
                 if err.code is DOMAIN_INVALID and \
                    address.split('@')[1] == 'localhost':
                     self._localhost = True
@@ -142,13 +142,13 @@ def check_localpart(localpart):
     invalid characters.
     """
     if len(localpart) > 64:
-        raise EAErr(_(u"The local-part '%s' is too long.") % localpart,
+        raise EAErr(_("The local-part '%s' is too long.") % localpart,
                     LOCALPART_TOO_LONG)
     invalid_chars = set(RE_LOCALPART.findall(localpart))
     if invalid_chars:
-        i_chars = u''.join((u'"%s" ' % c for c in invalid_chars))
-        raise EAErr(_(u"The local-part '%(l_part)s' contains invalid "
-                      u"characters: %(i_chars)s") % {'l_part': localpart,
+        i_chars = ''.join(('"%s" ' % c for c in invalid_chars))
+        raise EAErr(_("The local-part '%(l_part)s' contains invalid "
+                      "characters: %(i_chars)s") % {'l_part': localpart,
                     'i_chars': i_chars}, LOCALPART_INVALID)
     return localpart
 

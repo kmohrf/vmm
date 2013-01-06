@@ -16,6 +16,7 @@ import os
 import re
 
 from shutil import rmtree
+from stat import S_IRGRP, S_IROTH, S_IWGRP, S_IWOTH
 from subprocess import Popen, PIPE
 
 from VirtualMailManager.account import Account
@@ -37,7 +38,6 @@ from VirtualMailManager.emailaddress import DestinationEmailAddress, \
 from VirtualMailManager.errors import \
      DomainError, NotRootError, PermissionError, VMMError
 from VirtualMailManager.mailbox import new as new_mailbox
-from VirtualMailManager.pycompat import all, any
 from VirtualMailManager.quotalimit import QuotaLimit
 from VirtualMailManager.relocated import Relocated
 from VirtualMailManager.serviceset import ServiceSet, SERVICES
@@ -51,9 +51,9 @@ CFG_FILE = 'vmm.cfg'
 CFG_PATH = '/root:/usr/local/etc:/etc'
 RE_DOMAIN_SEARCH = """^[a-z0-9-\.]+$"""
 OTHER_TYPES = {
-    TYPE_ACCOUNT: (_(u'an account'), ACCOUNT_EXISTS),
-    TYPE_ALIAS: (_(u'an alias'), ALIAS_EXISTS),
-    TYPE_RELOCATED: (_(u'a relocated user'), RELOCATED_EXISTS),
+    TYPE_ACCOUNT: (_('an account'), ACCOUNT_EXISTS),
+    TYPE_ALIAS: (_('an alias'), ALIAS_EXISTS),
+    TYPE_RELOCATED: (_('a relocated user'), RELOCATED_EXISTS),
 }
 
 
@@ -79,7 +79,7 @@ class Handler(object):
         self._db_connect = None
 
         if os.geteuid():
-            raise NotRootError(_(u"You are not root.\n\tGood bye!\n"),
+            raise NotRootError(_("You are not root.\n\tGood bye!\n"),
                                CONF_NOPERM)
         if self._check_cfg_file():
             self._cfg = Cfg(self._cfg_fname)
@@ -99,22 +99,24 @@ class Handler(object):
                 self._cfg_fname = tmp
                 break
         if not self._cfg_fname:
-            raise VMMError(_(u"Could not find '%(cfg_file)s' in: "
-                             u"'%(cfg_path)s'") % {'cfg_file': CFG_FILE,
+            raise VMMError(_("Could not find '%(cfg_file)s' in: "
+                             "'%(cfg_path)s'") % {'cfg_file': CFG_FILE,
                            'cfg_path': CFG_PATH}, CONF_NOFILE)
 
     def _check_cfg_file(self):
         """Checks the configuration file, returns bool"""
+        GRPRW = S_IRGRP | S_IWGRP
+        OTHRW = S_IROTH | S_IWOTH
         self._find_cfg_file()
         fstat = os.stat(self._cfg_fname)
-        fmode = int(oct(fstat.st_mode & 0777))
-        if fmode % 100 and fstat.st_uid != fstat.st_gid or \
-           fmode % 10 and fstat.st_uid == fstat.st_gid:
+        if (fstat.st_uid == fstat.st_gid and fstat.st_mode & OTHRW) or \
+           (fstat.st_uid != fstat.st_gid and fstat.st_mode & (GRPRW | OTHRW)):
             # TP: Please keep the backticks around the command. `chmod 0600 …`
-            raise PermissionError(_(u"wrong permissions for '%(file)s': "
-                                    u"%(perms)s\n`chmod 0600 %(file)s` would "
-                                    u"be great.") % {'file': self._cfg_fname,
-                                  'perms': fmode}, CONF_WRONGPERM)
+            raise PermissionError(_("wrong permissions for '%(file)s': "
+                                    "%(perms)s\n`chmod 0600 %(file)s` would "
+                                    "be great.") % {'file': self._cfg_fname,
+                                  'perms': oct(fstat.st_mode)[-4:]},
+                                  CONF_WRONGPERM)
         else:
             return True
 
@@ -125,23 +127,23 @@ class Handler(object):
         dir_created = False
         basedir = self._cfg.dget('misc.base_directory')
         if not os.path.exists(basedir):
-            old_umask = os.umask(0006)
-            os.makedirs(basedir, 0771)
+            old_umask = os.umask(0o006)
+            os.makedirs(basedir, 0o771)
             os.chown(basedir, 0, 0)
             os.umask(old_umask)
             dir_created = True
         if not dir_created and not lisdir(basedir):
-            raise VMMError(_(u"'%(path)s' is not a directory.\n(%(cfg_file)s: "
-                             u"section 'misc', option 'base_directory')") %
+            raise VMMError(_("'%(path)s' is not a directory.\n(%(cfg_file)s: "
+                             "section 'misc', option 'base_directory')") %
                            {'path': basedir, 'cfg_file': self._cfg_fname},
                            NO_SUCH_DIRECTORY)
         for opt, val in self._cfg.items('bin'):
             try:
                 exec_ok(val)
-            except VMMError, err:
+            except VMMError as err:
                 if err.code in (NO_SUCH_BINARY, NOT_EXECUTABLE):
-                    raise VMMError(err.msg + _(u"\n(%(cfg_file)s: section "
-                                   u"'bin', option '%(option)s')") %
+                    raise VMMError(err.msg + _("\n(%(cfg_file)s: section "
+                                   "'bin', option '%(option)s')") %
                                    {'cfg_file': self._cfg_fname,
                                     'option': opt}, err.code)
                 else:
@@ -154,14 +156,14 @@ class Handler(object):
             try:
                 _db_mod = __import__('psycopg2')
             except ImportError:
-                raise VMMError(_(u"Unable to import database module '%s'.") %
+                raise VMMError(_("Unable to import database module '%s'.") %
                                'psycopg2', VMM_ERROR)
             self._db_connect = self._psycopg2_connect
         else:
             try:
                 tmp = __import__('pyPgSQL', globals(), locals(), ['PgSQL'])
             except ImportError:
-                raise VMMError(_(u"Unable to import database module '%s'.") %
+                raise VMMError(_("Unable to import database module '%s'.") %
                                'pyPgSQL', VMM_ERROR)
             _db_mod = tmp.PgSQL
             self._db_connect = self._pypgsql_connect
@@ -181,7 +183,7 @@ class Handler(object):
                 dbc = self._dbh.cursor()
                 dbc.execute("SET NAMES 'UTF8'")
                 dbc.close()
-            except _db_mod.libpq.DatabaseError, err:
+            except _db_mod.libpq.DatabaseError as err:
                 raise VMMError(str(err), DATABASE_ERROR)
 
     def _psycopg2_connect(self):
@@ -198,11 +200,10 @@ class Handler(object):
                         user=self._cfg.pget('database.user'),
                         password=self._cfg.pget('database.pass'))
                 self._dbh.set_client_encoding('utf8')
-                _db_mod.extensions.register_type(_db_mod.extensions.UNICODE)
                 dbc = self._dbh.cursor()
                 dbc.execute("SET NAMES 'UTF8'")
                 dbc.close()
-            except _db_mod.DatabaseError, err:
+            except _db_mod.DatabaseError as err:
                 raise VMMError(str(err), DATABASE_ERROR)
 
     def _chk_other_address_types(self, address, exclude):
@@ -240,7 +241,7 @@ class Handler(object):
             return False
         # TP: %(a_type)s will be one of: 'an account', 'an alias' or
         # 'a relocated user'
-        msg = _(u"There is already %(a_type)s with the address '%(address)s'.")
+        msg = _("There is already %(a_type)s with the address '%(address)s'.")
         raise VMMError(msg % {'a_type': OTHER_TYPES[other][0],
                               'address': address}, OTHER_TYPES[other][1])
 
@@ -282,7 +283,7 @@ class Handler(object):
         """
         if lisdir(directory):
             return Popen([self._cfg.dget('bin.du'), "-hs", directory],
-                         stdout=PIPE).communicate()[0].split('\t')[0]
+                         stdout=PIPE).communicate()[0].decode().split('\t')[0]
         else:
             self._warnings.append(_('No such directory: %s') % directory)
             return 0
@@ -293,16 +294,16 @@ class Handler(object):
         hashdir, domdir = domain.directory.split(os.path.sep)[-2:]
         dir_created = False
         os.chdir(self._cfg.dget('misc.base_directory'))
-        old_umask = os.umask(0022)
+        old_umask = os.umask(0o022)
         if not os.path.exists(hashdir):
-            os.mkdir(hashdir, 0711)
+            os.mkdir(hashdir, 0o711)
             os.chown(hashdir, 0, 0)
             dir_created = True
         if not dir_created and not lisdir(hashdir):
-            raise VMMError(_(u"'%s' is not a directory.") % hashdir,
+            raise VMMError(_("'%s' is not a directory.") % hashdir,
                            NO_SUCH_DIRECTORY)
         if os.path.exists(domain.directory):
-            raise VMMError(_(u"The file/directory '%s' already exists.") %
+            raise VMMError(_("The file/directory '%s' already exists.") %
                            domain.directory, VMM_ERROR)
         os.mkdir(os.path.join(hashdir, domdir),
                  self._cfg.dget('domain.directory_mode'))
@@ -315,7 +316,7 @@ class Handler(object):
         domdir = account.domain.directory
         if not lisdir(domdir):
             self._make_domain_dir(account.domain)
-        os.umask(0007)
+        os.umask(0o007)
         uid = account.uid
         os.chdir(domdir)
         os.mkdir('%s' % uid, self._cfg.dget('account.directory_mode'))
@@ -332,7 +333,7 @@ class Handler(object):
             bad = mailbox.add_boxes(folders,
                                     self._cfg.dget('mailbox.subscribe'))
             if bad:
-                self._warnings.append(_(u"Skipped mailbox folders:") +
+                self._warnings.append(_("Skipped mailbox folders:") +
                                       '\n\t- ' + '\n\t- '.join(bad))
         os.chdir(oldpwd)
 
@@ -344,34 +345,34 @@ class Handler(object):
         `domdir` : basestring
           The directory of the domain the user belongs to
           (commonly AccountObj.domain.directory)
-        `uid` : int/long
+        `uid` : int
           The user's UID (commonly AccountObj.uid)
-        `gid` : int/long
+        `gid` : int
           The user's GID (commonly AccountObj.gid)
         """
-        assert all(isinstance(xid, (long, int)) for xid in (uid, gid)) and \
-                isinstance(domdir, basestring)
+        assert all(isinstance(xid, int) for xid in (uid, gid)) and \
+                isinstance(domdir, str)
         if uid < MIN_UID or gid < MIN_GID:
-            raise VMMError(_(u"UID '%(uid)u' and/or GID '%(gid)u' are less "
-                             u"than %(min_uid)u/%(min_gid)u.") % {'uid': uid,
+            raise VMMError(_("UID '%(uid)u' and/or GID '%(gid)u' are less "
+                             "than %(min_uid)u/%(min_gid)u.") % {'uid': uid,
                            'gid': gid, 'min_gid': MIN_GID, 'min_uid': MIN_UID},
                            MAILDIR_PERM_MISMATCH)
         if domdir.count('..'):
-            raise VMMError(_(u'Found ".." in domain directory path: %s') %
+            raise VMMError(_('Found ".." in domain directory path: %s') %
                            domdir, FOUND_DOTS_IN_PATH)
         if not lisdir(domdir):
-            raise VMMError(_(u"No such directory: %s") % domdir,
+            raise VMMError(_("No such directory: %s") % domdir,
                            NO_SUCH_DIRECTORY)
         os.chdir(domdir)
         userdir = '%s' % uid
         if not lisdir(userdir):
-            self._warnings.append(_(u"No such directory: %s") %
+            self._warnings.append(_("No such directory: %s") %
                                   os.path.join(domdir, userdir))
             return
         mdstat = os.lstat(userdir)
         if (mdstat.st_uid, mdstat.st_gid) != (uid, gid):
-            raise VMMError(_(u'Detected owner/group mismatch in home '
-                             u'directory.'), MAILDIR_PERM_MISMATCH)
+            raise VMMError(_('Detected owner/group mismatch in home '
+                             'directory.'), MAILDIR_PERM_MISMATCH)
         rmtree(userdir, ignore_errors=True)
 
     def _delete_domain_dir(self, domdir, gid):
@@ -381,24 +382,24 @@ class Handler(object):
 
         `domdir` : basestring
           The domain's directory (commonly DomainObj.directory)
-        `gid` : int/long
+        `gid` : int
           The domain's GID (commonly DomainObj.gid)
         """
-        assert isinstance(domdir, basestring) and isinstance(gid, (long, int))
+        assert isinstance(domdir, str) and isinstance(gid, int)
         if gid < MIN_GID:
-            raise VMMError(_(u"GID '%(gid)u' is less than '%(min_gid)u'.") %
+            raise VMMError(_("GID '%(gid)u' is less than '%(min_gid)u'.") %
                            {'gid': gid, 'min_gid': MIN_GID},
                            DOMAINDIR_GROUP_MISMATCH)
         if domdir.count('..'):
-            raise VMMError(_(u'Found ".." in domain directory path: %s') %
+            raise VMMError(_('Found ".." in domain directory path: %s') %
                            domdir, FOUND_DOTS_IN_PATH)
         if not lisdir(domdir):
             self._warnings.append(_('No such directory: %s') % domdir)
             return
         dirst = os.lstat(domdir)
         if dirst.st_gid != gid:
-            raise VMMError(_(u'Detected group mismatch in domain directory: '
-                             u'%s') % domdir, DOMAINDIR_GROUP_MISMATCH)
+            raise VMMError(_('Detected group mismatch in domain directory: '
+                             '%s') % domdir, DOMAINDIR_GROUP_MISMATCH)
         rmtree(domdir, ignore_errors=True)
 
     def has_warnings(self):
@@ -426,9 +427,9 @@ class Handler(object):
     def cfg_install(self):
         """Installs the cfg_dget method as ``cfg_dget`` into the built-in
         namespace."""
-        import __builtin__
-        assert 'cfg_dget' not in __builtin__.__dict__
-        __builtin__.__dict__['cfg_dget'] = self._cfg.dget
+        import builtins
+        assert 'cfg_dget' not in builtins.__dict__
+        builtins.__dict__['cfg_dget'] = self._cfg.dget
 
     def domain_add(self, domainname, transport=None):
         """Wrapper around Domain's set_quotalimit, set_transport and save."""
@@ -439,7 +440,7 @@ class Handler(object):
         else:
             dom.set_transport(Transport(self._dbh, transport=transport))
         dom.set_quotalimit(QuotaLimit(self._dbh,
-                           bytes=long(self._cfg.dget('domain.quota_bytes')),
+                           bytes=int(self._cfg.dget('domain.quota_bytes')),
                            messages=self._cfg.dget('domain.quota_messages')))
         dom.set_serviceset(ServiceSet(self._dbh,
                                       imap=self._cfg.dget('domain.imap'),
@@ -452,11 +453,11 @@ class Handler(object):
 
     def domain_quotalimit(self, domainname, bytes_, messages=0, force=None):
         """Wrapper around Domain.update_quotalimit()."""
-        if not all(isinstance(i, (int, long)) for i in (bytes_, messages)):
+        if not all(isinstance(i, int) for i in (bytes_, messages)):
             raise TypeError("'bytes_' and 'messages' have to be "
                             "integers or longs.")
         if force is not None and force != 'force':
-            raise DomainError(_(u"Invalid argument: '%s'") % force,
+            raise DomainError(_("Invalid argument: '%s'") % force,
                               INVALID_ARGUMENT)
         dom = self._get_domain(domainname)
         quotalimit = QuotaLimit(self._dbh, bytes=bytes_, messages=messages)
@@ -469,11 +470,11 @@ class Handler(object):
         """Wrapper around Domain.update_serviceset()."""
         kwargs = dict.fromkeys(SERVICES, False)
         if force is not None and force != 'force':
-            raise DomainError(_(u"Invalid argument: '%s'") % force,
+            raise DomainError(_("Invalid argument: '%s'") % force,
                               INVALID_ARGUMENT)
         for service in set(services):
             if service not in SERVICES:
-                raise DomainError(_(u"Unknown service: '%s'") % service,
+                raise DomainError(_("Unknown service: '%s'") % service,
                                   UNKNOWN_SERVICE)
             kwargs[service] = True
 
@@ -484,7 +485,7 @@ class Handler(object):
     def domain_transport(self, domainname, transport, force=None):
         """Wrapper around Domain.update_transport()"""
         if force is not None and force != 'force':
-            raise DomainError(_(u"Invalid argument: '%s'") % force,
+            raise DomainError(_("Invalid argument: '%s'") % force,
                               INVALID_ARGUMENT)
         dom = self._get_domain(domainname)
         trsp = Transport(self._dbh, transport=transport)
@@ -518,13 +519,13 @@ class Handler(object):
         Domain.get_relocated."""
         if details not in [None, 'accounts', 'aliasdomains', 'aliases', 'full',
                            'relocated', 'catchall']:
-            raise VMMError(_(u"Invalid argument: '%s'") % details,
+            raise VMMError(_("Invalid argument: '%s'") % details,
                            INVALID_ARGUMENT)
         dom = self._get_domain(domainname)
         dominfo = dom.get_info()
         if dominfo['domain name'].startswith('xn--'):
             dominfo['domain name'] += ' (%s)' % \
-                                      dominfo['domain name'].decode('idna')
+                         dominfo['domain name'].encode('utf-8').decode('idna')
         if details is None:
             return dominfo
         elif details == 'accounts':
@@ -597,8 +598,8 @@ class Handler(object):
         if pattern and (pattern.startswith('%') or pattern.endswith('%')):
             like = True
             if not re.match(RE_DOMAIN_SEARCH, pattern.strip('%')):
-                raise VMMError(_(u"The pattern '%s' contains invalid "
-                                 u"characters.") % pattern, DOMAIN_INVALID)
+                raise VMMError(_("The pattern '%s' contains invalid "
+                                 "characters.") % pattern, DOMAIN_INVALID)
         self._db_connect()
         return search(self._dbh, pattern=pattern, like=like)
 
@@ -616,13 +617,10 @@ class Handler(object):
                 dpattern = parts[1]
                 dlike = dpattern.startswith('%') or dpattern.endswith('%')
 
-                if llike:
-                    checkp = lpattern.strip('%')
-                else:
-                    checkp = lpattern
+                checkp = lpattern.strip('%') if llike else lpattern
                 if len(checkp) > 0 and re.search(RE_LOCALPART, checkp):
-                    raise VMMError(_(u"The pattern '%s' contains invalid "
-                                     u"characters.") % pattern,
+                    raise VMMError(_("The pattern '%s' contains invalid "
+                                     "characters.") % pattern,
                                    LOCALPART_INVALID)
             else:
                 # else just match on domains
@@ -630,13 +628,10 @@ class Handler(object):
                 dpattern = parts[0]
                 dlike = dpattern.startswith('%') or dpattern.endswith('%')
 
-            if dlike:
-                checkp = dpattern.strip('%')
-            else:
-                checkp = dpattern
+            checkp = dpattern.strip('%') if dlike else dpattern
             if len(checkp) > 0 and not re.match(RE_DOMAIN_SEARCH, checkp):
-                raise VMMError(_(u"The pattern '%s' contains invalid "
-                                 u"characters.") % pattern, DOMAIN_INVALID)
+                raise VMMError(_("The pattern '%s' contains invalid "
+                                 "characters.") % pattern, DOMAIN_INVALID)
         self._db_connect()
         from VirtualMailManager.common import search_addresses
         return search_addresses(self._dbh, typelimit=typelimit,
@@ -647,7 +642,7 @@ class Handler(object):
         """Wrapper around Account.set_password() and Account.save()."""
         acc = self._get_account(emailaddress)
         if acc:
-            raise VMMError(_(u"The account '%s' already exists.") %
+            raise VMMError(_("The account '%s' already exists.") %
                            acc.address, ACCOUNT_EXISTS)
         self._is_other_address(acc.address, TYPE_ACCOUNT)
         acc.set_password(password)
@@ -670,8 +665,8 @@ class Handler(object):
         for destination in destinations:
             if destination.gid and \
                not self._chk_other_address_types(destination, TYPE_RELOCATED):
-                self._warnings.append(_(u"The destination account/alias '%s' "
-                                        u"does not exist.") % destination)
+                self._warnings.append(_("The destination account/alias '%s' "
+                                        "does not exist.") % destination)
 
     def user_delete(self, emailaddress, force=False):
         """Wrapper around Account.delete(...)"""
@@ -679,7 +674,7 @@ class Handler(object):
             raise TypeError('force must be a bool')
         acc = self._get_account(emailaddress)
         if not acc:
-            raise VMMError(_(u"The account '%s' does not exist.") %
+            raise VMMError(_("The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
         uid = acc.uid
         gid = acc.gid
@@ -689,10 +684,10 @@ class Handler(object):
         if self._cfg.dget('account.delete_directory'):
             try:
                 self._delete_home(dom_dir, uid, gid)
-            except VMMError, err:
+            except VMMError as err:
                 if err.code in (FOUND_DOTS_IN_PATH, MAILDIR_PERM_MISMATCH,
                                 NO_SUCH_DIRECTORY):
-                    warning = _(u"""\
+                    warning = _("""\
 The account has been successfully deleted from the database.
     But an error occurred while deleting the following directory:
     '%(directory)s'
@@ -708,7 +703,7 @@ The account has been successfully deleted from the database.
         if alias:
             return alias.get_destinations()
         if not self._is_other_address(alias.address, TYPE_ALIAS):
-            raise VMMError(_(u"The alias '%s' does not exist.") %
+            raise VMMError(_("The alias '%s' does not exist.") %
                            alias.address, NO_SUCH_ALIAS)
 
     def alias_delete(self, aliasaddress, targetaddresses=None):
@@ -725,7 +720,7 @@ The account has been successfully deleted from the database.
             warnings = []
             try:
                 alias.del_destinations(destinations, warnings)
-            except VMMError, err:
+            except VMMError as err:
                 error = err
             if warnings:
                 self._warnings.append(_('Ignored destination addresses:'))
@@ -747,8 +742,8 @@ The account has been successfully deleted from the database.
         for destination in destinations:
             if destination.gid and \
                not self._chk_other_address_types(destination, TYPE_RELOCATED):
-                self._warnings.append(_(u"The destination account/alias '%s' "
-                                        u"does not exist.") % destination)
+                self._warnings.append(_("The destination account/alias '%s' "
+                                        "does not exist.") % destination)
 
     def catchall_info(self, domain):
         """Returns an iterator object for all destinations (`EmailAddress`
@@ -769,7 +764,7 @@ The account has been successfully deleted from the database.
             warnings = []
             try:
                 catchall.del_destinations(destinations, warnings)
-            except VMMError, err:
+            except VMMError as err:
                 error = err
             if warnings:
                 self._warnings.append(_('Ignored destination addresses:'))
@@ -780,12 +775,12 @@ The account has been successfully deleted from the database.
     def user_info(self, emailaddress, details=None):
         """Wrapper around Account.get_info(...)"""
         if details not in (None, 'du', 'aliases', 'full'):
-            raise VMMError(_(u"Invalid argument: '%s'") % details,
+            raise VMMError(_("Invalid argument: '%s'") % details,
                            INVALID_ARGUMENT)
         acc = self._get_account(emailaddress)
         if not acc:
             if not self._is_other_address(acc.address, TYPE_ACCOUNT):
-                raise VMMError(_(u"The account '%s' does not exist.") %
+                raise VMMError(_("The account '%s' does not exist.") %
                                acc.address, NO_SUCH_ACCOUNT)
         info = acc.get_info()
         if self._cfg.dget('account.disk_usage') or details in ('du', 'full'):
@@ -806,12 +801,12 @@ The account has been successfully deleted from the database.
 
     def user_password(self, emailaddress, password):
         """Wrapper for Account.modify('password' ...)."""
-        if not isinstance(password, basestring) or not password:
-            raise VMMError(_(u"Could not accept password: '%s'") % password,
+        if not isinstance(password, str) or not password:
+            raise VMMError(_("Could not accept password: '%s'") % password,
                            INVALID_ARGUMENT)
         acc = self._get_account(emailaddress)
         if not acc:
-            raise VMMError(_(u"The account '%s' does not exist.") %
+            raise VMMError(_("The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
         acc.modify('password', password)
 
@@ -819,7 +814,7 @@ The account has been successfully deleted from the database.
         """Wrapper for Account.modify('name', ...)."""
         acc = self._get_account(emailaddress)
         if not acc:
-            raise VMMError(_(u"The account '%s' does not exist.") %
+            raise VMMError(_("The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
         acc.modify('name', name)
 
@@ -827,7 +822,7 @@ The account has been successfully deleted from the database.
         """Wrapper for Account.modify('note', ...)."""
         acc = self._get_account(emailaddress)
         if not acc:
-            raise VMMError(_(u"The account '%s' does not exist.") %
+            raise VMMError(_("The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
         acc.modify('note', note)
 
@@ -835,12 +830,12 @@ The account has been successfully deleted from the database.
         """Wrapper for Account.update_quotalimit(QuotaLimit)."""
         acc = self._get_account(emailaddress)
         if not acc:
-            raise VMMError(_(u"The account '%s' does not exist.") %
+            raise VMMError(_("The account '%s' does not exist.") %
                         acc.address, NO_SUCH_ACCOUNT)
         if bytes_ == 'domain':
             quotalimit = None
         else:
-            if not all(isinstance(i, (int, long)) for i in (bytes_, messages)):
+            if not all(isinstance(i, int) for i in (bytes_, messages)):
                 raise TypeError("'bytes_' and 'messages' have to be "
                                 "integers or longs.")
             quotalimit = QuotaLimit(self._dbh, bytes=bytes_,
@@ -849,24 +844,22 @@ The account has been successfully deleted from the database.
 
     def user_transport(self, emailaddress, transport):
         """Wrapper for Account.update_transport(Transport)."""
-        if not isinstance(transport, basestring) or not transport:
-            raise VMMError(_(u"Could not accept transport: '%s'") % transport,
+        if not isinstance(transport, str) or not transport:
+            raise VMMError(_("Could not accept transport: '%s'") % transport,
                            INVALID_ARGUMENT)
         acc = self._get_account(emailaddress)
         if not acc:
-            raise VMMError(_(u"The account '%s' does not exist.") %
+            raise VMMError(_("The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
-        if transport == 'domain':
-            transport = None
-        else:
-            transport = Transport(self._dbh, transport=transport)
+        transport = None if transport == 'domain' \
+                         else Transport(self._dbh, transport=transport)
         acc.update_transport(transport)
 
     def user_services(self, emailaddress, *services):
         """Wrapper around Account.update_serviceset()."""
         acc = self._get_account(emailaddress)
         if not acc:
-            raise VMMError(_(u"The account '%s' does not exist.") %
+            raise VMMError(_("The account '%s' does not exist.") %
                         acc.address, NO_SUCH_ACCOUNT)
         if len(services) == 1 and services[0] == 'domain':
             serviceset = None
@@ -874,7 +867,7 @@ The account has been successfully deleted from the database.
             kwargs = dict.fromkeys(SERVICES, False)
             for service in set(services):
                 if service not in SERVICES:
-                    raise VMMError(_(u"Unknown service: '%s'") % service,
+                    raise VMMError(_("Unknown service: '%s'") % service,
                                 UNKNOWN_SERVICE)
                 kwargs[service] = True
             serviceset = ServiceSet(self._dbh, **kwargs)
@@ -891,8 +884,8 @@ The account has been successfully deleted from the database.
         relocated.set_destination(destination)
         if destination.gid and \
            not self._chk_other_address_types(destination, TYPE_RELOCATED):
-            self._warnings.append(_(u"The destination account/alias '%s' "
-                                    u"does not exist.") % destination)
+            self._warnings.append(_("The destination account/alias '%s' "
+                                    "does not exist.") % destination)
 
     def relocated_info(self, emailaddress):
         """Returns the target address of the relocated user with the given
@@ -901,7 +894,7 @@ The account has been successfully deleted from the database.
         if relocated:
             return relocated.get_info()
         if not self._is_other_address(relocated.address, TYPE_RELOCATED):
-            raise VMMError(_(u"The relocated user '%s' does not exist.") %
+            raise VMMError(_("The relocated user '%s' does not exist.") %
                            relocated.address, NO_SUCH_RELOCATED)
 
     def relocated_delete(self, emailaddress):

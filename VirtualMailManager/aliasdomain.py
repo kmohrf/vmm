@@ -47,7 +47,7 @@ class AliasDomain(object):
         dbc.close()
         if result:
             if result[1]:
-                raise ADErr(_(u"The domain '%s' is a primary domain.") %
+                raise ADErr(_("The domain '%s' is a primary domain.") %
                             self._name, ALIASDOMAIN_ISDOMAIN)
             self._gid = result[0]
 
@@ -66,13 +66,13 @@ class AliasDomain(object):
     def save(self):
         """Stores information about the new AliasDomain in the database."""
         if self._gid > 0:
-            raise ADErr(_(u"The alias domain '%s' already exists.") %
+            raise ADErr(_("The alias domain '%s' already exists.") %
                         self._name, ALIASDOMAIN_EXISTS)
         if not self._domain:
-            raise ADErr(_(u'No destination domain set for the alias domain.'),
+            raise ADErr(_('No destination domain set for the alias domain.'),
                         ALIASDOMAIN_NO_DOMDEST)
         if self._domain.gid < 1:
-            raise ADErr(_(u"The target domain '%s' does not exist.") %
+            raise ADErr(_("The target domain '%s' does not exist.") %
                         self._domain.name, NO_SUCH_DOMAIN)
         dbc = self._dbh.cursor()
         dbc.execute('INSERT INTO domain_name (domainname, gid, is_primary) '
@@ -85,7 +85,7 @@ class AliasDomain(object):
         """Returns a dict (keys: "alias" and "domain") with the names of the
         AliasDomain and its primary domain."""
         if self._gid < 1:
-            raise ADErr(_(u"The alias domain '%s' does not exist.") %
+            raise ADErr(_("The alias domain '%s' does not exist.") %
                         self._name, NO_SUCH_ALIASDOMAIN)
         dbc = self._dbh.cursor()
         dbc.execute('SELECT domainname FROM domain_name WHERE gid = %s AND '
@@ -95,25 +95,25 @@ class AliasDomain(object):
         if domain:
             return {'alias': self._name, 'domain': domain[0]}
         else:  # an almost unlikely case, isn't it?
-            raise ADErr(_(u'There is no primary domain for the alias domain '
-                          u"'%s'.") % self._name, NO_SUCH_DOMAIN)
+            raise ADErr(_('There is no primary domain for the alias domain '
+                          "'%s'.") % self._name, NO_SUCH_DOMAIN)
 
     def switch(self):
         """Switch the destination of the AliasDomain to the new destination,
         set with the method `set_destination()`.
         """
         if not self._domain:
-            raise ADErr(_(u'No destination domain set for the alias domain.'),
+            raise ADErr(_('No destination domain set for the alias domain.'),
                         ALIASDOMAIN_NO_DOMDEST)
         if self._domain.gid < 1:
-            raise ADErr(_(u"The target domain '%s' does not exist.") %
+            raise ADErr(_("The target domain '%s' does not exist.") %
                         self._domain.name, NO_SUCH_DOMAIN)
         if self._gid < 1:
-            raise ADErr(_(u"The alias domain '%s' does not exist.") %
+            raise ADErr(_("The alias domain '%s' does not exist.") %
                         self._name, NO_SUCH_ALIASDOMAIN)
         if self._gid == self._domain.gid:
-            raise ADErr(_(u"The alias domain '%(alias)s' is already assigned "
-                          u"to the domain '%(domain)s'.") %
+            raise ADErr(_("The alias domain '%(alias)s' is already assigned "
+                          "to the domain '%(domain)s'.") %
                         {'alias': self._name, 'domain': self._domain.name},
                         ALIASDOMAIN_EXISTS)
         dbc = self._dbh.cursor()
@@ -130,7 +130,7 @@ class AliasDomain(object):
         Raises an AliasDomainError if the AliasDomain doesn't exist.
         """
         if self._gid < 1:
-            raise ADErr(_(u"The alias domain '%s' does not exist.") %
+            raise ADErr(_("The alias domain '%s' does not exist.") %
                         self._name, NO_SUCH_ALIASDOMAIN)
         dbc = self._dbh.cursor()
         dbc.execute('DELETE FROM domain_name WHERE domainname = %s AND NOT '
