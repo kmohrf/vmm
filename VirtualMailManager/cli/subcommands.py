@@ -682,7 +682,7 @@ def setup_parser():
                "Possible service names are: imap, pop3, sieve and smtp.\nThe "
                "new service set will affect only those accounts for which "
                "the set has not been overridden. If you want to restore the "
-               "default to all accounts, you may pass --force.")),
+               "default to all accounts, you may pass the option--force.")),
            formatter_class=RawDescriptionHelpFormatter)
     ds.add_argument('fqdn', help=_('a fully qualified domain name'))
     ds.add_argument('-s', choices=SERVICES,
@@ -698,7 +698,7 @@ def setup_parser():
                "with this subcommand.\n\nThe new transport will affect only "
                "those accounts for which the transport has not been "
                "overridden. If you want to restore the default to all "
-               "accounts, you may pass --force.")),
+               "accounts, you may give the option --force.")),
            formatter_class=RawDescriptionHelpFormatter)
     dt.add_argument('fqdn', help=_('a fully qualified domain name'))
     dt.add_argument('transport', help=_('a Postfix transport (transport: or '
