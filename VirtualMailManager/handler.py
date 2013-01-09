@@ -451,27 +451,20 @@ class Handler(object):
         dom.save()
         self._make_domain_dir(dom)
 
-    def domain_quotalimit(self, domainname, bytes_, messages=0, force=None):
+    def domain_quotalimit(self, domainname, bytes_, messages=0, force=False):
         """Wrapper around Domain.update_quotalimit()."""
         if not all(isinstance(i, int) for i in (bytes_, messages)):
             raise TypeError("'bytes_' and 'messages' have to be "
                             "integers or longs.")
-        if force is not None and force != 'force':
-            raise DomainError(_("Invalid argument: '%s'") % force,
-                              INVALID_ARGUMENT)
+        assert isinstance(force, bool)
         dom = self._get_domain(domainname)
         quotalimit = QuotaLimit(self._dbh, bytes=bytes_, messages=messages)
-        if force is None:
-            dom.update_quotalimit(quotalimit)
-        else:
-            dom.update_quotalimit(quotalimit, force=True)
+        dom.update_quotalimit(quotalimit, force)
 
-    def domain_services(self, domainname, force=None, *services):
+    def domain_services(self, domainname, force=False, *services):
         """Wrapper around Domain.update_serviceset()."""
+        assert isinstance(force, bool)
         kwargs = dict.fromkeys(SERVICES, False)
-        if force is not None and force != 'force':
-            raise DomainError(_("Invalid argument: '%s'") % force,
-                              INVALID_ARGUMENT)
         for service in set(services):
             if service not in SERVICES:
                 raise DomainError(_("Unknown service: '%s'") % service,
@@ -480,19 +473,14 @@ class Handler(object):
 
         dom = self._get_domain(domainname)
         serviceset = ServiceSet(self._dbh, **kwargs)
-        dom.update_serviceset(serviceset, (True, False)[not force])
+        dom.update_serviceset(serviceset, force)
 
-    def domain_transport(self, domainname, transport, force=None):
+    def domain_transport(self, domainname, transport, force=False):
         """Wrapper around Domain.update_transport()"""
-        if force is not None and force != 'force':
-            raise DomainError(_("Invalid argument: '%s'") % force,
-                              INVALID_ARGUMENT)
+        assert isinstance(force, bool)
         dom = self._get_domain(domainname)
         trsp = Transport(self._dbh, transport=transport)
-        if force is None:
-            dom.update_transport(trsp)
-        else:
-            dom.update_transport(trsp, force=True)
+        dom.update_transport(trsp, force)
 
     def domain_note(self, domainname, note):
         """Wrapper around Domain.update_note()"""

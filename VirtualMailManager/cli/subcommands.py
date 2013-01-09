@@ -228,23 +228,20 @@ def domain_info(ctx):
 
 def domain_quota(ctx):
     """update the quota limit of the specified domain"""
-    force = 'force' if ctx.args.force else None
     ctx.hdlr.domain_quotalimit(ctx.args.fqdn.lower(), ctx.args.storage,
-                               ctx.args.messages, force)
+                               ctx.args.messages, ctx.args.force)
 
 
 def domain_services(ctx):
     """allow all named service and block the uncredited."""
-    force = 'force' if ctx.args.force else None
     services = ctx.args.services if ctx.args.services else []
-    ctx.hdlr.domain_services(ctx.args.fqdn.lower(), force, *services)
+    ctx.hdlr.domain_services(ctx.args.fqdn.lower(), ctx.args.force, *services)
 
 
 def domain_transport(ctx):
     """update the transport of the specified domain"""
-    force = 'force' if ctx.args.force else None
     ctx.hdlr.domain_transport(ctx.args.fqdn.lower(),
-                              ctx.args.transport.lower(), force)
+                              ctx.args.transport.lower(), ctx.args.force)
 
 
 def domain_note(ctx):
