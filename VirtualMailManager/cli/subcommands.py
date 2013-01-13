@@ -166,7 +166,7 @@ def configure(ctx):
 def domain_add(ctx):
     """create a new domain"""
     fqdn = ctx.args.fqdn.lower()
-    transport = ctx.args.transport.lower if ctx.args.transport else None
+    transport = ctx.args.transport.lower() if ctx.args.transport else None
     ctx.hdlr.domain_add(fqdn, transport)
     if ctx.cget('domain.auto_postmaster'):
         w_std(_('Creating account for postmaster@%s') % fqdn)
