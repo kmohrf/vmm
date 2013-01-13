@@ -66,7 +66,7 @@ class CliHandler(Handler):
             raise VMMError(_("Invalid section: '%s'") % section,
                            INVALID_SECTION)
 
-    def user_add(self, emailaddress, password=None):
+    def user_add(self, emailaddress, password=None, note=None):
         """Override the parent user_add() - add the interactive password
         dialog.
 
@@ -81,6 +81,8 @@ class CliHandler(Handler):
         if password is None:
             password = (read_pass, randompw)[rand_pass]()
         acc.set_password(password)
+        if note:
+            acc.set_note(note)
         acc.save()
         self._make_account_dirs(acc)
         return (None, password)[rand_pass]

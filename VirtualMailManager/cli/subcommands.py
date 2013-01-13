@@ -167,12 +167,13 @@ def domain_add(ctx):
     """create a new domain"""
     fqdn = ctx.args.fqdn.lower()
     transport = ctx.args.transport.lower() if ctx.args.transport else None
-    ctx.hdlr.domain_add(fqdn, transport)
+    ctx.hdlr.domain_add(fqdn, transport, ctx.args.note)
     if ctx.cget('domain.auto_postmaster'):
         w_std(_('Creating account for postmaster@%s') % fqdn)
         ctx.args.scmd = 'useradd'
         ctx.args.address = 'postmaster@%s' % fqdn
         ctx.args.password = None
+        ctx.args.note = None
         user_add(ctx)
 
 
@@ -339,7 +340,8 @@ def relocated_info(ctx):
 
 def user_add(ctx):
     """create a new e-mail user with the given address"""
-    gen_pass = ctx.hdlr.user_add(ctx.args.address.lower(), ctx.args.password)
+    gen_pass = ctx.hdlr.user_add(ctx.args.address.lower(), ctx.args.password,
+                                 ctx.args.note)
     if not ctx.args.password and gen_pass:
         w_std(_("Generated password: %s") % gen_pass)
 
@@ -615,6 +617,8 @@ def setup_parser():
                "domain.")),
            formatter_class=RawDescriptionHelpFormatter)
     da.add_argument('fqdn', help=_('a fully qualified domain name'))
+    da.add_argument('-n', metavar='NOTE', dest='note',
+                    help=_('the note that should be set'))
     da.add_argument('-t', metavar='TRANSPORT', dest='transport',
                     help=_('a Postfix transport (transport: or '
                            'transport:nexthop)'))
@@ -771,6 +775,8 @@ def setup_parser():
            formatter_class=RawDescriptionHelpFormatter)
     ua.add_argument('address',
                     help=_("an account's e-mail address (local-part@fqdn)"))
+    ua.add_argument('-n', metavar='NOTE', dest='note',
+                    help=_('the note that should be set'))
     ua.add_argument('-p', metavar='PASSWORD', dest='password',
                     help=_("the new user's password"))
     ua.set_defaults(func=user_add, scmd='useradd')

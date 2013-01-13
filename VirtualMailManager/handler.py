@@ -431,7 +431,7 @@ class Handler(object):
         assert 'cfg_dget' not in builtins.__dict__
         builtins.__dict__['cfg_dget'] = self._cfg.dget
 
-    def domain_add(self, domainname, transport=None):
+    def domain_add(self, domainname, transport=None, note=None):
         """Wrapper around Domain's set_quotalimit, set_transport and save."""
         dom = self._get_domain(domainname)
         if transport is None:
@@ -439,6 +439,8 @@ class Handler(object):
                               transport=self._cfg.dget('domain.transport')))
         else:
             dom.set_transport(Transport(self._dbh, transport=transport))
+        if note:
+            dom.set_note(note)
         dom.set_quotalimit(QuotaLimit(self._dbh,
                            bytes=int(self._cfg.dget('domain.quota_bytes')),
                            messages=self._cfg.dget('domain.quota_messages')))
@@ -626,7 +628,7 @@ class Handler(object):
                                 lpattern=lpattern, llike=llike,
                                 dpattern=dpattern, dlike=dlike)
 
-    def user_add(self, emailaddress, password):
+    def user_add(self, emailaddress, password, note=None):
         """Wrapper around Account.set_password() and Account.save()."""
         acc = self._get_account(emailaddress)
         if acc:
@@ -634,6 +636,8 @@ class Handler(object):
                            acc.address, ACCOUNT_EXISTS)
         self._is_other_address(acc.address, TYPE_ACCOUNT)
         acc.set_password(password)
+        if note:
+            acc.set_note(note)
         acc.save()
         self._make_account_dirs(acc)
 
