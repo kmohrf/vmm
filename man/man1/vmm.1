@@ -464,7 +464,7 @@ to
 .\" ------------------------------------
 .SS domaininfo (di)
 .B vmm domaininfo
-.I fqdn 
+.I fqdn
 .RB [ \-d
 .IR details ]
 .PP
@@ -518,7 +518,7 @@ Domain information
 .\" ------------------------------------
 .SS domainquota (dq)
 .B vmm domainquota
-.I fqdn storage 
+.I fqdn storage
 .RB [ \-m
 .IR messages ]
 .RB [ --force ]
@@ -548,7 +548,7 @@ Example:
 .\" ------------------------------------
 .SS domainservices (ds)
 .B vmm domainservices
-.I fqdn 
+.I fqdn
 .RB [ \-s
 .IR "service ..." ]
 .RB [ \-\-force ]
@@ -562,7 +562,7 @@ Each specified
 .I service
 will be enabled/usable.
 All other services will be deactivated/unusable.
-Possible service names are: 
+Possible service names are:
 .BR  imap ", " pop3 ", " sieve " and " smtp .
 .br
 The new service set will affect only those accounts for which the set has not
@@ -741,8 +741,8 @@ To prevent this, give the optional argument
 .\" ------------------------------------
 .SS userinfo (ui)
 .B "vmm userinfo"
-.I address 
-.RB [ \-d 
+.I address
+.RB [ \-d
 .IR details ]
 .PP
 This subcommand displays some information about the account specified by
@@ -835,7 +835,7 @@ Example:
 .\" ------------------------------------
 .SS usernote (uo)
 .BI "vmm usernote" " address"
-.RB [ \-n 
+.RB [ \-n
 .IR note ]
 .PP
 With this subcommand, it is possible to attach a note to the specified
@@ -875,7 +875,7 @@ Example:
 .\" ------------------------------------
 .SS userservices (us)
 .B vmm userservices
-.I address 
+.I address
 .RB [ \-s
 .IR "service ..." ]
 .PP
