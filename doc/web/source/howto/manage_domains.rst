@@ -5,9 +5,19 @@ Managing domains
 
 domainadd
 ---------
+.. program:: vmm domainadd
+
 Syntax:
- | **vmm domainadd** *fqdn* [**-t** *transport*]
- | **vmm da** *fqdn* [**-t** *transport*]
+ | **vmm domainadd** *fqdn* [**-n** *note*] [**-t** *transport*]
+ | **vmm da** *fqdn* [**-n** *note*] [**-t** *transport*]
+
+.. option:: -n note
+
+ the note that should be set
+
+.. option:: -t transport
+
+ a Postfix transport (transport: or transport:nexthop)
  
 Adds the new domain into the database and creates the domain directory.
 

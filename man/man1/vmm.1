@@ -1,4 +1,4 @@
-.TH "VMM" "1" "2013-01-13" "vmm 0.7" "vmm"
+.TH "VMM" "1" "2013-01-19" "vmm 0.7" "vmm"
 .SH NAME
 vmm \- command line tool to manage email domains/accounts/aliases
 .\" -----------------------------------------------------------------------
@@ -385,8 +385,20 @@ Usable encoding suffixes
 .SS domainadd (da)
 .B vmm domainadd
 .I fqdn
+.RB [ \-n
+.IR note ]
 .RB [ \-t
 .IR transport ]
+.PP
+.\" ------------------------------------
+.TP
+.BI "\-n " note
+the note that should be set.
+.\" ------------------------------------
+.TP
+.BI "\-t " transport
+a Postfix transport (transport: or transport:nexthop).
+.\" ------------------------------------
 .PP
 Adds the new domain into the database and creates the domain directory.
 .PP
@@ -672,9 +684,21 @@ Example:
 .SH ACCOUNT SUBCOMMANDS
 .SS useradd (ua)
 .B vmm useradd
-.I address 
-.RB [ \-p 
+.I address
+.RB [ \-n
+.IR note ]
+.RB [ \-p
 .IR password ]
+.PP
+.\" ------------------------------------
+.TP
+.BI "\-n " note
+the note that should be set.
+.\" ------------------------------------
+.TP
+.BI "\-p " password
+the new user\(aqs password.
+.\" ------------------------------------
 .PP
 Use this subcommand to create a new e\-mail account for the given
 .IR address .

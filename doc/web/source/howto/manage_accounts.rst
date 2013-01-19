@@ -3,9 +3,19 @@ Managing accounts
 =================
 useradd
 -------
+.. program:: vmm useradd
+
 Syntax:
- | **vmm useradd** *address* [**-p** *password*]
- | **vmm ua** *address* [**-p** *password*]
+ | **vmm useradd** *address* [**-n** *note*] [**-p** *password*]
+ | **vmm ua** *address* [**-n** *note*] [**-p** *password*]
+
+.. option:: -n note
+
+ the note that should be set
+
+.. option:: -p password
+
+ the new user's password
 
 Use this subcommand to create a new e-mail account for the given *address*.
 
