@@ -93,13 +93,24 @@ Example:
 
 username
 --------
+.. program:: vmm username
+
 Syntax:
- | **vmm username** *address* [**-n** *name*]
- | **vmm un** *address* [**-n** *name*]
+ | **vmm username** *address* **-d** | **-n** *name*
+ | **vmm un** *address* **-d** | **-n** *name*
+
+.. option:: -d
+
+ delete the user's name
+
+.. option:: -n name
+
+ a user's real name
 
 The user's real *name* can be set/updated with this subcommand.
 
-If no *name* is given, the value stored for the account is erased.
+In order to delete the value stored for the account, pass the :option:`-d`
+option.
 
 Example:
 
@@ -109,13 +120,23 @@ Example:
 
 usernote
 --------
+.. program:: vmm usernote
+
 Syntax:
- | **vmm usernote** *address* [**-n** *note*]
- | **vmm uo** *address* [**-n** *note*]
+ | **vmm usernote** *address* **-d** | **-n** *note*
+ | **vmm uo** *address* **-d** | **-n** *note*
+
+.. option:: -d
+
+ delete the user's note
+
+.. option:: -n note
+
+ the note that should be set
 
 With this subcommand, it is possible to attach a note to the specified
 account.
-Without an argument, an existing note is removed.
+In order to delete an existing note, pass the :option:`-d` option.
 
 Example:
 

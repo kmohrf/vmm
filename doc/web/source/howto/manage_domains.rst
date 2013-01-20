@@ -112,13 +112,23 @@ Example:
 
 domainnote
 ----------
+.. program:: vmm domainnote
+
 Syntax:
- | **vmm domainnote** *fqdn* [**-n** *note*]
- | **vmm do** *fqdn* [**-n** *note*]
+ | **vmm domainnote** *fqdn* **-d** | **-n** *note*
+ | **vmm do** *fqdn* **-d** | **-n** *note*
+
+.. option:: -d
+
+ delete the domain's note
+
+.. option:: -n note
+
+ the note that should be set
 
 With this subcommand, it is possible to attach a note to the specified
 domain.
-Without an argument, an existing note is removed.
+In order to delete an existing note, pass the :option:`-d` option.
 
 Example:
 

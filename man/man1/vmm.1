@@ -1,4 +1,4 @@
-.TH "VMM" "1" "2013-01-19" "vmm 0.7" "vmm"
+.TH "VMM" "1" "2013-01-20" "vmm 0.7" "vmm"
 .SH NAME
 vmm \- command line tool to manage email domains/accounts/aliases
 .\" -----------------------------------------------------------------------
@@ -589,11 +589,23 @@ Example:
 .\" ------------------------------------
 .SS domainnote (do)
 .BI "vmm domainnote" " fqdn"
-.RB [ \-n
-.IR note ]
+.BR \-d | \-n
+.I note
+.PP
+.\" ------------------------------------
+.TP
+.B \-d
+delete the domain\(aqs note.
+.\" ------------------------------------
+.TP
+.BI "\-n " note
+the note that should be set.
+.\" ------------------------------------
 .PP
 With this subcommand, it is possible to attach a note to the specified
-domain. Without an argument, an existing note is removed.
+domain.
+In order to delete an existing note, pass the
+.BR \-d " option."
 .PP
 Example:
 .PP
@@ -797,16 +809,25 @@ Account information
 .\" ------------------------------------
 .SS username (un)
 .BI "vmm username" " address"
-.RB [ \-n
-.IR name ]
+.BR \-d | \-n
+.IR name
+.PP
+.\" ------------------------------------
+.TP
+.B \-d
+delete the user\(aqs name.
+.\" ------------------------------------
+.TP
+.BI "\-n " name
+a user\(aqs real name.
+.\" ------------------------------------
 .PP
 The user's real
 .I name
 can be set/updated with this subcommand.
 .PP
-If no
-.I name
-is given, the value stored for the account is erased.
+In order to delete the value stored for the account, pass the
+.BR \-d " option."
 .PP
 Example:
 .PP
@@ -835,11 +856,23 @@ Example:
 .\" ------------------------------------
 .SS usernote (uo)
 .BI "vmm usernote" " address"
-.RB [ \-n
-.IR note ]
+.BR \-d | \-n
+.IR note
+.PP
+.\" ------------------------------------
+.TP
+.B \-d
+delete the user\(aqs note.
+.\" ------------------------------------
+.TP
+.BI "\-n " note
+the note that should be set.
+.\" ------------------------------------
 .PP
 With this subcommand, it is possible to attach a note to the specified
-account. Without an argument, an existing note is removed.
+account.
+In order to delete an existing note, pass the
+.BR \-d " option."
 .PP
 Example:
 .PP
