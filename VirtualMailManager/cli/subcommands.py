@@ -642,11 +642,14 @@ def setup_parser():
     do = a('domainnote', aliases=('do',),
            help=_('set, update or delete the note of the given domain'),
            epilog=_('With this subcommand, it is possible to attach a note to '
-                    'the specified domain. Without an argument, an existing '
-                    'note is removed.'))
+                    'the specified domain. In order to delete an existing '
+                    'note, pass the -d option.'))
     do.add_argument('fqdn', help=_('a fully qualified domain name'))
-    do.add_argument('-n', metavar='NOTE', dest='note',
-                    help=_('the note that should be set'))
+    do_grp = do.add_mutually_exclusive_group(required=True)
+    do_grp.add_argument('-d', action='store_true', dest='delete',
+                        help=_('delete the note, if any'))
+    do_grp.add_argument('-n', metavar='NOTE', dest='note',
+                        help=_('the note that should be set'))
     do.set_defaults(func=domain_note, scmd='domainnote')
 
     dq = a('domainquota', aliases=('dq',),
@@ -799,24 +802,30 @@ def setup_parser():
     un = a('username', aliases=('un',),
            help=_('set, update or delete the real name for an address'),
            epilog=fill(_("The user's real name can be set/updated with this "
-               "subcommand.\n\nIf no name is given, the value stored for the "
-               "account is erased.")),
+               "subcommand.\n\nIn order to delete the value stored for the "
+               "account, pass the -d option.")),
            formatter_class=RawDescriptionHelpFormatter)
     un.add_argument('address',
                     help=_("an account's e-mail address (local-part@fqdn)"))
-    un.add_argument('-n', help=_("a user's real name"), metavar='NAME',
-                    dest='name')
+    un_grp = un.add_mutually_exclusive_group(required=True)
+    un_grp.add_argument('-d', action='store_true', dest='delete',
+                        help=_("delete the user's name if any"))
+    un_grp.add_argument('-n', help=_("a user's real name"), metavar='NAME',
+                        dest='name')
     un.set_defaults(func=user_name, scmd='username')
 
     uo = a('usernote', aliases=('uo',),
            help=_('set, update or delete the note of the given address'),
            epilog=_('With this subcommand, it is possible to attach a note to '
-               'the specified account. Without the note argument, an '
-               'existing note is removed.'))
+               'the specified account. In order to delete an existing note, '
+               'pass the -d option.'))
     uo.add_argument('address',
                     help=_("an account's e-mail address (local-part@fqdn)"))
-    uo.add_argument('-n', metavar='NOTE', dest='note',
-                    help=_('the note that should be set'))
+    uo_grp = uo.add_mutually_exclusive_group(required=True)
+    uo_grp.add_argument('-d', action='store_true', dest='delete',
+                        help=_('delete the note, if any'))
+    uo_grp.add_argument('-n', metavar='NOTE', dest='note',
+                        help=_('the note that should be set'))
     uo.set_defaults(func=user_note, scmd='usernote')
 
     up = a('userpassword', aliases=('up',),
