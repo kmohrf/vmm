@@ -207,8 +207,7 @@ This subcommand lists all password schemes which could be used in the
 The output varies, depending on the used Dovecot version and the system's
 libc.
 
-When your Dovecot installation isn't too old, you will see additionally
-a few usable encoding suffixes.
+Additionally a few usable encoding suffixes will be displayed.
 One of them can be appended to the password scheme.
 
 Example:

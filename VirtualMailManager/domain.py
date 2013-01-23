@@ -324,9 +324,6 @@ class Domain(object):
         `force` : bool
           enforce new quota limit for all accounts, default `False`
         """
-        if cfg_dget('misc.dovecot_version') < 0x10102f00:
-            raise VMMError(_('PostgreSQL-based dictionary quota requires '
-                             'Dovecot >= v1.1.2.'), VMM_ERROR)
         self._chk_state()
         assert isinstance(quotalimit, QuotaLimit)
         if not force and quotalimit == self._qlimit:

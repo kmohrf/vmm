@@ -598,10 +598,10 @@ def setup_parser():
            epilog=fill(_("This subcommand lists all password schemes which "
                "could be used in the vmm.cfg as value of the "
                "misc.password_scheme option. The output varies, depending "
-               "on the used Dovecot version and the system's libc.\nWhen "
-               "your Dovecot installation isn't too old, you will see "
-               "additionally a few usable encoding suffixes. One of them can "
-               "be appended to the password scheme.")),
+               "on the used Dovecot version and the system's libc.\n"
+               "Additionally a few usable encoding suffixes will be "
+               "displayed. One of them can be appended to the password "
+               "scheme.")),
            formatter_class=RawDescriptionHelpFormatter)
     lp.set_defaults(func=list_pwschemes, scmd='listpwschemes')
 

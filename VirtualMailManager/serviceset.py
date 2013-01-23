@@ -32,7 +32,7 @@ class ServiceSet(object):
     `services` : dict
       The four services above with boolean values
     """
-    __slots__ = ('_ssid', '_services', '_sieve_col', '_dbh')
+    __slots__ = ('_ssid', '_services', '_dbh')
     _kwargs = (('ssid',) + SERVICES)
 
     def __init__(self, dbh, **kwargs):
@@ -60,10 +60,6 @@ class ServiceSet(object):
         self._dbh = dbh
         self._ssid = 0
         self._services = dict.fromkeys(SERVICES, True)
-        if cfg_dget('misc.dovecot_version') < 0x10200b02:
-            self._sieve_col = 'managesieve'
-        else:
-            self._sieve_col = 'sieve'
 
         for key in kwargs.keys():
             if key not in self.__class__._kwargs:
@@ -108,8 +104,6 @@ class ServiceSet(object):
         sql = ('SELECT ssid FROM service_set WHERE %s' %
                ' AND '.join('%s = %s' %
                (k, str(v).upper()) for k, v in self._services.items()))
-        if self._sieve_col == 'managesieve':
-            sql = sql.replace('sieve', self._sieve_col)
         dbc = self._dbh.cursor()
         dbc.execute(sql)
         result = dbc.fetchone()
@@ -122,8 +116,8 @@ class ServiceSet(object):
     def _load_by_ssid(self, ssid):
         """Try to load the service_set by it's primary key."""
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT ssid, smtp, pop3, imap, %s' % (self._sieve_col,) +
-                    ' FROM service_set WHERE ssid = %s', (ssid,))
+        dbc.execute('SELECT ssid, smtp, pop3, imap, sieve '
+                    'FROM service_set WHERE ssid = %s', (ssid,))
         result = dbc.fetchone()
         dbc.close()
         if not result:
@@ -135,8 +129,7 @@ class ServiceSet(object):
 
     def _save(self):
         """Store a new service_set in the database."""
-        sql = ('INSERT INTO service_set (ssid, smtp, pop3, imap, %s) ' %
-               (self._sieve_col,) +
+        sql = ('INSERT INTO service_set (ssid, smtp, pop3, imap, sieve) '
                'VALUES (%(ssid)s, %(smtp)s, %(pop3)s, %(imap)s, %(sieve)s)')
         self._set_ssid()
         values = {'ssid': self._ssid}

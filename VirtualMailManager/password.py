@@ -182,18 +182,8 @@ def _md5_hash(password, scheme, encoding, user=None):
     """Generates DIGEST-MD5 aka PLAIN-MD5 and LDAP-MD5 hashes."""
     md5 = hashlib.md5()
     if scheme == 'DIGEST-MD5':
-        #  Prior to Dovecot v1.1.12/v1.2.beta2 there was a problem with a
-        #  empty auth_realms setting in dovecot.conf and user@domain.tld
-        #  usernames. So we have to generate different hashes for different
-        #  versions. See also:
-        #       http://dovecot.org/list/dovecot-news/2009-March/000103.html
-        #       http://hg.dovecot.org/dovecot-1.1/rev/2b0043ba89ae
-        if cfg_dget('misc.dovecot_version') >= 0x1010cf00:
-            md5.update(user.localpart.encode() + b':' +
-                       user.domainname.encode() + b':')
-        else:
-            raise VMMError('You will need Dovecot >= v1.2.0 for proper '
-                           'functioning digest-md5 authentication.', VMM_ERROR)
+        md5.update(user.localpart.encode() + b':' +
+                   user.domainname.encode() + b':')
     md5.update(password)
     if (scheme in ('PLAIN-MD5', 'DIGEST-MD5') and encoding in DEFAULT_HEX) or \
        (scheme == 'LDAP-MD5' and encoding == 'HEX'):
@@ -329,12 +319,11 @@ def list_schemes():
 
     `schemes` is an iterator for all supported password schemes (depends on
     the used Dovecot version and features of the libc).
-    `encodings` is a tuple with all usable encoding suffixes. The tuple may
-    be empty.
+    `encodings` is a tuple with all usable encoding suffixes.
     """
     dcv = cfg_dget('misc.dovecot_version')
     schemes = (k for (k, v) in _scheme_info.items() if v[1] <= dcv)
-    encodings = ('.B64', '.BASE64', '.HEX') if dcv >= 0x10100a01 else ()
+    encodings = ('.B64', '.BASE64', '.HEX')
     return schemes, encodings
 
 
@@ -365,9 +354,6 @@ def verify_scheme(scheme):
                        'version': version_str(_scheme_info[scheme][1])},
                        VMM_ERROR)
     if len(scheme_encoding) > 1:
-        if cfg_dget('misc.dovecot_version') < 0x10100a01:
-            raise VMMError(_('Encoding suffixes for password schemes require '
-                             'Dovecot >= v1.1.alpha1.'), VMM_ERROR)
         if scheme_encoding[1] not in ('B64', 'BASE64', 'HEX'):
             raise VMMError(_("Unsupported password encoding: '%s'") %
                            scheme_encoding[1], VMM_ERROR)

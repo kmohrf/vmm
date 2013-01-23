@@ -292,9 +292,6 @@ class Account(object):
         `quotalimit` : VirtualMailManager.quotalimit.QuotaLimit
           the new quota limit of the domain.
         """
-        if cfg_dget('misc.dovecot_version') < 0x10102f00:
-            raise VMMError(_('PostgreSQL-based dictionary quota requires '
-                             'Dovecot >= v1.1.2.'), VMM_ERROR)
         self._chk_state()
         if quotalimit == self._qlimit:
             return
