@@ -37,7 +37,7 @@ class MailLocation(object):
 
         Arguments:
 
-        `dbh` : pyPgSQL.PgSQL.Connection
+        `dbh` : psycopg2._psycopg.connection
           A database connection for the database access.
 
         Keyword arguments:

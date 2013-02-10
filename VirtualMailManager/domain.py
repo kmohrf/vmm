@@ -46,7 +46,7 @@ class Domain(object):
 
         Arguments:
 
-        `dbh` : pyPgSQL.PgSQL.Connection
+        `dbh` : psycopg2._psycopg.connection
           a database connection for the database access
         `domainname` : basestring
           The name of the domain

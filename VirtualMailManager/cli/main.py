@@ -14,8 +14,8 @@ from VirtualMailManager import ENCODING, errors
 from VirtualMailManager.config import BadOptionError, ConfigValueError
 from VirtualMailManager.cli import w_err
 from VirtualMailManager.cli.handler import CliHandler
-from VirtualMailManager.constants import DATABASE_ERROR, EX_SUCCESS, \
-     EX_USER_INTERRUPT, INVALID_ARGUMENT
+from VirtualMailManager.constants import EX_SUCCESS, EX_USER_INTERRUPT, \
+     INVALID_ARGUMENT
 from VirtualMailManager.cli.subcommands import RunContext, setup_parser
 
 
@@ -46,11 +46,9 @@ def run():
         # with Ctrl+C or Ctrl+D.
         w_err(EX_USER_INTERRUPT, '', _('Ouch!'), '')
     except errors.VMMError as err:
-        if err.code != DATABASE_ERROR:
-            if handler.has_warnings():
-                w_err(0, _('Warnings:'), *handler.get_warnings())
-            w_err(err.code, _('Error: %s') % err.msg)
-        w_err(err.code, str(err.msg, ENCODING, 'replace'))
+        if handler.has_warnings():
+            w_err(0, _('Warnings:'), *handler.get_warnings())
+        w_err(err.code, _('Error: %s') % err.msg)
     except (BadOptionError, ConfigValueError) as err:
         w_err(INVALID_ARGUMENT, _('Error: %s') % err)
     except NoSectionError as err:

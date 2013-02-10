@@ -23,7 +23,7 @@ class Transport(object):
         are given, tid will be used.
 
         Keyword arguments:
-        dbh -- a pyPgSQL.PgSQL.connection
+        dbh -- a psycopg2._psycopg.connection
         tid -- the id of a transport (int)
         transport -- the value of the transport (str)
 

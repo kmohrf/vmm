@@ -19,6 +19,8 @@ from shutil import rmtree
 from stat import S_IRGRP, S_IROTH, S_IWGRP, S_IWOTH
 from subprocess import Popen, PIPE
 
+import psycopg2
+
 from VirtualMailManager.account import Account
 from VirtualMailManager.alias import Alias
 from VirtualMailManager.aliasdomain import AliasDomain
@@ -45,7 +47,6 @@ from VirtualMailManager.transport import Transport
 
 
 _ = lambda msg: msg
-_db_mod = None
 
 CFG_FILE = 'vmm.cfg'
 CFG_PATH = '/root:/usr/local/etc:/etc'
@@ -60,7 +61,7 @@ OTHER_TYPES = {
 class Handler(object):
     """Wrapper class to simplify the access on all the stuff from
     VirtualMailManager"""
-    __slots__ = ('_cfg', '_cfg_fname', '_db_connect', '_dbh', '_warnings')
+    __slots__ = ('_cfg', '_cfg_fname', '_dbh', '_warnings')
 
     def __init__(self, skip_some_checks=False):
         """Creates a new Handler instance.
@@ -76,7 +77,6 @@ class Handler(object):
         self._warnings = []
         self._cfg = None
         self._dbh = None
-        self._db_connect = None
 
         if os.geteuid():
             raise NotRootError(_("You are not root.\n\tGood bye!\n"),
@@ -87,7 +87,6 @@ class Handler(object):
         if not skip_some_checks:
             self._cfg.check()
             self._chkenv()
-            self._set_db_connect()
 
     def _find_cfg_file(self):
         """Search the CFG_FILE in CFG_PATH.
@@ -149,50 +148,13 @@ class Handler(object):
                 else:
                     raise
 
-    def _set_db_connect(self):
-        """check which module to use and set self._db_connect"""
-        global _db_mod
-        if self._cfg.dget('database.module').lower() == 'psycopg2':
-            try:
-                _db_mod = __import__('psycopg2')
-            except ImportError:
-                raise VMMError(_("Unable to import database module '%s'.") %
-                               'psycopg2', VMM_ERROR)
-            self._db_connect = self._psycopg2_connect
-        else:
-            try:
-                tmp = __import__('pyPgSQL', globals(), locals(), ['PgSQL'])
-            except ImportError:
-                raise VMMError(_("Unable to import database module '%s'.") %
-                               'pyPgSQL', VMM_ERROR)
-            _db_mod = tmp.PgSQL
-            self._db_connect = self._pypgsql_connect
-
-    def _pypgsql_connect(self):
-        """Creates a pyPgSQL.PgSQL.connection instance."""
-        if self._dbh is None or (isinstance(self._dbh, _db_mod.Connection) and
-                                  not self._dbh._isOpen):
-            try:
-                self._dbh = _db_mod.connect(
-                        database=self._cfg.dget('database.name'),
-                        user=self._cfg.pget('database.user'),
-                        host=self._cfg.dget('database.host'),
-                        port=self._cfg.dget('database.port'),
-                        password=self._cfg.pget('database.pass'),
-                        client_encoding='utf8', unicode_results=True)
-                dbc = self._dbh.cursor()
-                dbc.execute("SET NAMES 'UTF8'")
-                dbc.close()
-            except _db_mod.libpq.DatabaseError as err:
-                raise VMMError(str(err), DATABASE_ERROR)
-
-    def _psycopg2_connect(self):
+    def _db_connect(self):
         """Return a new psycopg2 connection object."""
         if self._dbh is None or \
-          (isinstance(self._dbh, _db_mod.extensions.connection) and
+          (isinstance(self._dbh, psycopg2.extensions.connection) and
            self._dbh.closed):
             try:
-                self._dbh = _db_mod.connect(
+                self._dbh = psycopg2.connect(
                         host=self._cfg.dget('database.host'),
                         sslmode=self._cfg.dget('database.sslmode'),
                         port=self._cfg.dget('database.port'),
@@ -203,7 +165,7 @@ class Handler(object):
                 dbc = self._dbh.cursor()
                 dbc.execute("SET NAMES 'UTF8'")
                 dbc.close()
-            except _db_mod.DatabaseError as err:
+            except psycopg2.DatabaseError as err:
                 raise VMMError(str(err), DATABASE_ERROR)
 
     def _chk_other_address_types(self, address, exclude):

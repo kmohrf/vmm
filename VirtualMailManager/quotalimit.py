@@ -25,7 +25,7 @@ class QuotaLimit(object):
 
         Arguments:
 
-        `dbh` : pyPgSQL.PgSQL.Connection || psycopg2._psycopg.connection
+        `dbh` : psycopg2._psycopg.connection
           A database connection for the database access.
 
         Keyword arguments:

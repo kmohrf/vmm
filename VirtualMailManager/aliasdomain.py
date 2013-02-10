@@ -27,7 +27,7 @@ class AliasDomain(object):
 
         Arguments:
 
-        `dbh` : pyPgSQL.PgSQL.Connection
+        `dbh` : psycopg2._psycopg.connection
           a database connection for the database access
         `domainname` : basestring
           the name of the AliasDomain"""

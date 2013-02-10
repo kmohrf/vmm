@@ -15,21 +15,7 @@ import sys
 
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
-has_psycopg2 = False
-try:
-    import psycopg2
-    has_psycopg2 = True
-except ImportError:
-    try:
-        from pyPgSQL import PgSQL
-    except ImportError:
-        sys.stderr.write('error: no suitable database module found\n')
-        raise SystemExit(1)
-
-if has_psycopg2:
-    DBErr = psycopg2.DatabaseError
-else:
-    DBErr = PgSQL.libpq.DatabaseError
+import psycopg2
 
 
 def check_args(args, err_hdlr):
@@ -42,11 +28,8 @@ def check_args(args, err_hdlr):
 
 
 def get_dbh(database, user, password, host, port):
-    if has_psycopg2:
-        return psycopg2.connect(database=database, user=user,
-                                password=password, host=host, port=port)
-    return PgSQL.connect(user=user, password=password, host=host,
-                         database=database, port=port)
+    return psycopg2.connect(database=database, user=user,
+                            password=password, host=host, port=port)
 
 
 def get_argparser():
@@ -131,7 +114,7 @@ def set_versions(dbh, versions):
         try:
             dbc.execute("SELECT current_setting('server_version_num')")
             versions['pgsql'] = int(dbc.fetchone()[0])
-        except DBErr:
+        except psycopg2.DatabaseError:
             versions['pgsql'] = 80199
     dbc.execute("SELECT relname FROM pg_stat_user_tables WHERE relname LIKE "
                 "'userquota%'")

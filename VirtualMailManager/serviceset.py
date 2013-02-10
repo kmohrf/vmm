@@ -42,7 +42,7 @@ class ServiceSet(object):
         arguments ('smtp', 'pop3',  'imap', 'sieve') must be provided.
 
         Arguments:
-        `dbh` : pyPgSQL.PgSQL.Connection or psycopg2.extensions.connection
+        `dbh` : psycopg2.extensions.connection
           A database connection for the database access.
 
         Keyword arguments:
@@ -123,9 +123,7 @@ class ServiceSet(object):
         if not result:
             raise ValueError('Unknown service_set id specified: %r' % ssid)
         self._ssid = result[0]
-        #self._services.update(zip(SERVICES, result[1:]))
-        for key, value in zip(SERVICES, result[1:]):  # pyPgSQL compatible
-            self._services[key] = True if value else False
+        self._services.update(list(zip(SERVICES, result[1:])))
 
     def _save(self):
         """Store a new service_set in the database."""

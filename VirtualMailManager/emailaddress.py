@@ -97,7 +97,7 @@ class DestinationEmailAddress(EmailAddress):
 
         `address`: string/unicode
           a e-mail address like user@example.com
-        `dbh`: pyPgSQL.PgSQL.Connection/pyPgSQL.PgSQL.connection
+        `dbh`: psycopg2._psycopg.connection
           a database connection for the database access
         """
         super(DestinationEmailAddress, self).__init__(address, _validate)

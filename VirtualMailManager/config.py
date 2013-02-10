@@ -22,7 +22,6 @@ from VirtualMailManager.errors import ConfigError, VMMError
 from VirtualMailManager.maillocation import known_format
 from VirtualMailManager.password import verify_scheme as _verify_scheme
 
-DB_MODULES = ('psycopg2', 'pypgsql')
 DB_SSL_MODES = ('allow', 'disabled', 'prefer', 'require', 'verify-ca',
                 'verify-full')
 
@@ -313,7 +312,6 @@ class Config(LazyConfig):
             },
             'database': {
                 'host': LCO(str, 'localhost', self.get),
-                'module': LCO(str, 'psycopg2', self.get, check_db_module),
                 'name': LCO(str, 'mailsys', self.get),
                 'pass': LCO(str, None, self.get),
                 'port': LCO(int, 5432, self.getint),
@@ -437,15 +435,10 @@ class Config(LazyConfig):
                         _("Not a valid Dovecot version: '%s'") % value]
         # section database
         db_err = []
-        value = self.dget('database.module').lower()
-        if value not in DB_MODULES:
-            db_err.append('module: ' +
-                          _("Unsupported database module: '%s'") % value)
-        if value == 'psycopg2':
-            value = self.dget('database.sslmode')
-            if value not in DB_SSL_MODES:
-                db_err.append('sslmode: ' +
-                              _("Unknown pgsql SSL mode: '%s'") % value)
+        value = self.dget('database.sslmode')
+        if value not in DB_SSL_MODES:
+            db_err.append('sslmode: ' +
+                          _("Unknown pgsql SSL mode: '%s'") % value)
         if db_err:
             self._missing['database'] = db_err
         # section mailbox
@@ -469,14 +462,6 @@ def is_dir(path):
     if lisdir(path):
         return path
     raise ConfigValueError(_("No such directory: %s") % get_unicode(path))
-
-
-def check_db_module(module):
-    """Check if the *module* is a supported pgsql module."""
-    if module.lower() in DB_MODULES:
-        return module
-    raise ConfigValueError(_("Unsupported database module: '%s'") %
-                           get_unicode(module))
 
 
 def check_db_ssl_mode(ssl_mode):

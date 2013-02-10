@@ -43,7 +43,7 @@ class Account(object):
 
         Arguments:
 
-        `dbh` : pyPgSQL.PgSQL.Connection
+        `dbh` : psycopg2._psycopg.connection
           A database connection for the database access.
         `address` : VirtualMailManager.EmailAddress.EmailAddress
           The e-mail address of the (new) Account.
@@ -459,7 +459,7 @@ def get_account_by_uid(uid, dbh):
 
     `uid` : int
       The Account unique ID.
-    `dbh` : pyPgSQL.PgSQL.Connection
+    `dbh` : psycopg2._psycopg.connection
       a database connection for the database access.
     """
     try:
