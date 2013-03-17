@@ -11,8 +11,6 @@
 
 SERVICES = ('smtp', 'pop3', 'imap', 'sieve')
 
-cfg_dget = lambda option: None
-
 
 class ServiceSet(object):
     """A wrapper class that provides access to the service_set table.
@@ -150,5 +148,3 @@ class ServiceSet(object):
         """A dictionary: Keys: `smtp`, `pop3`, `imap` and `sieve` with
         boolean values."""
         return self._services.copy()
-
-del cfg_dget
