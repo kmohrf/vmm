@@ -168,6 +168,8 @@ conf.d/10-mail.conf
  # uncomment if you want to use the quota plugin
  #mail_plugins = quota
 
+.. _conf-d-10-master.conf:
+
 conf.d/10-master.conf
 ^^^^^^^^^^^^^^^^^^^^^
 .. code-block:: text

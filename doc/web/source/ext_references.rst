@@ -9,6 +9,7 @@
 .. _GPG: http://en.wikipedia.org/wiki/GNU_Privacy_Guard
 .. _IDN: http://en.wikipedia.org/wiki/Internationalized_domain_name
 .. _LDA: http://wiki.dovecot.org/LDA
+.. _LMTP: http://master.wiki2.dovecot.org/LMTP
 .. _Maildir: http://wiki2.dovecot.org/MailboxFormat/Maildir
 .. _MainConfig: http://wiki.dovecot.org/MainConfig
 .. _Mercurial: http://mercurial.selenic.com/

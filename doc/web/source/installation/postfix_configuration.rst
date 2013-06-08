@@ -72,4 +72,18 @@ The command of the `argv` attribute points to the
 For more details about the `flags` used above see: `pipe(8)`_.
 All other arguments are explained in the Dovecot LDA_ documentation.
 
+Using Dovecot's LMTP
+--------------------
+In order to use Dovecot's LMTP_ as `virtual_transport` with Postfix make sure
+you have have:
+
+ ‣ `lmtp` in your `protocols` setting (:ref:`dovecot2.conf`)
+ ‣ configured a `lmtp` listener: `service lmtp {}`
+   (:ref:`conf-d-10-master.conf`)
+ ‣ set `lmtp:unix:private/dovecot-lmtp` as the `domain.transport` in your
+   :file:`vmm.cfg`.
+
+If you want to switch the transport of existing domains and/or accounts, you
+can use the subcommands :ref:`domaintransport` and :ref:`usertransport`.
+
 .. include:: ../ext_references.rst
