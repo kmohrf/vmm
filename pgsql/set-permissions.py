@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding: utf-8
-# Copyright 2012, Pascal Volk
+# Copyright 2012 - 2013, Pascal Volk
 # See COPYING for distribution information.
 
 """
@@ -13,75 +13,53 @@
 import getpass
 import sys
 
-from optparse import OptionParser
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
-has_psycopg2 = False
-try:
-    import psycopg2
-    has_psycopg2 = True
-except ImportError:
-    try:
-        from pyPgSQL import PgSQL
-    except ImportError:
-        sys.stderr.write('error: no suitable database module found\n')
-        raise SystemExit(1)
-
-if has_psycopg2:
-    DBErr = psycopg2.DatabaseError
-else:
-    DBErr = PgSQL.libpq.DatabaseError
+import psycopg2
 
 
-def check_opts(opts, err_hdlr):
-    if not opts.postfix:
+def check_args(args, err_hdlr):
+    if not args.postfix:
         err_hdlr('missing Postfix database user name')
-    if not opts.dovecot:
+    if not args.dovecot:
         err_hdlr('missing Dovecot database user name')
-    if opts.askp:
-        opts.dbpass = getpass.getpass()
+    if args.askp:
+        args.dbpass = getpass.getpass()
 
 
 def get_dbh(database, user, password, host, port):
-    if has_psycopg2:
-        return psycopg2.connect(database=database, user=user,
-                                password=password, host=host, port=port)
-    return PgSQL.connect(user=user, password=password, host=host,
-                         database=database, port=port)
+    return psycopg2.connect(database=database, user=user,
+                            password=password, host=host, port=port)
 
 
-def get_optparser():
+def get_argparser():
     descr = 'Set permissions for Dovecot and Postfix in the vmm database.'
-    usage = 'usage: %prog OPTIONS'
-    parser = OptionParser(description=descr, usage=usage)
-    parser.add_option('-a', '--askpass', dest='askp', default=False,
+    parser = ArgumentParser(description=descr, usage='%(prog)s OPTIONS',
+                            formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-a', '--askpass', dest='askp',
             action='store_true', help='Prompt for the database password.')
-    parser.add_option('-H', '--host', dest='host', metavar='HOST',
-            default=None,
+    parser.add_argument('-H', '--host', dest='host', metavar='HOST',
             help='Hostname or IP address of the database server. Leave ' +
                  'blank in order to use the default Unix-domain socket.')
-    parser.add_option('-n', '--name', dest='name', metavar='NAME',
+    parser.add_argument('-n', '--name', dest='name', metavar='NAME',
             default='mailsys',
-            help='Specifies the name of the database to connect to. ' +
-                 'Default: %default')
-    parser.add_option('-p', '--pass', dest="dbpass", metavar='PASS',
-            default=None, help='Password for the database connection.')
-    parser.add_option('-P', '--port', dest='port', metavar='PORT', type='int',
-            default=5432,
+            help='Specifies the name of the database to connect to.')
+    parser.add_argument('-p', '--pass', dest="dbpass", metavar='PASS',
+            help='Password for the database connection.')
+    parser.add_argument('-P', '--port', dest='port', metavar='PORT',
+            type=int, default=5432,
             help='Specifies the TCP port or the local Unix-domain socket ' +
                  'file extension on which the server is listening for ' +
-                 'connections. Default: %default')
-    parser.add_option('-U', '--user', dest='user', metavar='USER',
+                 'connections.')
+    parser.add_argument('-U', '--user', dest='user', metavar='USER',
             default=getpass.getuser(),
-            help='Connect to the database as the user USER instead of the ' +
-                 'default: %default')
-    parser.add_option('-D', '--dovecot', dest='dovecot', metavar='USER',
+            help='Connect to the database as the user USER instead of the ')
+    parser.add_argument('-D', '--dovecot', dest='dovecot', metavar='USER',
             default='dovecot',
-            help='Database user name of the Dovecot database user. Default: ' +
-                 '%default')
-    parser.add_option('-M', '--postfix', dest='postfix', metavar='USER',
+            help='Database user name of the Dovecot database user.')
+    parser.add_argument('-M', '--postfix', dest='postfix', metavar='USER',
             default='postfix',
-            help='Database user name of the Postfix (MTA)  database user. ' +
-                 'Default: %default')
+            help='Database user name of the Postfix (MTA)  database user.')
     return parser
 
 
@@ -119,10 +97,10 @@ def set_permissions84(dbh, dc_vers, dovecot, postfix):
                 (dc_rw_tbls, db['dovecot']))
     dbc.execute('GRANT SELECT ON %s TO %s' % (dc_ro_tbls, db['dovecot']))
     dbc.execute('GRANT SELECT ON %s TO %s' % (pf_ro_tbls, db['postfix']))
-    for table, columns in db['dovecot_tbls'].iteritems():
+    for table, columns in db['dovecot_tbls'].items():
         dbc.execute('GRANT SELECT (%s) ON %s TO %s' % (columns, table,
                                                        db['dovecot']))
-    for table, columns in db['postfix_tbls'].iteritems():
+    for table, columns in db['postfix_tbls'].items():
         dbc.execute('GRANT SELECT (%s) ON %s TO %s' % (columns, table,
                                                        db['postfix']))
     dbc.close()
@@ -136,7 +114,7 @@ def set_versions(dbh, versions):
         try:
             dbc.execute("SELECT current_setting('server_version_num')")
             versions['pgsql'] = int(dbc.fetchone()[0])
-        except DBErr:
+        except psycopg2.DatabaseError:
             versions['pgsql'] = 80199
     dbc.execute("SELECT relname FROM pg_stat_user_tables WHERE relname LIKE "
                 "'userquota%'")
@@ -155,15 +133,15 @@ def set_versions(dbh, versions):
 
 
 if __name__ == '__main__':
-    optparser = get_optparser()
-    opts, args = optparser.parse_args()
-    check_opts(opts, optparser.error)
-    dbh = get_dbh(opts.name, opts.user, opts.dbpass, opts.host, opts.port)
+    argparser = get_argparser()
+    args = argparser.parse_args()
+    check_args(args, argparser.error)
+    dbh = get_dbh(args.name, args.user, args.dbpass, args.host, args.port)
     versions = {}
     set_versions(dbh, versions)
     if versions['pgsql'] < 80400:
-        set_permissions(dbh, versions['dovecot'], opts.dovecot, opts.postfix)
+        set_permissions(dbh, versions['dovecot'], args.dovecot, args.postfix)
     else:
-        set_permissions84(dbh, versions['dovecot'], opts.dovecot, opts.postfix)
+        set_permissions84(dbh, versions['dovecot'], args.dovecot, args.postfix)
     dbh.commit()
     dbh.close()

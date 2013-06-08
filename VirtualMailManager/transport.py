@@ -9,8 +9,6 @@
     domains and accounts.
 """
 
-from VirtualMailManager.pycompat import any
-
 _ = lambda msg: msg
 
 
@@ -25,8 +23,8 @@ class Transport(object):
         are given, tid will be used.
 
         Keyword arguments:
-        dbh -- a pyPgSQL.PgSQL.connection
-        tid -- the id of a transport (int/long)
+        dbh -- a psycopg2._psycopg.connection
+        tid -- the id of a transport (int)
         transport -- the value of the transport (str)
 
         """
@@ -34,10 +32,10 @@ class Transport(object):
         self._tid = 0
         assert any((tid, transport))
         if tid:
-            assert not isinstance(tid, bool) and isinstance(tid, (int, long))
+            assert not isinstance(tid, bool) and isinstance(tid, int)
             self._load_by_id(tid)
         else:
-            assert isinstance(transport, basestring)
+            assert isinstance(transport, str)
             self._transport = transport
             self._load_by_name()
 

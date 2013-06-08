@@ -63,10 +63,10 @@ class CliHandler(Handler):
         elif self._cfg.has_section(section):
             self._cfg.configure([section])
         else:
-            raise VMMError(_(u"Invalid section: '%s'") % section,
+            raise VMMError(_("Invalid section: '%s'") % section,
                            INVALID_SECTION)
 
-    def user_add(self, emailaddress, password=None):
+    def user_add(self, emailaddress, password=None, note=None):
         """Override the parent user_add() - add the interactive password
         dialog.
 
@@ -74,13 +74,15 @@ class CliHandler(Handler):
         """
         acc = self._get_account(emailaddress)
         if acc:
-            raise VMMError(_(u"The account '%s' already exists.") %
+            raise VMMError(_("The account '%s' already exists.") %
                            acc.address, ACCOUNT_EXISTS)
         self._is_other_address(acc.address, TYPE_ACCOUNT)
         rand_pass = self._cfg.dget('account.random_password')
         if password is None:
             password = (read_pass, randompw)[rand_pass]()
         acc.set_password(password)
+        if note:
+            acc.set_note(note)
         acc.save()
         self._make_account_dirs(acc)
         return (None, password)[rand_pass]
@@ -90,9 +92,9 @@ class CliHandler(Handler):
         password dialog."""
         acc = self._get_account(emailaddress)
         if not acc:
-            raise VMMError(_(u"The account '%s' does not exist.") %
+            raise VMMError(_("The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
-        if not isinstance(password, basestring) or not password:
+        if not isinstance(password, str) or not password:
             password = read_pass()
         acc.modify('password', password)
 

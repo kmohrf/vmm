@@ -11,15 +11,13 @@
 
 SERVICES = ('smtp', 'pop3', 'imap', 'sieve')
 
-cfg_dget = lambda option: None
-
 
 class ServiceSet(object):
     """A wrapper class that provides access to the service_set table.
 
     Each ServiceSet object provides following - read only - attributes:
 
-    `ssid` : long
+    `ssid` : int
       The id of the service set
     `smtp` : bool
       Boolean flag for service smtp
@@ -32,7 +30,7 @@ class ServiceSet(object):
     `services` : dict
       The four services above with boolean values
     """
-    __slots__ = ('_ssid', '_services', '_sieve_col', '_dbh')
+    __slots__ = ('_ssid', '_services', '_dbh')
     _kwargs = (('ssid',) + SERVICES)
 
     def __init__(self, dbh, **kwargs):
@@ -42,7 +40,7 @@ class ServiceSet(object):
         arguments ('smtp', 'pop3',  'imap', 'sieve') must be provided.
 
         Arguments:
-        `dbh` : pyPgSQL.PgSQL.Connection or psycopg2.extensions.connection
+        `dbh` : psycopg2.extensions.connection
           A database connection for the database access.
 
         Keyword arguments:
@@ -60,17 +58,13 @@ class ServiceSet(object):
         self._dbh = dbh
         self._ssid = 0
         self._services = dict.fromkeys(SERVICES, True)
-        if cfg_dget('misc.dovecot_version') < 0x10200b02:
-            self._sieve_col = 'managesieve'
-        else:
-            self._sieve_col = 'sieve'
 
-        for key in kwargs.iterkeys():
+        for key in kwargs.keys():
             if key not in self.__class__._kwargs:
                 raise ValueError('unrecognized keyword: %r' % key)
             if key == 'ssid':
                 assert not isinstance(kwargs[key], bool) and \
-                       isinstance(kwargs[key], (int, long)) and kwargs[key] > 0
+                       isinstance(kwargs[key], int) and kwargs[key] > 0
                 self._load_by_ssid(kwargs[key])
                 break
             else:
@@ -101,15 +95,13 @@ class ServiceSet(object):
 
     def __repr__(self):
         return '%s(%s, %s)' % (self.__class__.__name__, self._dbh,
-                  ', '.join('%s=%r' % s for s in self._services.iteritems()))
+                  ', '.join('%s=%r' % s for s in self._services.items()))
 
     def _load_by_services(self):
         """Try to load the service_set by it's service combination."""
         sql = ('SELECT ssid FROM service_set WHERE %s' %
                ' AND '.join('%s = %s' %
-               (k, str(v).upper()) for k, v in self._services.iteritems()))
-        if self._sieve_col == 'managesieve':
-            sql = sql.replace('sieve', self._sieve_col)
+               (k, str(v).upper()) for k, v in self._services.items()))
         dbc = self._dbh.cursor()
         dbc.execute(sql)
         result = dbc.fetchone()
@@ -122,24 +114,18 @@ class ServiceSet(object):
     def _load_by_ssid(self, ssid):
         """Try to load the service_set by it's primary key."""
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT ssid, smtp, pop3, imap, %s' % (self._sieve_col,) +
-                    ' FROM service_set WHERE ssid = %s', (ssid,))
+        dbc.execute('SELECT ssid, smtp, pop3, imap, sieve '
+                    'FROM service_set WHERE ssid = %s', (ssid,))
         result = dbc.fetchone()
         dbc.close()
         if not result:
             raise ValueError('Unknown service_set id specified: %r' % ssid)
         self._ssid = result[0]
-        #self._services.update(zip(SERVICES, result[1:]))
-        for key, value in zip(SERVICES, result[1:]):  # pyPgSQL compatible
-            if value:
-                self._services[key] = True
-            else:
-                self._services[key] = False
+        self._services.update(list(zip(SERVICES, result[1:])))
 
     def _save(self):
         """Store a new service_set in the database."""
-        sql = ('INSERT INTO service_set (ssid, smtp, pop3, imap, %s) ' %
-               (self._sieve_col,) +
+        sql = ('INSERT INTO service_set (ssid, smtp, pop3, imap, sieve) '
                'VALUES (%(ssid)s, %(smtp)s, %(pop3)s, %(imap)s, %(sieve)s)')
         self._set_ssid()
         values = {'ssid': self._ssid}
@@ -162,5 +148,3 @@ class ServiceSet(object):
         """A dictionary: Keys: `smtp`, `pop3`, `imap` and `sieve` with
         boolean values."""
         return self._services.copy()
-
-del cfg_dget

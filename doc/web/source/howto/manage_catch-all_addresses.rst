@@ -61,7 +61,7 @@ Example:
  root@host:~# vmm catchallinfo example.com
  Catch-all information
  ---------------------
-   Mail to unknown localparts in domain example.com will be sent to:
+   Mail to unknown local-parts in domain example.com will be sent to:
           * user@example.org
 
 .. versionadded:: 0.6.0

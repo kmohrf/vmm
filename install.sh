@@ -52,19 +52,6 @@ install -m 0644 ${INSTALL_OPTS} man1/vmm.1 ${MANDIR}/man1
 
 [ -d ${MANDIR}/man5 ] || mkdir -m 0755 -p ${MANDIR}/man5
 install -m 0644 ${INSTALL_OPTS} man5/vmm.cfg.5 ${MANDIR}/man5
-
-for l in $(find . -maxdepth 1 -mindepth 1 -type d \! -name man\?)
-do
-    for s in man1 man5; do
-        [ -d ${MANDIR}/${l}/${s} ] || mkdir -m 0755 -p ${MANDIR}/${l}/${s}
-    done
-    if [ -f ${l}/man1/vmm.1 ]; then
-        install -m 0644 ${INSTALL_OPTS} ${l}/man1/vmm.1 ${MANDIR}/${l}/man1
-    fi
-    if [ -f ${l}/man5/vmm.cfg.5 ]; then
-        install -m 0644 ${INSTALL_OPTS} ${l}/man5/vmm.cfg.5 ${MANDIR}/${l}/man5
-    fi
-done
 cd - >/dev/null
 
 [ -d ${DOC_DIR} ] || mkdir -m 0755 -p ${DOC_DIR}

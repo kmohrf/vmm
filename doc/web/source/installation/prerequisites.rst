@@ -1,9 +1,9 @@
 ==========================
 Installation Prerequisites
 ==========================
-You already should have installed and configured Postfix and Dovecot with
-PostgreSQL support. You also need access to a local or remote PostgreSQL
-server.
+You already should have installed and configured Postfix and Dovecot
+≥ 1.2.0 with PostgreSQL support. You also need access to a local or remote
+PostgreSQL server.
 
 Check for pgsql support in Dovecot and Postfix
 ----------------------------------------------
@@ -20,22 +20,7 @@ shown below:
   root@host:~# dovecot --build-options | grep postgresql
   SQL drivers: mysql postgresql sqlite
 
-vmm depends on Python (≥ 2.4.0) and Psycopg_ (≥ 2.0) or pyPgSQL_ (≥ 2.5.1)
-[#]_. Psycopg and pyPgSQL are depending on parts of the *eGenix.com mx Base
-Distribution* (mxDateTime_ and mxTools_).
-
-If you are using Python ≤ 2.5.0:
-
- ‣ if you want to store your users' passwords as ``PLAIN-MD4`` digest in
-   the database, vmm will try to use ``Crypto.Hash.MD4`` from PyCrypto_
- ‣ if you are using Dovecot ≥ v1.1.0 and you want to store your users'
-   passwords as ``SHA256`` or ``SSHA256`` hashes, vmm will try to use
-   ``Crypto.Hash.SHA256`` from PyCrypto. For ``SHA256``/``SSHA256`` you
-   should have installed PyCrypto, at least in version 2.1.0alpha1.
-
- When the Crypto.Hash module couldn't be imported, vmm will use
- dovecotpw/doveadm, if  the *misc.password_scheme* setting in your
- :file:`vmm.cfg` is set to ``PLAIN-MD4``, ``SHA256`` or ``SSHA256``.
+vmm depends on Python (≥ 3.2) and Psycopg_ (≥ 2.0).
 
 If your Dovecot and/or Postfix installation shouldn't support PostgreSQL you
 could possibly fix this by installing the missing package (see below) or by
@@ -43,29 +28,19 @@ recompiling the corresponding part.
 
 Package names by OS/Distribution
 --------------------------------
-Debian GNU/Linux (Squeeze/Wheezy)
+Debian GNU/Linux (Wheezy)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
  ‣ `postfix <http://packages.debian.org/postfix>`_ and
    `postfix-pgsql <http://packages.debian.org/postfix-pgsql>`_
- ‣ Squeeze:
-
-   * `dovecot-common <http://packages.debian.org/dovecot-common>`_
-
- ‣ Wheezy (and Squeeze backports):
-
-   * `dovecot-core <http://packages.debian.org/dovecot-core>`_ and
-     `dovecot-lmtpd <http://packages.debian.org/dovecot-lmtpd>`_
-
+ ‣ `dovecot-core <http://packages.debian.org/dovecot-core>`_ and
+   `dovecot-lmtpd <http://packages.debian.org/dovecot-lmtpd>`_
  ‣ `dovecot-imapd <http://packages.debian.org/dovecot-imapd>`_ and/or
    `dovecot-pop3d <http://packages.debian.org/dovecot-pop3d>`_
  ‣ `postgresql-client <http://packages.debian.org/postgresql-client>`_
    (or `postgresql <http://packages.debian.org/postgresql>`_ , if you do not
    have a dedicated PostgreSQL server.)
- ‣ `python <http://packages.debian.org/python>`_,
-   `python-egenix-mxdatetime \
-   <http://packages.debian.org/python-egenix-mxdatetime>`_
-   and `python-psycopg2 <http://packages.debian.org/python-psycopg2>`_
-   optionally `python-crypto <http://packages.debian.org/python-crypto>`_
+ ‣ `python3 <http://packages.debian.org/python3>`_ and
+   `python3-psycopg2 <http://packages.debian.org/python3-psycopg2>`_
  ‣ `gettext <http://packages.debian.org/gettext>`_
 
 FreeBSD
@@ -92,13 +67,16 @@ Applied use-Flags (/etc/portage/package.use)::
  net-mail/dovecot postgres -pam pop3d sieve
  dev-db/postgresql-server -perl
 
-OpenBSD (5.x)
+OpenBSD (5.2)
 ^^^^^^^^^^^^^
 Packages
  ‣ postfix-2.x.y-pgsql
  ‣ dovecot-2.x.y and dovecot-postgresql-2.x.y
  ‣ postgresql-client
- ‣ python-2.7.x, py-psycopg2 and optionally py-crypto
+ ‣ python-3.2.x
+
+Build from source
+ ‣ Psycopg_
 
 Or build the above mentioned software from ports.
 
@@ -108,9 +86,5 @@ openSUSE Linux
  ‣ postgresql-server and postgresql
  ‣ dovecot
  ‣ python and pyPgSQL optionally python-crypto
-
-
-.. rubric:: Footnotes
-.. [#] Beginning with version 0.7.0 of vmm support for pyPgSQL will be dropped.
 
 .. include:: ../ext_references.rst

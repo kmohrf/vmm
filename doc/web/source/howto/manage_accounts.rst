@@ -3,9 +3,19 @@ Managing accounts
 =================
 useradd
 -------
+.. program:: vmm useradd
+
 Syntax:
- | **vmm useradd** *address* [*password*]
- | **vmm ua** *address* [*password*]
+ | **vmm useradd** *address* [**-n** *note*] [**-p** *password*]
+ | **vmm ua** *address* [**-n** *note*] [**-p** *password*]
+
+.. option:: -n note
+
+ the note that should be set
+
+.. option:: -p password
+
+ the new user's password
 
 Use this subcommand to create a new e-mail account for the given *address*.
 
@@ -19,7 +29,7 @@ Example:
 
 .. code-block:: console
 
- root@host:~# vmm ua d.user@example.com "A 5ecR3t P4s5\/\/0rd"
+ root@host:~# vmm ua d.user@example.com -p "A 5ecR3t P4s5\/\/0rd"
  root@host:~# vmm useradd e.user@example.com
  Enter new password:
  Retype new password:
@@ -27,20 +37,20 @@ Example:
 userdelete
 ----------
 Syntax:
- | **vmm userdelete** *address* [*force*]
- | **vmm ud** *address* [*force*]
+ | **vmm userdelete** *address* [**‒‒force**]
+ | **vmm ud** *address* [**‒‒force**]
 
 Use this subcommand to delete the account with the given *address*.
 
 If there are one or more aliases with an identical destination address,
 :command:`vmm` will abort the requested operation and show an error message.
-To prevent this, specify the optional keyword **force**.
+To prevent this, give the optional argument **‒‒force**.
 
 userinfo
 --------
 Syntax:
- | **vmm userinfo** *address* [*details*]
- | **vmm ui** *address* [*details*]
+ | **vmm userinfo** *address* [**-d** *details*]
+ | **vmm ui** *address* [**-d** *details*]
 
 This subcommand displays some information about the account specified by
 *address*.
@@ -83,43 +93,64 @@ Example:
 
 username
 --------
+.. program:: vmm username
+
 Syntax:
- | **vmm username** *address* [*name*]
- | **vmm un** *address* [*name*]
+ | **vmm username** *address* **-d** | **-n** *name*
+ | **vmm un** *address* **-d** | **-n** *name*
+
+.. option:: -d
+
+ delete the user's name
+
+.. option:: -n name
+
+ a user's real name
 
 The user's real *name* can be set/updated with this subcommand.
 
-If no *name* is given, the value stored for the account is erased.
+In order to delete the value stored for the account, pass the :option:`-d`
+option.
 
 Example:
 
 .. code-block:: console
 
- root@host:~# vmm un d.user@example.com "John Doe"
+ root@host:~# vmm un d.user@example.com -n "John Doe"
 
 usernote
 --------
+.. program:: vmm usernote
+
 Syntax:
- | **vmm usernote** *address* [*note*]
- | **vmm uo** *address* [*note*]
+ | **vmm usernote** *address* **-d** | **-n** *note*
+ | **vmm uo** *address* **-d** | **-n** *note*
+
+.. option:: -d
+
+ delete the user's note
+
+.. option:: -n note
+
+ the note that should be set
 
 With this subcommand, it is possible to attach a note to the specified
 account.
-Without an argument, an existing note is removed.
+In order to delete an existing note, pass the :option:`-d` option.
 
 Example:
 
 .. code-block:: console
 
- root@host:~# vmm uo d.user@example.com Only needed until end of May 2012
+ root@host:~# vmm uo d.user@example.com -n 'Only needed until end of May 2013'
 
 .. versionadded:: 0.6.0
 
 userpassword
 ------------
 Syntax:
- | **vmm userpassword** *address* [*password*]
- | **vmm up** *address* [*password*]
+ | **vmm userpassword** *address* [**-p** *password*]
+ | **vmm up** *address* [**-p** *password*]
 
 The password of an account can be updated with this subcommand.
 
@@ -129,21 +160,21 @@ Example:
 
 .. code-block:: console
 
- root@host:~# vmm up d.user@example.com "A |\/|0r3 5ecur3 P4s5\/\/0rd?"
+ root@host:~# vmm up d.user@example.com -p "A |\/|0r3 5ecur3 P4s5\/\/0rd?"
 
 userquota
 ---------
 Syntax:
- | **vmm userquota** *address storage* [*messages*]
- | **vmm uq** *address storage* [*messages*]
+ | **vmm userquota** *address storage* [**-m** *messages*]
+ | **vmm uq** *address storage* [**-m** *messages*]
 
 This subcommand is used to set a new quota limit for the given account.
 
 When the argument *messages* was omitted the default number of messages
 **0** (zero) will be applied.
 
-Instead of *storage* pass **domain** to remove the account-specific
-override, causing the domain's value to be in effect.
+Instead of a *storage* limit pass the keyword **domain** to remove the
+account-specific override, causing the domain's value to be in effect.
 
 Example:
 
@@ -156,22 +187,22 @@ Example:
 userservices
 ------------
 Syntax:
- | **vmm userservices** *address* [*service ...*]
- | **vmm us** *address* [*service ...*]
+ | **vmm userservices** *address* [**-s** *service ...*]
+ | **vmm us** *address* [**-s** *service ...*]
 
 To grant a user access to the specified services, use this command.
 
 All omitted services will be deactivated/unusable for the user with the
 given *address*.
 
-Instead of *service* pass **domain** to remove the account-specific override,
-causing the domain's value to be in effect.
+Instead of any *service* pass the keyword **domain** to remove the
+account-specific override, causing the domain's value to be in effect.
 
 Example:
 
 .. code-block:: console
 
- root@host:~# userservices d.user@example.com SMTP IMAP
+ root@host:~# userservices d.user@example.com -s smtp imap
 
 .. _usertransport:
 
