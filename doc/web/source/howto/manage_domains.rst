@@ -5,9 +5,19 @@ Managing domains
 
 domainadd
 ---------
+.. program:: vmm domainadd
+
 Syntax:
- | **vmm domainadd** *fqdn* [*transport*]
- | **vmm da** *fqdn* [*transport*]
+ | **vmm domainadd** *fqdn* [**-n** *note*] [**-t** *transport*]
+ | **vmm da** *fqdn* [**-n** *note*] [**-t** *transport*]
+
+.. option:: -n note
+
+ the note that should be set
+
+.. option:: -t transport
+
+ a Postfix transport (transport: or transport:nexthop)
  
 Adds the new domain into the database and creates the domain directory.
 
@@ -32,7 +42,7 @@ Example:
 
 .. code-block:: console
 
- root@host:~# vmm domainadd support.example.com smtp:[mx1.example.com]:2025
+ root@host:~# vmm domainadd support.example.com -t smtp:[mx1.example.com]:2025
  Creating account for postmaster@support.example.com
  Enter new password: 
  Retype new password: 
@@ -44,16 +54,16 @@ Example:
 domaindelete
 ------------
 Syntax:
- | **vmm domaindelete** *fqdn* [**force**]
- | **vmm dd** *fqdn* [**force**]
+ | **vmm domaindelete** *fqdn* [**‒‒force**]
+ | **vmm dd** *fqdn* [**‒‒force**]
 
 This subcommand deletes the domain specified by *fqdn*.
 
 If there are accounts, aliases and/or relocated users assigned to the given
 domain, :command:`vmm` will abort the requested operation and show an error
 message.
-If you know, what you are doing, you can specify the optional keyword
-**force**.
+If you know, what you are doing, you can specify the optional argument
+**‒‒force**.
 
 If you really always know what you are doing, edit your :file:`vmm.cfg` and
 set the option *domain.force_deletion* to **true**.
@@ -61,8 +71,8 @@ set the option *domain.force_deletion* to **true**.
 domaininfo
 ----------
 Syntax:
- | **vmm domaininfo** *fqdn* [*details*]
- | **vmm di** *fqdn* [*details*]
+ | **vmm domaininfo** *fqdn* [**-d** *details*]
+ | **vmm di** *fqdn* [**-d** *details*]
 
 This subcommand shows some information about the given domain.
 
@@ -102,27 +112,37 @@ Example:
 
 domainnote
 ----------
+.. program:: vmm domainnote
+
 Syntax:
- | **vmm domainnote** *fqdn* [*note*]
- | **vmm do** *fqdn* [*note*]
+ | **vmm domainnote** *fqdn* **-d** | **-n** *note*
+ | **vmm do** *fqdn* **-d** | **-n** *note*
+
+.. option:: -d
+
+ delete the domain's note
+
+.. option:: -n note
+
+ the note that should be set
 
 With this subcommand, it is possible to attach a note to the specified
 domain.
-Without an argument, an existing note is removed.
+In order to delete an existing note, pass the :option:`-d` option.
 
 Example:
 
 .. code-block:: console
 
- root@host:~# vmm do example.com Belongs to Robert
+ root@host:~# vmm do example.com -n 'Belongs to Robert'
 
 .. versionadded:: 0.6.0
 
 domainquota
 -----------
 Syntax:
- | **vmm domainquota** *fqdn storage* [*messages*] [**force**]
- | **vmm dq** *fqdn storage* [*messages*] [**force**]
+ | **vmm domainquota** *fqdn storage* [**-m** *messages*] [**‒‒force**]
+ | **vmm dq** *fqdn storage* [**-m** *messages*] [**‒‒force**]
 
 This subcommand is used to configure a new quota limit for the accounts
 of the domain - not for the domain itself.
@@ -132,8 +152,8 @@ The default quota limit for accounts is defined in the :file:`vmm.cfg`
 
 The new quota limit will affect only those accounts for which the limit has
 not been overridden.
-If you want to restore the default to all accounts, you may pass the keyword
-**force**.
+If you want to restore the default to all accounts, you may pass the optional
+argument **‒‒force**.
 When the argument *messages* was omitted the default number of messages
 **0** (zero) will be applied.
 
@@ -141,15 +161,15 @@ Example:
 
 .. code-block:: console
 
- root@host:~# vmm domainquota example.com 1g force
+ root@host:~# vmm domainquota example.com 1g ‒‒force
 
 .. versionadded:: 0.6.0
 
 domainservices
 --------------
 Syntax:
- | **vmm domainservices** *fqdn* [*service ...*] [**force**]
- | **vmm ds** *fqdn* [*service ...*] [**force**]
+ | **vmm domainservices** *fqdn* [**-s** *service ...*] [**‒‒force**]
+ | **vmm ds** *fqdn* [**-s** *service ...*] [**‒‒force**]
 
 To define which services could be used by the users of the domain — with
 the given *fqdn* — use this subcommand.
@@ -160,7 +180,7 @@ Possible service names are: **imap**, **pop3**, **sieve** and **smtp**.
 The new service set will affect only those accounts for which the set has
 not been overridden.
 If you want to restore the default to all accounts, you may pass the
-keyword **force**.
+option **‒‒force**.
 
 .. versionadded:: 0.6.0
 
@@ -169,15 +189,15 @@ keyword **force**.
 domaintransport
 ---------------
 Syntax:
- | **vmm domaintransport** *fqdn transport* [**force**]
- | **vmm dt** *fqdn transport* [**force**]
+ | **vmm domaintransport** *fqdn transport* [**‒‒force**]
+ | **vmm dt** *fqdn transport* [**‒‒force**]
 
 A new transport for the indicated domain can be set with this subcommand.
 
 The new transport will affect only those accounts for which the transport
 has not been overridden.
 If you want to restore the default to all accounts, you may pass the
-keyword **force**.
+option **‒‒force**.
 
 Example:
 

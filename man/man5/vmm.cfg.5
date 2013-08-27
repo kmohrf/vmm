@@ -1,4 +1,4 @@
-.TH "VMM.CFG" "5" "2012-08-12" "vmm 0.6" "vmm"
+.TH "VMM.CFG" "5" "2013-02-10" "vmm 0.7" "vmm"
 .SH NAME
 vmm.cfg \- configuration file for vmm
 .\" -----------------------------------------------------------------------
@@ -231,14 +231,6 @@ database.
 .PP
 Hostname or IP address of the database server.
 .\" ------------------------------------
-.SS database.module
-.BR module " (default: psycopg2) :"
-.I String
-.PP
-The Python PostgreSQL database adapter module to be used.
-Supported modules are
-.BR psycopg2 " and " pyPgSQL .
-.\" ------------------------------------
 .SS database.name
 .BR name " (default: mailsys) :"
 .I String
@@ -269,11 +261,6 @@ Possible values are:
 The modes
 .BR verify\-ca " and " verify\-full
 are available since PostgreSQL 8.4
-.PP
-This setting will be ignored when the
-.I database.module
-is set to
-.BR pyPgSQL .
 .\" ------------------------------------
 .SS database.user
 .BR user " (default: " None ") :"

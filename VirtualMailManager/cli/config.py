@@ -8,8 +8,9 @@
     Adds some interactive stuff to the Config class.
 """
 
-from ConfigParser import RawConfigParser
+from configparser import RawConfigParser
 from shutil import copy2
+from string import Template
 
 from VirtualMailManager import ENCODING
 from VirtualMailManager.config import Config, ConfigValueError, LazyConfig
@@ -29,33 +30,35 @@ class CliConfig(Config):
     def configure(self, sections):
         """Interactive method for configuring all options of the given
         iterable ``sections`` object."""
-        input_fmt = _(u'Enter new value for option %(option)s '
-                      u'[%(current_value)s]: ')
+        input_tpl = Template(_('Enter new value for option $option '
+                               '[$current_value]: '))
         failures = 0
 
-        w_std(_(u'Using configuration file: %s\n') % self._cfg_filename)
+        w_std(_('Using configuration file: %s\n') % self._cfg_filename)
         for section in sections:
-            w_std(_(u"* Configuration section: '%s'") % section)
+            w_std(_("* Configuration section: '%s'") % section)
             for opt, val in self.items(section):
                 failures = 0
                 while True:
-                    newval = raw_input(input_fmt.encode(ENCODING, 'replace') %
-                                       {'option': opt, 'current_value': val})
+                    if isinstance(val, str):
+                        val = val.encode(ENCODING, 'replace').decode(ENCODING)
+                    newval = input(input_tpl.substitute(option=opt,
+                                                        current_value=val))
                     if newval and newval != val:
                         try:
                             LazyConfig.set(self, '%s.%s' % (section, opt),
                                            newval)
                             break
-                        except (ValueError, ConfigValueError, VMMError), err:
-                            w_err(0, _(u'Warning: %s') % err)
+                        except (ValueError, ConfigValueError, VMMError) as err:
+                            w_err(0, _('Warning: %s') % err)
                             failures += 1
                             if failures > 2:
-                                raise ConfigError(_(u'Too many failures - try '
-                                                    u'again later.'),
+                                raise ConfigError(_('Too many failures - try '
+                                                    'again later.'),
                                                   VMM_TOO_MANY_FAILURES)
                     else:
                         break
-            print
+            print()
         if self._modified:
             self._save_changes()
 
@@ -72,7 +75,7 @@ class CliConfig(Config):
             val = self._cfg[section][option_].cls(value)
             if self._cfg[section][option_].validate:
                 val = self._cfg[section][option_].validate(val)
-        except (ValueError, ConfigValueError), err:
+        except (ValueError, ConfigValueError) as err:
             raise ConfigError(str(err), CONF_ERROR)
         # Do not write default values also skip identical values
         if not self._cfg[section][option_].default is None:
@@ -89,8 +92,7 @@ class CliConfig(Config):
     def _save_changes(self):
         """Writes changes to the configuration file."""
         copy2(self._cfg_filename, self._cfg_filename + '.bak')
-        self._cfg_file = open(self._cfg_filename, 'w')
-        self.write(self._cfg_file)
-        self._cfg_file.close()
+        with open(self._cfg_filename, 'w', encoding='utf-8') as self._cfg_file:
+            self.write(self._cfg_file)
 
 del _

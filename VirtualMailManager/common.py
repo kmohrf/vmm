@@ -36,9 +36,9 @@ def expand_path(path):
 
 def get_unicode(string):
     """Converts `string` to `unicode`, if necessary."""
-    if isinstance(string, unicode):
+    if isinstance(string, str):
         return string
-    return unicode(string, ENCODING, 'replace')
+    return str(string, ENCODING, 'replace')
 
 
 def lisdir(path):
@@ -60,44 +60,44 @@ def exec_ok(binary):
     """
     binary = expand_path(binary)
     if not os.path.isfile(binary):
-        raise VMMError(_(u"No such file: '%s'") % get_unicode(binary),
+        raise VMMError(_("No such file: '%s'") % get_unicode(binary),
                        NO_SUCH_BINARY)
     if not os.access(binary, os.X_OK):
-        raise VMMError(_(u"File is not executable: '%s'") %
+        raise VMMError(_("File is not executable: '%s'") %
                        get_unicode(binary), NOT_EXECUTABLE)
     return binary
 
 
 def human_size(size):
     """Converts the `size` in bytes in human readable format."""
-    if not isinstance(size, (long, int)):
+    if not isinstance(size, int):
         try:
-            size = long(size)
+            size = int(size)
         except ValueError:
-            raise TypeError("'size' must be a positive long or int.")
+            raise TypeError("'size' must be a positive integer.")
     if size < 0:
-        raise ValueError("'size' must be a positive long or int.")
+        raise ValueError("'size' must be a positive integer.")
     if size < 1024:
         return str(size)
     # TP: abbreviations of gibibyte, tebibyte kibibyte and mebibyte
-    prefix_multiply = ((_(u'TiB'), 1 << 40), (_(u'GiB'), 1 << 30),
-                       (_(u'MiB'), 1 << 20), (_(u'KiB'), 1 << 10))
+    prefix_multiply = ((_('TiB'), 1 << 40), (_('GiB'), 1 << 30),
+                       (_('MiB'), 1 << 20), (_('KiB'), 1 << 10))
     for prefix, multiply in prefix_multiply:
         if size >= multiply:
             # TP: e.g.: '%(size)s %(prefix)s' -> '118.30 MiB'
-            return _(u'%(size)s %(prefix)s') % {
+            return _('%(size)s %(prefix)s') % {
                     'size': locale.format('%.2f', float(size) / multiply,
-                                          True).decode(ENCODING, 'replace'),
+                                          True),
                     'prefix': prefix}
 
 
 def size_in_bytes(size):
-    """Converts the string `size` to a long (size in bytes).
+    """Converts the string `size` to an integer (size in bytes).
 
     The string `size` can be suffixed with *b* (bytes), *k* (kilobytes),
     *M* (megabytes) or *G* (gigabytes).
     """
-    if not isinstance(size, basestring) or not size:
+    if not isinstance(size, str) or not size:
         raise TypeError('size must be a non empty string.')
     if size[-1].upper() in ('B', 'K', 'M', 'G'):
         try:
@@ -108,11 +108,11 @@ def size_in_bytes(size):
         if unit == 'B':
             return num
         elif unit == 'K':
-            return num << 10L
+            return num << 10
         elif unit == 'M':
-            return num << 20L
+            return num << 20
         else:
-            return num << 30L
+            return num << 30
     else:
         try:
             num = int(size)
@@ -136,8 +136,8 @@ def validate_transport(transport, maillocation):
     """
     if transport.transport in ('virtual', 'virtual:') and \
       not maillocation.postfix:
-        raise VMMError(_(u"Invalid transport '%(transport)s' for mailbox "
-                         u"format '%(mbfmt)s'.") %
+        raise VMMError(_("Invalid transport '%(transport)s' for mailbox "
+                         "format '%(mbfmt)s'.") %
                        {'transport': transport.transport,
                         'mbfmt': maillocation.mbformat}, INVALID_MAIL_LOCATION)
 
@@ -183,21 +183,22 @@ def version_hex(version_string):
 def version_str(version):
     """Converts a Dovecot version previously converted with version_hex back to
     a string.
-    Raises a `TypeError` if *version* is not an int/long.
+    Raises a `TypeError` if *version* is not an integer.
     Raises a `ValueError` if *version* is an incorrect int version.
     """
     global _version_cache
     if version in _version_cache:
         return _version_cache[version]
-    if not isinstance(version, (int, long)):
-        raise TypeError('Argument is not a int/long: %r', version)
+    if not isinstance(version, int):
+        raise TypeError('Argument is not a integer: %r', version)
     major = (version >> 28) & 0xFF
     minor = (version >> 20) & 0xFF
     patch = (version >> 12) & 0xFF
     level = (version >> 8) & 0x0F
     serial = version & 0xFF
 
-    levels = dict(zip(_version_level.values(), _version_level.keys()))
+    levels = dict(list(zip(list(_version_level.values()),
+                  list(_version_level.keys()))))
     if level == 0xF and not serial:
         version_string = '%u.%u.%u' % (major, minor, patch)
     elif level in levels and not patch:
@@ -214,7 +215,7 @@ def format_domain_default(domaindata):
     # TP: [domain default] indicates that a user's setting is the same as
     # configured in the user's domain.
     # e.g.: [  0.84%] 42/5,000 [domain default]
-    return _(u'%s [domain default]') % domaindata
+    return _('%s [domain default]') % domaindata
 
 
 def search_addresses(dbh, typelimit=None, lpattern=None, llike=False,

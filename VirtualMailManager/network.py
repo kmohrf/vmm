@@ -10,6 +10,8 @@
 
 import socket
 
+from binascii import b2a_hex
+
 
 class NetInfo(object):
     """Simple class for CIDR network addresses an IP addresses."""
@@ -81,7 +83,7 @@ def get_ip_addr_info(ip_address):
     `(address_family, address_as_long)` will be returned. The
     `address_family`will be either `socket.AF_INET` or `socket.AF_INET6`.
     """
-    if not isinstance(ip_address, basestring) or not ip_address:
+    if not isinstance(ip_address, str) or not ip_address:
         raise TypeError('ip_address must be a non empty string.')
     if not ip_address.count(':'):
         family = socket.AF_INET
@@ -97,4 +99,4 @@ def get_ip_addr_info(ip_address):
             address = socket.inet_pton(family, ip_address)
         except socket.error:
             raise ValueError('Not a valid IPv6 address: %r' % ip_address)
-    return (family, long(address.encode('hex'), 16))
+    return (family, int(b2a_hex(address), 16))
