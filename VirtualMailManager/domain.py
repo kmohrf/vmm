@@ -25,7 +25,7 @@ from VirtualMailManager.transport import Transport
 
 
 MAILDIR_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz'
-RE_DOMAIN = re.compile(r"^(?:[a-z0-9-]{1,63}\.){1,}[a-z]{2,6}$")
+RE_DOMAIN = re.compile(r"^(?:[a-z0-9-]{1,63}\.){1,}[a-z0-9-]{2,}$")
 _ = lambda msg: msg
 cfg_dget = lambda option: None
 
