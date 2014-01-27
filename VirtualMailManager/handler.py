@@ -522,7 +522,8 @@ class Handler(object):
                            INVALID_ARGUMENT)
         dom = self._get_domain(domainname)
         dominfo = dom.get_info()
-        if dominfo['domain name'].startswith('xn--'):
+        if dominfo['domain name'].startswith('xn--') or \
+           dominfo['domain name'].count('.xn--'):
             dominfo['domain name'] += ' (%s)' % \
                                       dominfo['domain name'].decode('idna')
         if details is None:
