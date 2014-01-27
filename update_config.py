@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-# Copyright (c) 2008 - 2013, Pascal Volk
+# Copyright (c) 2008 - 2014, Pascal Volk
 # See COPYING for distribution information.
 
 import os

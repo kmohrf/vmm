@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (c) 2012 - 2013, Pascal Volk
+# Copyright (c) 2012 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
     VirtualMailManager.cli.vmmhelp

@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# Copyright (c) 2012 martin f. krafft
+# Copyright (c) 2012 - 2014, martin f. krafft
 # See COPYING for distribution information.
 """
     VirtualMailManager.catchall

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
-# Copyright 2012, Pascal Volk
+# Copyright 2012 - 2014, Pascal Volk
 # See COPYING for distribution information.
 
 """
