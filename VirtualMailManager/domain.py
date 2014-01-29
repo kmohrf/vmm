@@ -25,7 +25,9 @@ from VirtualMailManager.transport import Transport
 
 
 MAILDIR_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz'
-RE_DOMAIN = re.compile(r"^(?:[a-z0-9-]{1,63}\.){1,}[a-z0-9-]{2,}$")
+RE_DOMAIN = re.compile(r"""^(?:[a-z0-9-]{1,63}\.){1,}  # one or more labels
+                            (?:[a-z]{2,}               # a ASCII TLD
+                            |xn--[a-z0-9]{4,})$        # or a ACE TLD""", re.X)
 _ = lambda msg: msg
 cfg_dget = lambda option: None
 
