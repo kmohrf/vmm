@@ -1,3 +1,174 @@
+=== 0.6.2 ===
+2014-02-01  Pascal Volk  <user@localhost.localdomain.org>
+
+	* UPGRADE:
+	UPGRADE: Added a note about upgrading from 0.6.1.
+	[19184d1265e5] [tip]
+
+	* doc/web/source/conf.py, doc/web/source/download.rst,
+	doc/web/source/features.rst,
+	doc/web/source/installation/install_vmm.rst,
+	doc/web/source/installation/postgresql_configuration.rst,
+	doc/web/source/pgsql_set_permissionspermissions.rst,
+	doc/web/source/release_history.rst,
+	doc/web/source/substitutions.rst,
+	doc/web/source/upgrade/0.5-0.6.rst:
+	doc/web: Updated documentation for vmm-0.6.2.
+	[6c369b680ab0]
+
+	* update_config.py:
+	update_config: Updated to work with version 0.6.1.
+	[9149e0249c25]
+
+2014-01-29  Pascal Volk  <user@localhost.localdomain.org>
+
+	* VirtualMailManager/domain.py:
+	VMM/domain: RE_DOMAIN: Check Punycode TLDs more precise.
+	[ad15e89a93ec]
+
+2014-01-27  Pascal Volk  <user@localhost.localdomain.org>
+
+	* COPYING, VirtualMailManager/__init__.py,
+	VirtualMailManager/account.py, VirtualMailManager/alias.py,
+	VirtualMailManager/aliasdomain.py, VirtualMailManager/catchall.py,
+	VirtualMailManager/cli/__init__.py,
+	VirtualMailManager/cli/clihelp.py, VirtualMailManager/cli/config.py,
+	VirtualMailManager/cli/handler.py, VirtualMailManager/cli/main.py,
+	VirtualMailManager/cli/subcommands.py, VirtualMailManager/common.py,
+	VirtualMailManager/config.py, VirtualMailManager/constants.py,
+	VirtualMailManager/domain.py, VirtualMailManager/emailaddress.py,
+	VirtualMailManager/errors.py, VirtualMailManager/ext/__init__.py,
+	VirtualMailManager/ext/postconf.py, VirtualMailManager/handler.py,
+	VirtualMailManager/mailbox.py, VirtualMailManager/maillocation.py,
+	VirtualMailManager/network.py, VirtualMailManager/password.py,
+	VirtualMailManager/pycompat/__init__.py,
+	VirtualMailManager/pycompat/hashlib.py,
+	VirtualMailManager/quotalimit.py, VirtualMailManager/relocated.py,
+	VirtualMailManager/serviceset.py, VirtualMailManager/transport.py,
+	pgsql/set-permissions.py, setup.py, update_config.py, vmm:
+	Updated copyright notices to include the year 2014.
+	[58815c004a61]
+
+	* VirtualMailManager/handler.py:
+	VMM/handler: Improved domaininfo subcommand.
+
+	Check all labels for ASCII-compatible encoding, not only the first
+	one. If something is in ACE format, convert it to IDNA.
+	[01db2457bbed]
+
+2014-01-26  Pascal Volk  <user@localhost.localdomain.org>
+
+	* README, VirtualMailManager/domain.py:
+	VMM/domain: Accept also ccTLDs and 'new' gTLDs.
+	[110491a871a7]
+
+2013-08-27  Pascal Volk  <user@localhost.localdomain.org>
+
+	* doc/web/source/_templates/layout.html:
+	doc/web: Removed layout.html template.
+	[4c8e15c2f01b]
+
+2013-06-08  Pascal Volk  <user@localhost.localdomain.org>
+
+	* doc/web/source/ext_references.rst,
+	doc/web/source/howto/manage_domains.rst,
+	doc/web/source/installation/dovecot_configuration.rst,
+	doc/web/source/installation/postfix_configuration.rst:
+	doc/web: Added a note about using Dovecot's LMTP with Postfix. This
+	solves issue #1.
+	[61aaa7a98ec0]
+
+2013-01-05  Pascal Volk  <user@localhost.localdomain.org>
+
+	* COPYING, VirtualMailManager/__init__.py,
+	VirtualMailManager/account.py, VirtualMailManager/alias.py,
+	VirtualMailManager/aliasdomain.py,
+	VirtualMailManager/cli/__init__.py,
+	VirtualMailManager/cli/clihelp.py, VirtualMailManager/cli/config.py,
+	VirtualMailManager/cli/handler.py, VirtualMailManager/cli/main.py,
+	VirtualMailManager/cli/subcommands.py, VirtualMailManager/common.py,
+	VirtualMailManager/config.py, VirtualMailManager/constants.py,
+	VirtualMailManager/domain.py, VirtualMailManager/emailaddress.py,
+	VirtualMailManager/errors.py, VirtualMailManager/ext/__init__.py,
+	VirtualMailManager/ext/postconf.py, VirtualMailManager/handler.py,
+	VirtualMailManager/mailbox.py, VirtualMailManager/maillocation.py,
+	VirtualMailManager/network.py, VirtualMailManager/password.py,
+	VirtualMailManager/pycompat/__init__.py,
+	VirtualMailManager/pycompat/hashlib.py,
+	VirtualMailManager/quotalimit.py, VirtualMailManager/relocated.py,
+	VirtualMailManager/serviceset.py, VirtualMailManager/transport.py,
+	setup.py, update_config.py, vmm:
+	Updated copyright notices to include the year 2013.
+	[d24f094d1cb5]
+
+2012-12-09  Pascal Volk  <user@localhost.localdomain.org>
+
+	* VirtualMailManager/account.py:
+	VMM/account: Fixed a typo in Account.delete().
+
+	Due to a wrong placed comma `userdelete … force' ended in a
+	TypeError.
+	[29295afafa91]
+
+2012-11-21  Pascal Volk  <user@localhost.localdomain.org>
+
+	* po/fi.po:
+	po: Updated Finnish translation (translated by Jorma Karvonen).
+	[86c2ed36aba8]
+
+2012-11-03  Pascal Volk  <user@localhost.localdomain.org>
+
+	* doc/web/source/installation/prerequisites.rst:
+	doc/web: Updated OpenBSD's package names.
+	[54172669bbae]
+
+2012-10-31  Pascal Volk  <user@localhost.localdomain.org>
+
+	* doc/web/source/installation/postfix_configuration.rst:
+	doc/web: Fixed a typo.
+	[6f1aba75b693]
+
+2012-10-30  Pascal Volk  <user@localhost.localdomain.org>
+
+	* VirtualMailManager/password.py:
+	VMM/password: Added scheme SCRAM-SHA-1.
+	[8ea32fbfc9df]
+
+2012-10-28  Pascal Volk  <user@localhost.localdomain.org>
+
+	* Configure.Dovecot_2, doc/web/source/_static/local.conf,
+	doc/web/source/installation/dovecot_configuration.rst:
+	Documentation: Fixed dictionary quota URI.
+	[152ea3e3e955]
+
+	* install.sh:
+	install.sh: Don't fail if $SYSCONFDIR doesn't exist.
+	[9b4d0e2c97d5]
+
+2012-10-24  Pascal Volk  <user@localhost.localdomain.org>
+
+	* doc/web/source/ext_references.rst:
+	doc/web/ext_references: Fixed URL of pg_hba.conf.
+	[c4c687668b6d]
+
+2012-10-19  Pascal Volk  <user@localhost.localdomain.org>
+
+	* README, doc/web/source/download.rst:
+	doc/web: Added links to the Debian package and the git repos.
+
+	README: Added git-URL.
+	[8009e87c7a20]
+
+2012-10-03  Pascal Volk  <user@localhost.localdomain.org>
+
+	* .hgtags:
+	Added tag vmm-0.6.1 for changeset 682431c45b24
+	[6463832d690e]
+
+	* ChangeLog, NEWS, VirtualMailManager/constants.py, setup.py:
+	Released vmm-0.6.1
+	[682431c45b24] [vmm-0.6.1]
+
 === 0.6.1 ===
 2012-10-03  Pascal Volk  <user@localhost.localdomain.org>
 

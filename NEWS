@@ -1,3 +1,11 @@
+v0.6.2  2014-02-01  Pascal Volk  <user+vmm@localhost.localdomain.org>
+
+	* Added support for ccTLDs and 'new' gTLDs
+	* Added support for SCRAM-SHA-1 password hashes (Dovecot ≧ v2.2.0)
+	* Updated translations: Finnish
+	- Fixed a TypeError in `userdelete … force`
+	- Fixed an error in the install.sh script
+
 v0.6.1	2012-10-03  Pascal Volk <user+vmm@localhost.localdomain.org>
 
 	* Added help messages for `vmm help <subcommand>`
