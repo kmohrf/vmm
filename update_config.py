@@ -54,7 +54,7 @@ def get_config_file():
 def update(cp):
     if VERSION == '0.5.2':
         upd_052(cp)
-    elif VERSION == '0.6.0':
+    elif VERSION in ('0.6.0', '0.6.1'):
         os.sys.stdout.write('info: vmm.cfg: nothing to do for version %s\n' %
                             VERSION)
         return
