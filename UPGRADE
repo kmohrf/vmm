@@ -99,5 +99,10 @@ If you have installed vmm 0.6.0 you have to proceed this steps:
 
     * execute upgrade.sh
 
+
+If you have installed vmm 0.6.1 you simply have to:
+
+    * execute upgrade.sh
+
 else
      * read INSTALL
