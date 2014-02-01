@@ -50,14 +50,14 @@ Dovecot v1.2.x/v2.0.x/v2.1.x
 """"""""""""""""""""""""""""
 .. code-block:: postgresql-console
 
- mailsys=> \i /path/to/vmm-0.6.1/pgsql/update_tables_0.5.x-0.6-dovecot-1.2.x.pgsql
+ mailsys=> \i /path/to/vmm-0.6.2/pgsql/update_tables_0.5.x-0.6-dovecot-1.2.x.pgsql
  mailsys=> \q
 
 Dovecot v1.0.x/v1.1.x
 """""""""""""""""""""
 .. code-block:: postgresql-console
 
- mailsys=> \i /path/to/vmm-0.6.1/pgsql/update_tables_0.5.x-0.6.pgsql
+ mailsys=> \i /path/to/vmm-0.6.2/pgsql/update_tables_0.5.x-0.6.pgsql
  mailsys=> \q
 
 .. _set-database-permissions:
@@ -74,7 +74,7 @@ Start Dovecot and Postfix again
    So you have to adjust all your ``postfix/pgsql-*.cf`` files and also your
    ``/etc/dovecot/dovecot-sql.conf`` or ``/etc/dovecot/dovecot-sql.conf.ext``.
 
-   See the `vmm-0.6.1/postfix/pgsql-*.cf` files and
+   See the `vmm-0.6.2/postfix/pgsql-*.cf` files and
    :ref:`Dovecot configuration <dovecot-sql-conf-ext>`/`dovecot-sql.conf.ext`
    or :ref:`Dovecot configuration <dovecot-sql-conf>`/`dovecot-sql-conf`.
 
@@ -94,8 +94,8 @@ This will install the new code and also update your :file:`vmm.cfg`.
 
 .. code-block:: console
 
- root@host:~# cd /path/to/vmm-0.6.1
- root@host:/path/to/vmm-0.6.1# ./upgrade.sh
+ root@host:~# cd /path/to/vmm-0.6.2
+ root@host:/path/to/vmm-0.6.2# ./upgrade.sh
  Please have a look at your configuration: /usr/local/etc/vmm.cfg
  This are your Modified/Renamed/New settings:
  R   account.delete_directory = false
@@ -177,6 +177,11 @@ To replace the function execute the following SQL statement:
 Upgrade vmm
 ^^^^^^^^^^^
 Execute the :file:`upgrade.sh`, in order to install the updated code.
+
+Upgrading from vmm-0.6.1
+------------------------
+If you have already installed vmm-6.0.1, simply execute the
+:file:`upgrade.sh` script.
 
 Upgrade to Dovecot ≧ v1.2.beta2
 -------------------------------

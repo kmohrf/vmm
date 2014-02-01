@@ -10,31 +10,32 @@ Current version
 Download a gzip compressed archive
 ----------------------------------
 vmm could be downloaded from the `download page`_ at `SourceForge`_. To
-extract the downloaded archive use ``tar xzf vmm-0.6.1.tar.gz``. This will
-create the new directory :file:`vmm-0.6.1` in the current working directory.
+extract the downloaded archive use ``tar xzf vmm-0.6.2.tar.gz``. This will
+create the new directory :file:`vmm-0.6.2` in the current working directory.
 
 Verify the downloaded archive
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 If you have downloaded the archive from the download site you can
 optionally verify the integrity_ of this archive.
 In order to verify the integrity of the archive you have to download the
-corresponding signature file (:file:`vmm-0.6.1.tar.gz.sig`) too.
+corresponding signature file (:file:`vmm-0.6.2.tar.gz.sig`) too.
 The signature can be verified using GPG_ or PGP_.
-For example to check the signature of the archive :file:`vmm-0.6.1.tar.gz`
-you can execute this command ``gpg --verify vmm-0.6.1.tar.gz.sig``.
+For example to check the signature of the archive :file:`vmm-0.6.2.tar.gz`
+you can execute this command ``gpg --verify vmm-0.6.2.tar.gz.sig``.
 
-The tarball was signed by Pascal Volk (ID: CEC0904E).
+The tarball was signed by Pascal Volk (ID 0xC51139FE).
+Older releases (≦ 0.6.1) were signed with key ID 0xCEC0904E).
 You can fetch the public key from a key server using the command
-``gpg --recv-keys 0xCEC0904E``.
+``gpg --recv-keys 0xC51139FE``.
 
 Get vmm from the Mercurial repository
 -------------------------------------
 To get a tagged clone of the current vmm release from the Mercurial_
 repository use:
-``hg clone http://hg.localdomain.org/vmm/ -r vmm-0.6.1 vmm-0.6.1``.
-This will put the files into the new created directory :file:`vmm-0.6.1`.
+``hg clone http://hg.localdomain.org/vmm/ -r vmm-0.6.2 vmm-0.6.2``.
+This will put the files into the new created directory :file:`vmm-0.6.2`.
 
-When you omit the ``-r vmm-0.6.1`` option, you will get the latest changes
+When you omit the ``-r vmm-0.6.2`` option, you will get the latest changes
 from the `vmm repository`_. This code may work for you or not.
 
 Get vmm from the Git repository
