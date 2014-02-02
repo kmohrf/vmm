@@ -17,7 +17,6 @@
 .. _Postfix: http://www.postfix.org/
 .. _PostgreSQL: http://www.postgresql.org/
 .. _Psycopg: http://initd.org/psycopg/
-.. _PyCrypto: http://www.pycrypto.org/
 .. _Python: http://www.python.org/
 .. _SourceForge: http://sourceforge.net/
 .. _UID: http://en.wikipedia.org/wiki/User_identifier_%28Unix%29
@@ -27,15 +26,12 @@
 .. _freenode: http://freenode.net/
 .. _integrity: http://en.wikipedia.org/wiki/Data_integrity
 .. _issue tracker: https://bitbucket.org/pvo/vmm/issues
-.. _mxDateTime: http://www.egenix.com/products/python/mxBase/mxDateTime/
-.. _mxTools: http://www.egenix.com/products/python/mxBase/mxTools/
 .. _passdb: http://wiki.dovecot.org/PasswordDatabase
 .. _pg_dump: http://www.postgresql.org/docs/current/static/app-pgdump.html
 .. _pg_hba.conf: \
  http://www.postgresql.org/docs/current/static/auth-pg-hba-conf.html
 .. _pgsql_table(5): http://www.postfix.org/pgsql_table.5.html
 .. _pipe(8): http://www.postfix.org/pipe.8.html
-.. _pyPgSQL: http://pypgsql.sourceforge.net/
 .. _relocated: http://www.postfix.org/relocated.5.html
 .. _setuid: http://en.wikipedia.org/wiki/Setuid
 .. _transport: http://www.postfix.org/transport.5.html

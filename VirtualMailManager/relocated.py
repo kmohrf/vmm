@@ -36,13 +36,13 @@ class Relocated(object):
         self._dbh = dbh
         self._gid = get_gid(self._dbh, self._addr.domainname)
         if not self._gid:
-            raise RErr(_(u"The domain '%s' does not exist.") %
+            raise RErr(_("The domain '%s' does not exist.") %
                        self._addr.domainname, NO_SUCH_DOMAIN)
         self._dest = None
 
         self._load()
 
-    def __nonzero__(self):
+    def __bool__(self):
         """Returns `True` if the Relocated is known, `False` if it's new."""
         return self._dest is not None
 
@@ -59,8 +59,8 @@ class Relocated(object):
         if destination:
             destination = DestinationEmailAddress(destination[0], self._dbh)
             if destination.at_localhost:
-                raise RErr(_(u"The destination address' domain name must not "
-                             u"be localhost."), DOMAIN_INVALID)
+                raise RErr(_("The destination address' domain name must not "
+                             "be localhost."), DOMAIN_INVALID)
             self._dest = destination
 
     @property
@@ -73,14 +73,14 @@ class Relocated(object):
         update = False
         assert isinstance(destination, DestinationEmailAddress)
         if destination.at_localhost:
-            raise RErr(_(u"The destination address' domain name must not be "
-                         u"localhost."), DOMAIN_INVALID)
+            raise RErr(_("The destination address' domain name must not be "
+                         "localhost."), DOMAIN_INVALID)
         if self._addr == destination:
-            raise RErr(_(u'Address and destination are identical.'),
+            raise RErr(_('Address and destination are identical.'),
                        RELOCATED_ADDR_DEST_IDENTICAL)
         if self._dest:
             if self._dest == destination:
-                raise RErr(_(u"The relocated user '%s' already exists.") %
+                raise RErr(_("The relocated user '%s' already exists.") %
                            self._addr, RELOCATED_EXISTS)
             else:
                 self._dest = destination
@@ -103,14 +103,14 @@ class Relocated(object):
     def get_info(self):
         """Returns the address to which mails should be sent."""
         if not self._dest:
-            raise RErr(_(u"The relocated user '%s' does not exist.") %
+            raise RErr(_("The relocated user '%s' does not exist.") %
                        self._addr, NO_SUCH_RELOCATED)
         return self._dest
 
     def delete(self):
         """Deletes the relocated entry from the database."""
         if not self._dest:
-            raise RErr(_(u"The relocated user '%s' does not exist.") %
+            raise RErr(_("The relocated user '%s' does not exist.") %
                        self._addr, NO_SUCH_RELOCATED)
         dbc = self._dbh.cursor()
         dbc.execute('DELETE FROM relocated WHERE gid = %s AND address = %s',

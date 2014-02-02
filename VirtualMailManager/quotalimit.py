@@ -9,8 +9,6 @@
     for domains and accounts.
 """
 
-from VirtualMailManager.pycompat import all
-
 _ = lambda msg: msg
 
 
@@ -27,14 +25,14 @@ class QuotaLimit(object):
 
         Arguments:
 
-        `dbh` : pyPgSQL.PgSQL.Connection || psycopg2._psycopg.connection
+        `dbh` : psycopg2._psycopg.connection
           A database connection for the database access.
 
         Keyword arguments:
 
         `qid` : int
           The id of a quota limit
-        `bytes` : long
+        `bytes` : int
           The quota limit in bytes.
         `messages` : int
           The quota limit in number of messages
@@ -44,24 +42,18 @@ class QuotaLimit(object):
         self._bytes = 0
         self._messages = 0
 
-        for key in kwargs.iterkeys():
+        for key in kwargs.keys():
             if key not in self.__class__._kwargs:
                 raise ValueError('unrecognized keyword: %r' % key)
         qid = kwargs.get('qid')
         if qid is not None:
-            assert isinstance(qid, (int, long))
+            assert isinstance(qid, int)
             self._load_by_qid(qid)
         else:
             bytes_, msgs = kwargs.get('bytes'), kwargs.get('messages')
-            assert all(isinstance(i, (int, long)) for i in (bytes_, msgs))
-            if bytes_ < 0:
-                self._bytes = -bytes_
-            else:
-                self._bytes = bytes_
-            if msgs < 0:
-                self._messages = -msgs
-            else:
-                self._messages = msgs
+            assert all(isinstance(i, int) for i in (bytes_, msgs))
+            self._bytes = -bytes_ if bytes_ < 0 else bytes_
+            self._messages = -msgs if msgs < 0 else msgs
             self._load_by_limit()
 
     @property

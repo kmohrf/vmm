@@ -15,14 +15,13 @@
         schemes, encodings = list_schemes()
 """
 
+import hashlib
+
+from base64 import b64encode
+from binascii import b2a_hex
 from crypt import crypt
 from random import SystemRandom
 from subprocess import Popen, PIPE
-
-try:
-    import hashlib
-except ImportError:
-    from VirtualMailManager.pycompat import hashlib
 
 from VirtualMailManager import ENCODING
 from VirtualMailManager.emailaddress import EmailAddress
@@ -30,7 +29,6 @@ from VirtualMailManager.common import get_unicode, version_str
 from VirtualMailManager.constants import VMM_ERROR
 from VirtualMailManager.errors import VMMError
 
-COMPAT = hasattr(hashlib, 'compat')
 SALTCHARS = './0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 PASSWDCHARS = '._-+#*23456789abcdefghikmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ'
 DEFAULT_B64 = (None, 'B64', 'BASE64')
@@ -55,7 +53,7 @@ _ = lambda msg: msg
 cfg_dget = lambda option: None
 _sys_rand = SystemRandom()
 _choice = _sys_rand.choice
-_get_salt = lambda s_len: ''.join(_choice(SALTCHARS) for x in xrange(s_len))
+_get_salt = lambda s_len: ''.join(_choice(SALTCHARS) for x in range(s_len))
 
 
 def _dovecotpw(password, scheme, encoding):
@@ -71,8 +69,8 @@ def _dovecotpw(password, scheme, encoding):
     process = Popen(cmd_args, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
     if process.returncode:
-        raise VMMError(stderr.strip(), VMM_ERROR)
-    hashed = stdout.strip()
+        raise VMMError(stderr.strip().decode(ENCODING), VMM_ERROR)
+    hashed = stdout.strip().decode(ENCODING)
     if not hashed.startswith('{%s}' % scheme):
         raise VMMError('Unexpected result from %s: %s' %
                        (cfg_dget('bin.dovecotpw'), hashed), VMM_ERROR)
@@ -80,33 +78,13 @@ def _dovecotpw(password, scheme, encoding):
 
 
 def _md4_new():
-    """Returns an new MD4-hash object if supported by the hashlib or
-    provided by PyCrypto - other `None`.
+    """Returns an new MD4-hash object if supported by the hashlib -
+    otherwise `None`.
     """
     try:
         return hashlib.new('md4')
-    except ValueError, err:
-        if str(err) == 'unsupported hash type':
-            if not COMPAT:
-                try:
-                    from Crypto.Hash import MD4
-                    return MD4.new()
-                except ImportError:
-                    return None
-        else:
-            raise
-
-
-def _sha256_new(data=''):
-    """Returns a new sha256 object from the hashlib.
-
-    Returns `None` if the PyCrypto in pycompat.hashlib is too old."""
-    if not COMPAT:
-        return hashlib.sha256(data)
-    try:
-        return hashlib.new('sha256', data)
-    except ValueError, err:
-        if str(err) == 'unsupported hash type':
+    except ValueError as err:
+        if err.args[0].startswith('unsupported hash type'):
             return None
         else:
             raise
@@ -121,13 +99,14 @@ def _format_digest(digest, scheme, encoding):
 
 def _clear_hash(password, scheme, encoding):
     """Generates a (encoded) CLEARTEXT/PLAIN 'hash'."""
+    password = password.decode(ENCODING)
     if encoding:
         if encoding == 'HEX':
-            password = password.encode('hex')
+            password = b2a_hex(password.encode()).decode()
         else:
-            password = password.encode('base64').replace('\n', '')
+            password = b64encode(password.encode()).decode()
         return _format_digest(password, scheme, encoding)
-    return get_unicode('{%s}%s' % (scheme, password))
+    return '{%s}%s' % (scheme, password)
 
 
 def _get_crypt_blowfish_salt():
@@ -174,12 +153,12 @@ def _crypt_hash(password, scheme, encoding):
         salt = _get_crypt_sha2_salt(CRYPT_ID_SHA256)
     else:
         salt = _get_crypt_sha2_salt(CRYPT_ID_SHA512)
-    encrypted = crypt(password, salt)
+    encrypted = crypt(password.decode(ENCODING), salt)
     if encoding:
         if encoding == 'HEX':
-            encrypted = encrypted.encode('hex')
+            encrypted = b2a_hex(encrypted.encode()).decode()
         else:
-            encrypted = encrypted.encode('base64').replace('\n', '')
+            encrypted = b64encode(encrypted.encode()).decode()
     if scheme in ('BLF-CRYPT', 'SHA256-CRYPT', 'SHA512-CRYPT') and \
        cfg_dget('misc.dovecot_version') < 0x20000b06:
         scheme = 'CRYPT'
@@ -194,7 +173,7 @@ def _md4_hash(password, scheme, encoding):
         if encoding in DEFAULT_HEX:
             digest = md4.hexdigest()
         else:
-            digest = md4.digest().encode('base64').rstrip()
+            digest = b64encode(md4.digest()).decode()
         return _format_digest(digest, scheme, encoding)
     return _dovecotpw(password, scheme, encoding)
 
@@ -203,22 +182,14 @@ def _md5_hash(password, scheme, encoding, user=None):
     """Generates DIGEST-MD5 aka PLAIN-MD5 and LDAP-MD5 hashes."""
     md5 = hashlib.md5()
     if scheme == 'DIGEST-MD5':
-        #  Prior to Dovecot v1.1.12/v1.2.beta2 there was a problem with a
-        #  empty auth_realms setting in dovecot.conf and user@domain.tld
-        #  usernames. So we have to generate different hashes for different
-        #  versions. See also:
-        #       http://dovecot.org/list/dovecot-news/2009-March/000103.html
-        #       http://hg.dovecot.org/dovecot-1.1/rev/2b0043ba89ae
-        if cfg_dget('misc.dovecot_version') >= 0x1010cf00:
-            md5.update('%s:%s:' % (user.localpart, user.domainname))
-        else:
-            md5.update('%s::' % user)
+        md5.update(user.localpart.encode() + b':' +
+                   user.domainname.encode() + b':')
     md5.update(password)
     if (scheme in ('PLAIN-MD5', 'DIGEST-MD5') and encoding in DEFAULT_HEX) or \
        (scheme == 'LDAP-MD5' and encoding == 'HEX'):
         digest = md5.hexdigest()
     else:
-        digest = md5.digest().encode('base64').rstrip()
+        digest = b64encode(md5.digest()).decode()
     return _format_digest(digest, scheme, encoding)
 
 
@@ -226,12 +197,13 @@ def _ntlm_hash(password, scheme, encoding):
     """Generates NTLM hashes."""
     md4 = _md4_new()
     if md4:
-        password = ''.join('%s\x00' % c for c in password)
+        password = b''.join(bytes(x)
+                            for x in zip(password, bytes(len(password))))
         md4.update(password)
         if encoding in DEFAULT_HEX:
             digest = md4.hexdigest()
         else:
-            digest = md4.digest().encode('base64').rstrip()
+            digest = b64encode(md4.digest()).decode()
         return _format_digest(digest, scheme, encoding)
     return _dovecotpw(password, scheme, encoding)
 
@@ -240,7 +212,7 @@ def _sha1_hash(password, scheme, encoding):
     """Generates SHA1 aka SHA hashes."""
     sha1 = hashlib.sha1(password)
     if encoding in DEFAULT_B64:
-        digest = sha1.digest().encode('base64').rstrip()
+        digest = b64encode(sha1.digest()).decode()
     else:
         digest = sha1.hexdigest()
     return _format_digest(digest, scheme, encoding)
@@ -248,80 +220,72 @@ def _sha1_hash(password, scheme, encoding):
 
 def _sha256_hash(password, scheme, encoding):
     """Generates SHA256 hashes."""
-    sha256 = _sha256_new(password)
-    if sha256:
-        if encoding in DEFAULT_B64:
-            digest = sha256.digest().encode('base64').rstrip()
-        else:
-            digest = sha256.hexdigest()
-        return _format_digest(digest, scheme, encoding)
-    return _dovecotpw(password, scheme, encoding)
+    sha256 = hashlib.sha256(password)
+    if encoding in DEFAULT_B64:
+        digest = b64encode(sha256.digest()).decode()
+    else:
+        digest = sha256.hexdigest()
+    return _format_digest(digest, scheme, encoding)
 
 
 def _sha512_hash(password, scheme, encoding):
     """Generates SHA512 hashes."""
-    if not COMPAT:
-        sha512 = hashlib.sha512(password)
-        if encoding in DEFAULT_B64:
-            digest = sha512.digest().encode('base64').replace('\n', '')
-        else:
-            digest = sha512.hexdigest()
-        return _format_digest(digest, scheme, encoding)
-    return _dovecotpw(password, scheme, encoding)
+    sha512 = hashlib.sha512(password)
+    if encoding in DEFAULT_B64:
+        digest = b64encode(sha512.digest()).decode()
+    else:
+        digest = sha512.hexdigest()
+    return _format_digest(digest, scheme, encoding)
 
 
 def _smd5_hash(password, scheme, encoding):
     """Generates SMD5 (salted PLAIN-MD5) hashes."""
     md5 = hashlib.md5(password)
-    salt = _get_salt(SALTED_ALGO_SALT_LEN)
+    salt = _get_salt(SALTED_ALGO_SALT_LEN).encode()
     md5.update(salt)
     if encoding in DEFAULT_B64:
-        digest = (md5.digest() + salt).encode('base64').rstrip()
+        digest = b64encode(md5.digest() + salt).decode()
     else:
-        digest = md5.hexdigest() + salt.encode('hex')
+        digest = md5.hexdigest() + b2a_hex(salt).decode()
     return _format_digest(digest, scheme, encoding)
 
 
 def _ssha1_hash(password, scheme, encoding):
     """Generates SSHA (salted SHA/SHA1) hashes."""
     sha1 = hashlib.sha1(password)
-    salt = _get_salt(SALTED_ALGO_SALT_LEN)
+    salt = _get_salt(SALTED_ALGO_SALT_LEN).encode()
     sha1.update(salt)
     if encoding in DEFAULT_B64:
-        digest = (sha1.digest() + salt).encode('base64').rstrip()
+        digest = b64encode(sha1.digest() + salt).decode()
     else:
-        digest = sha1.hexdigest() + salt.encode('hex')
+        digest = sha1.hexdigest() + b2a_hex(salt).decode()
     return _format_digest(digest, scheme, encoding)
 
 
 def _ssha256_hash(password, scheme, encoding):
     """Generates SSHA256 (salted SHA256) hashes."""
-    sha256 = _sha256_new(password)
-    if sha256:
-        salt = _get_salt(SALTED_ALGO_SALT_LEN)
-        sha256.update(salt)
-        if encoding in DEFAULT_B64:
-            digest = (sha256.digest() + salt).encode('base64').rstrip()
-        else:
-            digest = sha256.hexdigest() + salt.encode('hex')
-        return _format_digest(digest, scheme, encoding)
-    return _dovecotpw(password, scheme, encoding)
+    sha256 = hashlib.sha256(password)
+    salt = _get_salt(SALTED_ALGO_SALT_LEN).encode()
+    sha256.update(salt)
+    if encoding in DEFAULT_B64:
+        digest = b64encode(sha256.digest() + salt).decode()
+    else:
+        digest = sha256.hexdigest() + b2a_hex(salt).decode()
+    return _format_digest(digest, scheme, encoding)
 
 
 def _ssha512_hash(password, scheme, encoding):
     """Generates SSHA512 (salted SHA512) hashes."""
-    if not COMPAT:
-        salt = _get_salt(SALTED_ALGO_SALT_LEN)
-        sha512 = hashlib.sha512(password + salt)
-        if encoding in DEFAULT_B64:
-            digest = (sha512.digest() + salt).encode('base64').replace('\n',
-                                                                       '')
-        else:
-            digest = sha512.hexdigest() + salt.encode('hex')
-        return _format_digest(digest, scheme, encoding)
-    return _dovecotpw(password, scheme, encoding)
+    salt = _get_salt(SALTED_ALGO_SALT_LEN).encode()
+    sha512 = hashlib.sha512(password + salt)
+    if encoding in DEFAULT_B64:
+        digest = b64encode(sha512.digest() + salt).decode()
+    else:
+        digest = sha512.hexdigest() + b2a_hex(salt).decode()
+    return _format_digest(digest, scheme, encoding)
 
 _scheme_info = {
+    'CLEAR': (_clear_hash, 0x2010df00),
     'CLEARTEXT': (_clear_hash, 0x10000f00),
     'CRAM-MD5': (_dovecotpw, 0x10000f00),
     'CRYPT': (_crypt_hash, 0x10000f00),
@@ -355,15 +319,11 @@ def list_schemes():
 
     `schemes` is an iterator for all supported password schemes (depends on
     the used Dovecot version and features of the libc).
-    `encodings` is a tuple with all usable encoding suffixes. The tuple may
-    be empty.
+    `encodings` is a tuple with all usable encoding suffixes.
     """
     dcv = cfg_dget('misc.dovecot_version')
-    schemes = (k for (k, v) in _scheme_info.iteritems() if v[1] <= dcv)
-    if dcv >= 0x10100a01:
-        encodings = ('.B64', '.BASE64', '.HEX')
-    else:
-        encodings = ()
+    schemes = (k for (k, v) in _scheme_info.items() if v[1] <= dcv)
+    encodings = ('.B64', '.BASE64', '.HEX')
     return schemes, encodings
 
 
@@ -382,23 +342,20 @@ def verify_scheme(scheme):
       * depends on a newer Dovecot version
       * has a unknown encoding suffix
     """
-    assert isinstance(scheme, basestring), 'Not a str/unicode: %r' % scheme
+    assert isinstance(scheme, str), 'Not a str: {!r}'.format(scheme)
     scheme_encoding = scheme.upper().split('.')
     scheme = scheme_encoding[0]
     if scheme not in _scheme_info:
-        raise VMMError(_(u"Unsupported password scheme: '%s'") % scheme,
+        raise VMMError(_("Unsupported password scheme: '%s'") % scheme,
                        VMM_ERROR)
     if cfg_dget('misc.dovecot_version') < _scheme_info[scheme][1]:
-        raise VMMError(_(u"The password scheme '%(scheme)s' requires Dovecot "
-                         u">= v%(version)s.") % {'scheme': scheme,
+        raise VMMError(_("The password scheme '%(scheme)s' requires Dovecot "
+                         ">= v%(version)s.") % {'scheme': scheme,
                        'version': version_str(_scheme_info[scheme][1])},
                        VMM_ERROR)
     if len(scheme_encoding) > 1:
-        if cfg_dget('misc.dovecot_version') < 0x10100a01:
-            raise VMMError(_(u'Encoding suffixes for password schemes require '
-                             u'Dovecot >= v1.1.alpha1.'), VMM_ERROR)
         if scheme_encoding[1] not in ('B64', 'BASE64', 'HEX'):
-            raise VMMError(_(u"Unsupported password encoding: '%s'") %
+            raise VMMError(_("Unsupported password encoding: '%s'") %
                            scheme_encoding[1], VMM_ERROR)
         encoding = scheme_encoding[1]
     else:
@@ -413,11 +370,9 @@ def pwhash(password, scheme=None, user=None):
     be used for the hash generation.  When 'DIGEST-MD5' is used as scheme,
     also an EmailAddress instance must be given as *user* argument.
     """
-    if not isinstance(password, basestring):
+    if not isinstance(password, str):
         raise TypeError('Password is not a string: %r' % password)
-    if isinstance(password, unicode):
-        password = password.encode(ENCODING)
-    password = password.strip()
+    password = password.encode(ENCODING).strip()
     if not password:
         raise ValueError("Could not accept empty password.")
     if scheme is None:
