@@ -2,7 +2,7 @@
 Installation Prerequisites
 ==========================
 You already should have installed and configured Postfix and Dovecot
-≥ 1.2.0 with PostgreSQL support. You also need access to a local or remote
+≥ 2.0.0 with PostgreSQL support. You also need access to a local or remote
 PostgreSQL server.
 
 Check for pgsql support in Dovecot and Postfix

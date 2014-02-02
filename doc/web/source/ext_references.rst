@@ -8,6 +8,8 @@
 .. _GID: http://en.wikipedia.org/wiki/Group_identifier_%28Unix%29
 .. _GPG: http://en.wikipedia.org/wiki/GNU_Privacy_Guard
 .. _IDN: http://en.wikipedia.org/wiki/Internationalized_domain_name
+.. _IDN ccTLDs: \
+ http://en.wikipedia.org/wiki/Internationalized_country_code_top-level_domain
 .. _LDA: http://wiki.dovecot.org/LDA
 .. _LMTP: http://master.wiki2.dovecot.org/LMTP
 .. _Maildir: http://wiki2.dovecot.org/MailboxFormat/Maildir
