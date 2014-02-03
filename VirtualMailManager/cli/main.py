@@ -14,8 +14,8 @@ from VirtualMailManager import ENCODING, errors
 from VirtualMailManager.config import BadOptionError, ConfigValueError
 from VirtualMailManager.cli import w_err
 from VirtualMailManager.cli.handler import CliHandler
-from VirtualMailManager.constants import EX_SUCCESS, EX_USER_INTERRUPT, \
-     INVALID_ARGUMENT
+from VirtualMailManager.constants import EX_MISSING_ARGS, EX_SUCCESS, \
+     EX_USER_INTERRUPT, INVALID_ARGUMENT
 from VirtualMailManager.cli.subcommands import RunContext, setup_parser
 
 
@@ -34,8 +34,12 @@ def _get_handler():
         return handler
 
 
-def run():
+def run(argv):
     parser = setup_parser()
+    if len(argv) < 2:
+        parser.print_usage()
+        parser.exit(status=EX_MISSING_ARGS,
+                   message=_('You must specify a subcommand at least.') + '\n')
     args = parser.parse_args()
     handler = _get_handler()
     run_ctx = RunContext(args, handler)

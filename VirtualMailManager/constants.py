@@ -32,6 +32,7 @@ MIN_UID = 70000
 # exit codes
 
 EX_SUCCESS = 0
+EX_MISSING_ARGS = 1
 EX_USER_INTERRUPT = 3
 
 
