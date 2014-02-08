@@ -40,8 +40,8 @@ class CliHandler(Handler):
         """
         # Overwrite the parent CTor partly, we use the CliConfig class
         # and add some command line checks.
-        skip_some_checks = os.sys.argv[1] in ('cf', 'configure', 'h', 'help',
-                                              'v', 'version')
+        skip_some_checks = os.sys.argv[1] in ('cf', 'configure',
+                                              'cs', 'configset')
         super(CliHandler, self).__init__(skip_some_checks)
 
         self._cfg = Cfg(self._cfg_fname)
