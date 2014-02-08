@@ -28,6 +28,7 @@ __version__ = VERSION
 MIN_GID = 70000
 MIN_UID = 70000
 
+MIN_DOVECOT_VERSION = 0x20000f00
 
 # exit codes
 
