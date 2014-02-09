@@ -16,8 +16,9 @@ from configparser import \
 from io import StringIO
 
 from VirtualMailManager.common import VERSION_RE, \
-     exec_ok, expand_path, get_unicode, lisdir, size_in_bytes, version_hex
-from VirtualMailManager.constants import CONF_ERROR
+     exec_ok, expand_path, get_unicode, lisdir, size_in_bytes, version_hex, \
+     version_str
+from VirtualMailManager.constants import CONF_ERROR, MIN_DOVECOT_VERSION
 from VirtualMailManager.errors import ConfigError, VMMError
 from VirtualMailManager.maillocation import known_format
 from VirtualMailManager.password import verify_scheme as _verify_scheme
@@ -345,7 +346,7 @@ class Config(LazyConfig):
                 'crypt_sha256_rounds': LCO(int, 5000, self.getint),
                 'crypt_sha512_rounds': LCO(int, 5000, self.getint),
                 'dovecot_version': LCO(str, None, self.hexversion,
-                                       check_version_format),
+                                       check_dovecot_version),
                 'password_scheme': LCO(str, 'CRAM-MD5', self.get,
                                        verify_scheme),
             },
@@ -430,9 +431,10 @@ class Config(LazyConfig):
         """Check settings for which the possible values are known."""
         if not miss_vers:
             value = self.get('misc', 'dovecot_version')
-            if not VERSION_RE.match(value):
-                self._missing['misc'] = ['version: ' +
-                        _("Not a valid Dovecot version: '%s'") % value]
+            try:
+                checked = check_dovecot_version(value)
+            except ConfigValueError as err:
+                self._missing['misc'] = ['dovecot_version: %s' % str(err)]
         # section database
         db_err = []
         value = self.dget('database.sslmode')
@@ -497,14 +499,18 @@ def check_size_value(value):
     return value
 
 
-def check_version_format(version_string):
-    """Check if the *version_string* has the proper format, e.g.: '1.2.3'.
+def check_dovecot_version(version_string):
+    """Check if the *version_string* has the proper format, e.g.: '2.0.0',
+    and if the configured version is >= MIN_DOVECOT_VERSION.
     Returns the validated version string if it has the expected format.
     Otherwise a `ConfigValueError` will be raised.
     """
     if not VERSION_RE.match(version_string):
         raise ConfigValueError(_("Not a valid Dovecot version: '%s'") %
                                get_unicode(version_string))
+    if version_hex(version_string) < MIN_DOVECOT_VERSION:
+        raise ConfigValueError(_("vmm requires Dovecot >= %s") %
+                               version_str(MIN_DOVECOT_VERSION))
     return version_string
 
 
