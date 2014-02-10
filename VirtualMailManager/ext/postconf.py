@@ -56,7 +56,7 @@ class Postconf(object):
             raise VMMError(stderr.strip().decode(), VMM_ERROR)
 
     def read(self, parameter, expand_vars=True):
-        """Returns the parameters value.
+        """Returns the parameter's value.
 
         If expand_vars is True (default), all variables in the value will be
         expanded:
