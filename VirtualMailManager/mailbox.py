@@ -244,12 +244,12 @@ class SingleDbox(Mailbox):
         For additional mailboxes use the add_boxes() method.
         """
         assert cfg_dget('misc.dovecot_version') >= \
-                account.mail_location.dovecot_version
+            account.mail_location.dovecot_version
         super(SingleDbox, self).__init__(account)
 
     def _doveadm_create(self, mailboxes, subscribe):
         """Wrap around Dovecot's doveadm"""
-        cmd_args = [cfg_dget('bin.dovecotpw'), 'mailbox', 'create', '-u',
+        cmd_args = [cfg_dget('bin.doveadm'), 'mailbox', 'create', '-u',
                     str(self._user.address)]
         if subscribe:
             cmd_args.append('-s')
