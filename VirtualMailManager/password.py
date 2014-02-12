@@ -56,16 +56,14 @@ _choice = _sys_rand.choice
 _get_salt = lambda s_len: ''.join(_choice(SALTCHARS) for x in range(s_len))
 
 
-def _dovecotpw(password, scheme, encoding):
-    """Communicates with dovecotpw (Dovecot 2.0: `doveadm pw`) and returns
+def _doveadmpw(password, scheme, encoding):
+    """Communicates with Dovecot's doveadm and returns
     the hashed password: {scheme[.encoding]}hash
     """
     if encoding:
         scheme = '.'.join((scheme, encoding))
-    cmd_args = [cfg_dget('bin.dovecotpw'), '-s', scheme, '-p',
+    cmd_args = [cfg_dget('bin.doveadm'), 'pw', '-s', scheme, '-p',
                 get_unicode(password)]
-    if cfg_dget('misc.dovecot_version') >= 0x20000a01:
-        cmd_args.insert(1, 'pw')
     process = Popen(cmd_args, stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
     if process.returncode:
@@ -73,7 +71,7 @@ def _dovecotpw(password, scheme, encoding):
     hashed = stdout.strip().decode(ENCODING)
     if not hashed.startswith('{%s}' % scheme):
         raise VMMError('Unexpected result from %s: %s' %
-                       (cfg_dget('bin.dovecotpw'), hashed), VMM_ERROR)
+                       (cfg_dget('bin.doveadm'), hashed), VMM_ERROR)
     return hashed
 
 
@@ -175,7 +173,7 @@ def _md4_hash(password, scheme, encoding):
         else:
             digest = b64encode(md4.digest()).decode()
         return _format_digest(digest, scheme, encoding)
-    return _dovecotpw(password, scheme, encoding)
+    return _doveadmpw(password, scheme, encoding)
 
 
 def _md5_hash(password, scheme, encoding, user=None):
@@ -205,7 +203,7 @@ def _ntlm_hash(password, scheme, encoding):
         else:
             digest = b64encode(md4.digest()).decode()
         return _format_digest(digest, scheme, encoding)
-    return _dovecotpw(password, scheme, encoding)
+    return _doveadmpw(password, scheme, encoding)
 
 
 def _sha1_hash(password, scheme, encoding):
@@ -287,26 +285,26 @@ def _ssha512_hash(password, scheme, encoding):
 _scheme_info = {
     'CLEAR': (_clear_hash, 0x2010df00),
     'CLEARTEXT': (_clear_hash, 0x10000f00),
-    'CRAM-MD5': (_dovecotpw, 0x10000f00),
+    'CRAM-MD5': (_doveadmpw, 0x10000f00),
     'CRYPT': (_crypt_hash, 0x10000f00),
     'DIGEST-MD5': (_md5_hash, 0x10000f00),
-    'HMAC-MD5': (_dovecotpw, 0x10000f00),
-    'LANMAN': (_dovecotpw, 0x10000f00),
+    'HMAC-MD5': (_doveadmpw, 0x10000f00),
+    'LANMAN': (_doveadmpw, 0x10000f00),
     'LDAP-MD5': (_md5_hash, 0x10000f00),
     'MD5': (_crypt_hash, 0x10000f00),
     'MD5-CRYPT': (_crypt_hash, 0x10000f00),
     'NTLM': (_ntlm_hash, 0x10000f00),
-    'OTP': (_dovecotpw, 0x10100a01),
+    'OTP': (_doveadmpw, 0x10100a01),
     'PLAIN': (_clear_hash, 0x10000f00),
     'PLAIN-MD4': (_md4_hash, 0x10000f00),
     'PLAIN-MD5': (_md5_hash, 0x10000f00),
-    'RPA': (_dovecotpw, 0x10000f00),
-    'SCRAM-SHA-1': (_dovecotpw, 0x20200a01),
+    'RPA': (_doveadmpw, 0x10000f00),
+    'SCRAM-SHA-1': (_doveadmpw, 0x20200a01),
     'SHA': (_sha1_hash, 0x10000f00),
     'SHA1': (_sha1_hash, 0x10000f00),
     'SHA256': (_sha256_hash, 0x10100a01),
     'SHA512': (_sha512_hash, 0x20000b03),
-    'SKEY': (_dovecotpw, 0x10100a01),
+    'SKEY': (_doveadmpw, 0x10100a01),
     'SMD5': (_smd5_hash, 0x10000f00),
     'SSHA': (_ssha1_hash, 0x10000f00),
     'SSHA256': (_ssha256_hash, 0x10200a04),
