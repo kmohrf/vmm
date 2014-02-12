@@ -34,7 +34,7 @@ CREATE TABLE transport (
     CONSTRAINT  ukey_transport UNIQUE (transport)
 );
 -- Insert default transport
-INSERT INTO transport(transport) VALUES ('dovecot:');
+INSERT INTO transport(transport) VALUES ('lmtp:unix:private/dovecot-lmtp');
 
 CREATE TABLE mailboxformat (
     fid         bigint NOT NULL DEFAULT nextval('mailboxformat_id'),
