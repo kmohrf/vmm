@@ -16,7 +16,7 @@ from VirtualMailManager.cli import read_pass
 from VirtualMailManager.cli.config import CliConfig as Cfg
 from VirtualMailManager.constants import ACCOUNT_EXISTS, INVALID_SECTION, \
      NO_SUCH_ACCOUNT, TYPE_ACCOUNT
-from VirtualMailManager.password import randompw
+from VirtualMailManager.password import randompw, verify_scheme
 
 _ = lambda msg: msg
 
@@ -94,6 +94,10 @@ class CliHandler(Handler):
         if not acc:
             raise VMMError(_("The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
+        if scheme:
+            scheme, encoding = verify_scheme(scheme)
+            if encoding:
+                scheme = '%s.%s' % (scheme, encoding)
         if not isinstance(password, str) or not password:
             password = read_pass()
         acc.update_password(password, scheme)
