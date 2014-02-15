@@ -1,4 +1,4 @@
-.TH "VMM" "1" "2013-01-23" "vmm 0.7" "vmm"
+.TH "VMM" "1" "2014-02-15" "vmm 0.7" "vmm"
 .SH NAME
 vmm \- command line tool to manage email domains/accounts/aliases
 .\" -----------------------------------------------------------------------
@@ -838,6 +838,23 @@ Example:
 .BI "vmm userpassword" " address"
 .RB [ \-p
 .IR password ]
+.RB [ \-s
+.IR scheme ]
+.PP
+.TP
+.BI "\-p " password
+The user\(aqs new password.
+.\" ------------------------------------
+.TP
+.BI "\-s " scheme
+When a
+.I scheme
+was specified, it overrides the
+.I misc.password_scheme
+setting, configured in the
+.I vmm.cfg
+file.
+.\" ------------------------------------
 .PP
 The password of an account can be updated with this subcommand.
 .PP

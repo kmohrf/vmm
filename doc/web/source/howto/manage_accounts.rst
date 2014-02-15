@@ -148,9 +148,20 @@ Example:
 
 userpassword
 ------------
+.. program:: vmm userpassword
+
 Syntax:
- | **vmm userpassword** *address* [**-p** *password*]
- | **vmm up** *address* [**-p** *password*]
+ | **vmm userpassword** *address* [**-p** *password*] [**-s** *scheme*]
+ | **vmm up** *address* [**-p** *password*] [**-s** *scheme*]
+
+.. option:: -p password
+
+ The user's new password.
+
+.. option:: -s scheme
+
+ When a *scheme* was specified, it overrides the *misc.password_scheme*
+ setting, configured in the :file:`vmm.cfg` file.
 
 The password of an account can be updated with this subcommand.
 
