@@ -396,7 +396,8 @@ def user_name(ctx):
 
 def user_password(ctx):
     """update the password for the given address"""
-    ctx.hdlr.user_password(ctx.args.address.lower(), ctx.args.password)
+    ctx.hdlr.user_password(ctx.args.address.lower(), ctx.args.password,
+                           ctx.args.scheme)
 
 
 def user_note(ctx):
@@ -832,12 +833,15 @@ def setup_parser():
            help=_('update the password for the given address'),
            epilog=fill(_("The password of an account can be updated with this "
                "subcommand.\n\nIf no password was provided, vmm will prompt "
-               "for it interactively.")),
+               "for it interactively. When the scheme was omitted, vmm will "
+               "use misc.password_scheme from vmm.cfg. ")),
            formatter_class=RawDescriptionHelpFormatter)
     up.add_argument('address',
                     help=_("an account's e-mail address (local-part@fqdn)"))
     up.add_argument('-p', metavar='PASSWORD', dest='password',
                     help=_("the user's new password"))
+    up.add_argument('-s', metavar='SCHEME', dest='scheme',
+                    help=_('scheme used for password hashing'))
     up.set_defaults(func=user_password, scmd='userpassword')
 
     uq = a('userquota', aliases=('uq',),
