@@ -261,25 +261,43 @@ class Account(object):
     def modify(self, field, value):
         """Update the Account's *field* to the new *value*.
 
-        Possible values for *field* are: 'name', 'password', 'note'.
+        Possible values for *field* are: 'name' and 'note'.
 
         Arguments:
 
-        `field` : basestring
-          The attribute name: 'name', 'password' or 'note'
-        `value` : basestring
+        `field` : str
+          The attribute name: 'name', or 'note'
+        `value` : str
           The new value of the attribute.
         """
-        if field not in ('name', 'password', 'note'):
+        if field not in ('name', 'note'):
             raise AErr(_("Unknown field: '%s'") % field, INVALID_ARGUMENT)
         self._chk_state()
         dbc = self._dbh.cursor()
-        if field == 'password':
-            dbc.execute('UPDATE users SET passwd = %s WHERE uid = %s',
-                        (pwhash(value, user=self._addr), self._uid))
-        else:
-            dbc.execute('UPDATE users SET %s = %%s WHERE uid = %%s' % field,
-                        (value, self._uid))
+        dbc.execute('UPDATE users SET %s = %%s WHERE uid = %%s' % field,
+                    (value, self._uid))
+        if dbc.rowcount > 0:
+            self._dbh.commit()
+        dbc.close()
+
+    def update_password(self, password, scheme=None):
+        """Update the Account's password.
+
+        The given *password* will be hashed using password.pwhash.
+        When no *scheme* is specified, the configured scheme
+        (misc.password_scheme) will be used.
+
+        Arguments:
+
+        `password' : str
+          The Account's new plain text password
+        `scheme' : str
+          The password scheme used for password hashing; default None
+        """
+        self._chk_state()
+        dbc = self._dbh.cursor()
+        dbc.execute('UPDATE users SET passwd = %s WHERE uid = %s',
+                    (pwhash(password, scheme, self._addr), self.uid))
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
