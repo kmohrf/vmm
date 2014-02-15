@@ -87,7 +87,7 @@ class CliHandler(Handler):
         self._make_account_dirs(acc)
         return (None, password)[rand_pass]
 
-    def user_password(self, emailaddress, password=None):
+    def user_password(self, emailaddress, password=None, scheme=None):
         """Override the parent user_password() - add the interactive
         password dialog."""
         acc = self._get_account(emailaddress)
@@ -96,6 +96,6 @@ class CliHandler(Handler):
                            acc.address, NO_SUCH_ACCOUNT)
         if not isinstance(password, str) or not password:
             password = read_pass()
-        acc.modify('password', password)
+        acc.update_password(password, scheme)
 
 del _

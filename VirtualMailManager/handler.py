@@ -754,8 +754,8 @@ The account has been successfully deleted from the database.
         self._db_connect()
         return get_account_by_uid(uid, self._dbh)
 
-    def user_password(self, emailaddress, password):
-        """Wrapper for Account.modify('password' ...)."""
+    def user_password(self, emailaddress, password, scheme=None):
+        """Wrapper for Account.update_password(...)."""
         if not isinstance(password, str) or not password:
             raise VMMError(_("Could not accept password: '%s'") % password,
                            INVALID_ARGUMENT)
@@ -763,7 +763,7 @@ The account has been successfully deleted from the database.
         if not acc:
             raise VMMError(_("The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
-        acc.modify('password', password)
+        acc.update_password(password, scheme)
 
     def user_name(self, emailaddress, name):
         """Wrapper for Account.modify('name', ...)."""
