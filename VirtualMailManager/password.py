@@ -157,9 +157,6 @@ def _crypt_hash(password, scheme, encoding):
             encrypted = b2a_hex(encrypted.encode()).decode()
         else:
             encrypted = b64encode(encrypted.encode()).decode()
-    if scheme in ('BLF-CRYPT', 'SHA256-CRYPT', 'SHA512-CRYPT') and \
-       cfg_dget('misc.dovecot_version') < 0x20000b06:
-        scheme = 'CRYPT'
     return _format_digest(encrypted, scheme, encoding)
 
 
@@ -403,11 +400,11 @@ def _test_crypt_algorithms():
 JoouxdSqJO71l9Ld3tVrfOatEjarhghvEYADkq//LpDnTeO90tcbtHR1'
 
     if crypt('08/15!test~4711', '$2a$04$0123456789abcdefABCDEF$') == _blowfish:
-        _scheme_info['BLF-CRYPT'] = (_crypt_hash, 0x10000f00)
+        _scheme_info['BLF-CRYPT'] = (_crypt_hash, 0x20000b06)
     if crypt('08/15!test~4711', '$5$rounds=1000$0123456789abcdef$') == _sha256:
-        _scheme_info['SHA256-CRYPT'] = (_crypt_hash, 0x10000f00)
+        _scheme_info['SHA256-CRYPT'] = (_crypt_hash, 0x20000b06)
     if crypt('08/15!test~4711', '$6$rounds=1000$0123456789abcdef$') == _sha512:
-        _scheme_info['SHA512-CRYPT'] = (_crypt_hash, 0x10000f00)
+        _scheme_info['SHA512-CRYPT'] = (_crypt_hash, 0x20000b06)
 
 _test_crypt_algorithms()
 del _, cfg_dget, _test_crypt_algorithms
