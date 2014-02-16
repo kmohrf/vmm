@@ -13,9 +13,11 @@
         random_password = randompw()
         scheme, encoding = verify_scheme(scheme)
         schemes, encodings = list_schemes()
+        scheme = extract_scheme(hashed_password)
 """
 
 import hashlib
+import re
 
 from base64 import b64encode
 from binascii import b2a_hex
@@ -307,6 +309,17 @@ _scheme_info = {
     'SSHA256': (_ssha256_hash, 0x10200a04),
     'SSHA512': (_ssha512_hash, 0x20000b03),
 }
+
+
+def extract_scheme(password_hash):
+    """Returns the extracted password scheme from *password_hash*.
+
+    If the scheme couldn't be extracted, **None** will be returned.
+    """
+    scheme = re.match(r'^\{([^\}]{3,37})\}', password_hash)
+    if scheme:
+        return scheme.groups()[0]
+    return scheme
 
 
 def list_schemes():
