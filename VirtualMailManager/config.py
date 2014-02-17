@@ -435,7 +435,7 @@ class Config(LazyConfig):
         if not miss_vers:
             value = self.get('misc', 'dovecot_version')
             if not VERSION_RE.match(value):
-                self._missing['misc'] = ['version: ' +
+                self._missing['misc'] = ['dovecot_version: ' +
                         _(u"Not a valid Dovecot version: '%s'") % value]
         # section database
         db_err = []
