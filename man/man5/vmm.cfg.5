@@ -1,4 +1,4 @@
-.TH "VMM.CFG" "5" "2012-08-12" "vmm 0.6" "vmm"
+.TH "VMM.CFG" "5" "2014-02-17" "vmm 0.6" "vmm"
 .SH NAME
 vmm.cfg \- configuration file for vmm
 .\" -----------------------------------------------------------------------
@@ -533,6 +533,15 @@ suffix to the password_scheme.
 Supported encoding suffixes are:
 .BR .b64 ", " .base64 " and " .hex .
 For example: PLAIN.BASE64
+.IP Note:
+When setting another password scheme than
+.BR PLAIN " or " CRAM\-MD5 ,
+you have to remove
+.B cram\-md5
+from the
+.I auth_mechanisms
+setting in your
+.IR dovecot/conf.d/10\-auth.conf .
 .\" -----------------------------------------------------------------------
 .SH EXAMPLE
 An example configuration.

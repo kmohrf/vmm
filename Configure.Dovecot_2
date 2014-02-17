@@ -25,6 +25,9 @@ protocols = imap lmtp
 ###
 # conf.d/10-auth.conf
 ###
+# When you set another misc.password_scheme than PLAIN or CRAM-MD5 in
+# your vmm.cfg, you have to remove cram-md5 from the auth_mechanisms
+# setting.
 auth_mechanisms = plain login cram-md5
 passdb {
   driver = sql
