@@ -25,8 +25,8 @@ _ = lambda msg: msg
 class Postconf(object):
     """Wrapper class for Postfix's postconf."""
     __slots__ = ('_bin', '_val')
-    _parameter_re = re.compile(r'^\w+$')
-    _variables_re = re.compile(r'\$\b\w+\b')
+    _parameter_re = re.compile(r'^\w+$', re.ASCII)
+    _variables_re = re.compile(r'\$\b\w+\b', re.ASCII)
 
     def __init__(self, postconf_bin):
         """Creates a new Postconf instance.
@@ -53,10 +53,10 @@ class Postconf(object):
         stderr = Popen((self._bin, '-e', parameter + '=' + str(value)),
                        stderr=PIPE).communicate()[1]
         if stderr:
-            raise VMMError(stderr.strip(), VMM_ERROR)
+            raise VMMError(stderr.strip().decode(), VMM_ERROR)
 
     def read(self, parameter, expand_vars=True):
-        """Returns the parameters value.
+        """Returns the parameter's value.
 
         If expand_vars is True (default), all variables in the value will be
         expanded:
@@ -81,8 +81,8 @@ class Postconf(object):
         """Check that the `parameter` looks like a configuration parameter.
         If not, a VMMError will be raised."""
         if not self.__class__._parameter_re.match(parameter):
-            raise VMMError(_(u"The value '%s' does not look like a valid "
-                             u"Postfix configuration parameter name.") %
+            raise VMMError(_("The value '%s' does not look like a valid "
+                             "Postfix configuration parameter name.") %
                            parameter, VMM_ERROR)
 
     def _expand_vars(self):
@@ -99,7 +99,7 @@ class Postconf(object):
 
     def _expand_multi_vars(self, old_new):
         """Replace all $vars in self._val with their values."""
-        for old, new in old_new.iteritems():
+        for old, new in old_new.items():
             self._val = self._val.replace('$' + old, new)
 
     def _read(self, parameter):
@@ -107,8 +107,8 @@ class Postconf(object):
         stdout, stderr = Popen([self._bin, '-h', parameter], stdout=PIPE,
                                stderr=PIPE).communicate()
         if stderr:
-            raise VMMError(stderr.strip(), VMM_ERROR)
-        return stdout.strip()
+            raise VMMError(stderr.strip().decode(), VMM_ERROR)
+        return stdout.strip().decode()
 
     def _read_multi(self, parameters):
         """Ask postconf for multiple configuration parameters. Returns a dict
@@ -117,9 +117,9 @@ class Postconf(object):
         cmd.extend(parameter[1:] for parameter in parameters)
         stdout, stderr = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()
         if stderr:
-            raise VMMError(stderr.strip(), VMM_ERROR)
+            raise VMMError(stderr.strip().decode(), VMM_ERROR)
         par_val = {}
-        for line in stdout.splitlines():
+        for line in stdout.decode().splitlines():
             par, val = line.split(' = ')
             par_val[par] = val
         return par_val

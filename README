@@ -18,7 +18,7 @@ Features
 • General features
 
   ‣ Unicode/UTF-8 capable (input/storage/output)
-  ‣ supports IDN_ (also ccTLDs/ccIDNs and 'new' gTLDs)
+  ‣ supports IDN_ (also `IDN ccTLDs`_/ccIDNs and 'new' gTLDs)
   ‣ supports the mailbox format Maildir_ and Dovecot's own high-performance
     mailbox formats single- and multi-\ dbox_
   ‣ configurable basic mailbox structure, including sub-mailboxes
@@ -76,8 +76,8 @@ Features
 
 Installation Prerequisites
 ==========================
-You already should have installed and configured Postfix and Dovecot with
-PostgreSQL support. You also need access to a local or remote PostgreSQL
+You already should have installed and configured Postfix and Dovecot (≥ 2.0.0)
+with PostgreSQL support. You also need access to a local or remote PostgreSQL
 server.
 
 To verify that your Dovecot and Postfix installation has support for
@@ -90,22 +90,9 @@ PostgreSQL use the ``postconf`` and ``dovecot`` commands as shown below::
         hostname ~ # dovecot --build-options | grep postgresql
         SQL drivers: mysql postgresql sqlite
 
-vmm depends on Python (≥ 2.4.0) and Psycopg_ (≥ 2.0) or pyPgSQL_ (≥ 2.5.1).
-Psycopg and pyPgSQL are depending on parts of the *eGenix.com mx Base
-Distribution* (mxDateTime_ and mxTools_).
-
-If you are using Python ≤ 2.5.0:
-
-  • if you want to store your users' passwords as ``PLAIN-MD4`` digest in the
-    database, vmm will try to use ``Crypto.Hash.MD4`` from PyCrypto_
-  • if you are using Dovecot ≥ v1.1.0 and you want to store your users'
-    passwords as ``SHA256`` or ``SSHA256`` hashes, vmm will try to use
-    ``Crypto.Hash.SHA256`` from PyCrypto. For ``SHA256``/``SSHA256`` you
-    should have installed PyCrypto, at least in version 2.1.0alpha1.
-
-  When the Crypto.Hash module couldn't be imported, vmm will use
-  dovecotpw/doveadm, if  the *misc.password_scheme* setting in your *vmm.cfg*
-  is set to ``PLAIN-MD4``, ``SHA256`` or ``SSHA256``.
+Dependences
+-----------
+vmm (≥ 0.7.0) depends on Python (≥ 3.2) and Psycopg_ (≥ 2.0).
 
 Source code
 ===========
@@ -138,18 +125,16 @@ In short: "**New BSD License**" aka "3-clause license". For a few more
 details see the `COPYING` file.
 
 .. External references
+.. _IDN ccTLDs: \
+ http://en.wikipedia.org/wiki/Internationalized_country_code_top-level_domain
 .. _dbox: http://wiki2.dovecot.org/MailboxFormat/dbox
 .. _Dovecot: http://dovecot.org/
 .. _IDN: http://en.wikipedia.org/wiki/Internationalized_domain_name
 .. _Maildir: http://wiki2.dovecot.org/MailboxFormat/Maildir
 .. _Mercurial: http://mercurial.selenic.com/
-.. _mxDateTime: http://www.egenix.com/products/python/mxBase/mxDateTime/
-.. _mxTools: http://www.egenix.com/products/python/mxBase/mxTools/
 .. _Postfix: http://www.postfix.org/
 .. _PostgreSQL: http://www.postgresql.org/
 .. _Psycopg: http://initd.org/psycopg/
-.. _PyCrypto: http://www.pycrypto.org/
-.. _pyPgSQL: http://pypgsql.sourceforge.net/
 .. _Python: http://www.python.org/
 .. _relocated: http://www.postfix.org/relocated.5.html
 .. _transport: http://www.postfix.org/transport.5.html

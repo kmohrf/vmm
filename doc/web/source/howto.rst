@@ -6,7 +6,9 @@ vmm is the easy to use command-line tool of the Virtual Mail Manager.
 It allows you to simply and quickly administer your mail server.
 The general command syntax looks like::
 
- vmm subcommand [argument …]
+ vmm -h|-v|--help|--version
+ vmm subcommand -h|--help
+ vmm subcommand arguments [options]
 
 Each subcommand has both a long and a short form.
 Both forms are case sensitive.
@@ -26,43 +28,58 @@ The subcommands are categorized by their functionality:
 
 Most of the *subcommand*\ s take one or more *argument*\ s.
 
+Options
+-------
+The following options are recognized by :program:`vmm`.
+
+.. program:: vmm
+
+.. option:: -h, --help
+
+ show a list of available subcommands and exit.
+
+.. option:: -v, --version
+
+ show :command:`vmm`'s version and copyright information and exit.
+
+
 Arguments
 ---------
-address
+*address*
  The complete e-mail address (*local-part*\ @\ *fqdn*) of an user account,
  alias address or relocated user.
 
-destination
+*destination*
  Is either an e-mail address when used with
  :doc:`Alias subcommands <howto/manage_alias_addresses>`.
- Or a *fqnd* when used with
+ Or a *fqdn* when used with
  :doc:`Alias domain subcommands <howto/manage_alias_domains>`.
 
-fqdn
+*fqdn*
  The fully qualified domain name – without the trailing dot – of a domain
  or alias domain.
 
-messages
+*messages*
  An integer value which specifies a quota limit in number of messages.
  **0** (zero) means unlimited - no quota limit for the number of messages.
 
-option
+*option*
  Is the name of a configuration option, prefixed with the section name and
  a dot.
  For example: *misc*\ **.**\ *transport*
  All configuration options are described in :manpage:`vmm.cfg(5)`.
 
-service
+*service*
  The name of a service, commonly used with Dovecot.
  Supported services are: **imap**, **pop3**, **sieve** and **smtp**.
 
-storage
+*storage*
  Specifies a quota limit in bytes.
  One of the following prefixes can be appended to the integer value:
  **b** (bytes), **k** (kilobytes), **M** (megabytes) or **G** (gigabytes).
  **0** (zero) means unlimited - no quota limit in bytes.
 
-transport
+*transport*
  A transport for Postfix, written as: *transport*\ **:** or
  *transport*\ **:**\ *nexthop*.
  See :manpage:`transport(5)` for more details.
