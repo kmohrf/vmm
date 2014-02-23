@@ -396,8 +396,13 @@ def user_name(ctx):
 
 def user_password(ctx):
     """update the password for the given address"""
-    ctx.hdlr.user_password(ctx.args.address.lower(), ctx.args.password,
-                           ctx.args.scheme)
+    if ctx.args.pwhash:
+        if ctx.args.scheme:
+            w_std(_('Info: The -s option is ignored when --hash was given.'))
+        ctx.hdlr.user_pwhash(ctx.args.address.lower(), ctx.args.pwhash)
+    else:
+        ctx.hdlr.user_password(ctx.args.address.lower(), ctx.args.password,
+                               ctx.args.scheme)
 
 
 def user_note(ctx):
@@ -832,16 +837,21 @@ def setup_parser():
     up = a('userpassword', aliases=('up',),
            help=_('update the password for the given address'),
            epilog=fill(_("The password of an account can be updated with this "
-               "subcommand.\n\nIf no password was provided, vmm will prompt "
-               "for it interactively. When the scheme was omitted, vmm will "
-               "use misc.password_scheme from vmm.cfg. ")),
+               "subcommand.\n\nIf neither a password nor a password hash was "
+               "provided, vmm will prompt for the new password interactively. "
+               "When the scheme was omitted, vmm will use "
+               "misc.password_scheme from vmm.cfg. ")),
            formatter_class=RawDescriptionHelpFormatter)
     up.add_argument('address',
                     help=_("an account's e-mail address (local-part@fqdn)"))
-    up.add_argument('-p', metavar='PASSWORD', dest='password',
-                    help=_("the user's new password"))
+    up_grp = up.add_mutually_exclusive_group()
+    up_grp.add_argument('-p', metavar='PASSWORD', dest='password',
+                        help=_("the user's new password"))
     up.add_argument('-s', metavar='SCHEME', dest='scheme',
                     help=_('scheme used for password hashing'))
+    up_grp.add_argument('--hash', metavar='PWHASH', dest='pwhash',
+                        help=_('set the given password hash as-is as new '
+                               'password'))
     up.set_defaults(func=user_password, scmd='userpassword')
 
     uq = a('userquota', aliases=('uq',),
