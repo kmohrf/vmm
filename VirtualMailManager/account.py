@@ -261,17 +261,19 @@ class Account(object):
     def modify(self, field, value):
         """Update the Account's *field* to the new *value*.
 
-        Possible values for *field* are: 'name' and 'note'.
+        Possible values for *field* are: 'name', 'note' and 'pwhash'.
 
         Arguments:
 
         `field` : str
-          The attribute name: 'name', or 'note'
+          The attribute name: 'name', 'note' or 'pwhash'
         `value` : str
           The new value of the attribute.
         """
-        if field not in ('name', 'note'):
+        if field not in ('name', 'note', 'pwhash'):
             raise AErr(_("Unknown field: '%s'") % field, INVALID_ARGUMENT)
+        if field == 'pwhash':
+            field = 'passwd'
         self._chk_state()
         dbc = self._dbh.cursor()
         dbc.execute('UPDATE users SET %s = %%s WHERE uid = %%s' % field,
