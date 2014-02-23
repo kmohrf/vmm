@@ -40,6 +40,7 @@ from VirtualMailManager.emailaddress import DestinationEmailAddress, \
 from VirtualMailManager.errors import \
      DomainError, NotRootError, PermissionError, VMMError
 from VirtualMailManager.mailbox import new as new_mailbox
+from VirtualMailManager.password import extract_scheme, verify_scheme
 from VirtualMailManager.quotalimit import QuotaLimit
 from VirtualMailManager.relocated import Relocated
 from VirtualMailManager.serviceset import ServiceSet, SERVICES
@@ -764,6 +765,20 @@ The account has been successfully deleted from the database.
             raise VMMError(_("The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
         acc.update_password(password, scheme)
+
+    def user_pwhash(self, emailaddress, pwhash):
+        """Wrapper for Account.modify('pwhash', ...)"""
+        scheme = extract_scheme(pwhash)
+        if not scheme:
+            raise VMMError(_('Missing {SCHEME} prefix from password hash.'),
+                           INVALID_ARGUMENT)
+        else:
+            scheme, encoding = verify_scheme(scheme)  # or die …
+        acc = self._get_account(emailaddress)
+        if not acc:
+            raise VMMError(_("The account '%s' does not exist.") %
+                           acc.address, NO_SUCH_ACCOUNT)
+        acc.modify('pwhash', pwhash)
 
     def user_name(self, emailaddress, name):
         """Wrapper for Account.modify('name', ...)."""
