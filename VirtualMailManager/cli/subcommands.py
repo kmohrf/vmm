@@ -9,150 +9,83 @@
 """
 
 import locale
-import os
+import platform
 
+from argparse import Action, ArgumentParser, ArgumentTypeError, \
+     RawDescriptionHelpFormatter
 from textwrap import TextWrapper
 from time import strftime, strptime
 
 from VirtualMailManager import ENCODING
-from VirtualMailManager.cli import get_winsize, prog, w_err, w_std
-from VirtualMailManager.cli.clihelp import help_msgs
+from VirtualMailManager.cli import get_winsize, w_err, w_std
 from VirtualMailManager.common import human_size, size_in_bytes, \
      version_str, format_domain_default
 from VirtualMailManager.constants import __copyright__, __date__, \
      __version__, ACCOUNT_EXISTS, ALIAS_EXISTS, ALIASDOMAIN_ISDOMAIN, \
-     DOMAIN_ALIAS_EXISTS, INVALID_ARGUMENT, EX_MISSING_ARGS, \
-     RELOCATED_EXISTS, TYPE_ACCOUNT, TYPE_ALIAS, TYPE_RELOCATED
+     DOMAIN_ALIAS_EXISTS, INVALID_ARGUMENT, RELOCATED_EXISTS, TYPE_ACCOUNT, \
+     TYPE_ALIAS, TYPE_RELOCATED
 from VirtualMailManager.errors import VMMError
 from VirtualMailManager.password import list_schemes
 from VirtualMailManager.serviceset import SERVICES
 
 __all__ = (
-    'Command', 'RunContext', 'cmd_map', 'usage', 'alias_add', 'alias_delete',
-    'alias_info', 'aliasdomain_add', 'aliasdomain_delete', 'aliasdomain_info',
-    'aliasdomain_switch', 'catchall_add', 'catchall_info', 'catchall_delete',
-    'config_get', 'config_set', 'configure',
-    'domain_add', 'domain_delete',  'domain_info', 'domain_quota',
-    'domain_services', 'domain_transport', 'domain_note', 'get_user', 'help_',
-    'list_domains', 'list_pwschemes', 'list_users', 'list_aliases',
-    'list_relocated', 'list_addresses', 'relocated_add', 'relocated_delete',
-    'relocated_info', 'user_add', 'user_delete', 'user_info', 'user_name',
-    'user_password', 'user_quota', 'user_services', 'user_transport',
-    'user_note', 'version',
+    'RunContext', 'alias_add', 'alias_delete', 'alias_info', 'aliasdomain_add',
+    'aliasdomain_delete', 'aliasdomain_info', 'aliasdomain_switch',
+    'catchall_add', 'catchall_delete', 'catchall_info', 'config_get',
+    'config_set', 'configure', 'domain_add', 'domain_delete', 'domain_info',
+    'domain_note', 'domain_quota', 'domain_services', 'domain_transport',
+    'get_user', 'list_addresses', 'list_aliases', 'list_domains',
+    'list_pwschemes', 'list_relocated', 'list_users', 'relocated_add',
+    'relocated_delete', 'relocated_info', 'setup_parser', 'user_add',
+    'user_delete', 'user_info', 'user_name', 'user_note', 'user_password',
+    'user_quota', 'user_services', 'user_transport',
 )
 
+WS_ROWS = get_winsize()[1] - 2
+
 _ = lambda msg: msg
-txt_wrpr = TextWrapper(width=get_winsize()[1] - 1)
-cmd_map = {}
-
-
-class Command(object):
-    """Container class for command information."""
-    __slots__ = ('name', 'alias', 'func', 'args', 'descr')
-    FMT_HLP_USAGE = """
-usage: %(prog)s %(name)s %(args)s
-       %(prog)s %(alias)s %(args)s
-"""
-
-    def __init__(self, name, alias, func, args, descr):
-        """Create a new Command instance.
-
-        Arguments:
-
-        `name` : str
-          the command name, e.g. ``addalias``
-        `alias` : str
-          the command's short alias, e.g. ``aa``
-        `func` : callable
-          the function to handle the command
-        `args` : str
-          argument placeholders, e.g. ``aliasaddress``
-        `descr` : str
-          short description of the command
-        """
-        self.name = name
-        self.alias = alias
-        self.func = func
-        self.args = args
-        self.descr = descr
-
-    @property
-    def usage(self):
-        """the command's usage info."""
-        return u'%s %s %s' % (prog, self.name, self.args)
-
-    def help_(self):
-        """Print the Command's help message to stdout."""
-        old_ii = txt_wrpr.initial_indent
-        old_si = txt_wrpr.subsequent_indent
-
-        txt_wrpr.subsequent_indent = (len(self.name) + 2) * ' '
-        w_std(txt_wrpr.fill('%s: %s' % (self.name, self.descr)))
-
-        info = Command.FMT_HLP_USAGE % dict(alias=self.alias, args=self.args,
-                                            name=self.name, prog=prog)
-        w_std(info)
-
-        txt_wrpr.initial_indent = txt_wrpr.subsequent_indent = ' '
-        try:
-            [w_std(txt_wrpr.fill(_(para)) + '\n') for para
-                    in help_msgs[self.name]]
-        except KeyError:
-            w_err(1, _(u"Subcommand '%s' is not yet documented." % self.name),
-                  'see also: vmm(1)')
+txt_wrpr = TextWrapper(width=WS_ROWS)
 
 
 class RunContext(object):
     """Contains all information necessary to run a subcommand."""
-    __slots__ = ('argc', 'args', 'cget', 'hdlr', 'scmd')
-    plan_a_b = _(u'Plan A failed ... trying Plan B: %(subcommand)s %(object)s')
+    __slots__ = ('args', 'cget', 'hdlr')
+    plan_a_b = _('Plan A failed ... trying Plan B: %(subcommand)s %(object)s')
 
-    def __init__(self, argv, handler, command):
+    def __init__(self, args, handler):
         """Create a new RunContext"""
-        self.argc = len(argv)
-        self.args = [unicode(arg, ENCODING) for arg in argv]
+        self.args = args
         self.cget = handler.cfg_dget
         self.hdlr = handler
-        self.scmd = command
 
 
 def alias_add(ctx):
     """create a new alias e-mail address"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing alias address and destination.'),
-              ctx.scmd)
-    elif ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u'Missing destination address.'), ctx.scmd)
-    ctx.hdlr.alias_add(ctx.args[2].lower(), *ctx.args[3:])
+    ctx.hdlr.alias_add(ctx.args.address.lower(), *ctx.args.destination)
 
 
 def alias_delete(ctx):
     """delete the specified alias e-mail address or one of its destinations"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing alias address.'), ctx.scmd)
-    elif ctx.argc < 4:
-        ctx.hdlr.alias_delete(ctx.args[2].lower())
-    else:
-        ctx.hdlr.alias_delete(ctx.args[2].lower(), ctx.args[3:])
+    destination = ctx.args.destination if ctx.args.destination else None
+    ctx.hdlr.alias_delete(ctx.args.address.lower(), destination)
 
 
 def alias_info(ctx):
     """show the destination(s) of the specified alias"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing alias address.'), ctx.scmd)
-    address = ctx.args[2].lower()
+    address = ctx.args.address.lower()
     try:
         _print_aliase_info(address, ctx.hdlr.alias_info(address))
-    except VMMError, err:
+    except VMMError as err:
         if err.code is ACCOUNT_EXISTS:
-            w_err(0, ctx.plan_a_b % {'subcommand': u'userinfo',
+            w_err(0, ctx.plan_a_b % {'subcommand': 'userinfo',
                   'object': address})
-            ctx.scmd = ctx.args[1] = 'userinfo'
+            ctx.args.scmd = 'userinfo'
+            ctx.args.details = None
             user_info(ctx)
         elif err.code is RELOCATED_EXISTS:
-            w_err(0, ctx.plan_a_b % {'subcommand': u'relocatedinfo',
+            w_err(0, ctx.plan_a_b % {'subcommand': 'relocatedinfo',
                   'object': address})
-            ctx.scmd = ctx.args[1] = 'relocatedinfo'
+            ctx.args.scmd = 'relocatedinfo'
             relocated_info(ctx)
         else:
             raise
@@ -160,33 +93,25 @@ def alias_info(ctx):
 
 def aliasdomain_add(ctx):
     """create a new alias for an existing domain"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing alias domain name and destination '
-                                 u'domain name.'), ctx.scmd)
-    elif ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u'Missing destination domain name.'),
-              ctx.scmd)
-    ctx.hdlr.aliasdomain_add(ctx.args[2].lower(), ctx.args[3].lower())
+    ctx.hdlr.aliasdomain_add(ctx.args.fqdn.lower(),
+                             ctx.args.destination.lower())
 
 
 def aliasdomain_delete(ctx):
     """delete the specified alias domain"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing alias domain name.'), ctx.scmd)
-    ctx.hdlr.aliasdomain_delete(ctx.args[2].lower())
+    ctx.hdlr.aliasdomain_delete(ctx.args.fqdn.lower())
 
 
 def aliasdomain_info(ctx):
     """show the destination of the given alias domain"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing alias domain name.'), ctx.scmd)
+    fqdn = ctx.args.fqdn.lower()
     try:
-        _print_aliasdomain_info(ctx.hdlr.aliasdomain_info(ctx.args[2].lower()))
-    except VMMError, err:
+        _print_aliasdomain_info(ctx.hdlr.aliasdomain_info(fqdn))
+    except VMMError as err:
         if err.code is ALIASDOMAIN_ISDOMAIN:
-            w_err(0, ctx.plan_a_b % {'subcommand': u'domaininfo',
-                  'object': ctx.args[2].lower()})
-            ctx.scmd = ctx.args[1] = 'domaininfo'
+            w_err(0, ctx.plan_a_b % {'subcommand': 'domaininfo',
+                                     'object': fqdn})
+            ctx.args.scmd = 'domaininfo'
             domain_info(ctx)
         else:
             raise
@@ -194,327 +119,160 @@ def aliasdomain_info(ctx):
 
 def aliasdomain_switch(ctx):
     """assign the given alias domain to an other domain"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing alias domain name and destination '
-                                 u'domain name.'), ctx.scmd)
-    elif ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u'Missing destination domain name.'),
-              ctx.scmd)
-    ctx.hdlr.aliasdomain_switch(ctx.args[2].lower(), ctx.args[3].lower())
+    ctx.hdlr.aliasdomain_switch(ctx.args.fqdn.lower(),
+                                ctx.args.destination.lower())
 
 
 def catchall_add(ctx):
     """create a new catchall alias e-mail address"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain and destination.'),
-              ctx.scmd)
-    elif ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u'Missing destination address.'), ctx.scmd)
-    ctx.hdlr.catchall_add(ctx.args[2].lower(), *ctx.args[3:])
+    ctx.hdlr.catchall_add(ctx.args.fqdn.lower(), *ctx.args.destination)
 
 
 def catchall_delete(ctx):
     """delete the specified destination or all of the catchall destination"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain name.'), ctx.scmd)
-    elif ctx.argc < 4:
-        ctx.hdlr.catchall_delete(ctx.args[2].lower())
-    else:
-        ctx.hdlr.catchall_delete(ctx.args[2].lower(), ctx.args[3:])
+    destination = ctx.args.destination if ctx.args.destination else None
+    ctx.hdlr.catchall_delete(ctx.args.fqdn.lower(), destination)
 
 
 def catchall_info(ctx):
     """show the catchall destination(s) of the specified domain"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain name.'), ctx.scmd)
-    address = ctx.args[2].lower()
+    address = ctx.args.fqdn.lower()
     _print_catchall_info(address, ctx.hdlr.catchall_info(address))
 
 
 def config_get(ctx):
     """show the actual value of the configuration option"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u"Missing option name."), ctx.scmd)
-
     noop = lambda option: option
     opt_formater = {
         'misc.dovecot_version': version_str,
         'domain.quota_bytes': human_size,
     }
 
-    option = ctx.args[2].lower()
+    option = ctx.args.option.lower()
     w_std('%s = %s' % (option, opt_formater.get(option,
                        noop)(ctx.cget(option))))
 
 
 def config_set(ctx):
     """set a new value for the configuration option"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing option and new value.'), ctx.scmd)
-    if ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u'Missing new configuration value.'),
-              ctx.scmd)
-    ctx.hdlr.cfg_set(ctx.args[2].lower(), ctx.args[3])
+    ctx.hdlr.cfg_set(ctx.args.option.lower(), ctx.args.value)
 
 
 def configure(ctx):
     """start interactive configuration mode"""
-    if ctx.argc < 3:
-        ctx.hdlr.configure()
-    else:
-        ctx.hdlr.configure(ctx.args[2].lower())
+    ctx.hdlr.configure(ctx.args.section)
 
 
 def domain_add(ctx):
     """create a new domain"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain name.'), ctx.scmd)
-    elif ctx.argc < 4:
-        ctx.hdlr.domain_add(ctx.args[2].lower())
-    else:
-        ctx.hdlr.domain_add(ctx.args[2].lower(), ctx.args[3])
+    fqdn = ctx.args.fqdn.lower()
+    transport = ctx.args.transport.lower() if ctx.args.transport else None
+    ctx.hdlr.domain_add(fqdn, transport, ctx.args.note)
     if ctx.cget('domain.auto_postmaster'):
-        w_std(_(u'Creating account for postmaster@%s') % ctx.args[2].lower())
-        ctx.scmd = 'useradd'
-        ctx.args = [prog, ctx.scmd, u'postmaster@' + ctx.args[2].lower()]
-        ctx.argc = 3
+        w_std(_('Creating account for postmaster@%s') % fqdn)
+        ctx.args.scmd = 'useradd'
+        ctx.args.address = 'postmaster@%s' % fqdn
+        ctx.args.password = None
+        ctx.args.note = None
         user_add(ctx)
 
 
 def domain_delete(ctx):
     """delete the given domain and all its alias domains"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain name.'), ctx.scmd)
-    elif ctx.argc < 4:
-        ctx.hdlr.domain_delete(ctx.args[2].lower())
-    elif ctx.args[3].lower() == 'force':
-        ctx.hdlr.domain_delete(ctx.args[2].lower(), True)
-    else:
-        usage(INVALID_ARGUMENT, _(u"Invalid argument: '%s'") % ctx.args[3],
-              ctx.scmd)
+    ctx.hdlr.domain_delete(ctx.args.fqdn.lower(), ctx.args.force)
 
 
 def domain_info(ctx):
     """display information about the given domain"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain name.'), ctx.scmd)
-    if ctx.argc < 4:
-        details = None
-    else:
-        details = ctx.args[3].lower()
-        if details not in ('accounts', 'aliasdomains', 'aliases', 'full',
-                           'relocated', 'catchall'):
-            usage(INVALID_ARGUMENT, _(u"Invalid argument: '%s'") % details,
-                  ctx.scmd)
+    fqdn = ctx.args.fqdn.lower()
+    details = ctx.args.details
     try:
-        info = ctx.hdlr.domain_info(ctx.args[2].lower(), details)
-    except VMMError, err:
+        info = ctx.hdlr.domain_info(fqdn, details)
+    except VMMError as err:
         if err.code is DOMAIN_ALIAS_EXISTS:
-            w_err(0, ctx.plan_a_b % {'subcommand': u'aliasdomaininfo',
-                  'object': ctx.args[2].lower()})
-            ctx.scmd = ctx.args[1] = 'aliasdomaininfo'
+            w_err(0, ctx.plan_a_b % {'subcommand': 'aliasdomaininfo',
+                                     'object': fqdn})
+            ctx.args.scmd = 'aliasdomaininfo'
             aliasdomain_info(ctx)
         else:
             raise
     else:
-        q_limit = u'Storage: %(bytes)s; Messages: %(messages)s'
+        q_limit = 'Storage: %(bytes)s; Messages: %(messages)s'
         if not details:
             info['bytes'] = human_size(info['bytes'])
-            info['messages'] = locale.format('%d', info['messages'],
-                                             True).decode(ENCODING, 'replace')
+            info['messages'] = locale.format('%d', info['messages'], True)
             info['quota limit/user'] = q_limit % info
-            _print_info(ctx, info, _(u'Domain'))
+            _print_info(ctx, info, _('Domain'))
         else:
             info[0]['bytes'] = human_size(info[0]['bytes'])
             info[0]['messages'] = locale.format('%d', info[0]['messages'],
-                                                True).decode(ENCODING,
-                                                             'replace')
+                                                True)
             info[0]['quota limit/user'] = q_limit % info[0]
-            _print_info(ctx, info[0], _(u'Domain'))
-            if details == u'accounts':
-                _print_list(info[1], _(u'accounts'))
-            elif details == u'aliasdomains':
-                _print_list(info[1], _(u'alias domains'))
-            elif details == u'aliases':
-                _print_list(info[1], _(u'aliases'))
-            elif details == u'relocated':
-                _print_list(info[1], _(u'relocated users'))
-            elif details == u'catchall':
-                _print_list(info[1], _(u'catch-all destinations'))
+            _print_info(ctx, info[0], _('Domain'))
+            if details == 'accounts':
+                _print_list(info[1], _('accounts'))
+            elif details == 'aliasdomains':
+                _print_list(info[1], _('alias domains'))
+            elif details == 'aliases':
+                _print_list(info[1], _('aliases'))
+            elif details == 'relocated':
+                _print_list(info[1], _('relocated users'))
+            elif details == 'catchall':
+                _print_list(info[1], _('catch-all destinations'))
             else:
-                _print_list(info[1], _(u'alias domains'))
-                _print_list(info[2], _(u'accounts'))
-                _print_list(info[3], _(u'aliases'))
-                _print_list(info[4], _(u'relocated users'))
-                _print_list(info[5], _(u'catch-all destinations'))
+                _print_list(info[1], _('alias domains'))
+                _print_list(info[2], _('accounts'))
+                _print_list(info[3], _('aliases'))
+                _print_list(info[4], _('relocated users'))
+                _print_list(info[5], _('catch-all destinations'))
 
 
 def domain_quota(ctx):
     """update the quota limit of the specified domain"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain name and storage value.'),
-              ctx.scmd)
-    if ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u'Missing storage value.'), ctx.scmd)
-    messages = 0
-    force = None
-    try:
-        bytes_ = size_in_bytes(ctx.args[3])
-    except (ValueError, TypeError):
-        usage(INVALID_ARGUMENT, _(u"Invalid storage value: '%s'") %
-              ctx.args[3], ctx.scmd)
-    if ctx.argc < 5:
-        pass
-    elif ctx.argc < 6:
-        try:
-            messages = int(ctx.args[4])
-        except ValueError:
-            if ctx.args[4].lower() != 'force':
-                usage(INVALID_ARGUMENT,
-                      _(u"Neither a valid number of messages nor the keyword "
-                        u"'force': '%s'") % ctx.args[4], ctx.scmd)
-            force = 'force'
-    else:
-        try:
-            messages = int(ctx.args[4])
-        except ValueError:
-            usage(INVALID_ARGUMENT,
-                  _(u"Not a valid number of messages: '%s'") % ctx.args[4],
-                  ctx.scmd)
-        if ctx.args[5].lower() != 'force':
-            usage(INVALID_ARGUMENT, _(u"Invalid argument: '%s'") % ctx.args[5],
-                  ctx.scmd)
-        force = 'force'
-    ctx.hdlr.domain_quotalimit(ctx.args[2].lower(), bytes_, messages, force)
+    ctx.hdlr.domain_quotalimit(ctx.args.fqdn.lower(), ctx.args.storage,
+                               ctx.args.messages, ctx.args.force)
 
 
 def domain_services(ctx):
     """allow all named service and block the uncredited."""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain name.'), ctx.scmd)
-    services = []
-    force = False
-    if ctx.argc is 3:
-        pass
-    elif ctx.argc is 4:
-        arg = ctx.args[3].lower()
-        if arg in SERVICES:
-            services.append(arg)
-        elif arg == 'force':
-            force = True
-        else:
-            usage(INVALID_ARGUMENT, _(u"Invalid argument: '%s'") % arg,
-                  ctx.scmd)
-    else:
-        services.extend([service.lower() for service in ctx.args[3:-1]])
-        arg = ctx.args[-1].lower()
-        if arg == 'force':
-            force = True
-        else:
-            services.append(arg)
-        unknown = [service for service in services if service not in SERVICES]
-        if unknown:
-            usage(INVALID_ARGUMENT, _(u'Invalid service arguments: %s') %
-                  ' '.join(unknown), ctx.scmd)
-    ctx.hdlr.domain_services(ctx.args[2].lower(), (None, 'force')[force],
-                             *services)
+    services = ctx.args.services if ctx.args.services else []
+    ctx.hdlr.domain_services(ctx.args.fqdn.lower(), ctx.args.force, *services)
 
 
 def domain_transport(ctx):
     """update the transport of the specified domain"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain name and new transport.'),
-              ctx.scmd)
-    if ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u'Missing new transport.'), ctx.scmd)
-    if ctx.argc < 5:
-        ctx.hdlr.domain_transport(ctx.args[2].lower(), ctx.args[3])
-    else:
-        force = ctx.args[4].lower()
-        if force != 'force':
-            usage(INVALID_ARGUMENT, _(u"Invalid argument: '%s'") % force,
-                  ctx.scmd)
-        ctx.hdlr.domain_transport(ctx.args[2].lower(), ctx.args[3], force)
+    ctx.hdlr.domain_transport(ctx.args.fqdn.lower(),
+                              ctx.args.transport.lower(), ctx.args.force)
 
 
 def domain_note(ctx):
     """update the note of the given domain"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing domain name.'),
-              ctx.scmd)
-    elif ctx.argc < 4:
-        note = None
-    else:
-        note = ' '.join(ctx.args[3:])
-    ctx.hdlr.domain_note(ctx.args[2].lower(), note)
+    ctx.hdlr.domain_note(ctx.args.fqdn.lower(), ctx.args.note)
 
 
 def get_user(ctx):
     """get the address of the user with the given UID"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing UID.'), ctx.scmd)
-    _print_info(ctx, ctx.hdlr.user_by_uid(ctx.args[2]), _(u'Account'))
-
-
-def help_(ctx):
-    """print help messages."""
-    if ctx.argc > 2:
-        hlptpc = ctx.args[2].lower()
-        if hlptpc in cmd_map:
-            topic = hlptpc
-        else:
-            for scmd in cmd_map.itervalues():
-                if scmd.alias == hlptpc:
-                    topic = scmd.name
-                    break
-            else:
-                usage(INVALID_ARGUMENT, _(u"Unknown help topic: '%s'") %
-                      ctx.args[2], ctx.scmd)
-        if topic != u'help':
-            return cmd_map[topic].help_()
-
-    old_ii = txt_wrpr.initial_indent
-    old_si = txt_wrpr.subsequent_indent
-    txt_wrpr.initial_indent = ' '
-    # len(max(_overview.iterkeys(), key=len)) #Py25
-    txt_wrpr.subsequent_indent = 20 * ' '
-    order = cmd_map.keys()
-    order.sort()
-
-    w_std(_(u'List of available subcommands:') + '\n')
-    for key in order:
-        w_std('\n'.join(txt_wrpr.wrap('%-18s %s' % (key, cmd_map[key].descr))))
-
-    txt_wrpr.initial_indent = old_ii
-    txt_wrpr.subsequent_indent = old_si
-    txt_wrpr.initial_indent = ''
+    _print_info(ctx, ctx.hdlr.user_by_uid(ctx.args.uid), _('Account'))
 
 
 def list_domains(ctx):
     """list all domains / search domains by pattern"""
-    matching = ctx.argc > 2
-    if matching:
-        gids, domains = ctx.hdlr.domain_list(ctx.args[2].lower())
-    else:
-        gids, domains = ctx.hdlr.domain_list()
+    matching = True if ctx.args.pattern else False
+    pattern = ctx.args.pattern.lower() if matching else None
+    gids, domains = ctx.hdlr.domain_list(pattern)
     _print_domain_list(gids, domains, matching)
 
 
 def list_pwschemes(ctx_unused):
     """Prints all usable password schemes and password encoding suffixes."""
-    # TODO: Remove trailing colons from keys.
-    # For now it is to late, the translators has stared their work
-    keys = (_(u'Usable password schemes:'), _(u'Usable encoding suffixes:'))
+    keys = (_('Usable password schemes'), _('Usable encoding suffixes'))
     old_ii, old_si = txt_wrpr.initial_indent, txt_wrpr.subsequent_indent
     txt_wrpr.initial_indent = txt_wrpr.subsequent_indent = '\t'
     txt_wrpr.width = txt_wrpr.width - 8
 
     for key, value in zip(keys, list_schemes()):
-        if key.endswith(':'):  # who knows … (see TODO above)
-            #key = key.rpartition(':')[0]
-            key = key[:-1]  # This one is for Py24
         w_std(key, len(key) * '-')
-        w_std('\n'.join(txt_wrpr.wrap(' '.join(value))), '')
+        w_std('\n'.join(txt_wrpr.wrap(' '.join(sorted(value)))), '')
 
     txt_wrpr.initial_indent, txt_wrpr.subsequent_indent = old_ii, old_si
     txt_wrpr.width = txt_wrpr.width + 8
@@ -527,11 +285,9 @@ def list_addresses(ctx, limit=None):
     combining all three."""
     if limit is None:
         limit = TYPE_ACCOUNT | TYPE_ALIAS | TYPE_RELOCATED
-    matching = ctx.argc > 2
-    if matching:
-        gids, addresses = ctx.hdlr.address_list(limit, ctx.args[2].lower())
-    else:
-        gids, addresses = ctx.hdlr.address_list(limit)
+    matching = True if ctx.args.pattern else False
+    pattern = ctx.args.pattern.lower() if matching else None
+    gids, addresses = ctx.hdlr.address_list(limit, pattern)
     _print_address_list(limit, gids, addresses, matching)
 
 
@@ -552,39 +308,31 @@ def list_relocated(ctx):
 
 def relocated_add(ctx):
     """create a new record for a relocated user"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS,
-              _(u'Missing relocated address and destination.'), ctx.scmd)
-    elif ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u'Missing destination address.'), ctx.scmd)
-    ctx.hdlr.relocated_add(ctx.args[2].lower(), ctx.args[3])
+    ctx.hdlr.relocated_add(ctx.args.address.lower(), ctx.args.newaddress)
 
 
 def relocated_delete(ctx):
     """delete the record of the relocated user"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing relocated address.'), ctx.scmd)
-    ctx.hdlr.relocated_delete(ctx.args[2].lower())
+    ctx.hdlr.relocated_delete(ctx.args.address.lower())
 
 
 def relocated_info(ctx):
     """print information about a relocated user"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing relocated address.'), ctx.scmd)
-    relocated = ctx.args[2].lower()
+    relocated = ctx.args.address.lower()
     try:
         _print_relocated_info(addr=relocated,
                               dest=ctx.hdlr.relocated_info(relocated))
-    except VMMError, err:
+    except VMMError as err:
         if err.code is ACCOUNT_EXISTS:
-            w_err(0, ctx.plan_a_b % {'subcommand': u'userinfo',
+            w_err(0, ctx.plan_a_b % {'subcommand': 'userinfo',
                   'object': relocated})
-            ctx.scmd = ctx.args[1] = 'userinfoi'
+            ctx.args.scmd = 'userinfo'
+            ctx.args.details = None
             user_info(ctx)
         elif err.code is ALIAS_EXISTS:
-            w_err(0, ctx.plan_a_b % {'subcommand': u'aliasinfo',
+            w_err(0, ctx.plan_a_b % {'subcommand': 'aliasinfo',
                   'object': relocated})
-            ctx.scmd = ctx.args[1] = 'aliasinfo'
+            ctx.args.scmd = 'aliasinfo'
             alias_info(ctx)
         else:
             raise
@@ -592,65 +340,44 @@ def relocated_info(ctx):
 
 def user_add(ctx):
     """create a new e-mail user with the given address"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing e-mail address.'), ctx.scmd)
-    elif ctx.argc < 4:
-        password = None
-    else:
-        password = ctx.args[3]
-    gen_pass = ctx.hdlr.user_add(ctx.args[2].lower(), password)
-    if ctx.argc < 4 and gen_pass:
-        w_std(_(u"Generated password: %s") % gen_pass)
+    gen_pass = ctx.hdlr.user_add(ctx.args.address.lower(), ctx.args.password,
+                                 ctx.args.note)
+    if not ctx.args.password and gen_pass:
+        w_std(_("Generated password: %s") % gen_pass)
 
 
 def user_delete(ctx):
     """delete the specified user"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing e-mail address.'), ctx.scmd)
-    elif ctx.argc < 4:
-        ctx.hdlr.user_delete(ctx.args[2].lower())
-    elif ctx.args[3].lower() == 'force':
-        ctx.hdlr.user_delete(ctx.args[2].lower(), True)
-    else:
-        usage(INVALID_ARGUMENT, _(u"Invalid argument: '%s'") % ctx.args[3],
-              ctx.scmd)
+    ctx.hdlr.user_delete(ctx.args.address.lower(), ctx.args.force)
 
 
 def user_info(ctx):
     """display information about the given address"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing e-mail address.'), ctx.scmd)
-    if ctx.argc < 4:
-        details = None
-    else:
-        details = ctx.args[3].lower()
-        if details not in ('aliases', 'du', 'full'):
-            usage(INVALID_ARGUMENT, _(u"Invalid argument: '%s'") % details,
-                  ctx.scmd)
+    address = ctx.args.address.lower()
     try:
-        info = ctx.hdlr.user_info(ctx.args[2].lower(), details)
-    except VMMError, err:
+        info = ctx.hdlr.user_info(address, ctx.args.details)
+    except VMMError as err:
         if err.code is ALIAS_EXISTS:
-            w_err(0, ctx.plan_a_b % {'subcommand': u'aliasinfo',
-                  'object': ctx.args[2].lower()})
-            ctx.scmd = ctx.args[1] = 'aliasinfo'
+            w_err(0, ctx.plan_a_b % {'subcommand': 'aliasinfo',
+                  'object': address})
+            ctx.args.scmd = 'aliasinfo'
             alias_info(ctx)
         elif err.code is RELOCATED_EXISTS:
-            w_err(0, ctx.plan_a_b % {'subcommand': u'relocatedinfo',
-                  'object': ctx.args[2].lower()})
-            ctx.scmd = ctx.args[1] = 'relocatedinfo'
+            w_err(0, ctx.plan_a_b % {'subcommand': 'relocatedinfo',
+                  'object': address})
+            ctx.args.scmd = 'relocatedinfo'
             relocated_info(ctx)
         else:
             raise
     else:
-        if details in (None, 'du'):
+        if ctx.args.details in (None, 'du'):
             info['quota storage'] = _format_quota_usage(info['ql_bytes'],
                     info['uq_bytes'], True, info['ql_domaindefault'])
             info['quota messages'] = \
                 _format_quota_usage(info['ql_messages'],
                                     info['uq_messages'],
                                     domaindefault=info['ql_domaindefault'])
-            _print_info(ctx, info, _(u'Account'))
+            _print_info(ctx, info, _('Account'))
         else:
             info[0]['quota storage'] = _format_quota_usage(info[0]['ql_bytes'],
                     info[0]['uq_bytes'], True, info[0]['ql_domaindefault'])
@@ -658,286 +385,677 @@ def user_info(ctx):
                 _format_quota_usage(info[0]['ql_messages'],
                                     info[0]['uq_messages'],
                                     domaindefault=info[0]['ql_domaindefault'])
-            _print_info(ctx, info[0], _(u'Account'))
-            _print_list(info[1], _(u'alias addresses'))
+            _print_info(ctx, info[0], _('Account'))
+            _print_list(info[1], _('alias addresses'))
 
 
 def user_name(ctx):
     """set or update the real name for an address"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u"Missing e-mail address and user's name."),
-              ctx.scmd)
-    elif ctx.argc < 4:
-        name = None
-    else:
-        name = ctx.args[3]
-    ctx.hdlr.user_name(ctx.args[2].lower(), name)
+    ctx.hdlr.user_name(ctx.args.address.lower(), ctx.args.name)
 
 
 def user_password(ctx):
     """update the password for the given address"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing e-mail address.'), ctx.scmd)
-    elif ctx.argc < 4:
-        password = None
+    if ctx.args.pwhash:
+        if ctx.args.scheme:
+            w_std(_('Info: The -s option is ignored when --hash was given.'))
+        ctx.hdlr.user_pwhash(ctx.args.address.lower(), ctx.args.pwhash)
     else:
-        password = ctx.args[3]
-    ctx.hdlr.user_password(ctx.args[2].lower(), password)
+        ctx.hdlr.user_password(ctx.args.address.lower(), ctx.args.password,
+                               ctx.args.scheme)
 
 
 def user_note(ctx):
     """update the note of the given address"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing e-mail address.'),
-              ctx.scmd)
-    elif ctx.argc < 4:
-        note = None
-    else:
-        note = ' '.join(ctx.args[3:])
-    ctx.hdlr.user_note(ctx.args[2].lower(), note)
+    ctx.hdlr.user_note(ctx.args.address.lower(), ctx.args.note)
 
 
 def user_quota(ctx):
     """update the quota limit for the given address"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing e-mail address and storage value.'),
-              ctx.scmd)
-    elif ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u'Missing storage value.'), ctx.scmd)
-    if ctx.args[3] != 'domain':
-        try:
-            bytes_ = size_in_bytes(ctx.args[3])
-        except (ValueError, TypeError):
-            usage(INVALID_ARGUMENT, _(u"Invalid storage value: '%s'") %
-                  ctx.args[3], ctx.scmd)
-    else:
-        bytes_ = ctx.args[3]
-    if ctx.argc < 5:
-        messages = 0
-    else:
-        try:
-            messages = int(ctx.args[4])
-        except ValueError:
-            usage(INVALID_ARGUMENT,
-                  _(u"Not a valid number of messages: '%s'") % ctx.args[4],
-                  ctx.scmd)
-    ctx.hdlr.user_quotalimit(ctx.args[2].lower(), bytes_, messages)
+    ctx.hdlr.user_quotalimit(ctx.args.address.lower(), ctx.args.storage,
+                             ctx.args.messages)
 
 
 def user_services(ctx):
     """allow all named service and block the uncredited."""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing e-mail address.'), ctx.scmd)
-    services = []
-    if ctx.argc >= 4:
-        services.extend([service.lower() for service in ctx.args[3:]])
-        unknown = [service for service in services if service not in SERVICES]
-        if unknown and ctx.args[3] != 'domain':
-            usage(INVALID_ARGUMENT, _(u'Invalid service arguments: %s') %
-                  ' '.join(unknown), ctx.scmd)
-    ctx.hdlr.user_services(ctx.args[2].lower(), *services)
+    if 'domain' in ctx.args.services:
+        services = ['domain']
+    else:
+        services = ctx.args.services
+    ctx.hdlr.user_services(ctx.args.address.lower(), *services)
 
 
 def user_transport(ctx):
     """update the transport of the given address"""
-    if ctx.argc < 3:
-        usage(EX_MISSING_ARGS, _(u'Missing e-mail address and transport.'),
-              ctx.scmd)
-    if ctx.argc < 4:
-        usage(EX_MISSING_ARGS, _(u'Missing transport.'), ctx.scmd)
-    ctx.hdlr.user_transport(ctx.args[2].lower(), ctx.args[3])
+    ctx.hdlr.user_transport(ctx.args.address.lower(), ctx.args.transport)
 
 
-def usage(errno, errmsg, subcommand=None):
-    """print usage message for the given command or all commands.
-    When errno > 0, sys,exit(errno) will interrupt the program.
-    """
-    if subcommand and subcommand in cmd_map:
-        w_err(errno, _(u"Error: %s") % errmsg,
-              _(u"usage: ") + cmd_map[subcommand].usage)
+def setup_parser():
+    """Create the argument parser, add all the subcommands and return it."""
+    class ArgParser(ArgumentParser):
+        """This class fixes the 'width detection'."""
+        def _get_formatter(self):
+            return self.formatter_class(prog=self.prog, width=WS_ROWS,
+                                        max_help_position=26)
 
-    # TP: Please adjust translated words like the original text.
-    # (It's a table header.) Extract from usage text:
-    # usage: vmm subcommand arguments
-    #   short long
-    #   subcommand                arguments
-    #
-    #   da    domainadd           fqdn [transport]
-    #   dd    domaindelete        fqdn [force]
-    u_head = _(u"""usage: %s subcommand arguments
-  short long
-  subcommand                arguments\n""") % prog
-    order = cmd_map.keys()
-    order.sort()
-    w_err(0, u_head)
-    for key in order:
-        scmd = cmd_map[key]
-        w_err(0, '  %-5s %-19s %s' % (scmd.alias, scmd.name, scmd.args))
-    w_err(errno, '', _(u"Error: %s") % errmsg)
+    class VersionAction(Action):
+        """Show version and copyright information."""
+        def __call__(self, parser, namespace, values, option_string=None):
+            """implements the Action API."""
+            vers_info = _('{program}, version {version} (from {rel_date})\n'
+                          'Python {py_vers} on {sysname}'.format(
+                              program=parser.prog, version=__version__,
+                              rel_date=strftime(
+                                            locale.nl_langinfo(locale.D_FMT),
+                                            strptime(__date__, '%Y-%m-%d')),
+                              py_vers=platform.python_version(),
+                              sysname=platform.system()))
+            copy_info = _('{copyright}\n{program} is free software and comes '
+                          'with ABSOLUTELY NO WARRANTY.'.format(
+                              copyright=__copyright__, program=parser.prog))
+            parser.exit(message='\n\n'.join((vers_info, copy_info)) + '\n')
 
+    def quota_storage(string):
+        if string == 'domain':
+            return string
+        try:
+            storage = size_in_bytes(string)
+        except (TypeError, ValueError) as error:
+            raise ArgumentTypeError(str(error))
+        return storage
 
-def version(ctx_unused):
-    """Write version and copyright information to stdout."""
-    w_std('%s, %s %s (%s %s)\nPython %s %s %s\n\n%s\n%s %s' % (prog,
-    # TP: The words 'from', 'version' and 'on' are used in
-    # the version information, e.g.:
-    # vmm, version 0.5.2 (from 09/09/09)
-    # Python 2.5.4 on FreeBSD
-        _(u'version'), __version__, _(u'from'),
-        strftime(locale.nl_langinfo(locale.D_FMT),
-            strptime(__date__, '%Y-%m-%d')).decode(ENCODING, 'replace'),
-        os.sys.version.split()[0], _(u'on'), os.uname()[0],
-        __copyright__, prog,
-        _(u'is free software and comes with ABSOLUTELY NO WARRANTY.')))
+    old_rw = txt_wrpr.replace_whitespace
+    txt_wrpr.replace_whitespace = False
+    fill = lambda t: '\n'.join(txt_wrpr.fill(l) for l in t.splitlines(True))
+    mklst = lambda iterable: '\n\t - ' + '\n\t - '.join(iterable)
 
+    description = _('%(prog)s - command line tool to manage email '
+                    'domains/accounts/aliases/...')
+    epilog = _('use "%(prog)s <subcommand> -h" for information about the '
+               'given subcommand')
+    parser = ArgParser(description=description, epilog=epilog)
+    parser.add_argument('-v', '--version', action=VersionAction, nargs=0,
+                        help=_("show %(prog)s's version and copyright "
+                               "information and exit"))
+    subparsers = parser.add_subparsers(metavar=_('<subcommand>'),
+                                     title=_('list of available subcommands'))
+    a = subparsers.add_parser
 
-def update_cmd_map():
-    """Update the cmd_map, after gettext's _ was installed."""
-    cmd = Command
-    cmd_map.update({
-    # Account commands
-    'getuser': cmd('getuser', 'gu', get_user, 'uid',
-                   _(u'get the address of the user with the given UID')),
-    'useradd': cmd('useradd', 'ua', user_add, 'address [password]',
-                   _(u'create a new e-mail user with the given address')),
-    'userdelete': cmd('userdelete', 'ud', user_delete, 'address [force]',
-                      _(u'delete the specified user')),
-    'userinfo': cmd('userinfo', 'ui', user_info, 'address [details]',
-                    _(u'display information about the given address')),
-    'username': cmd('username', 'un', user_name, 'address [name]',
-                    _(u'set, update or delete the real name for an address')),
-    'userpassword': cmd('userpassword', 'up', user_password,
-                        'address [password]',
-                        _(u'update the password for the given address')),
-    'userquota': cmd('userquota', 'uq', user_quota,
-                     'address storage [messages] | address domain',
-                     _(u'update the quota limit for the given address')),
-    'userservices': cmd('userservices', 'us', user_services,
-                        'address [service ...] | address domain',
-                        _(u'enables the specified services and disables all '
-                          u'not specified services')),
-    'usertransport': cmd('usertransport', 'ut', user_transport,
-                         'address transport | address domain',
-                         _(u'update the transport of the given address')),
-    'usernote': cmd('usernote', 'uo', user_note, 'address [note]',
-                    _(u'set, update or delete the note of the given address')),
-    # Alias commands
-    'aliasadd': cmd('aliasadd', 'aa', alias_add, 'address destination ...',
-                    _(u'create a new alias e-mail address with one or more '
-                      u'destinations')),
-    'aliasdelete': cmd('aliasdelete', 'ad', alias_delete,
-                       'address [destination ...]',
-                       _(u'delete the specified alias e-mail address or one '
-                         u'of its destinations')),
-    'aliasinfo': cmd('aliasinfo', 'ai', alias_info, 'address',
-                     _(u'show the destination(s) of the specified alias')),
-    # AliasDomain commands
-    'aliasdomainadd': cmd('aliasdomainadd', 'ada', aliasdomain_add,
-                          'fqdn destination',
-                          _(u'create a new alias for an existing domain')),
-    'aliasdomaindelete': cmd('aliasdomaindelete', 'add', aliasdomain_delete,
-                             'fqdn', _(u'delete the specified alias domain')),
-    'aliasdomaininfo': cmd('aliasdomaininfo', 'adi', aliasdomain_info, 'fqdn',
-                         _(u'show the destination of the given alias domain')),
-    'aliasdomainswitch': cmd('aliasdomainswitch', 'ads', aliasdomain_switch,
-                             'fqdn destination', _(u'assign the given alias '
-                             'domain to an other domain')),
-    # CatchallAlias commands
-    'catchalladd': cmd('catchalladd', 'caa', catchall_add,
-                       'fqdn destination ...',
-                       _(u'add one or more catch-all destinations for a '
-                         u'domain')),
-    'catchalldelete': cmd('catchalldelete', 'cad', catchall_delete,
-                       'fqdn [destination ...]',
-                       _(u'delete the specified catch-all destination or all '
-                         u'of a domain\'s destinations')),
-    'catchallinfo': cmd('catchallinfo', 'cai', catchall_info, 'fqdn',
-                        _(u'show the catch-all destination(s) of the '
-                          u'specified domain')),
-    # Domain commands
-    'domainadd': cmd('domainadd', 'da', domain_add, 'fqdn [transport]',
-                     _(u'create a new domain')),
-    'domaindelete': cmd('domaindelete', 'dd', domain_delete, 'fqdn [force]',
-                      _(u'delete the given domain and all its alias domains')),
-    'domaininfo': cmd('domaininfo', 'di', domain_info, 'fqdn [details]',
-                      _(u'display information about the given domain')),
-    'domainquota': cmd('domainquota', 'dq', domain_quota,
-                       'fqdn storage [messages] [force]',
-                       _(u'update the quota limit of the specified domain')),
-    'domainservices': cmd('domainservices', 'ds', domain_services,
-                          'fqdn [service ...] [force]',
-                          _(u'enables the specified services and disables all '
-                            u'not specified services of the given domain')),
-    'domaintransport': cmd('domaintransport', 'dt', domain_transport,
-                           'fqdn transport [force]',
-                           _(u'update the transport of the specified domain')),
-    'domainnote': cmd('domainnote', 'do', domain_note, 'fqdn [note]',
-                     _(u'set, update or delete the note of the given domain')),
-    # List commands
-    'listdomains': cmd('listdomains', 'ld', list_domains, '[pattern]',
-                      _(u'list all domains or search for domains by pattern')),
-    'listaddresses': cmd('listaddresses', 'll', list_addresses, '[pattern]',
-                         _(u'list all addresses or search for addresses by '
-                           u'pattern')),
-    'listusers': cmd('listusers', 'lu', list_users, '[pattern]',
-                     _(u'list all user accounts or search for accounts by '
-                       u'pattern')),
-    'listaliases': cmd('listaliases', 'la', list_aliases, '[pattern]',
-                      _(u'list all aliases or search for aliases by pattern')),
-    'listrelocated': cmd('listrelocated', 'lr', list_relocated, '[pattern]',
-                         _(u'list all relocated users or search for relocated '
-                           u'users by pattern')),
-    # Relocated commands
-    'relocatedadd': cmd('relocatedadd', 'ra', relocated_add,
-                        'address newaddress',
-                        _(u'create a new record for a relocated user')),
-    'relocateddelete': cmd('relocateddelete', 'rd', relocated_delete,
-                           'address',
-                           _(u'delete the record of the relocated user')),
-    'relocatedinfo': cmd('relocatedinfo', 'ri', relocated_info, 'address',
-                         _(u'print information about a relocated user')),
-    # cli commands
-    'configget': cmd('configget', 'cg', config_get, 'option',
-                     _('show the actual value of the configuration option')),
-    'configset': cmd('configset', 'cs', config_set, 'option value',
-                      _('set a new value for the configuration option')),
-    'configure': cmd('configure', 'cf', configure, '[section]',
-                     _(u'start interactive configuration mode')),
-    'listpwschemes': cmd('listpwschemes', 'lp', list_pwschemes, '',
-                         _(u'lists all usable password schemes and password '
-                           u'encoding suffixes')),
-    'help': cmd('help', 'h', help_, '[subcommand]',
-                _(u'show a help overview or help for the given subcommand')),
-    'version': cmd('version', 'v', version, '',
-                   _(u'show version and copyright information')),
-    })
+    ###
+    # general subcommands
+    ###
+    cg = a('configget', aliases=('cg',),
+           help=_('show the actual value of the configuration option'),
+           epilog=_("This subcommand is used to display the actual value of "
+           "the given configuration option."))
+    cg.add_argument('option', help=_('the name of a configuration option'))
+    cg.set_defaults(func=config_get, scmd='configget')
+
+    cs = a('configset', aliases=('cs',),
+           help=_('set a new value for the configuration option'),
+           epilog=fill(_("Use this subcommand to set or update a single "
+               "configuration option's value. option is the configuration "
+               "option, value is the option's new value.\n\nNote: This "
+               "subcommand will create a new vmm.cfg without any comments. "
+               "Your current configuration file will be backed as "
+               "vmm.cfg.bak.")),
+           formatter_class=RawDescriptionHelpFormatter)
+    cs.add_argument('option', help=_('the name of a configuration option'))
+    cs.add_argument('value', help=_("the option's new value"))
+    cs.set_defaults(func=config_set, scmd='configset')
+
+    sections = ('account', 'bin', 'database', 'domain', 'mailbox', 'misc')
+    cf = a('configure', aliases=('cf',),
+           help=_('start interactive configuration mode'),
+           epilog=fill(_("Starts the interactive configuration for all "
+               "configuration sections.\n\nIn this process the currently set "
+               "value of each option will be displayed in square brackets. "
+               "If no value is configured, the default value of each option "
+               "will be displayed in square brackets. Press the return key, "
+               "to accept the displayed value.\n\n"
+               "If the optional argument section is given, only the "
+               "configuration options from the given section will be "
+               "displayed and will be configurable. The following sections "
+               "are available:\n") + mklst(sections)),
+           formatter_class=RawDescriptionHelpFormatter)
+    cf.add_argument('-s', choices=sections, metavar='SECTION', dest='section',
+                    help=_("configure only options of the given section"))
+    cf.set_defaults(func=configure, scmd='configure')
+
+    gu = a('getuser', aliases=('gu',),
+           help=_('get the address of the user with the given UID'),
+           epilog=_("If only the uid is available, for example from process "
+                    "list, the subcommand getuser will show the user's "
+                    "address."))
+    gu.add_argument('uid', type=int, help=_("a user's unique identifier"))
+    gu.set_defaults(func=get_user, scmd='getuser')
+
+    ll = a('listaddresses', aliases=('ll',),
+           help=_('list all addresses or search for addresses by pattern'),
+           epilog=fill(_("This command lists all defined addresses. "
+               "Addresses belonging to alias-domains are prefixed with a '-', "
+               "addresses of regular domains with a '+'. Additionally, the "
+               "letters 'u', 'a', and 'r' indicate the type of each address: "
+               "user, alias and relocated respectively. The output can be "
+               "limited with an optional pattern.\n\nTo perform a wild card "
+               "search, the % character can be used at the start and/or the "
+               "end of the pattern.")),
+           formatter_class=RawDescriptionHelpFormatter)
+    ll.add_argument('-p', help=_("the pattern to search for"),
+                    metavar='PATTERN', dest='pattern')
+    ll.set_defaults(func=list_addresses, scmd='listaddresses')
+
+    la = a('listaliases', aliases=('la',),
+           help=_('list all aliases or search for aliases by pattern'),
+           epilog=fill(_("This command lists all defined aliases. Aliases "
+               "belonging to alias-domains are prefixed with a '-', addresses "
+               "of regular domains with a '+'. The output can be limited "
+               "with an optional pattern.\n\nTo perform a wild card search, "
+               "the % character can be used at the start and/or the end of "
+               "the pattern.")),
+           formatter_class=RawDescriptionHelpFormatter)
+    la.add_argument('-p', help=_("the pattern to search for"),
+                    metavar='PATTERN', dest='pattern')
+    la.set_defaults(func=list_aliases, scmd='listaliases')
+
+    ld = a('listdomains', aliases=('ld',),
+           help=_('list all domains or search for domains by pattern'),
+           epilog=fill(_("This subcommand lists all available domains. All "
+               "domain names will be prefixed either with `[+]', if the "
+               "domain is a primary domain, or with `[-]', if it is an alias "
+               "domain name. The output can be limited with an optional "
+               "pattern.\n\nTo perform a wild card search, the % character "
+               "can be used at the start and/or the end of the pattern.")),
+           formatter_class=RawDescriptionHelpFormatter)
+    ld.add_argument('-p', help=_("the pattern to search for"),
+                    metavar='PATTERN', dest='pattern')
+    ld.set_defaults(func=list_domains, scmd='listdomains')
+
+    lr = a('listrelocated', aliases=('lr',),
+           help=_('list all relocated users or search for relocated users by '
+                  'pattern'),
+           epilog=fill(_("This command lists all defined relocated addresses. "
+               "Relocated entries belonging to alias-domains are prefixed "
+               "with a '-', addresses of regular domains with a '+'. The "
+               "output can be limited with an optional pattern.\n\nTo "
+               "perform a wild card search, the % character can be used at "
+               "the start and/or the end of the pattern.")),
+           formatter_class=RawDescriptionHelpFormatter)
+    lr.add_argument('-p', help=_("the pattern to search for"),
+                    metavar='PATTERN', dest='pattern')
+    lr.set_defaults(func=list_relocated, scmd='listrelocated')
+
+    lu = a('listusers', aliases=('lu',),
+           help=_('list all user accounts or search for accounts by pattern'),
+           epilog=fill(_("This command lists all user accounts. User accounts "
+               "belonging to alias-domains are prefixed with a '-', "
+               "addresses of regular domains with a '+'. The output can be "
+               "limited with an optional pattern.\n\nTo perform a wild card "
+               "search, the % character can be used at the start and/or the "
+               "end of the pattern.")),
+           formatter_class=RawDescriptionHelpFormatter)
+    lu.add_argument('-p', help=_("the pattern to search for"),
+                    metavar='PATTERN', dest='pattern')
+    lu.set_defaults(func=list_users, scmd='listusers')
+
+    lp = a('listpwschemes', aliases=('lp',),
+           help=_('lists all usable password schemes and password encoding '
+                  'suffixes'),
+           epilog=fill(_("This subcommand lists all password schemes which "
+               "could be used in the vmm.cfg as value of the "
+               "misc.password_scheme option. The output varies, depending "
+               "on the used Dovecot version and the system's libc.\n"
+               "Additionally a few usable encoding suffixes will be "
+               "displayed. One of them can be appended to the password "
+               "scheme.")),
+           formatter_class=RawDescriptionHelpFormatter)
+    lp.set_defaults(func=list_pwschemes, scmd='listpwschemes')
+
+    ###
+    # domain subcommands
+    ###
+    da = a('domainadd', aliases=('da',), help=_('create a new domain'),
+           epilog=fill(_("Adds the new domain into the database and creates "
+               "the domain directory.\n\nIf the optional argument transport "
+               "is given, it will override the default transport "
+               "(domain.transport) from vmm.cfg. The specified transport "
+               "will be the default transport for all new accounts in this "
+               "domain.")),
+           formatter_class=RawDescriptionHelpFormatter)
+    da.add_argument('fqdn', help=_('a fully qualified domain name'))
+    da.add_argument('-n', metavar='NOTE', dest='note',
+                    help=_('the note that should be set'))
+    da.add_argument('-t', metavar='TRANSPORT', dest='transport',
+                    help=_('a Postfix transport (transport: or '
+                           'transport:nexthop)'))
+    da.set_defaults(func=domain_add, scmd='domainadd')
+
+    details = ('accounts', 'aliasdomains', 'aliases', 'catchall', 'relocated',
+               'full')
+    di = a('domaininfo', aliases=('di',),
+           help=_('display information about the given domain'),
+           epilog=fill(_("This subcommand shows some information about the "
+               "given domain.\n\nFor a more detailed information about the "
+               "domain the optional argument details can be specified. A "
+               "possible details value can be one of the following six "
+               "keywords:\n") + mklst(details)),
+           formatter_class=RawDescriptionHelpFormatter)
+    di.add_argument('fqdn', help=_('a fully qualified domain name'))
+    di.add_argument('-d', choices=details, dest='details', metavar='DETAILS',
+                    help=_('additionally details to display'))
+    di.set_defaults(func=domain_info, scmd='domaininfo')
+
+    do = a('domainnote', aliases=('do',),
+           help=_('set, update or delete the note of the given domain'),
+           epilog=_('With this subcommand, it is possible to attach a note to '
+                    'the specified domain. In order to delete an existing '
+                    'note, pass the -d option.'))
+    do.add_argument('fqdn', help=_('a fully qualified domain name'))
+    do_grp = do.add_mutually_exclusive_group(required=True)
+    do_grp.add_argument('-d', action='store_true', dest='delete',
+                        help=_('delete the note, if any'))
+    do_grp.add_argument('-n', metavar='NOTE', dest='note',
+                        help=_('the note that should be set'))
+    do.set_defaults(func=domain_note, scmd='domainnote')
+
+    dq = a('domainquota', aliases=('dq',),
+           help=_('update the quota limit of the specified domain'),
+           epilog=fill(_("This subcommand is used to configure a new quota "
+               "limit for the accounts of the domain - not for the domain "
+               "itself.\n\nThe default quota limit for accounts is defined "
+               "in the vmm.cfg (domain.quota_bytes and "
+               "domain.quota_messages).\n\nThe new quota limit will affect "
+               "only those accounts for which the limit has not been "
+               "overridden. If you want to restore the default to all "
+               "accounts, you may pass the optional argument --force. When "
+               "the argument messages was omitted the default number of "
+               "messages 0 (zero) will be applied.")),
+           formatter_class=RawDescriptionHelpFormatter)
+    dq.add_argument('fqdn', help=_('a fully qualified domain name'))
+    dq.add_argument('storage', type=quota_storage,
+                    help=_('quota limit in {kilo,mega,giga}bytes e.g. 2G '
+                           'or 2048M',))
+    dq.add_argument('-m', default=0, type=int, metavar='MESSAGES',
+                    dest='messages',
+                    help=_('quota limit in number of messages (default: 0)'))
+    dq.add_argument('--force', action='store_true',
+                    help=_('enforce the limit for all accounts'))
+    dq.set_defaults(func=domain_quota, scmd='domainquota')
+
+    ds = a('domainservices', aliases=('ds',),
+           help=_('enables the specified services and disables all not '
+                  'specified services of the given domain'),
+           epilog=fill(_("To define which services could be used by the users "
+               "of the domain — with the given fqdn — use this "
+               "subcommand.\n\nEach specified service will be enabled/"
+               "usable. All other services will be deactivated/unusable. "
+               "Possible service names are: imap, pop3, sieve and smtp.\nThe "
+               "new service set will affect only those accounts for which "
+               "the set has not been overridden. If you want to restore the "
+               "default to all accounts, you may pass the option--force.")),
+           formatter_class=RawDescriptionHelpFormatter)
+    ds.add_argument('fqdn', help=_('a fully qualified domain name'))
+    ds.add_argument('-s', choices=SERVICES,
+                    help=_('services which should be usable'),
+                    metavar='SERVICE', nargs='+', dest='services')
+    ds.add_argument('--force', action='store_true',
+                    help=_('enforce the service set for all accounts'))
+    ds.set_defaults(func=domain_services, scmd='domainservices')
+
+    dt = a('domaintransport', aliases=('dt',),
+           help=_('update the transport of the specified domain'),
+           epilog=fill(_("A new transport for the indicated domain can be set "
+               "with this subcommand.\n\nThe new transport will affect only "
+               "those accounts for which the transport has not been "
+               "overridden. If you want to restore the default to all "
+               "accounts, you may give the option --force.")),
+           formatter_class=RawDescriptionHelpFormatter)
+    dt.add_argument('fqdn', help=_('a fully qualified domain name'))
+    dt.add_argument('transport', help=_('a Postfix transport (transport: or '
+                                        'transport:nexthop)'))
+    dt.add_argument('--force', action='store_true',
+                    help=_('enforce the transport for all accounts'))
+    dt.set_defaults(func=domain_transport, scmd='domaintransport')
+
+    dd = a('domaindelete', aliases=('dd',),
+           help=_('delete the given domain and all its alias domains'),
+           epilog=fill(_("This subcommand deletes the domain specified by "
+               "fqdn.\n\nIf there are accounts, aliases and/or relocated "
+               "users assigned to the given domain, vmm will abort the "
+               "requested operation and show an error message. If you know, "
+               "what you are doing, you can specify the optional argument "
+               "--force.\n\nIf you really always know what you are doing, "
+               "edit your vmm.cfg and set the option domain.force_deletion "
+               "to true.")),
+           formatter_class=RawDescriptionHelpFormatter)
+    dd.add_argument('fqdn', help=_('a fully qualified domain name'))
+    dd.add_argument('--force', action='store_true',
+                    help=_('also delete all accounts, aliases and/or '
+                           'relocated users'))
+    dd.set_defaults(func=domain_delete, scmd='domaindelete')
+
+    ###
+    # alias domain subcommands
+    ###
+    ada = a('aliasdomainadd', aliases=('ada',),
+            help=_('create a new alias for an existing domain'),
+            epilog=_('This subcommand adds the new alias domain (fqdn) to '
+                     'the destination domain that should be aliased.'))
+    ada.add_argument('fqdn', help=_('a fully qualified domain name'))
+    ada.add_argument('destination',
+                     help=_('the fqdn of the destination domain'))
+    ada.set_defaults(func=aliasdomain_add, scmd='aliasdomainadd')
+
+    adi = a('aliasdomaininfo', aliases=('adi',),
+            help=_('show the destination of the given alias domain'),
+            epilog=_('This subcommand shows to which domain the alias domain '
+                     'fqdn is assigned to.'))
+    adi.add_argument('fqdn', help=_('a fully qualified domain name'))
+    adi.set_defaults(func=aliasdomain_info, scmd='aliasdomaininfo')
+
+    ads = a('aliasdomainswitch', aliases=('ads',),
+            help=_('assign the given alias domain to an other domain'),
+            epilog=_('If the destination of the existing alias domain fqdn '
+                     'should be switched to another destination use this '
+                     'subcommand.'))
+    ads.add_argument('fqdn', help=_('a fully qualified domain name'))
+    ads.add_argument('destination',
+                     help=_('the fqdn of the destination domain'))
+    ads.set_defaults(func=aliasdomain_switch, scmd='aliasdomainswitch')
+
+    add = a('aliasdomaindelete', aliases=('add',),
+            help=_('delete the specified alias domain'),
+            epilog=_('Use this subcommand if the alias domain fqdn should be '
+                     'removed.'))
+    add.add_argument('fqdn', help=_('a fully qualified domain name'))
+    add.set_defaults(func=aliasdomain_delete, scmd='aliasdomaindelete')
+
+    ###
+    # account subcommands
+    ###
+    ua = a('useradd', aliases=('ua',),
+           help=_('create a new e-mail user with the given address'),
+           epilog=fill(_('Use this subcommand to create a new e-mail account '
+               'for the given address.\n\nIf the password is not provided, '
+               'vmm will prompt for it interactively. When no password is '
+               'provided and account.random_password is set to true, vmm '
+               'will generate a random password and print it to stdout '
+               'after the account has been created.')),
+           formatter_class=RawDescriptionHelpFormatter)
+    ua.add_argument('address',
+                    help=_("an account's e-mail address (local-part@fqdn)"))
+    ua.add_argument('-n', metavar='NOTE', dest='note',
+                    help=_('the note that should be set'))
+    ua.add_argument('-p', metavar='PASSWORD', dest='password',
+                    help=_("the new user's password"))
+    ua.set_defaults(func=user_add, scmd='useradd')
+
+    details = ('aliases', 'du', 'full')
+    ui = a('userinfo', aliases=('ui',),
+           help=_('display information about the given address'),
+           epilog=fill(_('This subcommand displays some information about '
+               'the account specified by the given address.\n\nIf the '
+               'optional argument details is given some more information '
+               'will be displayed.\nPossible values for details are:\n') +
+               mklst(details)),
+           formatter_class=RawDescriptionHelpFormatter)
+    ui.add_argument('address',
+                    help=_("an account's e-mail address (local-part@fqdn)"))
+    ui.add_argument('-d', choices=details, metavar='DETAILS', dest='details',
+                    help=_('additionally details to display'))
+    ui.set_defaults(func=user_info, scmd='userinfo')
+
+    un = a('username', aliases=('un',),
+           help=_('set, update or delete the real name for an address'),
+           epilog=fill(_("The user's real name can be set/updated with this "
+               "subcommand.\n\nIn order to delete the value stored for the "
+               "account, pass the -d option.")),
+           formatter_class=RawDescriptionHelpFormatter)
+    un.add_argument('address',
+                    help=_("an account's e-mail address (local-part@fqdn)"))
+    un_grp = un.add_mutually_exclusive_group(required=True)
+    un_grp.add_argument('-d', action='store_true', dest='delete',
+                        help=_("delete the user's name if any"))
+    un_grp.add_argument('-n', help=_("a user's real name"), metavar='NAME',
+                        dest='name')
+    un.set_defaults(func=user_name, scmd='username')
+
+    uo = a('usernote', aliases=('uo',),
+           help=_('set, update or delete the note of the given address'),
+           epilog=_('With this subcommand, it is possible to attach a note to '
+               'the specified account. In order to delete an existing note, '
+               'pass the -d option.'))
+    uo.add_argument('address',
+                    help=_("an account's e-mail address (local-part@fqdn)"))
+    uo_grp = uo.add_mutually_exclusive_group(required=True)
+    uo_grp.add_argument('-d', action='store_true', dest='delete',
+                        help=_('delete the note, if any'))
+    uo_grp.add_argument('-n', metavar='NOTE', dest='note',
+                        help=_('the note that should be set'))
+    uo.set_defaults(func=user_note, scmd='usernote')
+
+    up = a('userpassword', aliases=('up',),
+           help=_('update the password for the given address'),
+           epilog=fill(_("The password of an account can be updated with this "
+               "subcommand.\n\nIf neither a password nor a password hash was "
+               "provided, vmm will prompt for the new password interactively. "
+               "When the scheme was omitted, vmm will use "
+               "misc.password_scheme from vmm.cfg. ")),
+           formatter_class=RawDescriptionHelpFormatter)
+    up.add_argument('address',
+                    help=_("an account's e-mail address (local-part@fqdn)"))
+    up_grp = up.add_mutually_exclusive_group()
+    up_grp.add_argument('-p', metavar='PASSWORD', dest='password',
+                        help=_("the user's new password"))
+    up.add_argument('-s', metavar='SCHEME', dest='scheme',
+                    help=_('scheme used for password hashing'))
+    up_grp.add_argument('--hash', metavar='PWHASH', dest='pwhash',
+                        help=_('set the given password hash as-is as new '
+                               'password'))
+    up.set_defaults(func=user_password, scmd='userpassword')
+
+    uq = a('userquota', aliases=('uq',),
+           help=_('update the quota limit for the given address'),
+           epilog=fill(_("This subcommand is used to set a new quota limit "
+               "for the given account.\n\nWhen the argument messages was "
+               "omitted the default number of messages 0 (zero) will be "
+               "applied.\n\nInstead of a storage limit pass the keyword "
+               "'domain' to remove the account-specific override, causing "
+               "the domain's value to be in effect.")),
+           formatter_class=RawDescriptionHelpFormatter)
+    uq.add_argument('address',
+                    help=_("an account's e-mail address (local-part@fqdn)"))
+    uq.add_argument('storage', type=quota_storage,
+                    help=_('quota limit in {kilo,mega,giga}bytes e.g. 2G '
+                           'or 2048M'))
+    uq.add_argument('-m', default=0, type=int, metavar='MESSAGES',
+                    dest='messages',
+                    help=_('quota limit in number of messages (default: 0)'))
+    uq.set_defaults(func=user_quota, scmd='userquota')
+
+    us = a('userservices', aliases=('us',),
+           help=_('enable the specified services and disables all not '
+                  'specified services'),
+           epilog=fill(_("To grant a user access to the specified service(s), "
+               "use this command.\n\nAll omitted services will be "
+               "deactivated/unusable for the user with the given "
+               "address.\n\nInstead of any service pass the keyword "
+               "'domain' to remove the account-specific override, causing "
+               "the domain's value to be in effect.")),
+           formatter_class=RawDescriptionHelpFormatter)
+    us.add_argument('address',
+                    help=_("an account's e-mail address (local-part@fqdn)"))
+    us.add_argument('-s', choices=SERVICES + ('domain',),
+                    help=_('services which should be usable'),
+                    metavar='SERVICE', nargs='+', dest='services')
+    us.set_defaults(func=user_services, scmd='userservices')
+
+    ut = a('usertransport', aliases=('ut',),
+           help=_('update the transport of the given address'),
+           epilog=fill(_("A different transport for an account can be "
+               "specified with this subcommand.\n\nInstead of a transport "
+               "pass the keyword 'domain' to remove the account-specific "
+               "override, causing the domain's value to be in effect.")),
+           formatter_class=RawDescriptionHelpFormatter)
+    ut.add_argument('address',
+                    help=_("an account's e-mail address (local-part@fqdn)"))
+    ut.add_argument('transport', help=_('a Postfix transport (transport: or '
+                                        'transport:nexthop)'))
+    ut.set_defaults(func=user_transport, scmd='usertransport')
+
+    ud = a('userdelete', aliases=('ud',),
+           help=_('delete the specified user'),
+           epilog=fill(_('Use this subcommand to delete the account with the '
+               'given address.\n\nIf there are one or more aliases with an '
+               'identical destination address, vmm will abort the requested '
+               'operation and show an error message. To prevent this, '
+               'give the optional argument --force.')),
+           formatter_class=RawDescriptionHelpFormatter)
+    ud.add_argument('address',
+                    help=_("an account's e-mail address (local-part@fqdn)"))
+    ud.add_argument('--force', action='store_true',
+                    help=_('also delete assigned alias addresses'))
+    ud.set_defaults(func=user_delete, scmd='userdelete')
+
+    ###
+    # alias subcommands
+    ###
+    aa = a('aliasadd', aliases=('aa',),
+           help=_('create a new alias e-mail address with one or more '
+                  'destinations'),
+           epilog=fill(_("This subcommand is used to create a new alias "
+               "address with one or more destination addresses.\n\nWithin "
+               "the destination address, the placeholders %n, %d, and %= "
+               "will be replaced by the local part, the domain, or the "
+               "email address with '@' replaced by '=' respectively. In "
+               "combination with alias domains, this enables "
+               "domain-specific destinations.")),
+           formatter_class=RawDescriptionHelpFormatter)
+    aa.add_argument('address',
+                    help=_("an alias' e-mail address (local-part@fqdn)"))
+    aa.add_argument('destination', nargs='+',
+                    help=_("a destination's e-mail address (local-part@fqdn)"))
+    aa.set_defaults(func=alias_add, scmd='aliasadd')
+
+    ai = a('aliasinfo', aliases=('ai',),
+           help=_('show the destination(s) of the specified alias'),
+           epilog=_('Information about the alias with the given address can '
+                    'be displayed with this subcommand.'))
+    ai.add_argument('address',
+                    help=_("an alias' e-mail address (local-part@fqdn)"))
+    ai.set_defaults(func=alias_info, scmd='aliasinfo')
+
+    ad = a('aliasdelete', aliases=('ad',),
+           help=_('delete the specified alias e-mail address or one of its '
+                  'destinations'),
+           epilog=fill(_("This subcommand is used to delete one or multiple "
+               "destinations from the alias with the given address.\n\nWhen "
+               "no destination address was specified the alias with all its "
+               "destinations will be deleted.")),
+           formatter_class=RawDescriptionHelpFormatter)
+    ad.add_argument('address',
+                    help=_("an alias' e-mail address (local-part@fqdn)"))
+    ad.add_argument('destination', nargs='*',
+                    help=_("a destination's e-mail address (local-part@fqdn)"))
+    ad.set_defaults(func=alias_delete, scmd='aliasdelete')
+
+    ###
+    # catch-all subcommands
+    ###
+    caa = a('catchalladd', aliases=('caa',),
+            help=_('add one or more catch-all destinations for a domain'),
+            epilog=fill(_('This subcommand allows to specify destination '
+                'addresses for a domain, which shall receive mail addressed '
+                'to unknown local parts within that domain. Those catch-all '
+                'aliases hence "catch all" mail to any address in the domain '
+                '(unless a more specific alias, mailbox or relocated entry '
+                'exists).\n\nWARNING: Catch-all addresses can cause mail '
+                'server flooding because spammers like to deliver mail to '
+                'all possible combinations of names, e.g. to all addresses '
+                'between abba@example.org and zztop@example.org.')),
+           formatter_class=RawDescriptionHelpFormatter)
+    caa.add_argument('fqdn', help=_('a fully qualified domain name'))
+    caa.add_argument('destination', nargs='+',
+                    help=_("a destination's e-mail address (local-part@fqdn)"))
+    caa.set_defaults(func=catchall_add, scmd='catchalladd')
+
+    cai = a('catchallinfo', aliases=('cai',),
+            help=_('show the catch-all destination(s) of the specified '
+                   'domain'),
+            epilog=_('This subcommand displays information about catch-all '
+                     'aliases defined for a domain.'))
+    cai.add_argument('fqdn', help=_('a fully qualified domain name'))
+    cai.set_defaults(func=catchall_info, scmd='catchallinfo')
+
+    cad = a('catchalldelete', aliases=('cad',),
+            help=_("delete the specified catch-all destination or all of a "
+                   "domain's destinations"),
+            epilog=_('With this subcommand, catch-all aliases defined for a '
+                     'domain can be removed, either all of them, or those '
+                     'destinations which were specified explicitly.'))
+    cad.add_argument('fqdn', help=_('a fully qualified domain name'))
+    cad.add_argument('destination', nargs='*',
+                    help=_("a destination's e-mail address (local-part@fqdn)"))
+    cad.set_defaults(func=catchall_delete, scmd='catchalldelete')
+
+    ###
+    # relocated subcommands
+    ###
+    ra = a('relocatedadd', aliases=('ra',),
+           help=_('create a new record for a relocated user'),
+           epilog=_("A new relocated user can be created with this "
+                    "subcommand."))
+    ra.add_argument('address', help=_("a relocated user's e-mail address "
+                                      "(local-part@fqdn)"))
+    ra.add_argument('newaddress',
+                   help=_('e-mail address where the user can be reached now'))
+    ra.set_defaults(func=relocated_add, scmd='relocatedadd')
+
+    ri = a('relocatedinfo', aliases=('ri',),
+           help=_('print information about a relocated user'),
+           epilog=_('This subcommand shows the new address of the relocated '
+                    'user with the given address.'))
+    ri.add_argument('address', help=_("a relocated user's e-mail address "
+                                      "(local-part@fqdn)"))
+    ri.set_defaults(func=relocated_info, scmd='relocatedinfo')
+
+    rd = a('relocateddelete', aliases=('rd',),
+           help=_('delete the record of the relocated user'),
+           epilog=_('Use this subcommand in order to delete the relocated '
+                    'user with the given address.'))
+    rd.add_argument('address', help=_("a relocated user's e-mail address "
+                                      "(local-part@fqdn)"))
+    rd.set_defaults(func=relocated_delete, scmd='relocateddelete')
+
+    txt_wrpr.replace_whitespace = old_rw
+    return parser
 
 
 def _get_order(ctx):
     """returns a tuple with (key, 1||0) tuples. Used by functions, which
     get a dict from the handler."""
     order = ()
-    if ctx.scmd == 'domaininfo':
-        order = ((u'domain name', 0), (u'gid', 1), (u'domain directory', 0),
-                 (u'quota limit/user', 0), (u'active services', 0),
-                 (u'transport', 0), (u'alias domains', 0), (u'accounts', 0),
-                 (u'aliases', 0), (u'relocated', 0), (u'catch-all dests', 0))
-    elif ctx.scmd == 'userinfo':
-        if ctx.argc == 4 and ctx.args[3] != u'aliases' or \
+    if ctx.args.scmd == 'domaininfo':
+        order = (('domain name', 0), ('gid', 1), ('domain directory', 0),
+                 ('quota limit/user', 0), ('active services', 0),
+                 ('transport', 0), ('alias domains', 0), ('accounts', 0),
+                 ('aliases', 0), ('relocated', 0), ('catch-all dests', 0))
+    elif ctx.args.scmd == 'userinfo':
+        if ctx.args.details in ('du', 'full') or \
            ctx.cget('account.disk_usage'):
-            order = ((u'address', 0), (u'name', 0), (u'uid', 1), (u'gid', 1),
-                     (u'home', 0), (u'mail_location', 0),
-                     (u'quota storage', 0), (u'quota messages', 0),
-                     (u'disk usage', 0), (u'transport', 0), (u'smtp', 1),
-                     (u'pop3', 1), (u'imap', 1), (u'sieve', 1))
+            order = (('address', 0), ('name', 0), ('uid', 1), ('gid', 1),
+                     ('home', 0), ('mail_location', 0),
+                     ('quota storage', 0), ('quota messages', 0),
+                     ('disk usage', 0), ('transport', 0), ('smtp', 1),
+                     ('pop3', 1), ('imap', 1), ('sieve', 1))
         else:
-            order = ((u'address', 0), (u'name', 0), (u'uid', 1), (u'gid', 1),
-                     (u'home', 0), (u'mail_location', 0),
-                     (u'quota storage', 0), (u'quota messages', 0),
-                     (u'transport', 0), (u'smtp', 1), (u'pop3', 1),
-                     (u'imap', 1), (u'sieve', 1))
-    elif ctx.scmd == 'getuser':
-        order = ((u'uid', 1), (u'gid', 1), (u'address', 0))
+            order = (('address', 0), ('name', 0), ('uid', 1), ('gid', 1),
+                     ('home', 0), ('mail_location', 0),
+                     ('quota storage', 0), ('quota messages', 0),
+                     ('transport', 0), ('smtp', 1), ('pop3', 1),
+                     ('imap', 1), ('sieve', 1))
+    elif ctx.args.scmd == 'getuser':
+        order = (('uid', 1), ('gid', 1), ('address', 0))
     return order
 
 
@@ -950,43 +1068,37 @@ def _format_quota_usage(limit, used, human=False, domaindefault=False):
         }
     else:
         q_usage = {
-            'used': locale.format('%d', used, True).decode(ENCODING,
-                                                           'replace'),
-            'limit': locale.format('%d', limit, True).decode(ENCODING,
-                                                             'replace'),
+            'used': locale.format('%d', used, True),
+            'limit': locale.format('%d', limit, True),
         }
     if limit:
         q_usage['percent'] = locale.format('%6.2f', 100. / limit * used, True)
     else:
         q_usage['percent'] = locale.format('%6.2f', 0, True)
-    #  Py25: fmt = format_domain_default if domaindefault else lambda s: s
-    if domaindefault:
-        fmt = format_domain_default
-    else:
-        fmt = lambda s: s
+    fmt = format_domain_default if domaindefault else lambda s: s
     # TP: e.g.: [  0.00%] 21.09 KiB/1.00 GiB
-    return fmt(_(u'[%(percent)s%%] %(used)s/%(limit)s') % q_usage)
+    return fmt(_('[%(percent)s%%] %(used)s/%(limit)s') % q_usage)
 
 
 def _print_info(ctx, info, title):
     """Print info dicts."""
     # TP: used in e.g. 'Domain information' or 'Account information'
-    msg = u'%s %s' % (title, _(u'information'))
-    w_std(msg, u'-' * len(msg))
+    msg = '%s %s' % (title, _('information'))
+    w_std(msg, '-' * len(msg))
     for key, upper in _get_order(ctx):
         if upper:
-            w_std(u'\t%s: %s' % (key.upper().ljust(17, u'.'), info[key]))
+            w_std('\t%s: %s' % (key.upper().ljust(17, '.'), info[key]))
         else:
-            w_std(u'\t%s: %s' % (key.title().ljust(17, u'.'), info[key]))
-    print
+            w_std('\t%s: %s' % (key.title().ljust(17, '.'), info[key]))
+    print()
     note = info.get('note')
     if note:
         _print_note(note + '\n')
 
 
 def _print_note(note):
-    msg = _(u'Note')
-    w_std(msg, u'-' * len(msg))
+    msg = _('Note')
+    w_std(msg, '-' * len(msg))
     old_ii = txt_wrpr.initial_indent
     old_si = txt_wrpr.subsequent_indent
     txt_wrpr.initial_indent = txt_wrpr.subsequent_indent = '\t'
@@ -1001,63 +1113,61 @@ def _print_note(note):
 def _print_list(alist, title):
     """Print a list."""
     # TP: used in e.g. 'Existing alias addresses' or 'Existing accounts'
-    msg = u'%s %s' % (_(u'Existing'), title)
-    w_std(msg, u'-' * len(msg))
+    msg = '%s %s' % (_('Existing'), title)
+    w_std(msg, '-' * len(msg))
     if alist:
-        if title != _(u'alias domains'):
-            w_std(*(u'\t%s' % item for item in alist))
+        if title != _('alias domains'):
+            w_std(*('\t%s' % item for item in alist))
         else:
             for domain in alist:
                 if not domain.startswith('xn--'):
-                    w_std(u'\t%s' % domain)
+                    w_std('\t%s' % domain)
                 else:
-                    w_std(u'\t%s (%s)' % (domain, domain.decode('idna')))
-        print
+                    w_std('\t%s (%s)' % (domain,
+                                        domain.encode('utf-8').decode('idna')))
+        print()
     else:
-        w_std(_(u'\tNone'), '')
+        w_std(_('\tNone'), '')
 
 
 def _print_aliase_info(alias, destinations):
     """Print the alias address and all its destinations"""
-    title = _(u'Alias information')
-    w_std(title, u'-' * len(title))
-    w_std(_(u'\tMail for %s will be redirected to:') % alias)
-    w_std(*(u'\t     * %s' % dest for dest in destinations))
-    print
+    title = _('Alias information')
+    w_std(title, '-' * len(title))
+    w_std(_('\tMail for %s will be redirected to:') % alias)
+    w_std(*('\t     * %s' % dest for dest in destinations))
+    print()
 
 
 def _print_catchall_info(domain, destinations):
     """Print the catchall destinations of a domain"""
-    title = _(u'Catch-all information')
-    w_std(title, u'-' * len(title))
-    w_std(_(u'\tMail to unknown local-parts in domain %s will be sent to:')
+    title = _('Catch-all information')
+    w_std(title, '-' * len(title))
+    w_std(_('\tMail to unknown local-parts in domain %s will be sent to:')
           % domain)
-    w_std(*(u'\t     * %s' % dest for dest in destinations))
-    print
+    w_std(*('\t     * %s' % dest for dest in destinations))
+    print()
 
 
 def _print_relocated_info(**kwargs):
     """Print the old and new addresses of a relocated user."""
-    title = _(u'Relocated information')
-    w_std(title, u'-' * len(title))
-    w_std(_(u"\tUser '%(addr)s' has moved to '%(dest)s'") % kwargs, '')
+    title = _('Relocated information')
+    w_std(title, '-' * len(title))
+    w_std(_("\tUser '%(addr)s' has moved to '%(dest)s'") % kwargs, '')
 
 
 def _format_domain(domain, main=True):
     """format (prefix/convert) the domain name."""
     if domain.startswith('xn--'):
-        domain = u'%s (%s)' % (domain, domain.decode('idna'))
+        domain = '%s (%s)' % (domain, domain.encode('utf-8').decode('idna'))
     if main:
-        return u'\t[+] %s' % domain
-    return u'\t[-]     %s' % domain
+        return '\t[+] %s' % domain
+    return '\t[-]     %s' % domain
 
 
 def _print_domain_list(dids, domains, matching):
     """Print a list of (matching) domains/alias domains."""
-    if matching:
-        title = _(u'Matching domains')
-    else:
-        title = _(u'Existing domains')
+    title = _('Matching domains') if matching else _('Existing domains')
     w_std(title, '-' * len(title))
     if domains:
         for did in dids:
@@ -1067,7 +1177,7 @@ def _print_domain_list(dids, domains, matching):
                 w_std(*(_format_domain(a, False) for a in domains[did][1:]))
     else:
         w_std(_('\tNone'))
-    print
+    print()
 
 
 def _print_address_list(which, dids, addresses, matching):
@@ -1083,9 +1193,9 @@ def _print_address_list(which, dids, addresses, matching):
     }
     try:
         if matching:
-            title = _(u'Matching %s') % _trans[which]
+            title = _('Matching %s') % _trans[which]
         else:
-            title = _(u'Existing %s') % _trans[which]
+            title = _('Existing %s') % _trans[which]
         w_std(title, '-' * len(title))
     except KeyError:
         raise VMMError(_("Invalid address type for list: '%s'") % which,
@@ -1111,15 +1221,16 @@ def _print_address_list(which, dids, addresses, matching):
                 w_std('\t%s %s' % (leader, addr))
     else:
         w_std(_('\tNone'))
-    print
+    print()
 
 
 def _print_aliasdomain_info(info):
     """Print alias domain information."""
-    title = _(u'Alias domain information')
+    title = _('Alias domain information')
     for key in ('alias', 'domain'):
         if info[key].startswith('xn--'):
-            info[key] = u'%s (%s)' % (info[key], info[key].decode('idna'))
+            info[key] = '%s (%s)' % (info[key],
+                                     info[key].encode(ENCODING).decode('idna'))
     w_std(title, '-' * len(title),
           _('\tThe alias domain %(alias)s belongs to:\n\t    * %(domain)s') %
           info, '')

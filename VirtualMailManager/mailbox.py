@@ -14,6 +14,7 @@ import re
 from binascii import a2b_base64, b2a_base64
 from subprocess import Popen, PIPE
 
+from VirtualMailManager import ENCODING
 from VirtualMailManager.account import Account
 from VirtualMailManager.common import lisdir
 from VirtualMailManager.errors import VMMError
@@ -29,13 +30,14 @@ cfg_dget = lambda option: None
 
 def _mbase64_encode(inp, dest):
     if inp:
-        mb64 = b2a_base64(''.join(inp).encode('utf-16be'))
+        mb64 = b2a_base64(''.join(inp).encode('utf-16be')).decode()
         dest.append('&%s-' % mb64.rstrip('\n=').replace('/', ','))
         del inp[:]
 
 
 def _mbase64_to_unicode(mb64):
-    return unicode(a2b_base64(mb64.replace(',', '/') + '==='), 'utf-16be')
+    return str(a2b_base64(mb64.replace(',', '/').encode() + b'==='),
+               'utf-16be')
 
 
 def utf8_to_mutf7(src):
@@ -86,7 +88,7 @@ def mutf7_to_utf8(src):
 class Mailbox(object):
     """Base class of all mailbox classes."""
     __slots__ = ('_boxes', '_root', '_sep', '_user')
-    FILE_MODE = 0600
+    FILE_MODE = 0o600
     _ctrl_chr_re = re.compile('[\x00-\x1F\x7F-\x9F]')
     _box_name_re = re.compile('^[\x20-\x25\x27-\x7E]+$')
 
@@ -206,11 +208,9 @@ class Maildir(Mailbox):
         """Writes all created mailboxes to the subscriptions file."""
         if not self._boxes:
             return
-        subscriptions = open('subscriptions', 'w')
-        subscriptions.write('\n'.join(self._boxes))
-        subscriptions.write('\n')
-        subscriptions.flush()
-        subscriptions.close()
+        with open('subscriptions', 'w') as subscriptions:
+            subscriptions.write('\n'.join(self._boxes))
+            subscriptions.write('\n')
         os.chown('subscriptions', self._user.uid, self._user.gid)
         os.chmod('subscriptions', self.__class__.FILE_MODE)
         del self._boxes[:]
@@ -244,12 +244,12 @@ class SingleDbox(Mailbox):
         For additional mailboxes use the add_boxes() method.
         """
         assert cfg_dget('misc.dovecot_version') >= \
-                account.mail_location.dovecot_version
+            account.mail_location.dovecot_version
         super(SingleDbox, self).__init__(account)
 
     def _doveadm_create(self, mailboxes, subscribe):
         """Wrap around Dovecot's doveadm"""
-        cmd_args = [cfg_dget('bin.dovecotpw'), 'mailbox', 'create', '-u',
+        cmd_args = [cfg_dget('bin.doveadm'), 'mailbox', 'create', '-u',
                     str(self._user.address)]
         if subscribe:
             cmd_args.append('-s')
@@ -257,8 +257,8 @@ class SingleDbox(Mailbox):
         process = Popen(cmd_args, stderr=PIPE)
         stderr = process.communicate()[1]
         if process.returncode:
-            e_msg = _(u'Failed to create mailboxes: %r\n') % mailboxes
-            raise VMMError(e_msg + stderr.strip(), VMM_ERROR)
+            e_msg = _('Failed to create mailboxes: %r\n') % mailboxes
+            raise VMMError(e_msg + stderr.strip().decode(ENCODING), VMM_ERROR)
 
     def create(self):
         """Create a dbox INBOX"""

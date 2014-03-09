@@ -5,7 +5,7 @@ Features of vmm
 General features
 ----------------
  ‣ Unicode/UTF-8 capable (input/storage/output)
- ‣ supports IDN_ (also ccTLDs/ccIDNs and 'new' gTLDs)
+ ‣ supports IDN_ (also `IDN ccTLDs`_/ccIDNs and 'new' gTLDs)
  ‣ supports the mailbox format Maildir_ and Dovecot's own high-performance
    mailbox formats single- and multi-\ dbox_
  ‣ configurable basic mailbox structure, including sub-mailboxes

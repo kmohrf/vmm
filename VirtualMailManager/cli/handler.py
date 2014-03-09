@@ -16,7 +16,7 @@ from VirtualMailManager.cli import read_pass
 from VirtualMailManager.cli.config import CliConfig as Cfg
 from VirtualMailManager.constants import ACCOUNT_EXISTS, INVALID_SECTION, \
      NO_SUCH_ACCOUNT, TYPE_ACCOUNT
-from VirtualMailManager.password import randompw
+from VirtualMailManager.password import randompw, verify_scheme
 
 _ = lambda msg: msg
 
@@ -40,8 +40,8 @@ class CliHandler(Handler):
         """
         # Overwrite the parent CTor partly, we use the CliConfig class
         # and add some command line checks.
-        skip_some_checks = os.sys.argv[1] in ('cf', 'configure', 'h', 'help',
-                                              'v', 'version')
+        skip_some_checks = os.sys.argv[1] in ('cf', 'configure',
+                                              'cs', 'configset')
         super(CliHandler, self).__init__(skip_some_checks)
 
         self._cfg = Cfg(self._cfg_fname)
@@ -63,10 +63,10 @@ class CliHandler(Handler):
         elif self._cfg.has_section(section):
             self._cfg.configure([section])
         else:
-            raise VMMError(_(u"Invalid section: '%s'") % section,
+            raise VMMError(_("Invalid section: '%s'") % section,
                            INVALID_SECTION)
 
-    def user_add(self, emailaddress, password=None):
+    def user_add(self, emailaddress, password=None, note=None):
         """Override the parent user_add() - add the interactive password
         dialog.
 
@@ -74,26 +74,32 @@ class CliHandler(Handler):
         """
         acc = self._get_account(emailaddress)
         if acc:
-            raise VMMError(_(u"The account '%s' already exists.") %
+            raise VMMError(_("The account '%s' already exists.") %
                            acc.address, ACCOUNT_EXISTS)
         self._is_other_address(acc.address, TYPE_ACCOUNT)
         rand_pass = self._cfg.dget('account.random_password')
         if password is None:
             password = (read_pass, randompw)[rand_pass]()
         acc.set_password(password)
+        if note:
+            acc.set_note(note)
         acc.save()
         self._make_account_dirs(acc)
         return (None, password)[rand_pass]
 
-    def user_password(self, emailaddress, password=None):
+    def user_password(self, emailaddress, password=None, scheme=None):
         """Override the parent user_password() - add the interactive
         password dialog."""
         acc = self._get_account(emailaddress)
         if not acc:
-            raise VMMError(_(u"The account '%s' does not exist.") %
+            raise VMMError(_("The account '%s' does not exist.") %
                            acc.address, NO_SUCH_ACCOUNT)
-        if not isinstance(password, basestring) or not password:
+        if scheme:
+            scheme, encoding = verify_scheme(scheme)
+            if encoding:
+                scheme = '%s.%s' % (scheme, encoding)
+        if not isinstance(password, str) or not password:
             password = read_pass()
-        acc.modify('password', password)
+        acc.update_password(password, scheme)
 
 del _

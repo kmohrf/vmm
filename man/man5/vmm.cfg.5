@@ -1,4 +1,4 @@
-.TH "VMM.CFG" "5" "2014-02-17" "vmm 0.6" "vmm"
+.TH "VMM.CFG" "5" "2014-02-17" "vmm 0.7" "vmm"
 .SH NAME
 vmm.cfg \- configuration file for vmm
 .\" -----------------------------------------------------------------------
@@ -68,7 +68,7 @@ user = me
 pass = xxxxxxxx
 
 [misc]
-dovecot_version = 1.2.16
+dovecot_version = 2.2.11
 .fi
 .\" -----------------------------------------------------------------------
 .SH SEARCH ORDER
@@ -165,32 +165,21 @@ The
 .B bin
 section is used to specify some paths to some binaries required by
 .BR vmm (1).
-.SS bin.dovecotpw
-.BR dovecotpw " (default: /usr/sbin/dovecotpw) :"
+.SS bin.doveadm
+.BR doveadm " (default: /usr/bin/doveadm) :"
 .I String
 .PP
 The absolute path to the
-.BR dovecotpw (1)
-binary.
-Use the absolute path to the
 .BR doveadm (1)
-binary, if you are using Dovecot v2.0.
+binary.
 .PP
 This binary is used to generate a password hash, if
 .I misc.password_scheme
-is set to one of `CRAM\-MD5', `HMAC\-MD5', `LANMAN', `OTP', `RPA' or
-`SKEY'.
+is set to one of `CRAM\-MD5', `HMAC\-MD5', `LANMAN', `OTP', `RPA', 
+`SCRAM-SHA-1' or `SKEY'.
 This binary will be also required if your Python installation doesn't
-support the:
-.IP \(bu 4
-md4 hash algorithm (hashlib + OpenSSL or PyCrypto) used for the password
-schemes: `PLAIN\-MD4' and `NTLM'
-.IP \(bu
-sha256 hash algorithm (hashlib or PyCrypto \(>= 2.1.0alpha1) used for the
-password schemes: `SHA256' and `SSHA256'
-.IP \(bu
-sha512 hash algorithm (hashlib) used for the password schemes: `SHA512' and
-`SSHA512'
+support the md4 hash algorithm (hashlib + OpenSSL) used for the password
+schemes `PLAIN\-MD4' and `NTLM'.
 .PP
 The
 .BR doveadm (1)
@@ -231,14 +220,6 @@ database.
 .PP
 Hostname or IP address of the database server.
 .\" ------------------------------------
-.SS database.module
-.BR module " (default: psycopg2) :"
-.I String
-.PP
-The Python PostgreSQL database adapter module to be used.
-Supported modules are
-.BR psycopg2 " and " pyPgSQL .
-.\" ------------------------------------
 .SS database.name
 .BR name " (default: mailsys) :"
 .I String
@@ -269,11 +250,6 @@ Possible values are:
 The modes
 .BR verify\-ca " and " verify\-full
 are available since PostgreSQL 8.4
-.PP
-This setting will be ignored when the
-.I database.module
-is set to
-.BR pyPgSQL .
 .\" ------------------------------------
 .SS database.user
 .BR user " (default: " None ") :"
@@ -389,10 +365,10 @@ Determines whether newly created users can log in via SIEVE (ManageSieve).
 Determines whether newly created users can log in via SMTP (SMTP AUTH).
 .\" ------------------------------------
 .SS domain.transport
-.BR transport " (default: dovecot:) :"
+.BR transport " (default: lmtp:unix:private/dovecot\-lmtp) :"
 .I String
 .PP
-Default transport for domains and accounts.
+Default transport for new domains.
 For details see
 .BR transport (5).
 .\" -----------------------------------------------------------------------
@@ -553,9 +529,6 @@ default values.
 password_length = 10
 random_password = true
 
-[bin]
-dovecotpw = /usr/bin/doveadm
-
 [database]
 host = dbsrv8.example.net
 pass = PY_SRJ}L/0p\-oOk
@@ -566,14 +539,13 @@ user = vmm
 [domain]
 quota_bytes = 500M
 quota_messages = 10000
-transport = lmtp:unix:private/dovecot\-lmtp
 
 [mailbox]
 folders = Drafts:Sent:Templates:Trash:Lists.Dovecot:Lists.Postfix
 
 [misc]
 crypt_sha512_rounds = 10000
-dovecot_version = 2.0.beta4
+dovecot_version = 2.2.11
 password_scheme = SHA512\-CRYPT.hex
 .fi
 .\" -----------------------------------------------------------------------
