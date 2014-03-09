@@ -92,7 +92,7 @@ the database and to do the lookups in passdb and userdb.
  connect = host=localhost dbname=mailsys user=dovecot password=$Dovecot_PASS
  default_pass_scheme = CRAM-MD5
  password_query = SELECT userid AS "user", password FROM dovecotpassword('%Ln', '%Ld') WHERE %Ls
- user_query = SELECT SELECT home, uid, gid, mail FROM dovecotuser('%Ln', '%Ld')
+ user_query = SELECT home, uid, gid, mail FROM dovecotuser('%Ln', '%Ld')
 
 Dovecot v2.x
 ------------
