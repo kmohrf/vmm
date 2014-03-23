@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vmm 0.6.2\n"
 "Report-Msgid-Bugs-To: user+vmm/tp@localhost.localdomain.org\n"
-"POT-Creation-Date: 2014-03-23 16:32+0000\n"
+"POT-Creation-Date: 2014-03-23 20:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1339,6 +1339,8 @@ msgstr ""
 msgid "Invalid address type for list: '%s'"
 msgstr ""
 
+#. TP: the letters 'u', 'a' and 'r' are abbreviations of user,
+#. alias and relocated user
 #: VirtualMailManager/cli/subcommands.py:1101
 msgid "u"
 msgstr ""
