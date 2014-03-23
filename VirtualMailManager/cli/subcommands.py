@@ -1095,9 +1095,9 @@ def _print_address_list(which, dids, addresses, matching):
             # only one type is requested, so no type indicator
             _trans = {TYPE_ACCOUNT: '', TYPE_ALIAS: '', TYPE_RELOCATED: ''}
         else:
+            _trans = {
             # TP: the letters 'u', 'a' and 'r' are abbreviations of user,
             # alias and relocated user
-            _trans = {
                 TYPE_ACCOUNT: _('u'),
                 TYPE_ALIAS: _('a'),
                 TYPE_RELOCATED: _('r'),
