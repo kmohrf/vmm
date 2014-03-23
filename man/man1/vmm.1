@@ -1,10 +1,18 @@
-.TH "VMM" "1" "2012-09-27" "vmm 0.6" "vmm"
+.TH "VMM" "1" "2014-02-23" "vmm 0.7" "vmm"
 .SH NAME
 vmm \- command line tool to manage email domains/accounts/aliases
 .\" -----------------------------------------------------------------------
 .SH SYNOPSIS
 .B vmm
-.IR subcommand " [" "argument ..." ]
+.BR   \-h | \-v | \-\-help | \-\-version
+.\" --------------------------
+.br
+.BI vmm " subcommand " \-h \c
+.RB | \-\-help
+.\" --------------------------
+.br
+.BI vmm " subcommand"
+.IR arguments " [" options ]
 .\" -----------------------------------------------------------------------
 .SH DESCRIPTION
 .B vmm
@@ -25,6 +33,19 @@ Most of the
 .IR subcommand s
 take one or more
 .IR argument s.
+.\" -----------------------------------------------------------------------
+.SH OPTIONS
+The following options are recognized by
+.BR vmm .
+.TP
+.BR \-h ", " \-\-help
+show a list of available subcommands and exit.
+.\" --------------------------
+.TP
+.BR \-v ", " \-\-version
+show
+.BR vmm \(aqs
+version and copyright information and exit.
 .\" -----------------------------------------------------------------------
 .SH ARGUMENTS
 .TP 12
@@ -136,7 +157,8 @@ domain.transport = lmtp:unix:private/dovecot\-lmtp
 .\" ------------------------------------
 .SS configure (cf)
 .B vmm configure
-.RI [ section ]
+.RB [ \-s
+.IR section ]
 .PP
 Starts the interactive configuration for all configuration sections.
 .PP
@@ -184,7 +206,7 @@ Your current configuration file will be backed as
 Example:
 .PP
 .nf
-.B vmm configure mailbox
+.B vmm configure \-s mailbox
 Using configuration file: /usr/local/etc/vmm.cfg
 
 * Configuration section: `mailbox'
@@ -214,23 +236,10 @@ Account information
         Address........: a.user@example.com
 .fi
 .\" ------------------------------------
-.SS help (h)
-.B vmm help
-.RI [ subcommand ]
-.PP
-Prints a list of available subcommands with a short description to stdout.
-When a
-.I subcommand
-was given, help for that
-.I subcommand
-will be displayed.
-After this
-.B vmm
-exits.
-.\" ------------------------------------
 .SS listdomains (ld)
 .B vmm listdomains
-.RI [ pattern ]
+.RB [ \-p
+.IR pattern ]
 .PP
 This subcommand lists all available domains.
 All domain names will be prefixed either with `[+]', if the domain is a
@@ -245,7 +254,7 @@ and/or the end of the
 Example:
 .PP
 .nf
-.B vmm listdomains %example%
+.B vmm listdomains \-p %example%
 Matching domains
 ----------------
         [+] example.com
@@ -257,7 +266,8 @@ Matching domains
 .\" ------------------------------------
 .SS listaddresses (ll)
 .B vmm listaddresses
-.RI [ pattern ]
+.RB [ \-p
+.IR pattern ]
 .PP
 This command lists all defined addresses. Addresses belonging to
 alias-domains are prefixed with a '-', addresses of regular domains with
@@ -273,12 +283,13 @@ and/or the end of the
 Example:
 .PP
 .nf
-.B vmm listaddresses example.com
-.B vmm listaddresses %master@%
+.B vmm listaddresses \-p example.com
+.B vmm listaddresses \-p %master@%
 .\" ------------------------------------
 .SS listaliases (la)
 .B vmm listaliases
-.RI [ pattern ]
+.RB [ \-p
+.IR pattern ]
 .PP
 This command lists all defined aliases. Aliases belonging to
 alias-domains are prefixed with a '-', addresses of regular domains with
@@ -293,12 +304,13 @@ and/or the end of the
 Example:
 .PP
 .nf
-.B vmm listaliases example.com
-.B vmm listaliases %master@%
+.B vmm listaliases \-p example.com
+.B vmm listaliases \-p %master@%
 .\" ------------------------------------
 .SS listrelocated (lr)
 .B vmm listrelocated
-.RI [ pattern ]
+.RB [ \-p
+.IR pattern ]
 .PP
 This command lists all defined relocated addresses. Relocated entries
 belonging to alias-domains are prefixed with a '-', addresses of regular
@@ -314,12 +326,13 @@ and/or the end of the
 Example:
 .PP
 .nf
-.B vmm listrelocated example.com
-.B vmm listrelocated %master@%
+.B vmm listrelocated \-p example.com
+.B vmm listrelocated \-p %master@%
 .\" ------------------------------------
 .SS listusers (lu)
 .B vmm listusers
-.RI [ pattern ]
+.RB [ \-p
+.IR pattern ]
 .PP
 This command lists all user accounts. User accounts belonging to
 alias-domains are prefixed with a '-', addresses of regular
@@ -335,8 +348,8 @@ and/or the end of the
 Example:
 .PP
 .nf
-.B vmm listusers example.com
-.B vmm listusers %master@%
+.B vmm listusers \-p example.com
+.B vmm listusers \-p %master@%
 .\" ------------------------------------
 .SS listpwschemes (lp)
 .B vmm listpwschemes
@@ -349,8 +362,7 @@ option.
 The output varies, depending on the used Dovecot version and the system's
 libc.
 .br
-When your Dovecot installation isn't too old, you will see additionally a
-few usable encoding suffixes.
+Additionally a few usable encoding suffixes will be displayed.
 One of them can be appended to the password scheme.
 .PP
 Example:
@@ -359,30 +371,33 @@ Example:
 .B vmm listpwschemes
 Usable password schemes
 -----------------------
-        CRYPT SHA512-CRYPT LDAP-MD5 DIGEST-MD5 SHA256 SHA512 SSHA512
-        SKEY SSHA NTLM RPA MD5-CRYPT HMAC-MD5 SHA1 PLAIN SHA CRAM-MD5
-        SSHA256 MD5 LANMAN CLEARTEXT PLAIN-MD5 PLAIN-MD4 OTP SMD5
-        SHA256-CRYPT
+        CLEARTEXT CRAM-MD5 CRYPT DIGEST-MD5 HMAC-MD5 LANMAN LDAP-MD5 MD5
+        MD5-CRYPT NTLM OTP PLAIN PLAIN-MD4 PLAIN-MD5 RPA SHA SHA1 SHA256
+        SHA256-CRYPT SHA512 SHA512-CRYPT SKEY SMD5 SSHA SSHA256 SSHA512
 
 Usable encoding suffixes
 ------------------------
         .B64 .BASE64 .HEX
 .fi
-.\" ------------------------------------
-.SS version (v)
-.B vmm version
-.PP
-Prints
-.BR vmm 's
-version and copyright information to stdout.
-After this
-.B vmm
-exits.
 .\" -----------------------------------------------------------------------
 .SH DOMAIN SUBCOMMANDS
 .SS domainadd (da)
 .B vmm domainadd
-.IR fqdn " [" transport ]
+.I fqdn
+.RB [ \-n
+.IR note ]
+.RB [ \-t
+.IR transport ]
+.PP
+.\" ------------------------------------
+.TP
+.BI "\-n " note
+the note that should be set.
+.\" ------------------------------------
+.TP
+.BI "\-t " transport
+a Postfix transport (transport: or transport:nexthop).
+.\" ------------------------------------
 .PP
 Adds the new domain into the database and creates the domain directory.
 .PP
@@ -415,7 +430,7 @@ print the generated postmaster password to stdout.
 Examples:
 .PP
 .nf
-.B vmm domainadd support.example.com smtp:[mx1.example.com]:2025
+.B vmm domainadd support.example.com \-t smtp:[mx1.example.com]:2025
 Creating account for postmaster@support.example.com
 Enter new password:
 Retype new password:
@@ -427,7 +442,7 @@ Generated password: pLJUQ6Xg_z
 .\" ------------------------------------
 .SS domaindelete (dd)
 .BI "vmm domaindelete " fqdn
-.RB [ force ]
+.RB [ \-\-force ]
 .PP
 This subcommand deletes the domain specified by
 .IR fqdn .
@@ -436,8 +451,8 @@ If there are accounts, aliases and/or relocated users assigned to the given
 domain,
 .B vmm
 will abort the requested operation and show an error message.
-If you know, what you are doing, you can specify the optional keyword
-.BR force .
+If you know, what you are doing, you can specify the optional argument
+.BR \-\-force .
 .PP
 If you really always know what you are doing, edit your
 .I vmm.cfg
@@ -448,7 +463,9 @@ to
 .\" ------------------------------------
 .SS domaininfo (di)
 .B vmm domaininfo
-.IR fqdn \ [ details ]
+.I fqdn
+.RB [ \-d
+.IR details ]
 .PP
 This subcommand shows some information about the given domain.
 .PP
@@ -500,8 +517,10 @@ Domain information
 .\" ------------------------------------
 .SS domainquota (dq)
 .B vmm domainquota
-.IR "fqdn storage" " [" messages ]
-.RB [ force ]
+.I fqdn storage
+.RB [ \-m
+.IR messages ]
+.RB [ --force ]
 .PP
 This subcommand is used to configure a new quota limit for the accounts of
 the domain - not for the domain itself.
@@ -511,8 +530,8 @@ The default quota limit for accounts is defined in the
 .PP
 The new quota limit will affect only those accounts for which the limit
 has not been overridden. If you want to restore the default to all accounts,
-you may pass the keyword
-.BR force .
+you may pass the optional argument
+.BR \-\-force .
 .br
 When the argument
 .I messages
@@ -523,13 +542,15 @@ was omitted the default number of messages
 Example:
 .PP
 .nf
-.B vmm domainquota example.com 1g force
+.B vmm domainquota example.com 1g \-\-force
 .fi
 .\" ------------------------------------
 .SS domainservices (ds)
 .B vmm domainservices
-.IR fqdn " [" "service ..." ]
-.RB [ force ]
+.I fqdn
+.RB [ \-s
+.IR "service ..." ]
+.RB [ \-\-force ]
 .PP
 To define which services could be used by the users of the domain \(em with
 the given
@@ -540,24 +561,24 @@ Each specified
 .I service
 will be enabled/usable.
 All other services will be deactivated/unusable.
-Possible service names are: 
+Possible service names are:
 .BR  imap ", " pop3 ", " sieve " and " smtp .
 .br
 The new service set will affect only those accounts for which the set has not
 been overridden. If you want to restore the default to all accounts, you may
-pass the keyword
-.BR force .
+pass the option
+.BR \-\-force .
 .\" ------------------------------------
 .SS domaintransport (dt)
 .BI "vmm domaintransport" " fqdn transport"
-.RB [ force ]
+.RB [ --force ]
 .PP
 A new transport for the indicated domain can be set with this subcommand.
 .PP
 The new transport will affect only those accounts for which the transport has
 not been overridden. If you want to restore the default to all accounts, you
-may pass the keyword
-.BR force .
+may give the option
+.BR \-\-force .
 .PP
 Example:
 .PP
@@ -567,15 +588,28 @@ Example:
 .\" ------------------------------------
 .SS domainnote (do)
 .BI "vmm domainnote" " fqdn"
-.RI [ note ]
+.BR \-d | \-n
+.I note
+.PP
+.\" ------------------------------------
+.TP
+.B \-d
+delete the domain\(aqs note.
+.\" ------------------------------------
+.TP
+.BI "\-n " note
+the note that should be set.
+.\" ------------------------------------
 .PP
 With this subcommand, it is possible to attach a note to the specified
-domain. Without an argument, an existing note is removed.
+domain.
+In order to delete an existing note, pass the
+.BR \-d " option."
 .PP
 Example:
 .PP
 .nf
-.B vmm do example.com Belongs to Robert
+.B vmm do example.com \-n `Belongs to Robert'
 .fi
 .\" -----------------------------------------------------------------------
 .SH ALIAS DOMAIN SUBCOMMANDS
@@ -661,7 +695,21 @@ Example:
 .SH ACCOUNT SUBCOMMANDS
 .SS useradd (ua)
 .B vmm useradd
-.IR address " [" password ]
+.I address
+.RB [ \-n
+.IR note ]
+.RB [ \-p
+.IR password ]
+.PP
+.\" ------------------------------------
+.TP
+.BI "\-n " note
+the note that should be set.
+.\" ------------------------------------
+.TP
+.BI "\-p " password
+the new user\(aqs password.
+.\" ------------------------------------
 .PP
 Use this subcommand to create a new e\-mail account for the given
 .IR address .
@@ -683,7 +731,7 @@ has been created.
 Examples:
 .PP
 .nf
-.B vmm ua d.user@example.com \(dqA 5ecR3t P4s5\(rs/\(rs/0rd\(dq
+.B vmm ua d.user@example.com \-p \(dqA 5ecR3t P4s5\(rs/\(rs/0rd\(dq
 .B vmm useradd e.user@example.com
 Enter new password:
 Retype new password:
@@ -691,7 +739,7 @@ Retype new password:
 .\" ------------------------------------
 .SS userdelete (ud)
 .BI "vmm userdelete" " address"
-.RB [ force ]
+.RB [ \-\-force ]
 .PP
 Use this subcommand to delete the account with the given
 .IR address .
@@ -699,12 +747,14 @@ Use this subcommand to delete the account with the given
 If there are one or more aliases with an identical destination address,
 .B vmm
 will abort the requested operation and show an error message.
-To prevent this, specify the optional keyword
-.BR force .
+To prevent this, give the optional argument
+.BR \-\-force .
 .\" ------------------------------------
 .SS userinfo (ui)
 .B "vmm userinfo"
-.IR address " [" details ]
+.I address
+.RB [ \-d
+.IR details ]
 .PP
 This subcommand displays some information about the account specified by
 .IR address .
@@ -758,56 +808,116 @@ Account information
 .\" ------------------------------------
 .SS username (un)
 .BI "vmm username" " address"
-.RI [ name ]
+.BR \-d | \-n
+.IR name
+.PP
+.\" ------------------------------------
+.TP
+.B \-d
+delete the user\(aqs name.
+.\" ------------------------------------
+.TP
+.BI "\-n " name
+a user\(aqs real name.
+.\" ------------------------------------
 .PP
 The user's real
 .I name
 can be set/updated with this subcommand.
 .PP
-If no
-.I name
-is given, the value stored for the account is erased.
+In order to delete the value stored for the account, pass the
+.BR \-d " option."
 .PP
 Example:
 .PP
 .nf
-.B vmm un d.user@example.com \(dqJohn Doe\(dq
+.B vmm un d.user@example.com \-n \(dqJohn Doe\(dq
 .fi
 .\" ------------------------------------
 .SS userpassword (up)
 .BI "vmm userpassword" " address"
-.RI [ password ]
+.RB ([ \-p
+.IR password ]
+.RB [ \-s
+.IR scheme "] |"
+.B \-\-hash
+.IR pwhash ])
+.PP
+.TP
+.BI "\-p " password
+The user\(aqs new password.
+.\" ------------------------------------
+.TP
+.BI "\-s " scheme
+When a
+.I scheme
+was specified, it overrides the
+.I misc.password_scheme
+setting, configured in the
+.I vmm.cfg
+file.
+.\" ------------------------------------
+.TP
+.BI "\-\-hash " pwhash
+A hashed password, prefixed with
+.BI { SCHEME };
+as generated by
+.BR "doveadm pw" .
+You should enclose the hashed password in single quotes, if it contains
+one ore more dollar signs
+.RB ( $ ).
+.\" ------------------------------------
 .PP
 The password of an account can be updated with this subcommand.
 .PP
 If no
-.I password
+.IR password " or " pwhash
 was provided,
 .B vmm
-will prompt for it interactively.
+will prompt for a password interactively.
+.IP Note:
+When passing a hashed password,
+.B vmm
+checks only if the included
+.I SCHEME
+is supported by your Dovecot installation.  No further checks are done.
 .PP
 Example:
 .PP
 .nf
-.B vmm up d.user@example.com \(dqA |\(rs/|0r3 5ecur3 P4s5\(rs/\(rs/0rd?\(dq
+.B vmm up d.user@example.com \-p \(dqA |\(rs/|0r3 5ecur3 P4s5\(rs/\(rs/0rd?\(dq
 .fi
 .\" ------------------------------------
 .SS usernote (uo)
 .BI "vmm usernote" " address"
-.RI [ note ]
+.BR \-d | \-n
+.IR note
+.PP
+.\" ------------------------------------
+.TP
+.B \-d
+delete the user\(aqs note.
+.\" ------------------------------------
+.TP
+.BI "\-n " note
+the note that should be set.
+.\" ------------------------------------
 .PP
 With this subcommand, it is possible to attach a note to the specified
-account. Without an argument, an existing note is removed.
+account.
+In order to delete an existing note, pass the
+.BR \-d " option."
 .PP
 Example:
 .PP
 .nf
-.B vmm uo d.user@example.com Only needed until end of May 2012
+.B vmm uo d.user@example.com -n `Only needed until end of May 2013'
 .fi
 .\" ------------------------------------
 .SS userquota (uq)
 .BI "vmm userquota" " address storage"
-.RI [ messages ]
+.RB [ \-m
+.IR messages ]
 .PP
 This subcommand is used to set a new quota limit for the given account.
 .PP
@@ -819,7 +929,7 @@ was omitted the default number of messages
 .PP
 Instead of
 .I storage
-pass the keyword
+limit pass the keyword
 .B domain
 to remove the account\-specific override, causing the domain's value to be
 in effect.
@@ -832,7 +942,9 @@ Example:
 .\" ------------------------------------
 .SS userservices (us)
 .B vmm userservices
-.IR address " [" "service ..." ]
+.I address
+.RB [ \-s
+.IR "service ..." ]
 .PP
 To grant a user access to the specified services, use this command.
 .PP
@@ -840,15 +952,17 @@ All omitted services will be deactivated/unusable for the user with the
 given
 .IR address .
 .PP
-Instead of
+Instead of any
 .I service
-pass 'domain' to remove the account\-specific override, causing the
-domain's value to be in effect.
+pass the keyword
+.B domain
+to remove the account\-specific override, causing the domain's value to be
+in effect.
 .PP
 Example:
 .PP
 .nf
-.B vmm userservices d.user@example.com SMTP IMAP
+.B vmm userservices d.user@example.com \-s smtp imap
 .\" ------------------------------------
 .SS usertransport (ut)
 .BI "vmm usertransport" " address transport"
@@ -1013,7 +1127,7 @@ Example:
 .B vmm catchallinfo example.com
 Catch-all information
 ---------------------
-  Mail to unknown localparts in domain example.com will be sent to:
+  Mail to unknown local\-parts in domain example.com will be sent to:
          * user@example.org
 .fi
 .\" ------------------------------------
@@ -1044,6 +1158,7 @@ will be used when the above file doesn't exist.
 will be used when none of the both above mentioned files exists.
 .\" -----------------------------------------------------------------------
 .SH SEE ALSO
+.BR doveadm\-pw (1),
 .BR dsync (1),
 .BR transport (5),
 .BR vmm.cfg (5)

@@ -48,8 +48,8 @@ Example:
 configure
 ---------
 Syntax:
- | **vmm configure** [*section*]
- | **vmm cf** [*section*]
+ | **vmm configure** [**-s** *section*]
+ | **vmm cf** [**-s** *section*]
 
 Starts the interactive configuration for all configuration sections.
 
@@ -84,7 +84,7 @@ Example:
 
 .. code-block:: console
 
- root@host:~# vmm configure mailbox
+ root@host:~# vmm configure -s mailbox
  Using configuration file: /usr/local/etc/vmm.cfg
 
  * Configuration section: `mailbox'
@@ -113,21 +113,11 @@ Example:
          GID............: 70704
          Address........: a.user@example.com
 
-help
-----
-Syntax:
- | **vmm help** [*subcommand*]
- | **vmm h** [*subcommand*]
-
-Prints a list of available subcommands with a short description to stdout.
-When a *subcommand* was given, help for that *subcommand* will be displayed.
-After this :command:`vmm` exits.
-
 listaddresses
 -------------
 Syntax:
- | **vmm listaddresses** [*pattern*]
- | **vmm ll** [*pattern*]
+ | **vmm listaddresses** [**-p** *pattern*]
+ | **vmm ll** [**-p** *pattern*]
 
 This command lists all defined addresses. Addresses belonging to
 alias-domains are prefixed with a '-', addresses of regular domains with
@@ -143,7 +133,7 @@ Example:
 
 .. code-block:: console
 
- root@host:~# vmm ll example.com
+ root@host:~# vmm ll -p example.com
  Matching addresses
  ------------------
          [u+] a.user@example.com
@@ -158,8 +148,8 @@ Example:
 listaliases
 -----------
 Syntax:
- | **vmm listaliases** [*pattern*]
- | **vmm la** [*pattern*]
+ | **vmm listaliases** [**-p** *pattern*]
+ | **vmm la** [**-p** *pattern*]
 
 This command lists all defined aliases. Aliases belonging to alias-domains
 are prefixed with a '-', addresses of regular domains with a '+'.
@@ -172,7 +162,7 @@ Example:
 
 .. code-block:: console
 
- root@host:~# vmm listaliases example.com
+ root@host:~# vmm listaliases -p example.com
  Matching aliases
  ----------------
          [+] support@example.com
@@ -182,8 +172,8 @@ Example:
 listdomains
 -----------
 Syntax:
- | **vmm listdomains** [*pattern*]
- | **vmm ld** [*pattern*]
+ | **vmm listdomains** [**-p** *pattern*]
+ | **vmm ld** [**-p** *pattern*]
 
 This subcommand lists all available domains.
 All domain names will be prefixed either with '[+]', if the domain is
@@ -197,7 +187,7 @@ Example:
 
 .. code-block:: console
 
- root@host:~# vmm listdomains %example%
+ root@host:~# vmm listdomains -p %example%
  Matching domains
  ----------------
          [+] example.com
@@ -217,8 +207,7 @@ This subcommand lists all password schemes which could be used in the
 The output varies, depending on the used Dovecot version and the system's
 libc.
 
-When your Dovecot installation isn't too old, you will see additionally
-a few usable encoding suffixes.
+Additionally a few usable encoding suffixes will be displayed.
 One of them can be appended to the password scheme.
 
 Example:
@@ -228,10 +217,9 @@ Example:
  root@host:~# vmm listpwschemes
  Usable password schemes
  -----------------------
-         CRYPT SHA512-CRYPT LDAP-MD5 DIGEST-MD5 SHA256 SHA512 SSHA512
-         SKEY SSHA NTLM RPA MD5-CRYPT HMAC-MD5 SHA1 PLAIN SHA CRAM-MD5
-         SSHA256 MD5 LANMAN CLEARTEXT PLAIN-MD5 PLAIN-MD4 OTP SMD5
-         SHA256-CRYPT
+         CLEARTEXT CRAM-MD5 CRYPT DIGEST-MD5 HMAC-MD5 LANMAN LDAP-MD5 MD5
+         MD5-CRYPT NTLM OTP PLAIN PLAIN-MD4 PLAIN-MD5 RPA SHA SHA1 SHA256
+         SHA256-CRYPT SHA512 SHA512-CRYPT SKEY SMD5 SSHA SSHA256 SSHA512
 
  Usable encoding suffixes
  ------------------------
@@ -242,8 +230,8 @@ Example:
 listrelocated
 -------------
 Syntax:
- | **vmm listrelocated** [*pattern*]
- | **vmm lr** [*pattern*]
+ | **vmm listrelocated** [**-p** *pattern*]
+ | **vmm lr** [**-p** *pattern*]
 
 This command lists all defined relocated addresses.
 Relocated entries belonging to alias-domains are prefixed with a '-',
@@ -257,7 +245,7 @@ Example:
 
 .. code-block:: console
 
- root@host:~# vmm listrelocated example.com
+ root@host:~# vmm listrelocated -p example.com
  Matching relocated users
  ------------------------
          [+] b.user@example.com
@@ -267,8 +255,8 @@ Example:
 listusers
 ---------
 Syntax:
- | **vmm listusers** [*pattern*]
- | **vmm lu** [*pattern*]
+ | **vmm listusers** [**-p** *pattern*]
+ | **vmm lu** [**-p** *pattern*]
 
 This command lists all user accounts.
 User accounts belonging to alias-domains are prefixed with a '-', addresses
@@ -282,7 +270,7 @@ Example:
 
 .. code-block:: console
 
- root@host:~# vmm listusers example.com
+ root@host:~# vmm listusers -p example.com
  Matching user accounts
  ----------------------
          [+] a.user@example.com
@@ -291,12 +279,3 @@ Example:
          [+] postmaster@example.com
 
 .. versionadded:: 0.6.0
-
-version
--------
-Syntax:
- | **vmm version**
- | **vmm v**
-
-Prints :command:`vmm`'s version and copyright information to stdout.
-After this :command:`vmm` exits.

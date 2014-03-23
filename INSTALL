@@ -1,26 +1,12 @@
 Installation Prerequisites
-You should already have installed and configured Postfix, Dovecot and
-PostgreSQL.
+You should already have installed and configured Postfix, Dovecot ≥ 1.2.0
+and PostgreSQL.
 
 The Virtual Mail Manager depends on:
-    - Python (>= 2.4.0)
-    - Psycopg 2¹ or pyPgSQL²
+    - Python (≥ 3.2)
+    - Psycopg¹ (≥ 2.0)
 
-If you are using Python <= 2.5.0:
-    - if you want to store your users' passwords as PLAIN-MD4 digest in
-      the database, vmm will try to use Crypto.Hash.MD4 from PyCrypto³.
-    - if you are using Dovecot >= v1.1.0 and you want to store your users'
-      passwords as SHA256 or SSHA256 hashes, vmm will try to use
-      Crypto.Hash.SHA256 from PyCrypto². For SHA256/SSHA256 you should have
-      at least use PyCrypto in version 2.1.0alpha1.
-
-    When the Crypto.Hash module couldn't be imported, vmm will use
-    dovecotpw/doveadm, if the misc.password_scheme setting in the vmm.cfg
-    is set to PLAIN-MD4, SHA256 or SSHA256
-
-[1] Psycopg: <http://initd.org/psycopg/> (Debian: python-psycopg2)
-[2] pyPgSQL: <http://pypgsql.sourceforge.net/> (Debian: python-pgsql)
-[3] PyCrypto: <http://www.pycrypto.org/> (Debian: python-crypto)
+[1] Psycopg: <http://initd.org/psycopg/> (Debian: python3-psycopg2)
 
 
 Create additionally a user and groups for improved security
@@ -32,7 +18,7 @@ Create additionally a user and groups for improved security
 	doveauth
 
   This will create the doveauth user and group.
-  For Dovecot >= 2.0 we create also the group `dovemail'. Dovecot will assign
+  For Dovecot ≥ 2.0 we create also the group `dovemail'. Dovecot will assign
   this group to all Dovecot processes.
   On a Debian GNU/Linux bases system run:
 
@@ -43,7 +29,7 @@ Configuring PostgreSQL
 (for more details see:
     http://vmm.localdomain.org/installation/postgresql_configuration.html)
 
-* /etc/postgresql/8.4/main/pg_hba.conf
+* /etc/postgresql/9.1/main/pg_hba.conf
   [ if you prefer to connect via TCP/IP ]
     # IPv4 local connections:
     host    mailsys     +mailsys    127.0.0.1/32          md5
@@ -52,7 +38,7 @@ Configuring PostgreSQL
     local   mailsys     +mailsys                          md5
 
     # reload configuration
-    /etc/init.d/postgresql-8.4 force-reload
+    /etc/init.d/postgresql force-reload
 
 * Create a database superuser if necessary:
     # as root run: su - postgres
@@ -74,9 +60,7 @@ Configuring PostgreSQL
 
     # connect to the new database
     psql mailsys vmm -W -h 127.0.0.1
-    # either import the database structure for Dovecot v1.0.x/v1.1.x
-    \i vmm-y.x.z/pgsql/create_tables.pgsql
-    # or import the database structure for Dovecot v1.2.x/v2.x
+    # import the database structure for Dovecot ≥ 1.2.0
     \i vmm-x.y.z/pgsql/create_tables-dovecot-1.2.x.pgsql
     # leave psql
     \q
@@ -93,8 +77,8 @@ Create directory for your mails
   chmod 751 /srv/mail/*
 
 
-For Dovecot >= 2.0 read the file Configure.Dovecot_2
-Configuring Dovecot v1.x
+For Dovecot ≥ 2.0 read the file Configure.Dovecot_2
+Configuring Dovecot v1.2.x
 
 * /etc/dovecot/dovecot.conf
     # all your other settings
@@ -137,8 +121,8 @@ Configuring Dovecot v1.x
 
 Provide a root SETUID copy of Dovecot's deliver agent for Postfix
 
-/!\ Only required with Dovecot v.1.x.
-    With Dovecot >= v2.0 use Dovecot's lmtp!
+/!\ Only required with Dovecot v.1.2.x.
+    With Dovecot ≥ v2.0 use Dovecot's lmtp!
 
     mkdir -p /usr/local/lib/dovecot
     chmod 700 /usr/local/lib/dovecot
@@ -154,7 +138,7 @@ Start or restart Dovecot
 
 Configuring Postfix's master.cf
     
-/!\ Only required with Dovecot v.1.x.
+/!\ Only required with Dovecot v.1.2.x.
     # Add Dovecot's deliver agent
     dovecot   unix  -       n       n       -       -       pipe
       flags=DORhu user=nobody argv=/usr/local/lib/dovecot/deliver -f ${sender}
@@ -181,7 +165,7 @@ Configuring Postfix's main.cf
     virtual_mailbox_base = /
     virtual_mailbox_maps = ${proxysql}pgsql-virtual_mailbox_maps.cf
 
-    # dovecot LDA (only recommended with Dovecot v1.x)
+    # dovecot LDA (only recommended with Dovecot v1.2.x)
     #dovecot_destination_recipient_limit = 1
     #virtual_transport = dovecot:
 
@@ -219,7 +203,7 @@ Installing the Virtual Mail Manager and configure the rest
     # configure the Virtual Mail Manager
     # vmm.cfg(5) - configuration file for vmm
     #
-    # For Dovecot v1.x use 'dovecot:' as domain.transport
+    # For Dovecot v1.2.x use 'dovecot:' as domain.transport
     # When using Dovecot v2.x use 'lmtp:unix:private/dovecot-lmtp' as
     # domain.transport
     vmm configure

@@ -34,7 +34,7 @@ CREATE TABLE transport (
     CONSTRAINT  ukey_transport UNIQUE (transport)
 );
 -- Insert default transport
-INSERT INTO transport(transport) VALUES ('dovecot:');
+INSERT INTO transport(transport) VALUES ('lmtp:unix:private/dovecot-lmtp');
 
 CREATE TABLE mailboxformat (
     fid         bigint NOT NULL DEFAULT nextval('mailboxformat_id'),
@@ -74,12 +74,12 @@ CREATE TABLE service_set (
     smtp        boolean NOT NULL DEFAULT TRUE,
     pop3        boolean NOT NULL DEFAULT TRUE,
     imap        boolean NOT NULL DEFAULT TRUE,
-    managesieve boolean NOT NULL DEFAULT TRUE,
+    sieve       boolean NOT NULL DEFAULT TRUE,
     CONSTRAINT  pkey_service_set PRIMARY KEY (ssid),
-    CONSTRAINT  ukey_service_set UNIQUE (smtp, pop3, imap, managesieve)
+    CONSTRAINT  ukey_service_set UNIQUE (smtp, pop3, imap, sieve)
 );
 -- Insert all possible service combinations
-COPY service_set (smtp, pop3, imap, managesieve) FROM stdin;
+COPY service_set (smtp, pop3, imap, sieve) FROM stdin;
 TRUE	TRUE	TRUE	TRUE
 FALSE	TRUE	TRUE	TRUE
 TRUE	FALSE	TRUE	TRUE
@@ -148,12 +148,12 @@ CREATE TABLE users (
         REFERENCES transport (tid)
 );
 
-CREATE TABLE userquota_11 (
+CREATE TABLE userquota (
     uid         bigint NOT NULL,
-    path        varchar(16) NOT NULL,
-    current     bigint NOT NULL DEFAULT 0,
-    CONSTRAINT  pkey_userquota_11 PRIMARY KEY (uid, path),
-    CONSTRAINT  fkey_userquota_11_uid_users FOREIGN KEY (uid)
+    bytes       bigint NOT NULL DEFAULT 0,
+    messages    integer NOT NULL DEFAULT 0,
+    CONSTRAINT  pkey_userquota PRIMARY KEY (uid),
+    CONSTRAINT  fkey_userquota_uid_users FOREIGN KEY (uid)
         REFERENCES users (uid) ON DELETE CASCADE
 );
 
@@ -225,12 +225,12 @@ CREATE TYPE address_maildir AS (
 -- Data type for function dovecotpassword(varchar, varchar)
 -- ---
 CREATE TYPE dovecotpassword AS (
-    userid      varchar(320),
-    password    varchar(270),
-    smtp        boolean,
-    pop3        boolean,
-    imap        boolean,
-    managesieve boolean
+    userid    varchar(320),
+    password  varchar(270),
+    smtp      boolean,
+    pop3      boolean,
+    imap      boolean,
+    sieve     boolean
 );
 -- ---
 -- Data type for function dovecotquotauser(varchar, varchar)
@@ -310,21 +310,44 @@ CREATE TRIGGER primary_count_upd AFTER UPDATE ON domain_name
     FOR EACH ROW EXECUTE PROCEDURE domain_primary_trigger();
 
 
-CREATE OR REPLACE FUNCTION merge_userquota_11() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION merge_userquota() RETURNS TRIGGER AS $$
 BEGIN
-    UPDATE userquota_11
-       SET current = current + NEW.current
-     WHERE uid = NEW.uid AND path = NEW.path;
-    IF found THEN
-        RETURN NULL;
-    ELSE
+    IF NEW.messages < 0 OR NEW.messages IS NULL THEN
+        IF NEW.messages IS NULL THEN
+            NEW.messages = 0;
+        ELSE
+            NEW.messages = -NEW.messages;
+        END IF;
         RETURN NEW;
     END IF;
+    LOOP
+        UPDATE userquota
+           SET bytes = bytes + NEW.bytes, messages = messages + NEW.messages
+         WHERE uid = NEW.uid;
+        IF found THEN
+            RETURN NULL;
+        END IF;
+        BEGIN
+            IF NEW.messages = 0 THEN
+              INSERT INTO userquota VALUES (NEW.uid, NEW.bytes, NULL);
+            ELSE
+              INSERT INTO userquota VALUES (NEW.uid, NEW.bytes, -NEW.messages);
+            END IF;
+            RETURN NULL;
+        EXCEPTION
+            WHEN unique_violation THEN
+                -- do nothing, and loop to try the UPDATE again
+            WHEN foreign_key_violation THEN
+                -- break the loop: a non matching uid means no such user
+                RETURN NULL;
+        END;
+    END LOOP;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER mergeuserquota_11 BEFORE INSERT ON userquota_11
-    FOR EACH ROW EXECUTE PROCEDURE merge_userquota_11();
+
+CREATE TRIGGER mergeuserquota BEFORE INSERT ON userquota
+    FOR EACH ROW EXECUTE PROCEDURE merge_userquota();
 
 -- ######################## FUNCTIONs ####################################### --
 
@@ -347,7 +370,7 @@ AS $$
         userid varchar(320) := localpart || '@' || the_domain;
     BEGIN
         FOR record IN
-            SELECT userid, passwd, smtp, pop3, imap, managesieve
+            SELECT userid, passwd, smtp, pop3, imap, sieve
               FROM users, service_set, domain_data
              WHERE users.gid = (SELECT gid
                                   FROM domain_name
@@ -355,12 +378,12 @@ AS $$
                AND local_part = localpart
                AND users.gid = domain_data.gid
                AND CASE WHEN
-                  users.ssid IS NOT NULL
-                  THEN
-                    service_set.ssid = users.ssid
-                  ELSE
-                    service_set.ssid = domain_data.ssid
-                  END
+                     users.ssid IS NOT NULL
+                     THEN
+                       service_set.ssid = users.ssid
+                     ELSE
+                       service_set.ssid = domain_data.ssid
+                     END
             LOOP
                 RETURN NEXT record;
             END LOOP;
