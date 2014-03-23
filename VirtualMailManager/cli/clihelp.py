@@ -56,6 +56,7 @@ and/or the end of the <pattern>."""),),
     'listaliases': (_(u"""This command lists all defined aliases. Aliases
 belonging to alias-domains are prefixed with a '-', addresses of regular
 domains with a '+'. The output can be limited with an optional <pattern>."""),
+# xgettext:no-python-format
 _(u"""To perform a wild card search, the % character can be used at the start
 and/or the end of the <pattern>."""),),
     # TP: description of subcommand listdomains
@@ -85,7 +86,7 @@ and/or the end of the <pattern>."""),),
 belonging to alias-domains are prefixed with a '-', addresses of regular
 domains with a '+'. The output can be limited with an optional <pattern>."""),
 _(u"""To perform a wild card search, the % character can be used at the start
-and/or the end of the pattern."""),),
+and/or the end of the <pattern>."""),),
     # TP: description of subcommand version
     'version': (_(u"""Prints vmm's version and copyright information to stdout.
 After this vmm exits."""),),
