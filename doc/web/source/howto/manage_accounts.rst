@@ -36,15 +36,30 @@ Example:
 
 userdelete
 ----------
+
+.. program:: vmm userdelete
+
 Syntax:
- | **vmm userdelete** *address* [**‒‒force**]
- | **vmm ud** *address* [**‒‒force**]
+ | **vmm userdelete** *address* [**‒‒delete-home**] [**‒‒force**]
+ | **vmm ud** *address* [**‒‒delete-home**] [**‒‒force**]
+
+.. option:: --delete-home
+
+ When this option is present, :command:`vmm` will also delete the account's
+ home directory.
+ This overrides the *account.delete_directory* setting of :file:`vmm.cfg`.
+
+.. option:: --force
+
+ When this option is given, :command:`vmm` will delete the account, even if
+ there are aliases with the account's address as their destination.
+ Those aliases will be deleted too.
 
 Use this subcommand to delete the account with the given *address*.
 
 If there are one or more aliases with an identical destination address,
 :command:`vmm` will abort the requested operation and show an error message.
-To prevent this, give the optional argument **‒‒force**.
+To prevent this, give the optional argument :option:`--force`.
 
 userinfo
 --------

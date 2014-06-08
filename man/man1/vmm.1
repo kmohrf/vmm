@@ -1,4 +1,4 @@
-.TH "VMM" "1" "2014-02-23" "vmm 0.7" "vmm"
+.TH "VMM" "1" "2014-06-08" "vmm 0.7" "vmm"
 .SH NAME
 vmm \- command line tool to manage email domains/accounts/aliases
 .\" -----------------------------------------------------------------------
@@ -739,7 +739,28 @@ Retype new password:
 .\" ------------------------------------
 .SS userdelete (ud)
 .BI "vmm userdelete" " address"
+.RB [ \-\-delete\-home ]
 .RB [ \-\-force ]
+.PP
+.\" ------------------------------------
+.TP
+.B \-\-delete\-home
+When this option is present,
+.B vmm
+will also delete the account\(aqs home directory.
+This overrides the
+.I account.delete_directory
+setting of
+.IR vmm.cfg .
+.\" ------------------------------------
+.TP
+.B \-\-force
+When this option is given,
+.B vmm
+will delete the account, even if there are aliases with the account\(aqs
+address as their destination.
+Those aliases will be deleted too.
+.\" ------------------------------------
 .PP
 Use this subcommand to delete the account with the given
 .IR address .
