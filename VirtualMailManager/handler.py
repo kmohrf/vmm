@@ -624,8 +624,10 @@ class Handler(object):
                 self._warnings.append(_("The destination account/alias '%s' "
                                         "does not exist.") % destination)
 
-    def user_delete(self, emailaddress, force=False):
+    def user_delete(self, emailaddress, delete_home, force=False):
         """Wrapper around Account.delete(...)"""
+        if not isinstance(delete_home, bool):
+            raise TypeError('delete_home must be a bool')
         if not isinstance(force, bool):
             raise TypeError('force must be a bool')
         acc = self._get_account(emailaddress)
@@ -637,7 +639,7 @@ class Handler(object):
         dom_dir = acc.domain.directory
         acc_dir = acc.home
         acc.delete(force)
-        if self._cfg.dget('account.delete_directory'):
+        if delete_home or self._cfg.dget('account.delete_directory'):
             try:
                 self._delete_home(dom_dir, uid, gid)
             except VMMError as err:
