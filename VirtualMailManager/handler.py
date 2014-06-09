@@ -452,8 +452,10 @@ class Handler(object):
         dom = self._get_domain(domainname)
         dom.update_note(note)
 
-    def domain_delete(self, domainname, force=False):
+    def domain_delete(self, domainname, del_dir, force=False):
         """Wrapper around Domain.delete()"""
+        if not isinstance(del_dir, bool):
+            raise TypeError('del_dir must be a bool')
         if not isinstance(force, bool):
             raise TypeError('force must be a bool')
         dom = self._get_domain(domainname)
@@ -463,7 +465,7 @@ class Handler(object):
             dom.delete(True)
         else:
             dom.delete(False)
-        if self._cfg.dget('domain.delete_directory'):
+        if del_dir or self._cfg.dget('domain.delete_directory'):
             self._delete_domain_dir(domdir, gid)
 
     def domain_info(self, domainname, details=None):
