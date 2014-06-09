@@ -179,7 +179,8 @@ def domain_add(ctx):
 
 def domain_delete(ctx):
     """delete the given domain and all its alias domains"""
-    ctx.hdlr.domain_delete(ctx.args.fqdn.lower(), ctx.args.force)
+    ctx.hdlr.domain_delete(ctx.args.fqdn.lower(), ctx.args.delete_directory,
+                           ctx.args.force)
 
 
 def domain_info(ctx):
@@ -721,15 +722,19 @@ def setup_parser():
     dd = a('domaindelete', aliases=('dd',),
            help=_('delete the given domain and all its alias domains'),
            epilog=fill(_("This subcommand deletes the domain specified by "
-               "fqdn.\n\nIf there are accounts, aliases and/or relocated "
-               "users assigned to the given domain, vmm will abort the "
-               "requested operation and show an error message. If you know, "
-               "what you are doing, you can specify the optional argument "
-               "--force.\n\nIf you really always know what you are doing, "
-               "edit your vmm.cfg and set the option domain.force_deletion "
-               "to true.")),
+               "fqdn.\n\nWhen the --delete-directory option is given, vmm "
+               "will delete the directory of the given domain. This overrides "
+               "the domain.delete_directory setting of vmm.cfg.\n\nIf there "
+               "are accounts, aliases and/or relocated users assigned to the "
+               "given domain, vmm will abort the requested operation and show "
+               "an error message. If you know, what you are doing, you can "
+               "specify the optional argument --force.\n\nIf you really "
+               "always know what you are doing, edit your vmm.cfg and set the "
+               "option domain.force_deletion to true.")),
            formatter_class=RawDescriptionHelpFormatter)
     dd.add_argument('fqdn', help=_('a fully qualified domain name'))
+    dd.add_argument('--delete-directory', action='store_true',
+                    help="delete the domain's directory recursively")
     dd.add_argument('--force', action='store_true',
                     help=_('also delete all accounts, aliases and/or '
                            'relocated users'))
