@@ -461,7 +461,7 @@ class Handler(object):
         dom = self._get_domain(domainname)
         gid = dom.gid
         domdir = dom.directory
-        if self._cfg.dget('domain.force_deletion') or force:
+        if force or self._cfg.dget('domain.force_deletion'):
             dom.delete(True)
         else:
             dom.delete(False)
