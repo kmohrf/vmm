@@ -349,7 +349,7 @@ def user_add(ctx):
 
 def user_delete(ctx):
     """delete the specified user"""
-    ctx.hdlr.user_delete(ctx.args.address.lower(), ctx.args.delete_home,
+    ctx.hdlr.user_delete(ctx.args.address.lower(), ctx.args.delete_directory,
                          ctx.args.force)
 
 
@@ -912,17 +912,17 @@ def setup_parser():
     ud = a('userdelete', aliases=('ud',),
            help=_('delete the specified user'),
            epilog=fill(_('Use this subcommand to delete the account with the '
-               'given address.\n\nWhen the --delete-home option is present, '
-               'vmm will also delete the account\'s home directory. This '
-               'overrides the account.delete_directory setting of vmm.cfg.\n\n'
-               'If there are one or more aliases with an identical '
-               'destination address, vmm will abort the requested operation '
-               'and show an error message. To prevent this, give the optional '
-               'argument --force.')),
+               'given address.\n\nWhen the --delete-directory option is '
+               'present, vmm will also delete the account\'s home directory. '
+               'This overrides the account.delete_directory setting of '
+               'vmm.cfg.\n\nIf there are one or more aliases with an '
+               'identical destination address, vmm will abort the requested '
+               'operation and show an error message. To prevent this, give '
+               'the optional argument --force.')),
            formatter_class=RawDescriptionHelpFormatter)
     ud.add_argument('address',
                     help=_("an account's e-mail address (local-part@fqdn)"))
-    ud.add_argument('--delete-home', action='store_true',
+    ud.add_argument('--delete-directory', action='store_true',
                     help=_("delete the account's home directory"))
     ud.add_argument('--force', action='store_true',
                     help=_('also delete assigned alias addresses'))
