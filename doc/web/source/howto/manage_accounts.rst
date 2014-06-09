@@ -40,10 +40,10 @@ userdelete
 .. program:: vmm userdelete
 
 Syntax:
- | **vmm userdelete** *address* [**‒‒delete-home**] [**‒‒force**]
- | **vmm ud** *address* [**‒‒delete-home**] [**‒‒force**]
+ | **vmm userdelete** *address* [**‒‒delete-directory**] [**‒‒force**]
+ | **vmm ud** *address* [**‒‒delete-directory**] [**‒‒force**]
 
-.. option:: --delete-home
+.. option:: --delete-directory
 
  When this option is present, :command:`vmm` will also delete the account's
  home directory.
