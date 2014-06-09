@@ -53,9 +53,22 @@ Example:
 
 domaindelete
 ------------
+.. program:: vmm domaindelete
+
 Syntax:
- | **vmm domaindelete** *fqdn* [**‒‒force**]
- | **vmm dd** *fqdn* [**‒‒force**]
+ | **vmm domaindelete** *fqdn* [**‒‒delete‒directory**] [**‒‒force**]
+ | **vmm dd** *fqdn* [**‒‒delete‒directory**] [**‒‒force**]
+
+.. option:: --delete-directory
+
+ When this option is given, :command:`vmm` will delete the directory of
+ the given domain.
+ This overrides the *domain.delete_directory* setting of :file:`vmm.cfg`.
+
+.. option:: --force
+
+ Use this option in oder to force the deletion of the domain, even if
+ there are accounts, aliases, catch-all accounts and/or relocated users.
 
 This subcommand deletes the domain specified by *fqdn*.
 
@@ -63,7 +76,7 @@ If there are accounts, aliases and/or relocated users assigned to the given
 domain, :command:`vmm` will abort the requested operation and show an error
 message.
 If you know, what you are doing, you can specify the optional argument
-**‒‒force**.
+:option:`--force`.
 
 If you really always know what you are doing, edit your :file:`vmm.cfg` and
 set the option *domain.force_deletion* to **true**.

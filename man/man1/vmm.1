@@ -1,4 +1,4 @@
-.TH "VMM" "1" "2014-06-08" "vmm 0.7" "vmm"
+.TH "VMM" "1" "2014-06-09" "vmm 0.7" "vmm"
 .SH NAME
 vmm \- command line tool to manage email domains/accounts/aliases
 .\" -----------------------------------------------------------------------
@@ -442,7 +442,25 @@ Generated password: pLJUQ6Xg_z
 .\" ------------------------------------
 .SS domaindelete (dd)
 .BI "vmm domaindelete " fqdn
+.RB [ \-\-delete\-directory ]
 .RB [ \-\-force ]
+.PP
+.\" ------------------------------------
+.TP
+.B \-\-delete\-directory
+When this option is given,
+.B vmm
+will delete the directory of the given domain.
+This overrides the
+.I domain.delete_directory
+setting of
+.IR vmm.cfg .
+.\" ------------------------------------
+.TP
+.B \-\-force
+Use this option in oder to force the deletion of the domain, even if there
+are accounts, aliases, catch-all accounts and/or relocated users.
+.\" ------------------------------------
 .PP
 This subcommand deletes the domain specified by
 .IR fqdn .
