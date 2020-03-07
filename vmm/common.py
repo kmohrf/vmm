@@ -12,6 +12,7 @@ import locale
 import os
 import re
 import stat
+from gettext import gettext as _
 
 from vmm import ENCODING
 from vmm.constants import (
@@ -28,7 +29,6 @@ VERSION_RE = re.compile(r"^(\d+)\.(\d+)\.(?:(\d+)|(alpha|beta|rc)(\d+))$")
 
 _version_level = dict(alpha=0xA, beta=0xB, rc=0xC)
 _version_cache = {}
-_ = lambda msg: msg
 
 
 def expand_path(path):
@@ -305,6 +305,3 @@ def search_addresses(
             daddrs[gid] = []
         daddrs[gid].append((address, addrtype, aliasdomain))
     return gids, daddrs
-
-
-del _

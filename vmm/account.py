@@ -8,6 +8,8 @@
     vmm's Account class to manage e-mail accounts.
 """
 
+from gettext import gettext as _
+
 from vmm.common import version_str, format_domain_default
 from vmm.constants import (
     ACCOUNT_EXISTS,
@@ -31,7 +33,6 @@ from vmm.serviceset import ServiceSet
 
 __all__ = ("Account", "get_account_by_uid")
 
-_ = lambda msg: msg
 cfg_dget = lambda option: None
 
 
@@ -559,4 +560,4 @@ def get_account_by_uid(uid, dbh):
     return info
 
 
-del _, cfg_dget
+del cfg_dget

@@ -12,6 +12,7 @@
 import os
 import re
 from binascii import a2b_base64, b2a_base64
+from gettext import gettext as _
 from subprocess import Popen, PIPE
 
 from vmm import ENCODING
@@ -30,7 +31,6 @@ __all__ = (
     "mutf7_to_utf8",
 )
 
-_ = lambda msg: msg
 cfg_dget = lambda option: None
 
 
@@ -309,4 +309,4 @@ def new(account):
     raise ValueError("unsupported mailbox format: %r" % mbfmt)
 
 
-del _, cfg_dget
+del cfg_dget

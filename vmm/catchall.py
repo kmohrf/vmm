@@ -18,6 +18,8 @@
     Yet, we reuse the AliasError exception class, which makes sense.
 """
 
+from gettext import gettext as _
+
 from vmm.domain import get_gid
 from vmm.emailaddress import EmailAddress, DestinationEmailAddress as DestAddr
 from vmm.errors import AliasError as AErr
@@ -25,7 +27,6 @@ from vmm.ext.postconf import Postconf
 from vmm.constants import ALIAS_EXCEEDS_EXPANSION_LIMIT, NO_SUCH_ALIAS, NO_SUCH_DOMAIN
 
 
-_ = lambda msg: msg
 cfg_dget = lambda option: None
 
 
@@ -205,4 +206,4 @@ Hint: Delete some destination addresses."""
         del self._dests[:]
 
 
-del _, cfg_dget
+del cfg_dget

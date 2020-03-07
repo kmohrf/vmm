@@ -9,6 +9,7 @@
 """
 
 from configparser import RawConfigParser
+from gettext import gettext as _
 from shutil import copy2
 from string import Template
 
@@ -17,8 +18,6 @@ from vmm.config import Config, ConfigValueError, LazyConfig
 from vmm.errors import ConfigError, VMMError
 from vmm.cli import w_err, w_std
 from vmm.constants import CONF_ERROR, VMM_TOO_MANY_FAILURES
-
-_ = lambda msg: msg
 
 
 class CliConfig(Config):
@@ -94,6 +93,3 @@ class CliConfig(Config):
         copy2(self._cfg_filename, self._cfg_filename + ".bak")
         with open(self._cfg_filename, "w", encoding="utf-8") as self._cfg_file:
             self.write(self._cfg_file)
-
-
-del _

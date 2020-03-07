@@ -8,6 +8,7 @@
     vmm's EmailAddress class to handle e-mail addresses.
 """
 import re
+from gettext import gettext as _
 
 from vmm.domain import check_domainname, get_gid
 from vmm.constants import (
@@ -21,7 +22,6 @@ from vmm.errors import DomainError, EmailAddressError as EAErr
 
 
 RE_LOCALPART = re.compile(r"[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]", re.ASCII)
-_ = lambda msg: msg
 
 
 class EmailAddress(object):
@@ -167,6 +167,3 @@ def check_localpart(localpart):
             LOCALPART_INVALID,
         )
     return localpart
-
-
-del _

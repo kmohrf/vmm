@@ -8,6 +8,8 @@
     vmm's AliasDomain class to manage alias domains.
 """
 
+from gettext import gettext as _
+
 from vmm.domain import Domain, check_domainname
 from vmm.constants import (
     ALIASDOMAIN_EXISTS,
@@ -17,9 +19,6 @@ from vmm.constants import (
     NO_SUCH_DOMAIN,
 )
 from vmm.errors import AliasDomainError as ADErr
-
-
-_ = lambda msg: msg
 
 
 class AliasDomain(object):
@@ -180,6 +179,3 @@ class AliasDomain(object):
             self._dbh.commit()
             self._gid = 0
         dbc.close()
-
-
-del _

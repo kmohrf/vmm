@@ -8,6 +8,7 @@
     vmm's cli subcommands.
 """
 
+from gettext import gettext as _
 import locale
 import platform
 
@@ -87,7 +88,6 @@ __all__ = (
 
 WS_ROWS = get_winsize()[1] - 2
 
-_ = lambda msg: msg
 txt_wrpr = TextWrapper(width=WS_ROWS)
 
 
@@ -1668,6 +1668,3 @@ def _print_aliasdomain_info(info):
         _("\tThe alias domain %(alias)s belongs to:\n\t    * %(domain)s") % info,
         "",
     )
-
-
-del _

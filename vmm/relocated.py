@@ -7,6 +7,7 @@
 
     vmm's Relocated class to handle relocated users.
 """
+from gettext import gettext as _
 
 from vmm.domain import get_gid
 from vmm.emailaddress import EmailAddress, DestinationEmailAddress
@@ -18,9 +19,6 @@ from vmm.constants import (
     RELOCATED_ADDR_DEST_IDENTICAL,
     RELOCATED_EXISTS,
 )
-
-
-_ = lambda msg: msg
 
 
 class Relocated(object):
@@ -146,6 +144,3 @@ class Relocated(object):
             self._dbh.commit()
         dbc.close()
         self._dest = None
-
-
-del _

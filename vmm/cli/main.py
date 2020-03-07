@@ -9,6 +9,7 @@
 """
 
 from configparser import NoOptionError, NoSectionError
+from gettext import gettext as _
 
 from vmm import ENCODING, errors
 from vmm.config import BadOptionError, ConfigValueError
@@ -21,9 +22,6 @@ from vmm.constants import (
     INVALID_ARGUMENT,
 )
 from vmm.cli.subcommands import RunContext, setup_parser
-
-
-_ = lambda msg: msg
 
 
 def _get_handler():
@@ -76,6 +74,3 @@ def run(argv):
     if handler.has_warnings():
         w_err(0, _("Warnings:"), *handler.get_warnings())
     return EX_SUCCESS
-
-
-del _

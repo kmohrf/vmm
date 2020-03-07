@@ -12,6 +12,7 @@ import os
 from array import array
 from fcntl import ioctl
 from getpass import getpass
+from gettext import gettext as _
 from termios import TIOCGWINSZ
 
 from vmm import ENCODING
@@ -21,7 +22,6 @@ from vmm.errors import VMMError
 
 __all__ = ("get_winsize", "read_pass", "w_err", "w_std")
 
-_ = lambda msg: msg
 _std_write = os.sys.stdout.write
 _err_write = os.sys.stderr.write
 
@@ -106,6 +106,3 @@ def read_pass():
             continue
         mismatched = False
     return clear0
-
-
-del _

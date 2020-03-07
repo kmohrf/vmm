@@ -9,8 +9,6 @@
     domains and accounts.
 """
 
-_ = lambda msg: msg
-
 
 class Transport(object):
     """A wrapper class that provides access to the transport table"""
@@ -98,6 +96,3 @@ class Transport(object):
         )
         self._dbh.commit()
         dbc.close()
-
-
-del _

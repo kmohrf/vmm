@@ -17,6 +17,7 @@ from configparser import (
     ParsingError,
     RawConfigParser,
 )
+from gettext import gettext as _
 from io import StringIO
 
 from vmm.common import (
@@ -35,8 +36,6 @@ from vmm.maillocation import known_format
 from vmm.password import verify_scheme as _verify_scheme
 
 DB_SSL_MODES = ("allow", "disabled", "prefer", "require", "verify-ca", "verify-full")
-
-_ = lambda msg: msg
 
 
 class BadOptionError(Error):
@@ -543,6 +542,3 @@ def verify_scheme(scheme):
     if not encoding:
         return scheme
     return "%s.%s" % (scheme, encoding)
-
-
-del _

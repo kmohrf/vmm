@@ -9,8 +9,6 @@
     for domains and accounts.
 """
 
-_ = lambda msg: msg
-
 
 class QuotaLimit(object):
     """Class to handle quota limit specific data."""
@@ -118,6 +116,3 @@ class QuotaLimit(object):
         )
         self._dbh.commit()
         dbc.close()
-
-
-del _

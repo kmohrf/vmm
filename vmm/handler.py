@@ -15,6 +15,7 @@
 import os
 import re
 
+from gettext import gettext as _
 from shutil import rmtree
 from stat import S_IRGRP, S_IROTH, S_IWGRP, S_IWOTH
 from subprocess import Popen, PIPE
@@ -64,9 +65,6 @@ from vmm.quotalimit import QuotaLimit
 from vmm.relocated import Relocated
 from vmm.serviceset import ServiceSet, SERVICES
 from vmm.transport import Transport
-
-
-_ = lambda msg: msg
 
 CFG_FILE = "vmm.cfg"
 CFG_PATH = "/root:/usr/local/etc:/etc"
@@ -1002,6 +1000,3 @@ The account has been successfully deleted from the database.
         the database."""
         relocated = self._get_relocated(emailaddress)
         relocated.delete()
-
-
-del _

@@ -14,12 +14,11 @@
 """
 
 import re
+from gettext import gettext as _
 from subprocess import Popen, PIPE
 
 from vmm.errors import VMMError
 from vmm.constants import VMM_ERROR
-
-_ = lambda msg: msg
 
 
 class Postconf(object):
@@ -131,6 +130,3 @@ class Postconf(object):
             par, val = line.split(" = ")
             par_val[par] = val
         return par_val
-
-
-del _

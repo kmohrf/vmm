@@ -9,6 +9,7 @@
 """
 
 import os
+from gettext import gettext as _
 
 from vmm.errors import VMMError
 from vmm.handler import Handler
@@ -16,8 +17,6 @@ from vmm.cli import read_pass
 from vmm.cli.config import CliConfig as Cfg
 from vmm.constants import ACCOUNT_EXISTS, INVALID_SECTION, NO_SUCH_ACCOUNT, TYPE_ACCOUNT
 from vmm.password import randompw, verify_scheme
-
-_ = lambda msg: msg
 
 
 class CliHandler(Handler):
@@ -100,6 +99,3 @@ class CliHandler(Handler):
         if not isinstance(password, str) or not password:
             password = read_pass()
         acc.update_password(password, scheme)
-
-
-del _

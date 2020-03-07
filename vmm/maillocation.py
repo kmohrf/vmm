@@ -10,13 +10,14 @@
 
 """
 
+from gettext import gettext as _
+
 from vmm.constants import MAILLOCATION_INIT
 from vmm.errors import MailLocationError as MLErr
 
 
 __all__ = ("MailLocation", "known_format")
 
-_ = lambda msg: msg
 _format_info = {
     "maildir": dict(dovecot_version=0x10000F00, postfix=True),
     "mdbox": dict(dovecot_version=0x20000B05, postfix=False),
@@ -166,6 +167,3 @@ class MailLocation(object):
 def known_format(mbfmt):
     """Checks if the mailbox format *mbfmt* is known, returns bool."""
     return mbfmt.lower() in _format_info
-
-
-del _

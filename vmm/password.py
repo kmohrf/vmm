@@ -24,6 +24,7 @@ from binascii import b2a_hex
 from crypt import crypt
 from random import SystemRandom
 from subprocess import Popen, PIPE
+from gettext import gettext as _
 
 from vmm import ENCODING
 from vmm.emailaddress import EmailAddress
@@ -51,7 +52,6 @@ CRYPT_SHA2_SALT_LEN = 16
 SALTED_ALGO_SALT_LEN = 4
 
 
-_ = lambda msg: msg
 cfg_dget = lambda option: None
 _sys_rand = SystemRandom()
 _choice = _sys_rand.choice
@@ -429,4 +429,4 @@ JoouxdSqJO71l9Ld3tVrfOatEjarhghvEYADkq//LpDnTeO90tcbtHR1"
 
 
 _test_crypt_algorithms()
-del _, cfg_dget, _test_crypt_algorithms
+del cfg_dget, _test_crypt_algorithms

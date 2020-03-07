@@ -10,6 +10,7 @@
 
 import os
 import re
+from gettext import gettext as _
 from random import choice
 
 from vmm.constants import (
@@ -36,7 +37,6 @@ RE_DOMAIN = re.compile(
                             |xn--[a-z0-9]{4,})$        # or a ACE TLD""",
     re.X,
 )
-_ = lambda msg: msg
 cfg_dget = lambda option: None
 
 
@@ -642,4 +642,4 @@ def search(dbh, pattern=None, like=False):
     return gids, domains
 
 
-del _, cfg_dget
+del cfg_dget
