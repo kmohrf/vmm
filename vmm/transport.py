@@ -64,7 +64,14 @@ class Transport(object):
     def _load_by_id(self, tid):
         """load a transport by its id from the database"""
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT transport FROM transport WHERE tid = %s", (tid,))
+        # fmt: off
+        dbc.execute(
+            "SELECT transport "
+            "FROM transport "
+            "WHERE tid = %s",
+            (tid,)
+        )
+        # fmt: on
         result = dbc.fetchone()
         dbc.close()
         if not result:
@@ -75,9 +82,14 @@ class Transport(object):
     def _load_by_name(self):
         """Load a transport by its transport name from the database."""
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "SELECT tid FROM transport WHERE transport = %s", (self._transport,)
+            "SELECT tid "
+            "FROM transport "
+            "WHERE transport = %s",
+            (self._transport,)
         )
+        # fmt: on
         result = dbc.fetchone()
         dbc.close()
         if result:
@@ -90,9 +102,12 @@ class Transport(object):
         dbc = self._dbh.cursor()
         dbc.execute("SELECT nextval('transport_id')")
         self._tid = dbc.fetchone()[0]
+        # fmt: off
         dbc.execute(
-            "INSERT INTO transport (tid, transport) VALUES (%s, %s)",
+            "INSERT INTO transport (tid, transport) "
+            "VALUES (%s, %s)",
             (self._tid, self._transport),
         )
+        # fmt: on
         self._dbh.commit()
         dbc.close()

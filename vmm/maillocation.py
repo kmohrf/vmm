@@ -116,11 +116,14 @@ class MailLocation(object):
     def _load_by_mid(self, mid):
         """Load mail_location relevant information by *mid*"""
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "SELECT format, directory FROM mailboxformat, "
-            "maillocation WHERE mid = %u AND "
-            "maillocation.fid = mailboxformat.fid" % mid
+            "SELECT format, directory "
+            "FROM mailboxformat, maillocation "
+            "WHERE mid = %s AND maillocation.fid = mailboxformat.fid",
+            (mid,)
         )
+        # fmt: on
         result = dbc.fetchone()
         dbc.close()
         if not result:
@@ -132,11 +135,17 @@ class MailLocation(object):
         """Try to load mail_location relevant information by *mbfmt* and
         *directory* name. If it fails goto _save()."""
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "SELECT mid FROM maillocation WHERE fid = (SELECT fid "
-            "FROM mailboxformat WHERE format = %s) AND directory = %s",
+            "SELECT mid "
+            "FROM maillocation "
+            "WHERE ("
+            "   fid = (SELECT fid FROM mailboxformat WHERE format = %s) "
+            "   AND directory = %s"
+            ")",
             (mbfmt, directory),
         )
+        # fmt: on
         result = dbc.fetchone()
         dbc.close()
         if not result:
@@ -151,12 +160,17 @@ class MailLocation(object):
         dbc = self._dbh.cursor()
         dbc.execute("SELECT nextval('maillocation_id')")
         mid = dbc.fetchone()[0]
+        # fmt: off
         dbc.execute(
-            "INSERT INTO maillocation (fid, mid, directory) VALUES ("
-            "(SELECT fid FROM mailboxformat WHERE format = %s), %s, "
-            "%s)",
+            "INSERT INTO maillocation (fid, mid, directory) "
+            "VALUES ("
+            "   (SELECT fid FROM mailboxformat WHERE format = %s), "
+            "   %s, "
+            "   %s"
+            ")",
             (mbfmt, mid, directory),
         )
+        # fmt: on
         self._dbh.commit()
         dbc.close()
         self._mid = mid

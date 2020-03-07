@@ -42,11 +42,15 @@ class Alias(object):
     def _load_dests(self):
         """Loads all known destination addresses into the _dests list."""
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "SELECT destination FROM alias WHERE gid = %s AND "
-            "address = %s ORDER BY destination",
+            "SELECT destination "
+            "FROM alias "
+            "WHERE gid = %s AND address = %s "
+            "ORDER BY destination",
             (self._gid, self._addr.localpart),
         )
+        # fmt: on
         dests = dbc.fetchall()
         if dbc.rowcount > 0:
             self._dests.extend(DestAddr(dest[0], self._dbh) for dest in dests)
@@ -94,16 +98,21 @@ Hint: Delete some destination addresses."""
         """
         dbc = self._dbh.cursor()
         if not destinations:
+            # fmt: off
             dbc.execute(
-                "DELETE FROM alias WHERE gid = %s AND address = %s",
+                "DELETE FROM alias "
+                "WHERE gid = %s AND address = %s",
                 (self._gid, self._addr.localpart),
             )
+            # fmt: on
         else:
+            # fmt: off
             dbc.executemany(
-                "DELETE FROM alias WHERE gid = %d AND address = "
-                "'%s' AND destination = %%s" % (self._gid, self._addr.localpart),
-                ((str(dest),) for dest in destinations),
+                "DELETE FROM alias "
+                "WHERE gid = %s AND address = %s AND destination = %s",
+                ((self._gid, self._addr.localpart, str(dest)) for dest in destinations),
             )
+            # fmt: on
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
@@ -144,11 +153,16 @@ Hint: Delete some destination addresses."""
             return destinations
         self._check_expansion(len(destinations))
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.executemany(
             "INSERT INTO alias (gid, address, destination) "
-            "VALUES (%d, '%s', %%s)" % (self._gid, self._addr.localpart),
-            ((str(destination),) for destination in destinations),
+            "VALUES (%s, %s, %s)",
+            (
+                (self._gid, self._addr.localpart, str(destination))
+                for destination in destinations
+            ),
         )
+        # fmt: on
         self._dbh.commit()
         dbc.close()
         self._dests.extend(destinations)

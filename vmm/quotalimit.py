@@ -83,10 +83,14 @@ class QuotaLimit(object):
     def _load_by_limit(self):
         """Load the quota limit by limit values from the database."""
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "SELECT qid FROM quotalimit WHERE bytes = %s AND " "messages = %s",
+            "SELECT qid "
+            "FROM quotalimit "
+            "WHERE bytes = %s AND messages = %s",
             (self._bytes, self._messages),
         )
+        # fmt: on
         res = dbc.fetchone()
         dbc.close()
         if res:
@@ -97,7 +101,14 @@ class QuotaLimit(object):
     def _load_by_qid(self, qid):
         """Load the quota limit by its unique ID from the database."""
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT bytes, messages FROM quotalimit WHERE qid = %s", (qid,))
+        # fmt: off
+        dbc.execute(
+            "SELECT bytes, messages "
+            "FROM quotalimit "
+            "WHERE qid = %s",
+            (qid,)
+        )
+        # fmt: on
         res = dbc.fetchone()
         dbc.close()
         if not res:
@@ -110,9 +121,12 @@ class QuotaLimit(object):
         dbc = self._dbh.cursor()
         dbc.execute("SELECT nextval('quotalimit_id')")
         self._qid = dbc.fetchone()[0]
+        # fmt: off
         dbc.execute(
-            "INSERT INTO quotalimit (qid, bytes, messages) VALUES " "(%s, %s, %s)",
+            "INSERT INTO quotalimit (qid, bytes, messages) "
+            "VALUES (%s, %s, %s)",
             (self._qid, self._bytes, self._messages),
         )
+        # fmt: on
         self._dbh.commit()
         dbc.close()

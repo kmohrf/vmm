@@ -107,11 +107,18 @@ class ServiceSet(object):
 
     def _load_by_services(self):
         """Try to load the service_set by it's service combination."""
-        sql = "SELECT ssid FROM service_set WHERE %s" % " AND ".join(
-            "%s = %s" % (k, str(v).upper()) for k, v in self._services.items()
-        )
         dbc = self._dbh.cursor()
-        dbc.execute(sql)
+        # TODO PY3PORT: possible SQL injection?
+        service_queries = " AND ".join(
+            f"{k} = {str(v).upper()}" for k, v in self._services.items()
+        )
+        # fmt: off
+        dbc.execute(
+            f"SELECT ssid "
+            f"FROM service_set "
+            f"WHERE {service_queries}"
+        )
+        # fmt: on
         result = dbc.fetchone()
         dbc.close()
         if result:
@@ -122,10 +129,14 @@ class ServiceSet(object):
     def _load_by_ssid(self, ssid):
         """Try to load the service_set by it's primary key."""
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "SELECT ssid, smtp, pop3, imap, sieve " "FROM service_set WHERE ssid = %s",
+            "SELECT ssid, smtp, pop3, imap, sieve "
+            "FROM service_set "
+            "WHERE ssid = %s",
             (ssid,),
         )
+        # fmt: on
         result = dbc.fetchone()
         dbc.close()
         if not result:
@@ -135,10 +146,12 @@ class ServiceSet(object):
 
     def _save(self):
         """Store a new service_set in the database."""
+        # fmt: off
         sql = (
             "INSERT INTO service_set (ssid, smtp, pop3, imap, sieve) "
             "VALUES (%(ssid)s, %(smtp)s, %(pop3)s, %(imap)s, %(sieve)s)"
         )
+        # fmt: on
         self._set_ssid()
         values = {"ssid": self._ssid}
         values.update(self._services)

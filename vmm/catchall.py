@@ -50,7 +50,14 @@ class CatchallAlias(object):
     def _load_dests(self):
         """Loads all known destination addresses into the _dests list."""
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT destination FROM catchall WHERE gid = %s", (self._gid,))
+        # fmt: off
+        dbc.execute(
+            "SELECT destination "
+            "FROM catchall "
+            "WHERE gid = %s",
+            (self._gid,)
+        )
+        # fmt: on
         dests = dbc.fetchall()
         if dbc.rowcount > 0:
             self._dests.extend(DestAddr(dest[0], self._dbh) for dest in dests)
@@ -100,13 +107,21 @@ Hint: Delete some destination addresses."""
         """
         dbc = self._dbh.cursor()
         if not destinations:
-            dbc.execute("DELETE FROM catchall WHERE gid = %s", (self._gid,))
-        else:
-            dbc.executemany(
-                "DELETE FROM catchall WHERE gid = %d AND "
-                "destination = %%s" % self._gid,
-                ((str(dest),) for dest in destinations),
+            # fmt: off
+            dbc.execute(
+                "DELETE FROM catchall "
+                "WHERE gid = %s",
+                (self._gid,)
             )
+            # fmt: on
+        else:
+            # fmt: off
+            dbc.executemany(
+                "DELETE FROM catchall "
+                "WHERE gid = %s AND destination = %s",
+                ((self._gid, str(dest)) for dest in destinations),
+            )
+            # fmt: on
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
@@ -143,10 +158,13 @@ Hint: Delete some destination addresses."""
             return destinations
         self._check_expansion(len(destinations))
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.executemany(
-            "INSERT INTO catchall (gid, destination) " "VALUES (%d, %%s)" % self._gid,
-            ((str(destination),) for destination in destinations),
+            "INSERT INTO catchall (gid, destination) "
+            "VALUES (%s, %s)",
+            ((self._gid, str(destination)) for destination in destinations),
         )
+        # fmt: on
         self._dbh.commit()
         dbc.close()
         self._dests.extend(destinations)

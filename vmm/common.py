@@ -233,6 +233,62 @@ def format_domain_default(domaindata):
     return _("%s [domain default]") % domaindata
 
 
+def _build_search_addresses_query(typelimit, lpattern, llike, dpattern, dlike):
+    if typelimit is None:
+        typelimit = TYPE_ACCOUNT | TYPE_ALIAS | TYPE_RELOCATED
+    selected_types = []
+    if typelimit & TYPE_ACCOUNT:
+        # fmt: off
+        selected_types.append(
+            "SELECT gid, local_part, %d AS type "
+            "FROM users" % TYPE_ACCOUNT
+        )
+        # fmt: on
+    if typelimit & TYPE_ALIAS:
+        # fmt: off
+        selected_types.append(
+            "SELECT DISTINCT gid, address AS local_part, %d AS type "
+            "FROM alias" % TYPE_ALIAS
+        )
+        # fmt: on
+    if typelimit & TYPE_RELOCATED:
+        # fmt: off
+        selected_types.append(
+            "SELECT gid, address AS local_part, %d AS type "
+            "FROM relocated" % TYPE_RELOCATED
+        )
+        # fmt: on
+    type_query = " UNION ".join(selected_types)
+
+    where = []
+    sqlargs = []
+    for like, field, pattern in (
+        (dlike, "domainname", dpattern),
+        (llike, "local_part", lpattern),
+    ):
+        if not like and not pattern:
+            continue
+        match = "LIKE" if like else "="
+        where.append(f"{field} {match} %s")
+        sqlargs.append(pattern)
+    where_query = f"WHERE ({' AND '.join(where)})" if where else ""
+
+    # fmt: off
+    sql = (
+        f"SELECT "
+        f"   gid, "
+        f"   local_part || '@' || domainname AS address, "
+        f"   type, "
+        f"   NOT is_primary AS from_aliasdomain "
+        f"FROM ({type_query}) a "
+        f"JOIN domain_name USING (gid) "
+        f"{where_query} "
+        f"ORDER BY domainname, local_part"
+    )
+    # fmt: on
+    return sql, sqlargs
+
+
 def search_addresses(
     dbh, typelimit=None, lpattern=None, llike=False, dpattern=None, dlike=False
 ):
@@ -257,42 +313,10 @@ def search_addresses(
     type, and boolean indicating whether the address stems from an alias
     domain.
     """
-    if typelimit is None:
-        typelimit = TYPE_ACCOUNT | TYPE_ALIAS | TYPE_RELOCATED
-    queries = []
-    if typelimit & TYPE_ACCOUNT:
-        queries.append("SELECT gid, local_part, %d AS type FROM users" % TYPE_ACCOUNT)
-    if typelimit & TYPE_ALIAS:
-        queries.append(
-            "SELECT DISTINCT gid, address as local_part, "
-            "%d AS type FROM alias" % TYPE_ALIAS
-        )
-    if typelimit & TYPE_RELOCATED:
-        queries.append(
-            "SELECT gid, address as local_part, %d AS type "
-            "FROM relocated" % TYPE_RELOCATED
-        )
-    sql = "SELECT gid, local_part || '@' || domainname AS address, "
-    sql += "type, NOT is_primary AS from_aliasdomain FROM ("
-    sql += " UNION ".join(queries)
-    sql += ") a JOIN domain_name USING (gid)"
-    nextkw = "WHERE"
-    sqlargs = []
-    for like, field, pattern in (
-        (dlike, "domainname", dpattern),
-        (llike, "local_part", lpattern),
-    ):
-        if like:
-            match = "LIKE"
-        else:
-            if not pattern:
-                continue
-            match = "="
-        sql += " %s %s %s %%s" % (nextkw, field, match)
-        sqlargs.append(pattern)
-        nextkw = "AND"
-    sql += " ORDER BY domainname, local_part"
     dbc = dbh.cursor()
+    sql, sqlargs = _build_search_addresses_query(
+        typelimit, lpattern, llike, dpattern, dlike
+    )
     dbc.execute(sql, sqlargs)
     result = dbc.fetchall()
     dbc.close()

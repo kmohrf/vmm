@@ -90,13 +90,14 @@ class Domain(object):
         domain.
         """
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "SELECT dd.gid, qid, ssid, tid, domaindir, is_primary, "
-            "note "
-            "FROM domain_data dd, domain_name dn WHERE domainname = "
-            "%s AND dn.gid = dd.gid",
+            "SELECT dd.gid, qid, ssid, tid, domaindir, is_primary, note "
+            "FROM domain_data dd, domain_name dn "
+            "WHERE domainname = %s AND dn.gid = dd.gid",
             (self._name,),
         )
+        # fmt: on
         result = dbc.fetchone()
         dbc.close()
         if result:
@@ -125,15 +126,18 @@ class Domain(object):
         are accounts, aliases and/or relocated users.
         """
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
             "SELECT "
-            "(SELECT count(gid) FROM users WHERE gid = %(gid)u)"
-            "  as account_count, "
-            "(SELECT count(gid) FROM alias WHERE gid = %(gid)u)"
-            "  as alias_count, "
-            "(SELECT count(gid) FROM relocated WHERE gid = %(gid)u)"
-            "  as relocated_count" % {"gid": self._gid}
+            "   (SELECT count(gid) FROM users WHERE gid = %(gid)s) "
+            "       AS account_count,"
+            "   (SELECT count(gid) FROM alias WHERE gid = %(gid)s) "
+            "       AS alias_count,"
+            "   (SELECT count(gid) FROM relocated WHERE gid = %(gid)s) "
+            "       AS relocated_count",
+            {"gid": self._gid}
         )
+        # fmt: on
         result = dbc.fetchall()
         dbc.close()
         result = result[0]
@@ -167,10 +171,14 @@ class Domain(object):
     def _update_tables(self, column, value):
         """Update table columns in the domain_data table."""
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "UPDATE domain_data SET %s = %%s WHERE gid = %%s" % column,
+            f"UPDATE domain_data "
+            f"SET {column} = %s "
+            f"WHERE gid = %s",
             (value, self._gid),
         )
+        # fmt: on
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
@@ -194,9 +202,13 @@ class Domain(object):
         self._update_tables(column, value)
         if force:
             dbc = self._dbh.cursor()
+            # fmt: off
             dbc.execute(
-                "UPDATE users SET %s = NULL WHERE gid = %%s" % column, (self._gid,)
+                f"UPDATE users SET {column} = NULL "
+                f"WHERE gid = %s",
+                (self._gid,)
             )
+            # fmt: on
             if dbc.rowcount > 0:
                 self._dbh.commit()
             dbc.close()
@@ -310,9 +322,9 @@ class Domain(object):
         self._chk_state(False)
         assert all((self._directory, self._qlimit, self._services, self._transport))
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "INSERT INTO domain_data (gid, qid, ssid, tid, domaindir, "
-            "note) "
+            "INSERT INTO domain_data (gid, qid, ssid, tid, domaindir, note) "
             "VALUES (%s, %s, %s, %s, %s, %s)",
             (
                 self._gid,
@@ -328,6 +340,7 @@ class Domain(object):
             "VALUES (%s, %s, TRUE)",
             (self._name, self._gid),
         )
+        # fmt: on
         self._dbh.commit()
         dbc.close()
         self._new = False
@@ -350,7 +363,13 @@ class Domain(object):
             self._check_for_addresses()
         dbc = self._dbh.cursor()
         for tbl in ("alias", "users", "relocated", "domain_name", "domain_data"):
-            dbc.execute("DELETE FROM %s WHERE gid = %u" % (tbl, self._gid))
+            # fmt: off
+            dbc.execute(
+                "DELETE FROM %s "
+                "WHERE gid = %s",
+                (tbl, self._gid)
+            )
+            # fmt: on
         self._dbh.commit()
         dbc.close()
         self._gid = 0
@@ -447,12 +466,18 @@ class Domain(object):
         """Returns a dictionary with information about the domain."""
         self._chk_state()
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            'SELECT aliasdomains "alias domains", accounts, aliases, '
-            'relocated, catchall "catch-all dests" '
+            "SELECT "
+            '   aliasdomains "alias domains", '
+            "   accounts, "
+            "   aliases, "
+            "   relocated, "
+            '   catchall "catch-all dests" '
             "FROM vmm_domain_info WHERE gid = %s",
             (self._gid,),
         )
+        # fmt: on
         info = dbc.fetchone()
         dbc.close()
         keys = ("alias domains", "accounts", "aliases", "relocated", "catch-all dests")
@@ -477,10 +502,15 @@ class Domain(object):
         """Returns a list with all accounts of the domain."""
         self._chk_state()
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "SELECT local_part from users where gid = %s ORDER BY " "local_part",
+            "SELECT local_part "
+            "FROM users "
+            "WHERE gid = %s "
+            "ORDER BY local_part",
             (self._gid,),
         )
+        # fmt: on
         users = dbc.fetchall()
         dbc.close()
         accounts = []
@@ -494,10 +524,15 @@ class Domain(object):
         """Returns a list with all aliases e-mail addresses of the domain."""
         self._chk_state()
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "SELECT DISTINCT address FROM alias WHERE gid = %s ORDER " "BY address",
+            "SELECT DISTINCT address "
+            "FROM alias "
+            "WHERE gid = %s "
+            "ORDER BY address",
             (self._gid,),
         )
+        # fmt: on
         addresses = dbc.fetchall()
         dbc.close()
         aliases = []
@@ -511,10 +546,15 @@ class Domain(object):
         """Returns a list with all addresses of relocated users."""
         self._chk_state()
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "SELECT address FROM relocated WHERE gid = %s ORDER BY " "address",
+            "SELECT address "
+            "FROM relocated "
+            "WHERE gid = %s "
+            "ORDER BY address",
             (self._gid,),
         )
+        # fmt: on
         addresses = dbc.fetchall()
         dbc.close()
         relocated = []
@@ -528,11 +568,15 @@ class Domain(object):
         """Returns a list with all catchall e-mail addresses of the domain."""
         self._chk_state()
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "SELECT DISTINCT destination FROM catchall WHERE gid = %s "
+            "SELECT DISTINCT destination "
+            "FROM catchall "
+            "WHERE gid = %s "
             "ORDER BY destination",
             (self._gid,),
         )
+        # fmt: on
         addresses = dbc.fetchall()
         dbc.close()
         return addresses
@@ -541,11 +585,15 @@ class Domain(object):
         """Returns a list with all alias domain names of the domain."""
         self._chk_state()
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "SELECT domainname FROM domain_name WHERE gid = %s AND "
-            "NOT is_primary ORDER BY domainname",
+            "SELECT domainname "
+            "FROM domain_name "
+            "WHERE gid = %s AND NOT is_primary "
+            "ORDER BY domainname",
             (self._gid,),
         )
+        # fmt: on
         anames = dbc.fetchall()
         dbc.close()
         aliasdomains = []
@@ -577,7 +625,14 @@ def get_gid(dbh, domainname):
     """
     domainname = check_domainname(domainname)
     dbc = dbh.cursor()
-    dbc.execute("SELECT gid FROM domain_name WHERE domainname = %s", (domainname,))
+    # fmt: off
+    dbc.execute(
+        "SELECT gid "
+        "FROM domain_name "
+        "WHERE domainname = %s",
+        (domainname,)
+    )
+    # fmt: on
     gid = dbc.fetchone()
     dbc.close()
     if gid:
@@ -609,15 +664,21 @@ def search(dbh, pattern=None, like=False):
     """
     if pattern and not like:
         pattern = check_domainname(pattern)
-    sql = "SELECT gid, domainname, is_primary FROM domain_name"
-    if pattern:
-        if like:
-            sql += " WHERE domainname LIKE '%s'" % pattern
-        else:
-            sql += " WHERE domainname = '%s'" % pattern
-    sql += " ORDER BY is_primary DESC, domainname"
+    where_domainname_pattern = (
+        (" WHERE domainname LIKE %s" if like else " WHERE domainname = %s")
+        if pattern
+        else ""
+    )
+    # fmt: off
+    sql = (
+        f"SELECT gid, domainname, is_primary "
+        f"FROM domain_name "
+        f"{where_domainname_pattern} "
+        f"ORDER BY is_primary DESC, domainname"
+    )
+    # fmt: on
     dbc = dbh.cursor()
-    dbc.execute(sql)
+    dbc.execute(sql, (pattern,) if pattern else None)
     result = dbc.fetchall()
     dbc.close()
 

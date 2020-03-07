@@ -96,11 +96,14 @@ class Account(object):
         """Load 'uid', 'mid', 'qid', 'ssid', 'tid' and 'note' from the
         database and set _new to `False` - if the user could be found. """
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "SELECT uid, mid, qid, ssid, tid, note FROM users "
+            "SELECT uid, mid, qid, ssid, tid, note "
+            "FROM users "
             "WHERE gid = %s AND local_part = %s",
             (self._domain.gid, self._addr.localpart),
         )
+        # fmt: on
         result = dbc.fetchone()
         dbc.close()
         if result:
@@ -161,9 +164,14 @@ class Account(object):
         if column not in ("qid", "ssid", "tid"):
             raise ValueError("Unknown column: %r" % column)
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "UPDATE users SET %s = %%s WHERE uid = %%s" % column, (value, self._uid)
+            f"UPDATE users "
+            f"SET {column} = %s "
+            f"WHERE uid = %s",
+            (value, self._uid)
         )
+        # fmt: on
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
@@ -172,10 +180,14 @@ class Account(object):
         """Count all alias addresses where the destination address is the
         address of the Account."""
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "SELECT COUNT(destination) FROM alias WHERE destination " "= %s",
+            "SELECT COUNT(destination) "
+            "FROM alias "
+            "WHERE destination = %s",
             (str(self._addr),),
         )
+        # fmt: on
         a_count = dbc.fetchone()[0]
         dbc.close()
         return a_count
@@ -281,9 +293,19 @@ class Account(object):
             )
         )
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "INSERT INTO users (local_part, passwd, uid, gid, mid, "
-            "qid, ssid, tid, note) "
+            "INSERT INTO users ("
+            "   local_part, "
+            "   passwd, "
+            "   uid, "
+            "   gid, "
+            "   mid, "
+            "   qid, "
+            "   ssid, "
+            "   tid, "
+            "   note"
+            ") "
             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
             (
                 self._addr.localpart,
@@ -297,6 +319,7 @@ class Account(object):
                 self._note,
             ),
         )
+        # fmt: on
         self._dbh.commit()
         dbc.close()
         self._new = False
@@ -319,9 +342,14 @@ class Account(object):
             field = "passwd"
         self._chk_state()
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "UPDATE users SET %s = %%s WHERE uid = %%s" % field, (value, self._uid)
+            f"UPDATE users "
+            f"SET {field} = %s "
+            f"WHERE uid = %s",
+            (value, self._uid)
         )
+        # fmt: on
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
@@ -342,10 +370,14 @@ class Account(object):
         """
         self._chk_state()
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "UPDATE users SET passwd = %s WHERE uid = %s",
+            "UPDATE users "
+            "SET passwd = %s "
+            "WHERE uid = %s",
             (pwhash(password, scheme, self._addr), self.uid),
         )
+        # fmt: on
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
@@ -435,13 +467,19 @@ class Account(object):
         """
         self._chk_state()
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "SELECT name, CASE WHEN bytes IS NULL THEN 0 ELSE bytes "
-            "END, CASE WHEN messages IS NULL THEN 0 ELSE messages END "
-            "FROM users LEFT JOIN userquota USING (uid) WHERE "
-            "users.uid = %s",
+            "SELECT ("
+            "   name, "
+            "   CASE WHEN bytes IS NULL THEN 0 ELSE bytes END, "
+            "   CASE WHEN messages IS NULL THEN 0 ELSE messages END "
+            ") "
+            "FROM users "
+            "LEFT JOIN userquota USING (uid) "
+            "WHERE users.uid = %s",
             (self._uid,),
         )
+        # fmt: on
         info = dbc.fetchone()
         dbc.close()
         if info:
@@ -474,12 +512,19 @@ class Account(object):
         is the address of the Account."""
         self._chk_state()
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "SELECT address ||'@'|| domainname FROM alias, "
-            "domain_name WHERE destination = %s AND domain_name.gid = "
-            "alias.gid AND domain_name.is_primary ORDER BY address",
+            "SELECT address ||'@'|| domainname "
+            "FROM alias, domain_name "
+            "WHERE ("
+            "   destination = %s "
+            "   AND domain_name.gid = alias.gid "
+            "   AND domain_name.is_primary"
+            ") "
+            "ORDER BY address",
             (str(self._addr),),
         )
+        # fmt: on
         addresses = dbc.fetchall()
         dbc.close()
         aliases = []
@@ -502,10 +547,22 @@ class Account(object):
         self._chk_state()
         dbc = self._dbh.cursor()
         if force:
-            dbc.execute("DELETE FROM users WHERE uid = %s", (self._uid,))
+            # fmt: off
+            dbc.execute(
+                "DELETE FROM users "
+                "WHERE uid = %s",
+                (self._uid,)
+            )
+            # fmt: on
             # delete also all aliases where the destination address is the same
             # as for this account.
-            dbc.execute("DELETE FROM alias WHERE destination = %s", (str(self._addr),))
+            # fmt: off
+            dbc.execute(
+                "DELETE FROM alias "
+                "WHERE destination = %s",
+                (str(self._addr),)
+            )
+            # fmt: on
             self._dbh.commit()
         else:  # check first for aliases
             a_count = self._count_aliases()
@@ -519,7 +576,13 @@ class Account(object):
                     % {"count": a_count, "address": self._addr},
                     ALIAS_PRESENT,
                 )
-            dbc.execute("DELETE FROM users WHERE uid = %s", (self._uid,))
+            # fmt: off
+            dbc.execute(
+                "DELETE FROM users "
+                "WHERE uid = %s",
+                (self._uid,)
+            )
+            # fmt: on
             self._dbh.commit()
         dbc.close()
         self._new = True
@@ -548,12 +611,16 @@ def get_account_by_uid(uid, dbh):
     if uid < 1:
         raise AErr(_("UID must be greater than 0."), INVALID_ARGUMENT)
     dbc = dbh.cursor()
+    # fmt: off
     dbc.execute(
         "SELECT local_part||'@'|| domain_name.domainname AS address, "
-        "uid, users.gid, note FROM users LEFT JOIN domain_name ON "
-        "(domain_name.gid = users.gid AND is_primary) WHERE uid = %s",
+        "   uid, users.gid, note "
+        "FROM users "
+        "LEFT JOIN domain_name ON (domain_name.gid = users.gid AND is_primary) "
+        "WHERE uid = %s",
         (uid,),
     )
+    # fmt: on
     info = dbc.fetchone()
     dbc.close()
     if not info:

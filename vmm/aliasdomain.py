@@ -45,10 +45,14 @@ class AliasDomain(object):
         """Loads the AliasDomain's GID from the database and checks if the
         domain name is marked as primary."""
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "SELECT gid, is_primary FROM domain_name WHERE " "domainname = %s",
+            "SELECT gid, is_primary "
+            "FROM domain_name "
+            "WHERE domainname = %s",
             (self._name,),
         )
+        # fmt: on
         result = dbc.fetchone()
         dbc.close()
         if result:
@@ -89,11 +93,13 @@ class AliasDomain(object):
                 NO_SUCH_DOMAIN,
             )
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
             "INSERT INTO domain_name (domainname, gid, is_primary) "
             "VALUES (%s, %s, FALSE)",
             (self._name, self._domain.gid),
         )
+        # fmt: on
         self._dbh.commit()
         dbc.close()
         self._gid = self._domain.gid
@@ -107,10 +113,14 @@ class AliasDomain(object):
                 NO_SUCH_ALIASDOMAIN,
             )
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "SELECT domainname FROM domain_name WHERE gid = %s AND " "is_primary",
+            "SELECT domainname "
+            "FROM domain_name "
+            "WHERE gid = %s AND is_primary",
             (self._gid,),
         )
+        # fmt: on
         domain = dbc.fetchone()
         dbc.close()
         if domain:
@@ -151,11 +161,14 @@ class AliasDomain(object):
                 ALIASDOMAIN_EXISTS,
             )
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "UPDATE domain_name SET gid = %s WHERE gid = %s AND "
-            "domainname = %s AND NOT is_primary",
+            "UPDATE domain_name "
+            "SET gid = %s "
+            "WHERE gid = %s AND domainname = %s AND NOT is_primary",
             (self._domain.gid, self._gid, self._name),
         )
+        # fmt: on
         self._dbh.commit()
         dbc.close()
         self._gid = self._domain.gid
@@ -171,10 +184,13 @@ class AliasDomain(object):
                 NO_SUCH_ALIASDOMAIN,
             )
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "DELETE FROM domain_name WHERE domainname = %s AND NOT " "is_primary",
+            "DELETE FROM domain_name "
+            "WHERE domainname = %s AND NOT " "is_primary",
             (self._name,),
         )
+        # fmt: on
         if dbc.rowcount > 0:
             self._dbh.commit()
             self._gid = 0

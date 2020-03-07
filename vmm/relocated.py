@@ -57,10 +57,14 @@ class Relocated(object):
 
         """
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "SELECT destination FROM relocated WHERE gid = %s AND " "address = %s",
+            "SELECT destination "
+            "FROM relocated "
+            "WHERE gid = %s AND address = %s",
             (self._gid, self._addr.localpart),
         )
+        # fmt: on
         destination = dbc.fetchone()
         dbc.close()
         if destination:
@@ -105,17 +109,22 @@ class Relocated(object):
 
         dbc = self._dbh.cursor()
         if not update:
+            # fmt: off
             dbc.execute(
                 "INSERT INTO relocated (gid, address, destination) "
                 "VALUES (%s, %s, %s)",
                 (self._gid, self._addr.localpart, str(self._dest)),
             )
+            # fmt: on
         else:
+            # fmt: off
             dbc.execute(
-                "UPDATE relocated SET destination = %s WHERE gid = %s "
-                "AND address = %s",
+                "UPDATE relocated "
+                "SET destination = %s "
+                "WHERE gid = %s AND address = %s",
                 (str(self._dest), self._gid, self._addr.localpart),
             )
+            # fmt: on
         self._dbh.commit()
         dbc.close()
 
@@ -136,10 +145,13 @@ class Relocated(object):
                 NO_SUCH_RELOCATED,
             )
         dbc = self._dbh.cursor()
+        # fmt: off
         dbc.execute(
-            "DELETE FROM relocated WHERE gid = %s AND address = %s",
+            "DELETE FROM relocated "
+            "WHERE gid = %s AND address = %s",
             (self._gid, self._addr.localpart),
         )
+        # fmt: on
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
