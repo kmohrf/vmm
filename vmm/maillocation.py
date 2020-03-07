@@ -2,16 +2,16 @@
 # Copyright (c) 2008 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.maillocation
+    vmm.maillocation
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Virtual Mail Manager's maillocation module to handle Dovecot's
+    vmm's maillocation module to handle Dovecot's
     mail_location setting for accounts.
 
 """
 
-from VirtualMailManager.constants import MAILLOCATION_INIT
-from VirtualMailManager.errors import MailLocationError as MLErr
+from vmm.constants import MAILLOCATION_INIT
+from vmm.errors import MailLocationError as MLErr
 
 
 __all__ = ('MailLocation', 'known_format')

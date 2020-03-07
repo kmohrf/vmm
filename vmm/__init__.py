@@ -2,17 +2,17 @@
 # Copyright (c) 2007 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager
+    vmm
     ~~~~~~~~~~~~~~~~~~
 
-    VirtualMailManager package initialization code
+    vmm package initialization code
 """
 
 import gettext
 import locale
 import sys
 
-from VirtualMailManager.constants import __author__, __date__, __version__
+from vmm.constants import __author__, __date__, __version__
 
 __all__ = [
     # version information from VERSION

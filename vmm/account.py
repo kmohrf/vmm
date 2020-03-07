@@ -2,27 +2,25 @@
 # Copyright (c) 2007 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.account
+    vmm.account
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Virtual Mail Manager's Account class to manage e-mail accounts.
+    vmm's Account class to manage e-mail accounts.
 """
 
-from VirtualMailManager.common import version_str, \
-     format_domain_default
-from VirtualMailManager.constants import \
-     ACCOUNT_EXISTS, ACCOUNT_MISSING_PASSWORD, ALIAS_PRESENT, \
-     INVALID_ARGUMENT, INVALID_MAIL_LOCATION, NO_SUCH_ACCOUNT, \
-     NO_SUCH_DOMAIN, VMM_ERROR
-from VirtualMailManager.common import validate_transport
-from VirtualMailManager.domain import Domain
-from VirtualMailManager.emailaddress import EmailAddress
-from VirtualMailManager.errors import VMMError, AccountError as AErr
-from VirtualMailManager.maillocation import MailLocation
-from VirtualMailManager.password import pwhash
-from VirtualMailManager.quotalimit import QuotaLimit
-from VirtualMailManager.transport import Transport
-from VirtualMailManager.serviceset import ServiceSet
+from vmm.common import version_str, format_domain_default
+from vmm.constants import (ACCOUNT_EXISTS, ACCOUNT_MISSING_PASSWORD, ALIAS_PRESENT,
+                           INVALID_ARGUMENT, INVALID_MAIL_LOCATION, NO_SUCH_ACCOUNT,
+                           NO_SUCH_DOMAIN, VMM_ERROR)
+from vmm.common import validate_transport
+from vmm.domain import Domain
+from vmm.emailaddress import EmailAddress
+from vmm.errors import VMMError, AccountError as AErr
+from vmm.maillocation import MailLocation
+from vmm.password import pwhash
+from vmm.quotalimit import QuotaLimit
+from vmm.transport import Transport
+from vmm.serviceset import ServiceSet
 
 __all__ = ('Account', 'get_account_by_uid')
 
@@ -45,7 +43,7 @@ class Account(object):
 
         `dbh` : psycopg2._psycopg.connection
           A database connection for the database access.
-        `address` : VirtualMailManager.EmailAddress.EmailAddress
+        `address` : vmm.EmailAddress.EmailAddress
           The e-mail address of the (new) Account.
         """
         if not isinstance(address, EmailAddress):
@@ -309,7 +307,7 @@ class Account(object):
 
         Arguments:
 
-        `quotalimit` : VirtualMailManager.quotalimit.QuotaLimit
+        `quotalimit` : vmm.quotalimit.QuotaLimit
           the new quota limit of the domain.
         """
         self._chk_state()
@@ -326,7 +324,7 @@ class Account(object):
 
         Argument:
 
-        `serviceset` : VirtualMailManager.serviceset.ServiceSet
+        `serviceset` : vmm.serviceset.ServiceSet
           the new service set.
         """
         self._chk_state()
@@ -343,7 +341,7 @@ class Account(object):
 
         Arguments:
 
-        `transport` : VirtualMailManager.transport.Transport
+        `transport` : vmm.transport.Transport
           the new transport
         """
         self._chk_state()

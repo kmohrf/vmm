@@ -2,7 +2,7 @@
 # Copyright (c) 2010 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.cli.handler
+    vmm.cli.handler
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     A derived Handler class with a few changes/additions for cli use.
@@ -10,13 +10,13 @@
 
 import os
 
-from VirtualMailManager.errors import VMMError
-from VirtualMailManager.handler import Handler
-from VirtualMailManager.cli import read_pass
-from VirtualMailManager.cli.config import CliConfig as Cfg
-from VirtualMailManager.constants import ACCOUNT_EXISTS, INVALID_SECTION, \
-     NO_SUCH_ACCOUNT, TYPE_ACCOUNT
-from VirtualMailManager.password import randompw, verify_scheme
+from vmm.errors import VMMError
+from vmm.handler import Handler
+from vmm.cli import read_pass
+from vmm.cli.config import CliConfig as Cfg
+from vmm.constants import (ACCOUNT_EXISTS, INVALID_SECTION, NO_SUCH_ACCOUNT,
+                           TYPE_ACCOUNT)
+from vmm.password import randompw, verify_scheme
 
 _ = lambda msg: msg
 
@@ -27,7 +27,7 @@ class CliHandler(Handler):
 
     It provides the additional methods cfgSet() and configure().
 
-    Additionally it uses `VirtualMailManager.cli.read_pass()` for for the
+    Additionally it uses `vmm.cli.read_pass()` for for the
     interactive password dialog.
     """
 

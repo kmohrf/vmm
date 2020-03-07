@@ -2,10 +2,10 @@
 # Copyright (c) 2007 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.cli.subcommands
+    vmm.cli.subcommands
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    VirtualMailManager's cli subcommands.
+    vmm's cli subcommands.
 """
 
 import locale
@@ -16,17 +16,16 @@ from argparse import Action, ArgumentParser, ArgumentTypeError, \
 from textwrap import TextWrapper
 from time import strftime, strptime
 
-from VirtualMailManager import ENCODING
-from VirtualMailManager.cli import get_winsize, w_err, w_std
-from VirtualMailManager.common import human_size, size_in_bytes, \
-     version_str, format_domain_default
-from VirtualMailManager.constants import __copyright__, __date__, \
-     __version__, ACCOUNT_EXISTS, ALIAS_EXISTS, ALIASDOMAIN_ISDOMAIN, \
-     DOMAIN_ALIAS_EXISTS, INVALID_ARGUMENT, RELOCATED_EXISTS, TYPE_ACCOUNT, \
-     TYPE_ALIAS, TYPE_RELOCATED
-from VirtualMailManager.errors import VMMError
-from VirtualMailManager.password import list_schemes
-from VirtualMailManager.serviceset import SERVICES
+from vmm import ENCODING
+from vmm.cli import get_winsize, w_err, w_std
+from vmm.common import human_size, size_in_bytes, version_str, format_domain_default
+from vmm.constants import (__copyright__, __date__, __version__, ACCOUNT_EXISTS,
+                           ALIAS_EXISTS, ALIASDOMAIN_ISDOMAIN, DOMAIN_ALIAS_EXISTS,
+                           INVALID_ARGUMENT, RELOCATED_EXISTS, TYPE_ACCOUNT,
+                           TYPE_ALIAS, TYPE_RELOCATED)
+from vmm.errors import VMMError
+from vmm.password import list_schemes
+from vmm.serviceset import SERVICES
 
 __all__ = (
     'RunContext', 'alias_add', 'alias_delete', 'alias_info', 'aliasdomain_add',

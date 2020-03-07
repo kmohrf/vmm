@@ -2,10 +2,10 @@
 # Copyright (c) 2011 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.serviceset
+    vmm.serviceset
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Virtual Mail Manager's ServiceSet class for simplified database access
+    vmm's ServiceSet class for simplified database access
     to the service_set table.
 """
 

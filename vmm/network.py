@@ -2,7 +2,7 @@
 # Copyright (c) 2011 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.network
+    vmm.network
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Network/IP address related class and function

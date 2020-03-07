@@ -2,10 +2,10 @@
 # Copyright (c) 2012 - 2014, martin f. krafft
 # See COPYING for distribution information.
 """
-    VirtualMailManager.catchall
+    vmm.catchall
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Virtual Mail Manager's CatchallAlias class to manage domain catch-all
+    vmm's CatchallAlias class to manage domain catch-all
     aliases.
 
     This is heavily based on (more or less a copy of) the Alias class, because
@@ -18,13 +18,11 @@
     Yet, we reuse the AliasError exception class, which makes sense.
 """
 
-from VirtualMailManager.domain import get_gid
-from VirtualMailManager.emailaddress import \
-     EmailAddress, DestinationEmailAddress as DestAddr
-from VirtualMailManager.errors import AliasError as AErr
-from VirtualMailManager.ext.postconf import Postconf
-from VirtualMailManager.constants import \
-     ALIAS_EXCEEDS_EXPANSION_LIMIT, NO_SUCH_ALIAS, NO_SUCH_DOMAIN
+from vmm.domain import get_gid
+from vmm.emailaddress import EmailAddress, DestinationEmailAddress as DestAddr
+from vmm.errors import AliasError as AErr
+from vmm.ext.postconf import Postconf
+from vmm.constants import ALIAS_EXCEEDS_EXPANSION_LIMIT, NO_SUCH_ALIAS, NO_SUCH_DOMAIN
 
 
 _ = lambda msg: msg

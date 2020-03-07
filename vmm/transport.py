@@ -2,10 +2,10 @@
 # Copyright (c) 2008 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.transport
+    vmm.transport
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Virtual Mail Manager's Transport class to manage the transport for
+    vmm's Transport class to manage the transport for
     domains and accounts.
 """
 

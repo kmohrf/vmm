@@ -2,7 +2,7 @@
 # Copyright (c) 2007 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-   VirtualMailManager.handler
+   vmm.handler
    ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
    A wrapper class. It wraps round all other classes and does some
@@ -21,30 +21,31 @@ from subprocess import Popen, PIPE
 
 import psycopg2
 
-from VirtualMailManager.account import Account
-from VirtualMailManager.alias import Alias
-from VirtualMailManager.aliasdomain import AliasDomain
-from VirtualMailManager.catchall import CatchallAlias
-from VirtualMailManager.common import exec_ok, lisdir
-from VirtualMailManager.config import Config as Cfg
-from VirtualMailManager.constants import MIN_GID, MIN_UID, \
-     ACCOUNT_EXISTS, ALIAS_EXISTS, CONF_NOFILE, CONF_NOPERM, CONF_WRONGPERM, \
-     DATABASE_ERROR, DOMAINDIR_GROUP_MISMATCH, DOMAIN_INVALID, \
-     FOUND_DOTS_IN_PATH, INVALID_ARGUMENT, MAILDIR_PERM_MISMATCH, \
-     NOT_EXECUTABLE, NO_SUCH_ACCOUNT, NO_SUCH_ALIAS, NO_SUCH_BINARY, \
-     NO_SUCH_DIRECTORY, NO_SUCH_RELOCATED, RELOCATED_EXISTS, UNKNOWN_SERVICE, \
-     VMM_ERROR, LOCALPART_INVALID, TYPE_ACCOUNT, TYPE_ALIAS, TYPE_RELOCATED
-from VirtualMailManager.domain import Domain
-from VirtualMailManager.emailaddress import DestinationEmailAddress, \
+from vmm.account import Account
+from vmm.alias import Alias
+from vmm.aliasdomain import AliasDomain
+from vmm.catchall import CatchallAlias
+from vmm.common import exec_ok, lisdir
+from vmm.config import Config as Cfg
+from vmm.constants import (MIN_GID, MIN_UID, ACCOUNT_EXISTS, ALIAS_EXISTS, CONF_NOFILE,
+                           CONF_NOPERM, CONF_WRONGPERM, DATABASE_ERROR,
+                           DOMAINDIR_GROUP_MISMATCH, DOMAIN_INVALID,
+                           FOUND_DOTS_IN_PATH, INVALID_ARGUMENT, MAILDIR_PERM_MISMATCH,
+                           NOT_EXECUTABLE, NO_SUCH_ACCOUNT, NO_SUCH_ALIAS,
+                           NO_SUCH_BINARY, NO_SUCH_DIRECTORY, NO_SUCH_RELOCATED,
+                           RELOCATED_EXISTS, UNKNOWN_SERVICE, VMM_ERROR,
+                           LOCALPART_INVALID, TYPE_ACCOUNT, TYPE_ALIAS, TYPE_RELOCATED)
+from vmm.domain import Domain
+from vmm.emailaddress import DestinationEmailAddress, \
      EmailAddress, RE_LOCALPART
-from VirtualMailManager.errors import \
+from vmm.errors import \
      DomainError, NotRootError, PermissionError, VMMError
-from VirtualMailManager.mailbox import new as new_mailbox
-from VirtualMailManager.password import extract_scheme, verify_scheme
-from VirtualMailManager.quotalimit import QuotaLimit
-from VirtualMailManager.relocated import Relocated
-from VirtualMailManager.serviceset import ServiceSet, SERVICES
-from VirtualMailManager.transport import Transport
+from vmm.mailbox import new as new_mailbox
+from vmm.password import extract_scheme, verify_scheme
+from vmm.quotalimit import QuotaLimit
+from vmm.relocated import Relocated
+from vmm.serviceset import ServiceSet, SERVICES
+from vmm.transport import Transport
 
 
 _ = lambda msg: msg
@@ -60,8 +61,7 @@ OTHER_TYPES = {
 
 
 class Handler(object):
-    """Wrapper class to simplify the access on all the stuff from
-    VirtualMailManager"""
+    """Wrapper class to simplify the access on all the stuff from vmm"""
     __slots__ = ('_cfg', '_cfg_fname', '_dbh', '_warnings')
 
     def __init__(self, skip_some_checks=False):
@@ -549,7 +549,7 @@ class Handler(object):
 
     def domain_list(self, pattern=None):
         """Wrapper around function search() from module Domain."""
-        from VirtualMailManager.domain import search
+        from vmm.domain import search
         like = False
         if pattern and (pattern.startswith('%') or pattern.endswith('%')):
             like = True
@@ -589,7 +589,7 @@ class Handler(object):
                 raise VMMError(_("The pattern '%s' contains invalid "
                                  "characters.") % pattern, DOMAIN_INVALID)
         self._db_connect()
-        from VirtualMailManager.common import search_addresses
+        from vmm.common import search_addresses
         return search_addresses(self._dbh, typelimit=typelimit,
                                 lpattern=lpattern, llike=llike,
                                 dpattern=dpattern, dlike=dlike)
@@ -755,7 +755,7 @@ The account has been successfully deleted from the database.
     def user_by_uid(self, uid):
         """Search for an Account by its *uid*.
         Returns a dict (address, uid and gid) if a user could be found."""
-        from VirtualMailManager.account import get_account_by_uid
+        from vmm.account import get_account_by_uid
         self._db_connect()
         return get_account_by_uid(uid, self._dbh)
 

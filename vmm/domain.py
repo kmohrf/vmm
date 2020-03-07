@@ -2,25 +2,25 @@
 # Copyright (c) 2007 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.domain
+    vmm.domain
     ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Virtual Mail Manager's Domain class to manage e-mail domains.
+    vmm's Domain class to manage e-mail domains.
 """
 
 import os
 import re
 from random import choice
 
-from VirtualMailManager.constants import \
-     ACCOUNT_AND_ALIAS_PRESENT, DOMAIN_ALIAS_EXISTS, DOMAIN_EXISTS, \
-     DOMAIN_INVALID, DOMAIN_TOO_LONG, NO_SUCH_DOMAIN, VMM_ERROR
-from VirtualMailManager.common import validate_transport
-from VirtualMailManager.errors import VMMError, DomainError as DomErr
-from VirtualMailManager.maillocation import MailLocation
-from VirtualMailManager.quotalimit import QuotaLimit
-from VirtualMailManager.serviceset import ServiceSet
-from VirtualMailManager.transport import Transport
+from vmm.constants import (ACCOUNT_AND_ALIAS_PRESENT, DOMAIN_ALIAS_EXISTS,
+                           DOMAIN_EXISTS, DOMAIN_INVALID, DOMAIN_TOO_LONG,
+                           NO_SUCH_DOMAIN, VMM_ERROR)
+from vmm.common import validate_transport
+from vmm.errors import VMMError, DomainError as DomErr
+from vmm.maillocation import MailLocation
+from vmm.quotalimit import QuotaLimit
+from vmm.serviceset import ServiceSet
+from vmm.transport import Transport
 
 
 MAILDIR_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz'
@@ -122,7 +122,7 @@ class Domain(object):
 
     def _chk_state(self, must_exist=True):
         """Checks the state of the Domain instance and will raise a
-        VirtualMailManager.errors.DomainError:
+        vmm.errors.DomainError:
           - if *must_exist* is `True` and the domain doesn't exist
           - or *must_exist* is `False` and the domain exists
         """
@@ -221,7 +221,7 @@ class Domain(object):
 
         Argument:
 
-        `quotalimit` : VirtualMailManager.quotalimit.QuotaLimit
+        `quotalimit` : vmm.quotalimit.QuotaLimit
           The quota limit of the new Domain.
         """
         self._chk_state(False)
@@ -233,7 +233,7 @@ class Domain(object):
 
         Argument:
 
-       `serviceset` : VirtualMailManager.serviceset.ServiceSet
+       `serviceset` : vmm.serviceset.ServiceSet
          The service set for the new Domain.
         """
         self._chk_state(False)
@@ -245,7 +245,7 @@ class Domain(object):
 
         Argument:
 
-        `transport` : VirtualMailManager.Transport
+        `transport` : vmm.Transport
           The transport of the new Domain
         """
         self._chk_state(False)
@@ -321,7 +321,7 @@ class Domain(object):
 
         Arguments:
 
-        `quotalimit` : VirtualMailManager.quotalimit.QuotaLimit
+        `quotalimit` : vmm.quotalimit.QuotaLimit
           the new quota limit of the domain.
         `force` : bool
           enforce new quota limit for all accounts, default `False`
@@ -341,7 +341,7 @@ class Domain(object):
         set will only affect accounts that use the default.
 
         Arguments:
-        `serviceset` : VirtualMailManager.serviceset.ServiceSet
+        `serviceset` : vmm.serviceset.ServiceSet
           the new set of services
         `force`
           enforce the serviceset for all accounts, default `False`
@@ -362,7 +362,7 @@ class Domain(object):
 
         Arguments:
 
-        `transport` : VirtualMailManager.Transport
+        `transport` : vmm.Transport
           the new transport
         `force` : bool
           enforce new transport setting for all accounts, default `False`

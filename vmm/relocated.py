@@ -2,18 +2,17 @@
 # Copyright (c) 2008 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.relocated
+    vmm.relocated
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Virtual Mail Manager's Relocated class to handle relocated users.
+    vmm's Relocated class to handle relocated users.
 """
 
-from VirtualMailManager.domain import get_gid
-from VirtualMailManager.emailaddress import EmailAddress, \
-     DestinationEmailAddress
-from VirtualMailManager.errors import RelocatedError as RErr
-from VirtualMailManager.constants import DOMAIN_INVALID, NO_SUCH_DOMAIN, \
-     NO_SUCH_RELOCATED, RELOCATED_ADDR_DEST_IDENTICAL, RELOCATED_EXISTS
+from vmm.domain import get_gid
+from vmm.emailaddress import EmailAddress, DestinationEmailAddress
+from vmm.errors import RelocatedError as RErr
+from vmm.constants import (DOMAIN_INVALID, NO_SUCH_DOMAIN, NO_SUCH_RELOCATED,
+                           RELOCATED_ADDR_DEST_IDENTICAL, RELOCATED_EXISTS)
 
 
 _ = lambda msg: msg

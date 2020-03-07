@@ -2,21 +2,21 @@
 # Copyright (c) 2007 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.cli.main
+    vmm.cli.main
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    VirtualMailManager's command line interface.
+    vmm's command line interface.
 """
 
 from configparser import NoOptionError, NoSectionError
 
-from VirtualMailManager import ENCODING, errors
-from VirtualMailManager.config import BadOptionError, ConfigValueError
-from VirtualMailManager.cli import w_err
-from VirtualMailManager.cli.handler import CliHandler
-from VirtualMailManager.constants import EX_MISSING_ARGS, EX_SUCCESS, \
-     EX_USER_INTERRUPT, INVALID_ARGUMENT
-from VirtualMailManager.cli.subcommands import RunContext, setup_parser
+from vmm import ENCODING, errors
+from vmm.config import BadOptionError, ConfigValueError
+from vmm.cli import w_err
+from vmm.cli.handler import CliHandler
+from vmm.constants import (EX_MISSING_ARGS, EX_SUCCESS, EX_USER_INTERRUPT,
+                           INVALID_ARGUMENT)
+from vmm.cli.subcommands import RunContext, setup_parser
 
 
 _ = lambda msg: msg

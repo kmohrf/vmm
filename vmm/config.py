@@ -2,26 +2,23 @@
 # Copyright (c) 2007 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.config
+    vmm.config
     ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    VMM's configuration module for simplified configuration access.
+    vmm's configuration module for simplified configuration access.
 """
 
 import collections
-
-from configparser import \
-     Error, MissingSectionHeaderError, NoOptionError, NoSectionError, \
-     ParsingError, RawConfigParser
+from configparser import (Error, MissingSectionHeaderError, NoOptionError,
+                          NoSectionError, ParsingError, RawConfigParser)
 from io import StringIO
 
-from VirtualMailManager.common import VERSION_RE, \
-     exec_ok, expand_path, get_unicode, lisdir, size_in_bytes, version_hex, \
-     version_str
-from VirtualMailManager.constants import CONF_ERROR, MIN_DOVECOT_VERSION
-from VirtualMailManager.errors import ConfigError, VMMError
-from VirtualMailManager.maillocation import known_format
-from VirtualMailManager.password import verify_scheme as _verify_scheme
+from vmm.common import (VERSION_RE, exec_ok, expand_path, get_unicode, lisdir,
+                        size_in_bytes, version_hex, version_str)
+from vmm.constants import CONF_ERROR, MIN_DOVECOT_VERSION
+from vmm.errors import ConfigError, VMMError
+from vmm.maillocation import known_format
+from vmm.password import verify_scheme as _verify_scheme
 
 DB_SSL_MODES = ('allow', 'disabled', 'prefer', 'require', 'verify-ca',
                 'verify-full')

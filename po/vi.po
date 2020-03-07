@@ -17,75 +17,75 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: LocFactoryEditor 1.8\n"
 
-#: VirtualMailManager/Account.py:36 VirtualMailManager/Relocated.py:44
+#: vmm/Account.py:36 vmm/Relocated.py:44
 #, python-format
 msgid "There is already an alias with the address “%s”."
 msgstr "Đã có một bí danh với địa chỉ « %s »."
 
-#: VirtualMailManager/Account.py:41 VirtualMailManager/Alias.py:45
+#: vmm/Account.py:41 vmm/Alias.py:45
 #, python-format
 msgid "There is already a relocated user with the address “%s”."
 msgstr "Đã có một người dùng định vị lại với địa chỉ « %s »."
 
-#: VirtualMailManager/Account.py:61 VirtualMailManager/Alias.py:61
-#: VirtualMailManager/Domain.py:163 VirtualMailManager/Domain.py:189
-#: VirtualMailManager/Domain.py:220 VirtualMailManager/Relocated.py:60
+#: vmm/Account.py:61 vmm/Alias.py:61
+#: vmm/Domain.py:163 vmm/Domain.py:189
+#: vmm/Domain.py:220 vmm/Relocated.py:60
 #, python-format
 msgid "The domain “%s” doesn't exist yet."
 msgstr "Miền « %s » không tồn tại."
 
-#: VirtualMailManager/Account.py:80
+#: vmm/Account.py:80
 #, python-format
 msgid "Unknown service “%s”."
 msgstr "Không nhận ra dịch vụ « %s »."
 
-#: VirtualMailManager/Account.py:83 VirtualMailManager/Account.py:150
-#: VirtualMailManager/Account.py:178 VirtualMailManager/Account.py:212
+#: vmm/Account.py:83 vmm/Account.py:150
+#: vmm/Account.py:178 vmm/Account.py:212
 #, python-format
 msgid "The account “%s” doesn't exists."
 msgstr "Tài khoản « %s » không tồn tại."
 
-#: VirtualMailManager/Account.py:145
+#: vmm/Account.py:145
 #, python-format
 msgid "The account “%s” already exists."
 msgstr "Tài khoản « %s » đã có."
 
-#: VirtualMailManager/Account.py:186
+#: vmm/Account.py:186
 msgid "enabled"
 msgstr "đã bật"
 
-#: VirtualMailManager/Account.py:188
+#: vmm/Account.py:188
 msgid "disabled"
 msgstr "bị tắt"
 
-#: VirtualMailManager/Account.py:233
+#: vmm/Account.py:233
 #, python-format
 msgid "There are %(count)d aliases with the destination address “%(address)s”."
 msgstr "Có %(count)d bí danh với địa chỉ đích đến « %(address)s »."
 
-#: VirtualMailManager/Account.py:241
+#: vmm/Account.py:241
 msgid "uid must be an int/long."
 msgstr "UID phải là một số nguyên dài."
 
-#: VirtualMailManager/Account.py:243
+#: vmm/Account.py:243
 msgid "uid must be greater than 0."
 msgstr "UID phải lớn hơn 0."
 
-#: VirtualMailManager/Account.py:251
+#: vmm/Account.py:251
 #, python-format
 msgid "There is no account with the UID “%d”."
 msgstr "Không có tài khoản với UID « %d »."
 
-#: VirtualMailManager/Alias.py:30 VirtualMailManager/Relocated.py:30
+#: vmm/Alias.py:30 vmm/Relocated.py:30
 msgid "Address and destination are identical."
 msgstr "Địa chỉ và đích đến vẫn trùng nhau."
 
-#: VirtualMailManager/Alias.py:40 VirtualMailManager/Relocated.py:39
+#: vmm/Alias.py:40 vmm/Relocated.py:39
 #, python-format
 msgid "There is already an account with address “%s”."
 msgstr "Đã có một tài khoản với địa chỉ « %s »."
 
-#: VirtualMailManager/Alias.py:71
+#: vmm/Alias.py:71
 #, python-format
 msgid ""
 "Can't add new destination to alias “%(address)s”.\n"
@@ -98,145 +98,145 @@ msgstr ""
 "Một đích đến thêm nữa sẽ làm cho bí danh này vô ích.\n"
 "Gợi ý: tăng giới hạn « virtual_alias_expansion_limit » của Postfix.\n"
 
-#: VirtualMailManager/Alias.py:80
+#: vmm/Alias.py:80
 msgid "No destination address for alias denoted."
 msgstr "Chưa ghi rõ địa chỉ đích đến cho bí danh."
 
-#: VirtualMailManager/Alias.py:91
+#: vmm/Alias.py:91
 #, python-format
 msgid "The alias “%(a)s” with destination “%(d)s” already exists."
 msgstr "Đã có bí danh « %(a)s » với đích đến « %(d)s »."
 
-#: VirtualMailManager/Alias.py:106 VirtualMailManager/Alias.py:123
+#: vmm/Alias.py:106 vmm/Alias.py:123
 #, python-format
 msgid "The alias “%s” doesn't exists."
 msgstr "Bí danh « %s » không tồn tại."
 
-#: VirtualMailManager/Alias.py:125
+#: vmm/Alias.py:125
 #, python-format
 msgid "The alias “%(a)s” with destination “%(d)s” doesn't exists."
 msgstr "Bí danh « %(a)s » với đích đến « %(d)s » vẫn không tồn tại."
 
-#: VirtualMailManager/AliasDomain.py:32
+#: vmm/AliasDomain.py:32
 #, python-format
 msgid "The domain “%s” is a primary domain."
 msgstr "Miền « %s » là một miền chính."
 
-#: VirtualMailManager/AliasDomain.py:37
+#: vmm/AliasDomain.py:37
 #, python-format
 msgid "The alias domain “%s” already exists."
 msgstr "Miền bí danh « %s » đã có."
 
-#: VirtualMailManager/AliasDomain.py:40 VirtualMailManager/AliasDomain.py:70
+#: vmm/AliasDomain.py:40 vmm/AliasDomain.py:70
 msgid "No destination domain for alias domain denoted."
 msgstr "Chưa ghi rõ miền đích đến cho miền bí danh."
 
-#: VirtualMailManager/AliasDomain.py:43 VirtualMailManager/AliasDomain.py:73
+#: vmm/AliasDomain.py:43 vmm/AliasDomain.py:73
 #, python-format
 msgid "The target domain “%s” doesn't exist yet."
 msgstr "Miền đích « %s » không tồn tại."
 
-#: VirtualMailManager/AliasDomain.py:62
+#: vmm/AliasDomain.py:62
 #, python-format
 msgid "There is no primary domain for the alias domain “%s”."
 msgstr "Không có miền chính đối với miền bí danh « %s »."
 
-#: VirtualMailManager/AliasDomain.py:65 VirtualMailManager/AliasDomain.py:76
-#: VirtualMailManager/AliasDomain.py:99
+#: vmm/AliasDomain.py:65 vmm/AliasDomain.py:76
+#: vmm/AliasDomain.py:99
 #, python-format
 msgid "The alias domain “%s” doesn't exist yet."
 msgstr "Miền bí danh « %s » không tồn tại."
 
-#: VirtualMailManager/AliasDomain.py:79
+#: vmm/AliasDomain.py:79
 #, python-format
 msgid "The alias domain “%(alias)s” is already assigned to the domain “%(domain)s”."
 msgstr "Miền bí danh « %(alias)s » đã được gán cho miền « %(domain)s » vào một lúc trước."
 
-#: VirtualMailManager/Config.py:102 VirtualMailManager/Config.py:137
+#: vmm/Config.py:102 vmm/Config.py:137
 #, python-format
 msgid "Using configuration file: %s\n"
 msgstr "Đang sử dụng tập tin cấu hình: %s\n"
 
-#: VirtualMailManager/Config.py:106
+#: vmm/Config.py:106
 #, python-format
 msgid "missing section: %s\n"
 msgstr "thiếu phần: %s\n"
 
-#: VirtualMailManager/Config.py:108
+#: vmm/Config.py:108
 #, python-format
 msgid "missing options in section %s:\n"
 msgstr "thiếu tuỳ chọn trong phần %s:\n"
 
-#: VirtualMailManager/Config.py:140
+#: vmm/Config.py:140
 #, python-format
 msgid "* Config section: “%s”"
 msgstr "* Phần cấu hình: « %s »"
 
-#: VirtualMailManager/Config.py:143
+#: vmm/Config.py:143
 #, python-format
 msgid "Enter new value for option %(opt)s [%(val)s]: "
 msgstr "Hãy gõ giá trị mới cho %(opt)s [%(val)s]: "
 
-#: VirtualMailManager/Domain.py:39
+#: vmm/Domain.py:39
 #, python-format
 msgid "The domain “%s” is an alias domain."
 msgstr "Miền « %s » là một miền bí danh."
 
-#: VirtualMailManager/Domain.py:124
+#: vmm/Domain.py:124
 msgid "There are accounts and aliases."
 msgstr "Có cả hai tài khoản và bí danh."
 
-#: VirtualMailManager/Domain.py:127
+#: vmm/Domain.py:127
 msgid "There are accounts."
 msgstr "Có tài khoản."
 
-#: VirtualMailManager/Domain.py:130
+#: vmm/Domain.py:130
 msgid "There are aliases."
 msgstr "Có bí danh."
 
-#: VirtualMailManager/Domain.py:145
+#: vmm/Domain.py:145
 #, python-format
 msgid "The domain “%s” already exists."
 msgstr "Miền « %s » đã có."
 
-#: VirtualMailManager/EmailAddress.py:46
+#: vmm/EmailAddress.py:46
 #, python-format
 msgid "Missing '@' sign in e-mail address “%s”."
 msgstr "Địa chỉ thư điện tử « %s » còn thiếu ký hiệu « @ »."
 
-#: VirtualMailManager/EmailAddress.py:49
+#: vmm/EmailAddress.py:49
 #, python-format
 msgid "“%s” looks not like an e-mail address."
 msgstr "« %s » không hình như một địa chỉ thư điện tử."
 
-#: VirtualMailManager/EmailAddress.py:54
+#: vmm/EmailAddress.py:54
 #, python-format
 msgid "Missing domain name after “%s@”."
 msgstr "Thiếu tên miền đằng sau « %s@ »."
 
-#: VirtualMailManager/EmailAddress.py:66
+#: vmm/EmailAddress.py:66
 msgid "No localpart specified."
 msgstr "Chưa ghi rõ localpart."
 
-#: VirtualMailManager/EmailAddress.py:69
+#: vmm/EmailAddress.py:69
 #, python-format
 msgid "The local part “%s” is too long"
 msgstr "Phần cục bộ « %s » vẫn quá dài"
 
-#: VirtualMailManager/EmailAddress.py:76
+#: vmm/EmailAddress.py:76
 #, python-format
 msgid "The local part “%(lpart)s” contains invalid characters: %(ichrs)s"
 msgstr "Phần cục bộ « %(lpart)s » chứa ký tự sai: %(ichrs)s"
 
-#: VirtualMailManager/MailLocation.py:32
+#: vmm/MailLocation.py:32
 msgid "Either mid or maillocation must be specified."
 msgstr "Phải ghi rõ hoặc mid hoặc maillocation."
 
-#: VirtualMailManager/MailLocation.py:38
+#: vmm/MailLocation.py:38
 msgid "mid must be an int/long."
 msgstr "mid phải là một số nguyên dài."
 
-#: VirtualMailManager/MailLocation.py:46
+#: vmm/MailLocation.py:46
 #, python-format
 msgid ""
 "Invalid folder name “%s”, it may consist only of\n"
@@ -246,47 +246,47 @@ msgstr ""
 "tên này phải có chiều dài 1-20 ký tự byte đơn\n"
 "(cho phép chữ cái, chữ số và dấu gạch dưới)."
 
-#: VirtualMailManager/MailLocation.py:59
+#: vmm/MailLocation.py:59
 msgid "Unknown mid specified."
 msgstr "Đã ghi rõ một mid không rõ."
 
-#: VirtualMailManager/Relocated.py:65
+#: vmm/Relocated.py:65
 msgid "No destination address for relocated user denoted."
 msgstr "Chưa ghi rõ địa chỉ đích đến cho người dùng định vị lại."
 
-#: VirtualMailManager/Relocated.py:75
+#: vmm/Relocated.py:75
 #, python-format
 msgid "The relocated user “%s” already exists."
 msgstr "Người dùng định vị lại « %s » đã có."
 
-#: VirtualMailManager/Relocated.py:89 VirtualMailManager/Relocated.py:102
+#: vmm/Relocated.py:89 vmm/Relocated.py:102
 #, python-format
 msgid "The relocated user “%s” doesn't exists."
 msgstr "Người dùng định vị lại « %s » không tồn tại."
 
-#: VirtualMailManager/Transport.py:29
+#: vmm/Transport.py:29
 msgid "Either tid or transport must be specified."
 msgstr "Phải ghi rõ hoặc tid hoặc truyền tải."
 
-#: VirtualMailManager/Transport.py:35
+#: vmm/Transport.py:35
 msgid "tid must be an int/long."
 msgstr "tid phải là một số nguyên dài."
 
-#: VirtualMailManager/Transport.py:63
+#: vmm/Transport.py:63
 msgid "Unknown tid specified."
 msgstr "Đã ghi rõ một tid không rõ"
 
-#: VirtualMailManager/VirtualMailManager.py:54
+#: vmm/VirtualMailManager.py:54
 msgid ""
 "You are not root.\n"
 "\tGood bye!\n"
 msgstr "Tiếc là bạn không phải người chủ.\n"
 
-#: VirtualMailManager/VirtualMailManager.py:74
+#: vmm/VirtualMailManager.py:74
 msgid "No “vmm.cfg” found in: /root:/usr/local/etc:/etc"
 msgstr "Tập tin “vmm.cfg” không tìm thấy trong: /root:/usr/local/etc:/etc"
 
-#: VirtualMailManager/VirtualMailManager.py:85
+#: vmm/VirtualMailManager.py:85
 #, python-format
 msgid ""
 "fix permissions (%(perms)s) for “%(file)s”\n"
@@ -296,7 +296,7 @@ msgstr ""
 "đối với tập tin « %(file)s ». Đề nghị:\n"
 "chmod 0600 %(file)s"
 
-#: VirtualMailManager/VirtualMailManager.py:100
+#: vmm/VirtualMailManager.py:100
 #, python-format
 msgid ""
 "“%s” is not a directory.\n"
@@ -305,7 +305,7 @@ msgstr ""
 "« %s » không phải là một thư mục.\n"
 "(vmm.cfg: phần \"domdir\", tuỳ chọn \"base\")"
 
-#: VirtualMailManager/VirtualMailManager.py:105
+#: vmm/VirtualMailManager.py:105
 #, python-format
 msgid ""
 "“%(binary)s” doesn't exists.\n"
@@ -314,7 +314,7 @@ msgstr ""
 "\"%(binary)s” không tồn tại.\n"
 "(vmm.cfg: phần \"bin\", tuỳ chọn \"%(option)s\")"
 
-#: VirtualMailManager/VirtualMailManager.py:109
+#: vmm/VirtualMailManager.py:109
 #, python-format
 msgid ""
 "“%(binary)s” is not executable.\n"
@@ -323,54 +323,54 @@ msgstr ""
 "“%(binary)s” không thể thực hiện được.\n"
 "(vmm.cfg: phần \"bin\", tuỳ chọn \"%(option)s\")"
 
-#: VirtualMailManager/VirtualMailManager.py:166
+#: vmm/VirtualMailManager.py:166
 msgid "The domain name is too long."
 msgstr "Tên miền quá dài."
 
-#: VirtualMailManager/VirtualMailManager.py:169
+#: vmm/VirtualMailManager.py:169
 #, python-format
 msgid "The domain name “%s” is invalid."
 msgstr "Tên miền « %s » vẫn không hợp lệ."
 
-#: VirtualMailManager/VirtualMailManager.py:209
+#: vmm/VirtualMailManager.py:209
 msgid "Enter new password: "
 msgstr "Gõ mật khẩu mới: "
 
-#: VirtualMailManager/VirtualMailManager.py:210
+#: vmm/VirtualMailManager.py:210
 msgid "Retype new password: "
 msgstr "Gõ lại mật khẩu mới: "
 
-#: VirtualMailManager/VirtualMailManager.py:212
+#: vmm/VirtualMailManager.py:212
 msgid "Sorry, passwords do not match"
 msgstr "Rất tiếc, hai mật khẩu không khớp."
 
-#: VirtualMailManager/VirtualMailManager.py:216
+#: vmm/VirtualMailManager.py:216
 msgid "Sorry, empty passwords are not permitted"
 msgstr "Không cho phép gõ mật khẩu trống"
 
-#: VirtualMailManager/VirtualMailManager.py:265
-#: VirtualMailManager/VirtualMailManager.py:352
+#: vmm/VirtualMailManager.py:265
+#: vmm/VirtualMailManager.py:352
 #, python-format
 msgid "No such directory: %s"
 msgstr "Không có thư mục nào như vậy: %s"
 
-#: VirtualMailManager/VirtualMailManager.py:340
+#: vmm/VirtualMailManager.py:340
 msgid "Found \"..\" in home directory path."
 msgstr "Tìm thấy « .. » trong đường dẫn đến thư mục chính."
 
-#: VirtualMailManager/VirtualMailManager.py:348
+#: vmm/VirtualMailManager.py:348
 msgid "Owner/group mismatch in home directory detected."
 msgstr "Phát hiện chủ sỡ hữu không tương ứng với nhóm trong thư mục chính."
 
-#: VirtualMailManager/VirtualMailManager.py:364
+#: vmm/VirtualMailManager.py:364
 msgid "FATAL: \"..\" in domain directory path detected."
 msgstr "NGHIÊM TRỌNG: phát hiện « .. » trong đường dẫn đến thư mục miền."
 
-#: VirtualMailManager/VirtualMailManager.py:370
+#: vmm/VirtualMailManager.py:370
 msgid "FATAL: group mismatch in domain directory detected"
 msgstr "NGHIÊM TRỌNG: phát hiện nhóm không tương ứng trong thư mục miền"
 
-#: VirtualMailManager/VirtualMailManager.py:457
+#: vmm/VirtualMailManager.py:457
 #, python-format
 msgid ""
 "Configurtion error: \"%s\"\n"
@@ -379,21 +379,21 @@ msgstr ""
 "Lỗi cấu hình: \"%s\"\n"
 "(trong phần \"connfig\", tuỳ chọn \"done\") xem cũng: vmm.cfg(5)\n"
 
-#: VirtualMailManager/VirtualMailManager.py:477
+#: vmm/VirtualMailManager.py:477
 #, python-format
 msgid "Invalid section: “%s”"
 msgstr "Phần không hợp lệ: « %s »"
 
-#: VirtualMailManager/VirtualMailManager.py:487
-#: VirtualMailManager/VirtualMailManager.py:497
-#: VirtualMailManager/VirtualMailManager.py:516
-#: VirtualMailManager/VirtualMailManager.py:624
-#: VirtualMailManager/VirtualMailManager.py:655
+#: vmm/VirtualMailManager.py:487
+#: vmm/VirtualMailManager.py:497
+#: vmm/VirtualMailManager.py:516
+#: vmm/VirtualMailManager.py:624
+#: vmm/VirtualMailManager.py:655
 #, python-format
 msgid "Invalid argument: “%s”"
 msgstr "Đối số không hợp lệ: « %s »"
 
-#: VirtualMailManager/VirtualMailManager.py:520
+#: vmm/VirtualMailManager.py:520
 msgid ""
 "The keyword “detailed” is deprecated and will be removed in a future release.\n"
 "   Please use the keyword “full” to get full details."
@@ -401,17 +401,17 @@ msgstr ""
 "Từ khoá « detailed » (chi tiết) bị phản đối nên được gỡ bỏ trong một phiên bản sau.\n"
 "  Hãy sử dụng từ khoá « full » (đầy đủ) để lấy chi tiết."
 
-#: VirtualMailManager/VirtualMailManager.py:593
+#: vmm/VirtualMailManager.py:593
 #, python-format
 msgid "The pattern “%s” contains invalid characters."
 msgstr "Mẫu « %s » chứa ký tự không hợp lệ."
 
-#: VirtualMailManager/VirtualMailManager.py:619
+#: vmm/VirtualMailManager.py:619
 #, python-format
 msgid "The destination account/alias “%s” doesn't exists yet."
 msgstr "Tài khoản hay bí danh đích đến « %s » không tồn tại."
 
-#: VirtualMailManager/VirtualMailManager.py:636
+#: vmm/VirtualMailManager.py:636
 #, python-format
 msgid ""
 "The account has been successfully deleted from the database.\n"
@@ -424,12 +424,12 @@ msgstr ""
 "  « %(directory)s »\n"
 "  Lý do : %(raeson)s"
 
-#: VirtualMailManager/VirtualMailManager.py:676
+#: vmm/VirtualMailManager.py:676
 msgid "Account doesn't exists"
 msgstr "Tài khoản không tồn tại"
 
-#: VirtualMailManager/VirtualMailManager.py:692
-#: VirtualMailManager/VirtualMailManager.py:702
+#: vmm/VirtualMailManager.py:692
+#: vmm/VirtualMailManager.py:702
 msgid ""
 "The service name “managesieve” is deprecated and will be removed\n"
 "   in a future release.\n"
@@ -438,7 +438,7 @@ msgstr ""
 "Tên dịch vụ « managesieve » bị phản đối nên được gỡ bỏ trong một phiên bản sau.\n"
 "  Hãy thay thế bằng tên dịch vụ « sieve »."
 
-#: VirtualMailManager/ext/Postconf.py:44
+#: vmm/ext/Postconf.py:44
 #, python-format
 msgid "The value “%s” looks not like a valid postfix configuration parameter name."
 msgstr "Giá trị « %s » không hình như một tên tham số cấu hình Postfix hợp lệ."

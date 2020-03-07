@@ -2,7 +2,7 @@
 # Copyright (c) 2010 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.common
+    vmm.common
     ~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Some common functions
@@ -13,10 +13,10 @@ import os
 import re
 import stat
 
-from VirtualMailManager import ENCODING
-from VirtualMailManager.constants import INVALID_MAIL_LOCATION, \
-     NOT_EXECUTABLE, NO_SUCH_BINARY, TYPE_ACCOUNT, TYPE_ALIAS, TYPE_RELOCATED
-from VirtualMailManager.errors import VMMError
+from vmm import ENCODING
+from vmm.constants import (INVALID_MAIL_LOCATION, NOT_EXECUTABLE, NO_SUCH_BINARY,
+                           TYPE_ACCOUNT, TYPE_ALIAS, TYPE_RELOCATED)
+from vmm.errors import VMMError
 
 VERSION_RE = re.compile(r'^(\d+)\.(\d+)\.(?:(\d+)|(alpha|beta|rc)(\d+))$')
 
@@ -129,9 +129,9 @@ def validate_transport(transport, maillocation):
 
     Arguments:
 
-    `transport` : VirtualMailManager.transport.Transport
+    `transport` : vmm.transport.Transport
       a Transport object
-    `maillocation` : VirtualMailManager.maillocation.MailLocation
+    `maillocation` : vmm.maillocation.MailLocation
       a MailLocation object
     """
     if transport.transport in ('virtual', 'virtual:') and \

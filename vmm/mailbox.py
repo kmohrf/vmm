@@ -2,10 +2,10 @@
 # Copyright (c) 2010 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.mailbox
+    vmm.mailbox
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    VirtualMailManager's mailbox classes for the Maildir, single dbox
+    vmm's mailbox classes for the Maildir, single dbox
     (sdbox) and multi dbox (mdbox) mailbox formats.
 """
 
@@ -14,11 +14,11 @@ import re
 from binascii import a2b_base64, b2a_base64
 from subprocess import Popen, PIPE
 
-from VirtualMailManager import ENCODING
-from VirtualMailManager.account import Account
-from VirtualMailManager.common import lisdir
-from VirtualMailManager.errors import VMMError
-from VirtualMailManager.constants import VMM_ERROR
+from vmm import ENCODING
+from vmm.account import Account
+from vmm.common import lisdir
+from vmm.errors import VMMError
+from vmm.constants import VMM_ERROR
 
 
 __all__ = ('new', 'Maildir', 'SingleDbox', 'MultiDbox',

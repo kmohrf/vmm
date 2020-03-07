@@ -2,18 +2,17 @@
 # Copyright (c) 2008 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.emailaddress
+    vmm.emailaddress
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Virtual Mail Manager's EmailAddress class to handle e-mail addresses.
+    vmm's EmailAddress class to handle e-mail addresses.
 """
 import re
 
-from VirtualMailManager.domain import check_domainname, get_gid
-from VirtualMailManager.constants import \
-     DOMAIN_NO_NAME, INVALID_ADDRESS, LOCALPART_INVALID, LOCALPART_TOO_LONG, \
-     DOMAIN_INVALID
-from VirtualMailManager.errors import DomainError, EmailAddressError as EAErr
+from vmm.domain import check_domainname, get_gid
+from vmm.constants import (DOMAIN_NO_NAME, INVALID_ADDRESS, LOCALPART_INVALID,
+                           LOCALPART_TOO_LONG, DOMAIN_INVALID)
+from vmm.errors import DomainError, EmailAddressError as EAErr
 
 
 RE_LOCALPART = re.compile(r"[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]", re.ASCII)

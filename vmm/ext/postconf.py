@@ -2,7 +2,7 @@
 # Copyright (c) 2008 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.ext.postconf
+    vmm.ext.postconf
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Wrapper class for Postfix's postconf.
@@ -16,8 +16,8 @@
 import re
 from subprocess import Popen, PIPE
 
-from VirtualMailManager.errors import VMMError
-from VirtualMailManager.constants import VMM_ERROR
+from vmm.errors import VMMError
+from vmm.constants import VMM_ERROR
 
 _ = lambda msg: msg
 

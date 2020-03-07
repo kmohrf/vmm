@@ -12,19 +12,19 @@ from shutil import copy2
 pre_060 = False
 
 try:
-    from VirtualMailManager.constants.VERSION import VERSION
+    from vmm.constants.VERSION import VERSION
     pre_060 = True
 except ImportError:
     try:
-        from VirtualMailManager.constants import VERSION
+        from vmm.constants import VERSION
     except ImportError:
         os.sys.stderr.write('error: no vmm version information found\n')
         raise SystemExit(2)
 
 # we have to remove the old CamelCase files
 if pre_060:
-    import VirtualMailManager
-    vmm_inst_dir = os.path.dirname(VirtualMailManager.__file__)
+    import vmm
+    vmm_inst_dir = os.path.dirname(vmm.__file__)
     tmp_info = open('/tmp/vmm_inst_dir', 'w')
     tmp_info.write(vmm_inst_dir)
     tmp_info.close()

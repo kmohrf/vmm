@@ -2,19 +2,17 @@
 # Copyright (c) 2007 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.alias
+    vmm.alias
     ~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Virtual Mail Manager's Alias class to manage e-mail aliases.
+    vmm's Alias class to manage e-mail aliases.
 """
 
-from VirtualMailManager.domain import get_gid
-from VirtualMailManager.emailaddress import \
-     EmailAddress, DestinationEmailAddress as DestAddr
-from VirtualMailManager.errors import AliasError as AErr
-from VirtualMailManager.ext.postconf import Postconf
-from VirtualMailManager.constants import \
-     ALIAS_EXCEEDS_EXPANSION_LIMIT, NO_SUCH_ALIAS, NO_SUCH_DOMAIN
+from vmm.domain import get_gid
+from vmm.emailaddress import EmailAddress, DestinationEmailAddress as DestAddr
+from vmm.errors import AliasError as AErr
+from vmm.ext.postconf import Postconf
+from vmm.constants import ALIAS_EXCEEDS_EXPANSION_LIMIT, NO_SUCH_ALIAS, NO_SUCH_DOMAIN
 
 
 _ = lambda msg: msg

@@ -2,15 +2,15 @@
 # Copyright (c) 2007 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.errors
+    vmm.errors
     ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    VMM's Exception classes
+    vmm's Exception classes
 """
 
 
 class VMMError(Exception):
-    """Exception base class for VirtualMailManager exceptions"""
+    """Exception base class for vmm exceptions"""
 
     def __init__(self, msg, code):
         Exception.__init__(self, msg)

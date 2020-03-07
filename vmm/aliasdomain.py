@@ -2,17 +2,16 @@
 # Copyright (c) 2008 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.aliasdomain
+    vmm.aliasdomain
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Virtual Mail Manager's AliasDomain class to manage alias domains.
+    vmm's AliasDomain class to manage alias domains.
 """
 
-from VirtualMailManager.domain import Domain, check_domainname
-from VirtualMailManager.constants import \
-     ALIASDOMAIN_EXISTS, ALIASDOMAIN_ISDOMAIN, ALIASDOMAIN_NO_DOMDEST, \
-     NO_SUCH_ALIASDOMAIN, NO_SUCH_DOMAIN
-from VirtualMailManager.errors import AliasDomainError as ADErr
+from vmm.domain import Domain, check_domainname
+from vmm.constants import (ALIASDOMAIN_EXISTS, ALIASDOMAIN_ISDOMAIN,
+                           ALIASDOMAIN_NO_DOMDEST, NO_SUCH_ALIASDOMAIN, NO_SUCH_DOMAIN)
+from vmm.errors import AliasDomainError as ADErr
 
 
 _ = lambda msg: msg
@@ -57,7 +56,7 @@ class AliasDomain(object):
 
         Argument:
 
-        `dest_domain` : VirtualMailManager.Domain.Domain
+        `dest_domain` : vmm.Domain.Domain
           the AliasDomain's destination domain
         """
         assert isinstance(dest_domain, Domain)

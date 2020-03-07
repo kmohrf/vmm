@@ -2,10 +2,10 @@
 # Copyright (c) 2010 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.cli
+    vmm.cli
     ~~~~~~~~~~~~~~~~~~~~~~
 
-    VirtualMailManager's command line interface.
+    vmm's command line interface.
 """
 
 import os
@@ -14,9 +14,9 @@ from fcntl import ioctl
 from getpass import getpass
 from termios import TIOCGWINSZ
 
-from VirtualMailManager import ENCODING
-from VirtualMailManager.constants import VMM_TOO_MANY_FAILURES
-from VirtualMailManager.errors import VMMError
+from vmm import ENCODING
+from vmm.constants import VMM_TOO_MANY_FAILURES
+from vmm.errors import VMMError
 
 
 __all__ = ('get_winsize', 'read_pass', 'w_err', 'w_std')

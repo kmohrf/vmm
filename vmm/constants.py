@@ -2,10 +2,10 @@
 # Copyright (c) 2007 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.constants
+    vmm.constants
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    VirtualMailManager's constants:
+    vmm's constants:
         * version information
         * upper and lower limits MIN_* / MAX_*
         * exit codes

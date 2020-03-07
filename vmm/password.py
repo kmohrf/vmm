@@ -2,10 +2,10 @@
 # Copyright (c) 2010 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.password
+    vmm.password
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    VirtualMailManager's password module to generate password hashes from
+    vmm's password module to generate password hashes from
     passwords or random passwords. This module provides following
     functions:
 
@@ -25,11 +25,11 @@ from crypt import crypt
 from random import SystemRandom
 from subprocess import Popen, PIPE
 
-from VirtualMailManager import ENCODING
-from VirtualMailManager.emailaddress import EmailAddress
-from VirtualMailManager.common import get_unicode, version_str
-from VirtualMailManager.constants import VMM_ERROR
-from VirtualMailManager.errors import VMMError
+from vmm import ENCODING
+from vmm.emailaddress import EmailAddress
+from vmm.common import get_unicode, version_str
+from vmm.constants import VMM_ERROR
+from vmm.errors import VMMError
 
 SALTCHARS = './0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 PASSWDCHARS = '._-+#*23456789abcdefghikmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ'

@@ -2,10 +2,10 @@
 # Copyright (c) 2011 - 2014, Pascal Volk
 # See COPYING for distribution information.
 """
-    VirtualMailManager.quotalimit
+    vmm.quotalimit
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Virtual Mail Manager's QuotaLimit class to manage quota limits
+    vmm's QuotaLimit class to manage quota limits
     for domains and accounts.
 """
 

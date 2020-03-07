@@ -16,9 +16,9 @@ aliases and relocated users.
 It is designed for Dovecot and Postfix with a PostgreSQL backend.
 """
 packages = [
-    'VirtualMailManager',
-    'VirtualMailManager.cli',
-    'VirtualMailManager.ext',
+    'vmm',
+    'vmm.cli',
+    'vmm.ext',
 ]
 # http://pypi.python.org/pypi?%3Aaction=list_classifiers
 classifiers = ['Development Status :: 5 - Production/Stable',
@@ -48,7 +48,7 @@ platforms = ['freebsd7', 'linux2', 'openbsd5']
 if os.path.exists('MANIFEST'):
     os.remove('MANIFEST')
 
-setup_args = {'name': 'VirtualMailManager',
+setup_args = {'name': 'vmm',
               'version': VERSION,
               'description': descr,
               'long_description': long_description,
