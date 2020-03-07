@@ -415,21 +415,21 @@ def randompw():
     return "".join(_sys_rand.sample(PASSWDCHARS, pw_len))
 
 
-def _test_crypt_algorithms():
-    """Check for Blowfish/SHA-256/SHA-512 support in crypt.crypt()."""
-    _blowfish = "$2a$04$0123456789abcdefABCDE.N.drYX5yIAL1LkTaaZotW3yI0hQhZru"
-    _sha256 = "$5$rounds=1000$0123456789abcdef$K/DksR0DT01hGc8g/kt9McEgrbFMKi\
-9qrb1jehe7hn4"
-    _sha512 = "$6$rounds=1000$0123456789abcdef$ZIAd5WqfyLkpvsVCVUU1GrvqaZTqvh\
-JoouxdSqJO71l9Ld3tVrfOatEjarhghvEYADkq//LpDnTeO90tcbtHR1"
+# Check for Blowfish/SHA-256/SHA-512 support in crypt.crypt()
+if "$2a$04$0123456789abcdefABCDE.N.drYX5yIAL1LkTaaZotW3yI0hQhZru" == crypt(
+    "08/15!test~4711", "$2a$04$0123456789abcdefABCDEF$"
+):
+    _scheme_info["BLF-CRYPT"] = (_crypt_hash, 0x20000B06)
+if (
+    "$5$rounds=1000$0123456789abcdef$K/DksR0DT01hGc8g/kt9McEgrbFMKi9qrb1jehe7hn4"
+    == crypt("08/15!test~4711", "$5$rounds=1000$0123456789abcdef$")
+):
+    _scheme_info["SHA256-CRYPT"] = (_crypt_hash, 0x20000B06)
+if (
+    "$6$rounds=1000$0123456789abcdef$ZIAd5WqfyLkpvsVCVUU1GrvqaZTqvhJoouxdSqJO71l9Ld3"
+    "tVrfOatEjarhghvEYADkq//LpDnTeO90tcbtHR1"
+    == crypt("08/15!test~4711", "$6$rounds=1000$0123456789abcdef$")
+):
+    _scheme_info["SHA512-CRYPT"] = (_crypt_hash, 0x20000B06)
 
-    if crypt("08/15!test~4711", "$2a$04$0123456789abcdefABCDEF$") == _blowfish:
-        _scheme_info["BLF-CRYPT"] = (_crypt_hash, 0x20000B06)
-    if crypt("08/15!test~4711", "$5$rounds=1000$0123456789abcdef$") == _sha256:
-        _scheme_info["SHA256-CRYPT"] = (_crypt_hash, 0x20000B06)
-    if crypt("08/15!test~4711", "$6$rounds=1000$0123456789abcdef$") == _sha512:
-        _scheme_info["SHA512-CRYPT"] = (_crypt_hash, 0x20000B06)
-
-
-_test_crypt_algorithms()
-del cfg_dget, _test_crypt_algorithms
+del cfg_dget
