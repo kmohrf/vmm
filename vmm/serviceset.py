@@ -9,7 +9,7 @@
     to the service_set table.
 """
 
-SERVICES = ('smtp', 'pop3', 'imap', 'sieve')
+SERVICES = ("smtp", "pop3", "imap", "sieve")
 
 
 class ServiceSet(object):
@@ -30,8 +30,9 @@ class ServiceSet(object):
     `services` : dict
       The four services above with boolean values
     """
-    __slots__ = ('_ssid', '_services', '_dbh')
-    _kwargs = (('ssid',) + SERVICES)
+
+    __slots__ = ("_ssid", "_services", "_dbh")
+    _kwargs = ("ssid",) + SERVICES
 
     def __init__(self, dbh, **kwargs):
         """Creates a new ServiceSet instance.
@@ -61,10 +62,13 @@ class ServiceSet(object):
 
         for key in kwargs.keys():
             if key not in self.__class__._kwargs:
-                raise ValueError('unrecognized keyword: %r' % key)
-            if key == 'ssid':
-                assert not isinstance(kwargs[key], bool) and \
-                       isinstance(kwargs[key], int) and kwargs[key] > 0
+                raise ValueError("unrecognized keyword: %r" % key)
+            if key == "ssid":
+                assert (
+                    not isinstance(kwargs[key], bool)
+                    and isinstance(kwargs[key], int)
+                    and kwargs[key] > 0
+                )
                 self._load_by_ssid(kwargs[key])
                 break
             else:
@@ -86,22 +90,26 @@ class ServiceSet(object):
 
     def __getattr__(self, name):
         if name not in self.__class__._kwargs:
-            raise AttributeError('%r object has no attribute %r' % (
-                                 self.__class__.__name__, name))
-        if name == 'ssid':
+            raise AttributeError(
+                "%r object has no attribute %r" % (self.__class__.__name__, name)
+            )
+        if name == "ssid":
             return self._ssid
         else:
             return self._services[name]
 
     def __repr__(self):
-        return '%s(%s, %s)' % (self.__class__.__name__, self._dbh,
-                  ', '.join('%s=%r' % s for s in self._services.items()))
+        return "%s(%s, %s)" % (
+            self.__class__.__name__,
+            self._dbh,
+            ", ".join("%s=%r" % s for s in self._services.items()),
+        )
 
     def _load_by_services(self):
         """Try to load the service_set by it's service combination."""
-        sql = ('SELECT ssid FROM service_set WHERE %s' %
-               ' AND '.join('%s = %s' %
-               (k, str(v).upper()) for k, v in self._services.items()))
+        sql = "SELECT ssid FROM service_set WHERE %s" % " AND ".join(
+            "%s = %s" % (k, str(v).upper()) for k, v in self._services.items()
+        )
         dbc = self._dbh.cursor()
         dbc.execute(sql)
         result = dbc.fetchone()
@@ -114,21 +122,25 @@ class ServiceSet(object):
     def _load_by_ssid(self, ssid):
         """Try to load the service_set by it's primary key."""
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT ssid, smtp, pop3, imap, sieve '
-                    'FROM service_set WHERE ssid = %s', (ssid,))
+        dbc.execute(
+            "SELECT ssid, smtp, pop3, imap, sieve " "FROM service_set WHERE ssid = %s",
+            (ssid,),
+        )
         result = dbc.fetchone()
         dbc.close()
         if not result:
-            raise ValueError('Unknown service_set id specified: %r' % ssid)
+            raise ValueError("Unknown service_set id specified: %r" % ssid)
         self._ssid = result[0]
         self._services.update(list(zip(SERVICES, result[1:])))
 
     def _save(self):
         """Store a new service_set in the database."""
-        sql = ('INSERT INTO service_set (ssid, smtp, pop3, imap, sieve) '
-               'VALUES (%(ssid)s, %(smtp)s, %(pop3)s, %(imap)s, %(sieve)s)')
+        sql = (
+            "INSERT INTO service_set (ssid, smtp, pop3, imap, sieve) "
+            "VALUES (%(ssid)s, %(smtp)s, %(pop3)s, %(imap)s, %(sieve)s)"
+        )
         self._set_ssid()
-        values = {'ssid': self._ssid}
+        values = {"ssid": self._ssid}
         values.update(self._services)
         dbc = self._dbh.cursor()
         dbc.execute(sql, values)

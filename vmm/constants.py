@@ -13,12 +13,12 @@
 """
 # version information
 
-__all__ = ['__author__', '__date__', '__version__']
-AUTHOR = 'Pascal Volk <user+vmm@localhost.localdomain.org>'
-RELDATE = '2014-02-01'
-VERSION = '0.6.2'
+__all__ = ["__author__", "__date__", "__version__"]
+AUTHOR = "Pascal Volk <user+vmm@localhost.localdomain.org>"
+RELDATE = "2014-02-01"
+VERSION = "0.6.2"
 __author__ = AUTHOR
-__copyright__ = 'Copyright (c) 2007-2014 %s' % __author__
+__copyright__ = "Copyright (c) 2007-2014 %s" % __author__
 __date__ = RELDATE
 __version__ = VERSION
 
@@ -28,7 +28,7 @@ __version__ = VERSION
 MIN_GID = 70000
 MIN_UID = 70000
 
-MIN_DOVECOT_VERSION = 0x20000f00
+MIN_DOVECOT_VERSION = 0x20000F00
 
 # exit codes
 

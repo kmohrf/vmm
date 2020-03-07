@@ -12,9 +12,15 @@ import os
 import re
 from random import choice
 
-from vmm.constants import (ACCOUNT_AND_ALIAS_PRESENT, DOMAIN_ALIAS_EXISTS,
-                           DOMAIN_EXISTS, DOMAIN_INVALID, DOMAIN_TOO_LONG,
-                           NO_SUCH_DOMAIN, VMM_ERROR)
+from vmm.constants import (
+    ACCOUNT_AND_ALIAS_PRESENT,
+    DOMAIN_ALIAS_EXISTS,
+    DOMAIN_EXISTS,
+    DOMAIN_INVALID,
+    DOMAIN_TOO_LONG,
+    NO_SUCH_DOMAIN,
+    VMM_ERROR,
+)
 from vmm.common import validate_transport
 from vmm.errors import VMMError, DomainError as DomErr
 from vmm.maillocation import MailLocation
@@ -23,18 +29,31 @@ from vmm.serviceset import ServiceSet
 from vmm.transport import Transport
 
 
-MAILDIR_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz'
-RE_DOMAIN = re.compile(r"""^(?:[a-z0-9-]{1,63}\.){1,}  # one or more labels
+MAILDIR_CHARS = "0123456789abcdefghijklmnopqrstuvwxyz"
+RE_DOMAIN = re.compile(
+    r"""^(?:[a-z0-9-]{1,63}\.){1,}  # one or more labels
                             (?:[a-z]{2,}               # a ASCII TLD
-                            |xn--[a-z0-9]{4,})$        # or a ACE TLD""", re.X)
+                            |xn--[a-z0-9]{4,})$        # or a ACE TLD""",
+    re.X,
+)
 _ = lambda msg: msg
 cfg_dget = lambda option: None
 
 
 class Domain(object):
     """Class to manage e-mail domains."""
-    __slots__ = ('_directory', '_gid', '_name', '_qlimit', '_services',
-                 '_transport', '_note', '_dbh', '_new')
+
+    __slots__ = (
+        "_directory",
+        "_gid",
+        "_name",
+        "_qlimit",
+        "_services",
+        "_transport",
+        "_note",
+        "_dbh",
+        "_new",
+    )
 
     def __init__(self, dbh, domainname):
         """Creates a new Domain instance.
@@ -72,16 +91,21 @@ class Domain(object):
         domain.
         """
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT dd.gid, qid, ssid, tid, domaindir, is_primary, '
-                    'note '
-                    'FROM domain_data dd, domain_name dn WHERE domainname = '
-                    '%s AND dn.gid = dd.gid', (self._name,))
+        dbc.execute(
+            "SELECT dd.gid, qid, ssid, tid, domaindir, is_primary, "
+            "note "
+            "FROM domain_data dd, domain_name dn WHERE domainname = "
+            "%s AND dn.gid = dd.gid",
+            (self._name,),
+        )
         result = dbc.fetchone()
         dbc.close()
         if result:
             if not result[5]:
-                raise DomErr(_("The domain '%s' is an alias domain.") %
-                             self._name, DOMAIN_ALIAS_EXISTS)
+                raise DomErr(
+                    _("The domain '%s' is an alias domain.") % self._name,
+                    DOMAIN_ALIAS_EXISTS,
+                )
             self._gid, self._directory = result[0], result[4]
             self._qlimit = QuotaLimit(self._dbh, qid=result[1])
             self._services = ServiceSet(self._dbh, ssid=result[2])
@@ -102,23 +126,29 @@ class Domain(object):
         are accounts, aliases and/or relocated users.
         """
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT '
-                    '(SELECT count(gid) FROM users WHERE gid = %(gid)u)'
-                    '  as account_count, '
-                    '(SELECT count(gid) FROM alias WHERE gid = %(gid)u)'
-                    '  as alias_count, '
-                    '(SELECT count(gid) FROM relocated WHERE gid = %(gid)u)'
-                    '  as relocated_count'
-                    % {'gid': self._gid})
+        dbc.execute(
+            "SELECT "
+            "(SELECT count(gid) FROM users WHERE gid = %(gid)u)"
+            "  as account_count, "
+            "(SELECT count(gid) FROM alias WHERE gid = %(gid)u)"
+            "  as alias_count, "
+            "(SELECT count(gid) FROM relocated WHERE gid = %(gid)u)"
+            "  as relocated_count" % {"gid": self._gid}
+        )
         result = dbc.fetchall()
         dbc.close()
         result = result[0]
         if any(result):
-            keys = ('account_count', 'alias_count', 'relocated_count')
-            raise DomErr(_('There are %(account_count)u accounts, '
-                           '%(alias_count)u aliases and %(relocated_count)u '
-                           'relocated users.') % dict(list(zip(keys, result))),
-                         ACCOUNT_AND_ALIAS_PRESENT)
+            keys = ("account_count", "alias_count", "relocated_count")
+            raise DomErr(
+                _(
+                    "There are %(account_count)u accounts, "
+                    "%(alias_count)u aliases and %(relocated_count)u "
+                    "relocated users."
+                )
+                % dict(list(zip(keys, result))),
+                ACCOUNT_AND_ALIAS_PRESENT,
+            )
 
     def _chk_state(self, must_exist=True):
         """Checks the state of the Domain instance and will raise a
@@ -127,17 +157,21 @@ class Domain(object):
           - or *must_exist* is `False` and the domain exists
         """
         if must_exist and self._new:
-            raise DomErr(_("The domain '%s' does not exist.") % self._name,
-                         NO_SUCH_DOMAIN)
+            raise DomErr(
+                _("The domain '%s' does not exist.") % self._name, NO_SUCH_DOMAIN
+            )
         elif not must_exist and not self._new:
-            raise DomErr(_("The domain '%s' already exists.") % self._name,
-                         DOMAIN_EXISTS)
+            raise DomErr(
+                _("The domain '%s' already exists.") % self._name, DOMAIN_EXISTS
+            )
 
     def _update_tables(self, column, value):
         """Update table columns in the domain_data table."""
         dbc = self._dbh.cursor()
-        dbc.execute('UPDATE domain_data SET %s = %%s WHERE gid = %%s' % column,
-                    (value, self._gid))
+        dbc.execute(
+            "UPDATE domain_data SET %s = %%s WHERE gid = %%s" % column,
+            (value, self._gid),
+        )
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
@@ -156,13 +190,14 @@ class Domain(object):
         `force` : bool
           reset existing users. Default: `False`
         """
-        if column not in ('qid', 'ssid', 'tid'):
-            raise ValueError('Unknown column: %r' % column)
+        if column not in ("qid", "ssid", "tid"):
+            raise ValueError("Unknown column: %r" % column)
         self._update_tables(column, value)
         if force:
             dbc = self._dbh.cursor()
-            dbc.execute('UPDATE users SET %s = NULL WHERE gid = %%s' % column,
-                        (self._gid,))
+            dbc.execute(
+                "UPDATE users SET %s = NULL WHERE gid = %%s" % column, (self._gid,)
+            )
             if dbc.rowcount > 0:
                 self._dbh.commit()
             dbc.close()
@@ -213,8 +248,7 @@ class Domain(object):
         self._chk_state(False)
         assert self._directory is None
         self._set_gid()
-        self._directory = os.path.join(basedir, choice(MAILDIR_CHARS),
-                                       str(self._gid))
+        self._directory = os.path.join(basedir, choice(MAILDIR_CHARS), str(self._gid))
 
     def set_quotalimit(self, quotalimit):
         """Set the quota limit for the new Domain.
@@ -250,10 +284,14 @@ class Domain(object):
         """
         self._chk_state(False)
         assert isinstance(transport, Transport)
-        validate_transport(transport,
-                           MailLocation(self._dbh,
-                                        mbfmt=cfg_dget('mailbox.format'),
-                                        directory=cfg_dget('mailbox.root')))
+        validate_transport(
+            transport,
+            MailLocation(
+                self._dbh,
+                mbfmt=cfg_dget("mailbox.format"),
+                directory=cfg_dget("mailbox.root"),
+            ),
+        )
         self._transport = transport
 
     def set_note(self, note):
@@ -271,16 +309,26 @@ class Domain(object):
     def save(self):
         """Stores the new domain in the database."""
         self._chk_state(False)
-        assert all((self._directory, self._qlimit, self._services,
-                    self._transport))
+        assert all((self._directory, self._qlimit, self._services, self._transport))
         dbc = self._dbh.cursor()
-        dbc.execute('INSERT INTO domain_data (gid, qid, ssid, tid, domaindir, '
-                    'note) '
-                    'VALUES (%s, %s, %s, %s, %s, %s)', (self._gid,
-                    self._qlimit.qid, self._services.ssid, self._transport.tid,
-                    self._directory, self._note))
-        dbc.execute('INSERT INTO domain_name (domainname, gid, is_primary) '
-                    'VALUES (%s, %s, TRUE)', (self._name, self._gid))
+        dbc.execute(
+            "INSERT INTO domain_data (gid, qid, ssid, tid, domaindir, "
+            "note) "
+            "VALUES (%s, %s, %s, %s, %s, %s)",
+            (
+                self._gid,
+                self._qlimit.qid,
+                self._services.ssid,
+                self._transport.tid,
+                self._directory,
+                self._note,
+            ),
+        )
+        dbc.execute(
+            "INSERT INTO domain_name (domainname, gid, is_primary) "
+            "VALUES (%s, %s, TRUE)",
+            (self._name, self._gid),
+        )
         self._dbh.commit()
         dbc.close()
         self._new = False
@@ -297,13 +345,12 @@ class Domain(object):
           Default `False`
         """
         if not isinstance(force, bool):
-            raise TypeError('force must be a bool')
+            raise TypeError("force must be a bool")
         self._chk_state()
         if not force:
             self._check_for_addresses()
         dbc = self._dbh.cursor()
-        for tbl in ('alias', 'users', 'relocated', 'domain_name',
-                    'domain_data'):
+        for tbl in ("alias", "users", "relocated", "domain_name", "domain_data"):
             dbc.execute("DELETE FROM %s WHERE gid = %u" % (tbl, self._gid))
         self._dbh.commit()
         dbc.close()
@@ -330,7 +377,7 @@ class Domain(object):
         assert isinstance(quotalimit, QuotaLimit)
         if not force and quotalimit == self._qlimit:
             return
-        self._update_tables_ref('qid', quotalimit.qid, force)
+        self._update_tables_ref("qid", quotalimit.qid, force)
         self._qlimit = quotalimit
 
     def update_serviceset(self, serviceset, force=False):
@@ -350,7 +397,7 @@ class Domain(object):
         assert isinstance(serviceset, ServiceSet)
         if not force and serviceset == self._services:
             return
-        self._update_tables_ref('ssid', serviceset.ssid, force)
+        self._update_tables_ref("ssid", serviceset.ssid, force)
         self._services = serviceset
 
     def update_transport(self, transport, force=False):
@@ -371,11 +418,15 @@ class Domain(object):
         assert isinstance(transport, Transport)
         if not force and transport == self._transport:
             return
-        validate_transport(transport,
-                           MailLocation(self._dbh,
-                                        mbfmt=cfg_dget('mailbox.format'),
-                                        directory=cfg_dget('mailbox.root')))
-        self._update_tables_ref('tid', transport.tid, force)
+        validate_transport(
+            transport,
+            MailLocation(
+                self._dbh,
+                mbfmt=cfg_dget("mailbox.format"),
+                directory=cfg_dget("mailbox.root"),
+            ),
+        )
+        self._update_tables_ref("tid", transport.tid, force)
         self._transport = transport
 
     def update_note(self, note):
@@ -390,48 +441,52 @@ class Domain(object):
         assert note is None or isinstance(note, str)
         if note == self._note:
             return
-        self._update_tables('note', note)
+        self._update_tables("note", note)
         self._note = note
 
     def get_info(self):
         """Returns a dictionary with information about the domain."""
         self._chk_state()
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT aliasdomains "alias domains", accounts, aliases, '
-                    'relocated, catchall "catch-all dests" '
-                    'FROM vmm_domain_info WHERE gid = %s', (self._gid,))
+        dbc.execute(
+            'SELECT aliasdomains "alias domains", accounts, aliases, '
+            'relocated, catchall "catch-all dests" '
+            "FROM vmm_domain_info WHERE gid = %s",
+            (self._gid,),
+        )
         info = dbc.fetchone()
         dbc.close()
-        keys = ('alias domains', 'accounts', 'aliases', 'relocated',
-                'catch-all dests')
+        keys = ("alias domains", "accounts", "aliases", "relocated", "catch-all dests")
         info = dict(list(zip(keys, info)))
-        info['gid'] = self._gid
-        info['domain name'] = self._name
-        info['transport'] = self._transport.transport
-        info['domain directory'] = self._directory
-        info['bytes'] = self._qlimit.bytes
-        info['messages'] = self._qlimit.messages
+        info["gid"] = self._gid
+        info["domain name"] = self._name
+        info["transport"] = self._transport.transport
+        info["domain directory"] = self._directory
+        info["bytes"] = self._qlimit.bytes
+        info["messages"] = self._qlimit.messages
         services = self._services.services
         services = [s.upper() for s in services if services[s]]
         if services:
             services.sort()
         else:
-            services.append('None')
-        info['active services'] = ' '.join(services)
-        info['note'] = self._note
+            services.append("None")
+        info["active services"] = " ".join(services)
+        info["note"] = self._note
         return info
 
     def get_accounts(self):
         """Returns a list with all accounts of the domain."""
         self._chk_state()
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT local_part from users where gid = %s ORDER BY '
-                    'local_part', (self._gid,))
+        dbc.execute(
+            "SELECT local_part from users where gid = %s ORDER BY " "local_part",
+            (self._gid,),
+        )
         users = dbc.fetchall()
         dbc.close()
         accounts = []
         if users:
-            addr = '@'.join
+            addr = "@".join
             _dom = self._name
             accounts = [addr((account[0], _dom)) for account in users]
         return accounts
@@ -440,13 +495,15 @@ class Domain(object):
         """Returns a list with all aliases e-mail addresses of the domain."""
         self._chk_state()
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT DISTINCT address FROM alias WHERE gid = %s ORDER '
-                    'BY address', (self._gid,))
+        dbc.execute(
+            "SELECT DISTINCT address FROM alias WHERE gid = %s ORDER " "BY address",
+            (self._gid,),
+        )
         addresses = dbc.fetchall()
         dbc.close()
         aliases = []
         if addresses:
-            addr = '@'.join
+            addr = "@".join
             _dom = self._name
             aliases = [addr((alias[0], _dom)) for alias in addresses]
         return aliases
@@ -455,13 +512,15 @@ class Domain(object):
         """Returns a list with all addresses of relocated users."""
         self._chk_state()
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT address FROM relocated WHERE gid = %s ORDER BY '
-                    'address', (self._gid,))
+        dbc.execute(
+            "SELECT address FROM relocated WHERE gid = %s ORDER BY " "address",
+            (self._gid,),
+        )
         addresses = dbc.fetchall()
         dbc.close()
         relocated = []
         if addresses:
-            addr = '@'.join
+            addr = "@".join
             _dom = self._name
             relocated = [addr((address[0], _dom)) for address in addresses]
         return relocated
@@ -470,8 +529,11 @@ class Domain(object):
         """Returns a list with all catchall e-mail addresses of the domain."""
         self._chk_state()
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT DISTINCT destination FROM catchall WHERE gid = %s '
-                    'ORDER BY destination', (self._gid,))
+        dbc.execute(
+            "SELECT DISTINCT destination FROM catchall WHERE gid = %s "
+            "ORDER BY destination",
+            (self._gid,),
+        )
         addresses = dbc.fetchall()
         dbc.close()
         return addresses
@@ -480,8 +542,11 @@ class Domain(object):
         """Returns a list with all alias domain names of the domain."""
         self._chk_state()
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT domainname FROM domain_name WHERE gid = %s AND '
-                    'NOT is_primary ORDER BY domainname', (self._gid,))
+        dbc.execute(
+            "SELECT domainname FROM domain_name WHERE gid = %s AND "
+            "NOT is_primary ORDER BY domainname",
+            (self._gid,),
+        )
         anames = dbc.fetchall()
         dbc.close()
         aliasdomains = []
@@ -498,12 +563,11 @@ def check_domainname(domainname):
 
     """
     if not RE_DOMAIN.match(domainname):
-        domainname = domainname.encode('idna').decode()
+        domainname = domainname.encode("idna").decode()
     if len(domainname) > 255:
-        raise DomErr(_('The domain name is too long'), DOMAIN_TOO_LONG)
+        raise DomErr(_("The domain name is too long"), DOMAIN_TOO_LONG)
     if not RE_DOMAIN.match(domainname):
-        raise DomErr(_("The domain name '%s' is invalid") % domainname,
-                     DOMAIN_INVALID)
+        raise DomErr(_("The domain name '%s' is invalid") % domainname, DOMAIN_INVALID)
     return domainname
 
 
@@ -514,8 +578,7 @@ def get_gid(dbh, domainname):
     """
     domainname = check_domainname(domainname)
     dbc = dbh.cursor()
-    dbc.execute('SELECT gid FROM domain_name WHERE domainname = %s',
-                (domainname,))
+    dbc.execute("SELECT gid FROM domain_name WHERE domainname = %s", (domainname,))
     gid = dbc.fetchone()
     dbc.close()
     if gid:
@@ -547,13 +610,13 @@ def search(dbh, pattern=None, like=False):
     """
     if pattern and not like:
         pattern = check_domainname(pattern)
-    sql = 'SELECT gid, domainname, is_primary FROM domain_name'
+    sql = "SELECT gid, domainname, is_primary FROM domain_name"
     if pattern:
         if like:
             sql += " WHERE domainname LIKE '%s'" % pattern
         else:
             sql += " WHERE domainname = '%s'" % pattern
-    sql += ' ORDER BY is_primary DESC, domainname'
+    sql += " ORDER BY is_primary DESC, domainname"
     dbc = dbh.cursor()
     dbc.execute(sql)
     result = dbc.fetchall()
@@ -577,5 +640,6 @@ def search(dbh, pattern=None, like=False):
                 gids.append(gid)
                 domains[gid] = [None, domain]
     return gids, domains
+
 
 del _, cfg_dget

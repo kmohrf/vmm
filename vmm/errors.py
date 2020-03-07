@@ -18,54 +18,64 @@ class VMMError(Exception):
         self.code = int(code)
 
     def __repr__(self):
-        return '%s(%r, %r)' % (self.__class__.__name__, self.msg, self.code)
+        return "%s(%r, %r)" % (self.__class__.__name__, self.msg, self.code)
 
 
 class ConfigError(VMMError):
     """Exception class for configuration exceptions"""
+
     pass
 
 
 class PermissionError(VMMError):
     """Exception class for permissions exceptions"""
+
     pass
 
 
 class NotRootError(VMMError):
     """Exception class for non-root exceptions"""
+
     pass
 
 
 class DomainError(VMMError):
     """Exception class for Domain exceptions"""
+
     pass
 
 
 class AliasDomainError(VMMError):
     """Exception class for AliasDomain exceptions"""
+
     pass
 
 
 class AccountError(VMMError):
     """Exception class for Account exceptions"""
+
     pass
 
 
 class AliasError(VMMError):
     """Exception class for Alias exceptions"""
+
     pass
 
 
 class EmailAddressError(VMMError):
     """Exception class for EmailAddress exceptions"""
+
     pass
 
 
 class MailLocationError(VMMError):
     """Exception class for MailLocation exceptions"""
+
     pass
 
 
 class RelocatedError(VMMError):
     """Exception class for Relocated exceptions"""
+
     pass

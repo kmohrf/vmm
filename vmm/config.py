@@ -9,30 +9,45 @@
 """
 
 import collections
-from configparser import (Error, MissingSectionHeaderError, NoOptionError,
-                          NoSectionError, ParsingError, RawConfigParser)
+from configparser import (
+    Error,
+    MissingSectionHeaderError,
+    NoOptionError,
+    NoSectionError,
+    ParsingError,
+    RawConfigParser,
+)
 from io import StringIO
 
-from vmm.common import (VERSION_RE, exec_ok, expand_path, get_unicode, lisdir,
-                        size_in_bytes, version_hex, version_str)
+from vmm.common import (
+    VERSION_RE,
+    exec_ok,
+    expand_path,
+    get_unicode,
+    lisdir,
+    size_in_bytes,
+    version_hex,
+    version_str,
+)
 from vmm.constants import CONF_ERROR, MIN_DOVECOT_VERSION
 from vmm.errors import ConfigError, VMMError
 from vmm.maillocation import known_format
 from vmm.password import verify_scheme as _verify_scheme
 
-DB_SSL_MODES = ('allow', 'disabled', 'prefer', 'require', 'verify-ca',
-                'verify-full')
+DB_SSL_MODES = ("allow", "disabled", "prefer", "require", "verify-ca", "verify-full")
 
 _ = lambda msg: msg
 
 
 class BadOptionError(Error):
     """Raised when a option isn't in the format 'section.option'."""
+
     pass
 
 
 class ConfigValueError(Error):
     """Raised when creating or validating of new values fails."""
+
     pass
 
 
@@ -40,8 +55,9 @@ class NoDefaultError(Error):
     """Raised when the requested option has no default value."""
 
     def __init__(self, section, option):
-        Error.__init__(self, 'Option %r in section %r has no default value' %
-                             (option, section))
+        Error.__init__(
+            self, "Option %r in section %r has no default value" % (option, section)
+        )
 
 
 class LazyConfig(RawConfigParser):
@@ -67,9 +83,7 @@ class LazyConfig(RawConfigParser):
         self._modified = False
         # sample _cfg dict.  Create your own in your derived class.
         self._cfg = {
-            'sectionname': {
-                'optionname': LazyConfigOption(int, 1, self.getint),
-            }
+            "sectionname": {"optionname": LazyConfigOption(int, 1, self.getint),}
         }
 
     def bool_new(self, value):
@@ -85,8 +99,7 @@ class LazyConfig(RawConfigParser):
         if value.lower() in self.BOOLEAN_STATES:
             return self.BOOLEAN_STATES[value.lower()]
         else:
-            raise ConfigValueError(_("Not a boolean: '%s'") %
-                                   get_unicode(value))
+            raise ConfigValueError(_("Not a boolean: '%s'") % get_unicode(value))
 
     def getboolean(self, section, option):
         """Returns the boolean value of the option, in the given
@@ -103,7 +116,7 @@ class LazyConfig(RawConfigParser):
         if isinstance(tmp, bool):
             return tmp
         if not tmp.lower() in self.BOOLEAN_STATES:
-            raise ValueError('Not a boolean: %s' % tmp)
+            raise ValueError("Not a boolean: %s" % tmp)
         return self.BOOLEAN_STATES[tmp.lower()]
 
     def _get_section_option(self, section_option):
@@ -120,12 +133,13 @@ class LazyConfig(RawConfigParser):
           * `NoSectionError`
           * `NoOptionError`
         """
-        sect_opt = section_option.lower().split('.')
+        sect_opt = section_option.lower().split(".")
         # TODO: cache it
         if len(sect_opt) != 2 or not sect_opt[0] or not sect_opt[1]:
-            raise BadOptionError(_("Bad format: '%s' - expected: "
-                                   "section.option") %
-                                 get_unicode(section_option))
+            raise BadOptionError(
+                _("Bad format: '%s' - expected: " "section.option")
+                % get_unicode(section_option)
+            )
         if not sect_opt[0] in self._cfg:
             raise NoSectionError(sect_opt[0])
         if not sect_opt[1] in self._cfg[sect_opt[0]]:
@@ -141,14 +155,16 @@ class LazyConfig(RawConfigParser):
         elif not section in self._cfg:
             raise NoSectionError(section)
         else:
-            return ((k, self._cfg[section][k].default)
-                    for k in self._cfg[section].keys())
+            return (
+                (k, self._cfg[section][k].default) for k in self._cfg[section].keys()
+            )
         # still here? Get defaults and merge defaults with configured setting
-        defaults = dict((k, self._cfg[section][k].default)
-                        for k in self._cfg[section].keys())
+        defaults = dict(
+            (k, self._cfg[section][k].default) for k in self._cfg[section].keys()
+        )
         defaults.update(sect)
-        if '__name__' in defaults:
-            del defaults['__name__']
+        if "__name__" in defaults:
+            del defaults["__name__"]
         return iter(defaults.items())
 
     def dget(self, option):
@@ -210,7 +226,7 @@ class LazyConfig(RawConfigParser):
         try:
             self._get_section_option(option)
             return True
-        except(BadOptionError, NoSectionError, NoOptionError):
+        except (BadOptionError, NoSectionError, NoOptionError):
             return False
 
     def sections(self):
@@ -225,7 +241,8 @@ class LazyConfigOption(object):
     and instances of classes derived from `LazyConfig`, like the
     `Config` class.
     """
-    __slots__ = ('__cls', '__default', '__getter', '__validate')
+
+    __slots__ = ("__cls", "__default", "__getter", "__validate")
 
     def __init__(self, cls, default, getter, validate=None):
         """Creates a new `LazyConfigOption` instance.
@@ -247,12 +264,15 @@ class LazyConfigOption(object):
         self.__cls = cls
         self.__default = default if default is None else self.__cls(default)
         if not isinstance(getter, collections.Callable):
-            raise TypeError('getter has to be a callable, got a %r' %
-                            getter.__class__.__name__)
+            raise TypeError(
+                "getter has to be a callable, got a %r" % getter.__class__.__name__
+            )
         self.__getter = getter
         if validate and not isinstance(validate, collections.Callable):
-            raise TypeError('validate has to be callable or None, got a %r' %
-                            validate.__class__.__name__)
+            raise TypeError(
+                "validate has to be callable or None, got a %r"
+                % validate.__class__.__name__
+            )
         self.__validate = validate
 
     @property
@@ -295,56 +315,54 @@ class Config(LazyConfig):
         LCO = LazyConfigOption
         bool_t = self.bool_new
         self._cfg = {
-            'account': {
-                'delete_directory': LCO(bool_t, False, self.getboolean),
-                'directory_mode': LCO(int, 448, self.getint),
-                'disk_usage': LCO(bool_t, False, self.getboolean),
-                'password_length': LCO(int, 8, self.getint),
-                'random_password': LCO(bool_t, False, self.getboolean),
+            "account": {
+                "delete_directory": LCO(bool_t, False, self.getboolean),
+                "directory_mode": LCO(int, 448, self.getint),
+                "disk_usage": LCO(bool_t, False, self.getboolean),
+                "password_length": LCO(int, 8, self.getint),
+                "random_password": LCO(bool_t, False, self.getboolean),
             },
-            'bin': {
-                'doveadm': LCO(str, '/usr/bin/doveadm', self.get, exec_ok),
-                'du': LCO(str, '/usr/bin/du', self.get, exec_ok),
-                'postconf': LCO(str, '/usr/sbin/postconf', self.get, exec_ok),
+            "bin": {
+                "doveadm": LCO(str, "/usr/bin/doveadm", self.get, exec_ok),
+                "du": LCO(str, "/usr/bin/du", self.get, exec_ok),
+                "postconf": LCO(str, "/usr/sbin/postconf", self.get, exec_ok),
             },
-            'database': {
-                'host': LCO(str, 'localhost', self.get),
-                'name': LCO(str, 'mailsys', self.get),
-                'pass': LCO(str, None, self.get),
-                'port': LCO(int, 5432, self.getint),
-                'sslmode': LCO(str, 'prefer', self.get, check_db_ssl_mode),
-                'user': LCO(str, None, self.get),
+            "database": {
+                "host": LCO(str, "localhost", self.get),
+                "name": LCO(str, "mailsys", self.get),
+                "pass": LCO(str, None, self.get),
+                "port": LCO(int, 5432, self.getint),
+                "sslmode": LCO(str, "prefer", self.get, check_db_ssl_mode),
+                "user": LCO(str, None, self.get),
             },
-            'domain': {
-                'auto_postmaster': LCO(bool_t, True, self.getboolean),
-                'delete_directory': LCO(bool_t, False, self.getboolean),
-                'directory_mode': LCO(int, 504, self.getint),
-                'force_deletion': LCO(bool_t, False, self.getboolean),
-                'imap': LCO(bool_t, True, self.getboolean),
-                'pop3': LCO(bool_t, True, self.getboolean),
-                'sieve': LCO(bool_t, True, self.getboolean),
-                'smtp': LCO(bool_t, True, self.getboolean),
-                'quota_bytes': LCO(str, '0', self.get_in_bytes,
-                                   check_size_value),
-                'quota_messages': LCO(int, 0, self.getint),
-                'transport': LCO(str, 'lmtp:unix:private/dovecot-lmtp',
-                                 self.get),
+            "domain": {
+                "auto_postmaster": LCO(bool_t, True, self.getboolean),
+                "delete_directory": LCO(bool_t, False, self.getboolean),
+                "directory_mode": LCO(int, 504, self.getint),
+                "force_deletion": LCO(bool_t, False, self.getboolean),
+                "imap": LCO(bool_t, True, self.getboolean),
+                "pop3": LCO(bool_t, True, self.getboolean),
+                "sieve": LCO(bool_t, True, self.getboolean),
+                "smtp": LCO(bool_t, True, self.getboolean),
+                "quota_bytes": LCO(str, "0", self.get_in_bytes, check_size_value),
+                "quota_messages": LCO(int, 0, self.getint),
+                "transport": LCO(str, "lmtp:unix:private/dovecot-lmtp", self.get),
             },
-            'mailbox': {
-                'folders': LCO(str, 'Drafts:Sent:Templates:Trash', self.str),
-                'format': LCO(str, 'maildir', self.get, check_mailbox_format),
-                'root': LCO(str, 'Maildir', self.str),
-                'subscribe': LCO(bool_t, True, self.getboolean),
+            "mailbox": {
+                "folders": LCO(str, "Drafts:Sent:Templates:Trash", self.str),
+                "format": LCO(str, "maildir", self.get, check_mailbox_format),
+                "root": LCO(str, "Maildir", self.str),
+                "subscribe": LCO(bool_t, True, self.getboolean),
             },
-            'misc': {
-                'base_directory': LCO(str, '/srv/mail', self.get, is_dir),
-                'crypt_blowfish_rounds': LCO(int, 5, self.getint),
-                'crypt_sha256_rounds': LCO(int, 5000, self.getint),
-                'crypt_sha512_rounds': LCO(int, 5000, self.getint),
-                'dovecot_version': LCO(str, None, self.hexversion,
-                                       check_dovecot_version),
-                'password_scheme': LCO(str, 'CRAM-MD5', self.get,
-                                       verify_scheme),
+            "misc": {
+                "base_directory": LCO(str, "/srv/mail", self.get, is_dir),
+                "crypt_blowfish_rounds": LCO(int, 5, self.getint),
+                "crypt_sha256_rounds": LCO(int, 5000, self.getint),
+                "crypt_sha512_rounds": LCO(int, 5000, self.getint),
+                "dovecot_version": LCO(
+                    str, None, self.hexversion, check_dovecot_version
+                ),
+                "password_scheme": LCO(str, "CRAM-MD5", self.get, verify_scheme),
             },
         }
 
@@ -354,7 +372,7 @@ class Config(LazyConfig):
         Raises a ConfigError if the configuration syntax is
         invalid.
         """
-        with open(self._cfg_filename, 'r', encoding='utf-8') as self._cfg_file:
+        with open(self._cfg_filename, "r", encoding="utf-8") as self._cfg_file:
             try:
                 self.readfp(self._cfg_file)
             except (MissingSectionHeaderError, ParsingError) as err:
@@ -366,31 +384,35 @@ class Config(LazyConfig):
         Raises a ConfigError if settings w/o a default value are missed.
         Or some settings have a invalid value.
         """
+
         def iter_dict():
             for section, options in self._missing.items():
-                errmsg.write(_('* Section: %s\n') % section)
-                errmsg.writelines('    %s\n' % option for option in options)
+                errmsg.write(_("* Section: %s\n") % section)
+                errmsg.writelines("    %s\n" % option for option in options)
             self._missing.clear()
 
         errmsg = None
         self._chk_non_default()
-        miss_vers = 'misc' in self._missing and \
-                    'dovecot_version' in self._missing['misc']
+        miss_vers = (
+            "misc" in self._missing and "dovecot_version" in self._missing["misc"]
+        )
         if self._missing:
             errmsg = StringIO()
-            errmsg.write(_('Check of configuration file %s failed.\n') %
-                         self._cfg_filename)
-            errmsg.write(_('Missing options, which have no default value.\n'))
+            errmsg.write(
+                _("Check of configuration file %s failed.\n") % self._cfg_filename
+            )
+            errmsg.write(_("Missing options, which have no default value.\n"))
             iter_dict()
         self._chk_possible_values(miss_vers)
         if self._missing:
             if not errmsg:
                 errmsg = StringIO()
-                errmsg.write(_('Check of configuration file %s failed.\n') %
-                             self._cfg_filename)
-                errmsg.write(_('Invalid configuration values.\n'))
+                errmsg.write(
+                    _("Check of configuration file %s failed.\n") % self._cfg_filename
+                )
+                errmsg.write(_("Invalid configuration values.\n"))
             else:
-                errmsg.write('\n' + _('Invalid configuration values.\n'))
+                errmsg.write("\n" + _("Invalid configuration values.\n"))
             iter_dict()
         if errmsg:
             raise ConfigError(errmsg.getvalue(), CONF_ERROR)
@@ -417,8 +439,9 @@ class Config(LazyConfig):
         for section in self._cfg.keys():
             missing = []
             for option, value in self._cfg[section].items():
-                if (value.default is None and
-                    not RawConfigParser.has_option(self, section, option)):
+                if value.default is None and not RawConfigParser.has_option(
+                    self, section, option
+                ):
                     missing.append(option)
             if missing:
                 self._missing[section] = missing
@@ -426,29 +449,29 @@ class Config(LazyConfig):
     def _chk_possible_values(self, miss_vers):
         """Check settings for which the possible values are known."""
         if not miss_vers:
-            value = self.get('misc', 'dovecot_version')
+            value = self.get("misc", "dovecot_version")
             try:
                 checked = check_dovecot_version(value)
             except ConfigValueError as err:
-                self._missing['misc'] = ['dovecot_version: %s' % str(err)]
+                self._missing["misc"] = ["dovecot_version: %s" % str(err)]
         # section database
         db_err = []
-        value = self.dget('database.sslmode')
+        value = self.dget("database.sslmode")
         if value not in DB_SSL_MODES:
-            db_err.append('sslmode: ' +
-                          _("Unknown pgsql SSL mode: '%s'") % value)
+            db_err.append("sslmode: " + _("Unknown pgsql SSL mode: '%s'") % value)
         if db_err:
-            self._missing['database'] = db_err
+            self._missing["database"] = db_err
         # section mailbox
-        value = self.dget('mailbox.format')
+        value = self.dget("mailbox.format")
         if not known_format(value):
-            self._missing['mailbox'] = ['format: ' +
-                              _("Unsupported mailbox format: '%s'") % value]
+            self._missing["mailbox"] = [
+                "format: " + _("Unsupported mailbox format: '%s'") % value
+            ]
         # section domain
         try:
-            value = self.dget('domain.quota_bytes')
+            value = self.dget("domain.quota_bytes")
         except (ValueError, TypeError) as err:
-            self._missing['domain'] = ['quota_bytes: ' + str(err)]
+            self._missing["domain"] = ["quota_bytes: " + str(err)]
 
 
 def is_dir(path):
@@ -466,8 +489,7 @@ def check_db_ssl_mode(ssl_mode):
     """Check if the *ssl_mode* is one of the SSL modes, known by pgsql."""
     if ssl_mode in DB_SSL_MODES:
         return ssl_mode
-    raise ConfigValueError(_("Unknown pgsql SSL mode: '%s'") %
-                           get_unicode(ssl_mode))
+    raise ConfigValueError(_("Unknown pgsql SSL mode: '%s'") % get_unicode(ssl_mode))
 
 
 def check_mailbox_format(format):
@@ -479,8 +501,7 @@ def check_mailbox_format(format):
     format = format.lower()
     if known_format(format):
         return format
-    raise ConfigValueError(_("Unsupported mailbox format: '%s'") %
-                           get_unicode(format))
+    raise ConfigValueError(_("Unsupported mailbox format: '%s'") % get_unicode(format))
 
 
 def check_size_value(value):
@@ -490,8 +511,7 @@ def check_size_value(value):
     try:
         tmp = size_in_bytes(value)
     except (TypeError, ValueError) as err:
-        raise ConfigValueError(_("Not a valid size value: '%s'") %
-                               get_unicode(value))
+        raise ConfigValueError(_("Not a valid size value: '%s'") % get_unicode(value))
     return value
 
 
@@ -502,11 +522,13 @@ def check_dovecot_version(version_string):
     Otherwise a `ConfigValueError` will be raised.
     """
     if not VERSION_RE.match(version_string):
-        raise ConfigValueError(_("Not a valid Dovecot version: '%s'") %
-                               get_unicode(version_string))
+        raise ConfigValueError(
+            _("Not a valid Dovecot version: '%s'") % get_unicode(version_string)
+        )
     if version_hex(version_string) < MIN_DOVECOT_VERSION:
-        raise ConfigValueError(_("vmm requires Dovecot >= %s") %
-                               version_str(MIN_DOVECOT_VERSION))
+        raise ConfigValueError(
+            _("vmm requires Dovecot >= %s") % version_str(MIN_DOVECOT_VERSION)
+        )
     return version_string
 
 
@@ -520,6 +542,7 @@ def verify_scheme(scheme):
         raise ConfigValueError(err.msg)
     if not encoding:
         return scheme
-    return '%s.%s' % (scheme, encoding)
+    return "%s.%s" % (scheme, encoding)
+
 
 del _

@@ -14,7 +14,8 @@ _ = lambda msg: msg
 
 class Transport(object):
     """A wrapper class that provides access to the transport table"""
-    __slots__ = ('_tid', '_transport', '_dbh')
+
+    __slots__ = ("_tid", "_transport", "_dbh")
 
     def __init__(self, dbh, tid=None, transport=None):
         """Creates a new Transport instance.
@@ -65,19 +66,20 @@ class Transport(object):
     def _load_by_id(self, tid):
         """load a transport by its id from the database"""
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT transport FROM transport WHERE tid = %s', (tid,))
+        dbc.execute("SELECT transport FROM transport WHERE tid = %s", (tid,))
         result = dbc.fetchone()
         dbc.close()
         if not result:
-            raise ValueError('Unknown transport id specified: %r' % tid)
+            raise ValueError("Unknown transport id specified: %r" % tid)
         self._transport = result[0]
         self._tid = tid
 
     def _load_by_name(self):
         """Load a transport by its transport name from the database."""
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT tid FROM transport WHERE transport = %s',
-                    (self._transport,))
+        dbc.execute(
+            "SELECT tid FROM transport WHERE transport = %s", (self._transport,)
+        )
         result = dbc.fetchone()
         dbc.close()
         if result:
@@ -90,9 +92,12 @@ class Transport(object):
         dbc = self._dbh.cursor()
         dbc.execute("SELECT nextval('transport_id')")
         self._tid = dbc.fetchone()[0]
-        dbc.execute('INSERT INTO transport (tid, transport) VALUES (%s, %s)',
-                    (self._tid, self._transport))
+        dbc.execute(
+            "INSERT INTO transport (tid, transport) VALUES (%s, %s)",
+            (self._tid, self._transport),
+        )
         self._dbh.commit()
         dbc.close()
+
 
 del _

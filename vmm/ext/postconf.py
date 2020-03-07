@@ -24,9 +24,10 @@ _ = lambda msg: msg
 
 class Postconf(object):
     """Wrapper class for Postfix's postconf."""
-    __slots__ = ('_bin', '_val')
-    _parameter_re = re.compile(r'^\w+$', re.ASCII)
-    _variables_re = re.compile(r'\$\b\w+\b', re.ASCII)
+
+    __slots__ = ("_bin", "_val")
+    _parameter_re = re.compile(r"^\w+$", re.ASCII)
+    _variables_re = re.compile(r"\$\b\w+\b", re.ASCII)
 
     def __init__(self, postconf_bin):
         """Creates a new Postconf instance.
@@ -37,7 +38,7 @@ class Postconf(object):
           absolute path to the Postfix postconf binary.
         """
         self._bin = postconf_bin
-        self._val = ''
+        self._val = ""
 
     def edit(self, parameter, value):
         """Set the `parameter`'s value to `value`.
@@ -50,8 +51,9 @@ class Postconf(object):
           the parameter's new value.
         """
         self._check_parameter(parameter)
-        stderr = Popen((self._bin, '-e', parameter + '=' + str(value)),
-                       stderr=PIPE).communicate()[1]
+        stderr = Popen(
+            (self._bin, "-e", parameter + "=" + str(value)), stderr=PIPE
+        ).communicate()[1]
         if stderr:
             raise VMMError(stderr.strip().decode(), VMM_ERROR)
 
@@ -81,9 +83,14 @@ class Postconf(object):
         """Check that the `parameter` looks like a configuration parameter.
         If not, a VMMError will be raised."""
         if not self.__class__._parameter_re.match(parameter):
-            raise VMMError(_("The value '%s' does not look like a valid "
-                             "Postfix configuration parameter name.") %
-                           parameter, VMM_ERROR)
+            raise VMMError(
+                _(
+                    "The value '%s' does not look like a valid "
+                    "Postfix configuration parameter name."
+                )
+                % parameter,
+                VMM_ERROR,
+            )
 
     def _expand_vars(self):
         """Expand the $variables in self._val to their values."""
@@ -100,12 +107,13 @@ class Postconf(object):
     def _expand_multi_vars(self, old_new):
         """Replace all $vars in self._val with their values."""
         for old, new in old_new.items():
-            self._val = self._val.replace('$' + old, new)
+            self._val = self._val.replace("$" + old, new)
 
     def _read(self, parameter):
         """Ask postconf for the value of a single configuration parameter."""
-        stdout, stderr = Popen([self._bin, '-h', parameter], stdout=PIPE,
-                               stderr=PIPE).communicate()
+        stdout, stderr = Popen(
+            [self._bin, "-h", parameter], stdout=PIPE, stderr=PIPE
+        ).communicate()
         if stderr:
             raise VMMError(stderr.strip().decode(), VMM_ERROR)
         return stdout.strip().decode()
@@ -120,8 +128,9 @@ class Postconf(object):
             raise VMMError(stderr.strip().decode(), VMM_ERROR)
         par_val = {}
         for line in stdout.decode().splitlines():
-            par, val = line.split(' = ')
+            par, val = line.split(" = ")
             par_val[par] = val
         return par_val
+
 
 del _

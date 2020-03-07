@@ -14,8 +14,7 @@ from vmm.errors import VMMError
 from vmm.handler import Handler
 from vmm.cli import read_pass
 from vmm.cli.config import CliConfig as Cfg
-from vmm.constants import (ACCOUNT_EXISTS, INVALID_SECTION, NO_SUCH_ACCOUNT,
-                           TYPE_ACCOUNT)
+from vmm.constants import ACCOUNT_EXISTS, INVALID_SECTION, NO_SUCH_ACCOUNT, TYPE_ACCOUNT
 from vmm.password import randompw, verify_scheme
 
 _ = lambda msg: msg
@@ -40,8 +39,7 @@ class CliHandler(Handler):
         """
         # Overwrite the parent CTor partly, we use the CliConfig class
         # and add some command line checks.
-        skip_some_checks = os.sys.argv[1] in ('cf', 'configure',
-                                              'cs', 'configset')
+        skip_some_checks = os.sys.argv[1] in ("cf", "configure", "cs", "configset")
         super(CliHandler, self).__init__(skip_some_checks)
 
         self._cfg = Cfg(self._cfg_fname)
@@ -63,8 +61,7 @@ class CliHandler(Handler):
         elif self._cfg.has_section(section):
             self._cfg.configure([section])
         else:
-            raise VMMError(_("Invalid section: '%s'") % section,
-                           INVALID_SECTION)
+            raise VMMError(_("Invalid section: '%s'") % section, INVALID_SECTION)
 
     def user_add(self, emailaddress, password=None, note=None):
         """Override the parent user_add() - add the interactive password
@@ -74,10 +71,11 @@ class CliHandler(Handler):
         """
         acc = self._get_account(emailaddress)
         if acc:
-            raise VMMError(_("The account '%s' already exists.") %
-                           acc.address, ACCOUNT_EXISTS)
+            raise VMMError(
+                _("The account '%s' already exists.") % acc.address, ACCOUNT_EXISTS
+            )
         self._is_other_address(acc.address, TYPE_ACCOUNT)
-        rand_pass = self._cfg.dget('account.random_password')
+        rand_pass = self._cfg.dget("account.random_password")
         if password is None:
             password = (read_pass, randompw)[rand_pass]()
         acc.set_password(password)
@@ -92,14 +90,16 @@ class CliHandler(Handler):
         password dialog."""
         acc = self._get_account(emailaddress)
         if not acc:
-            raise VMMError(_("The account '%s' does not exist.") %
-                           acc.address, NO_SUCH_ACCOUNT)
+            raise VMMError(
+                _("The account '%s' does not exist.") % acc.address, NO_SUCH_ACCOUNT
+            )
         if scheme:
             scheme, encoding = verify_scheme(scheme)
             if encoding:
-                scheme = '%s.%s' % (scheme, encoding)
+                scheme = "%s.%s" % (scheme, encoding)
         if not isinstance(password, str) or not password:
             password = read_pass()
         acc.update_password(password, scheme)
+
 
 del _

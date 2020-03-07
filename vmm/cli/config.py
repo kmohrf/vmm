@@ -30,32 +30,32 @@ class CliConfig(Config):
     def configure(self, sections):
         """Interactive method for configuring all options of the given
         iterable ``sections`` object."""
-        input_tpl = Template(_('Enter new value for option $option '
-                               '[$current_value]: '))
+        input_tpl = Template(
+            _("Enter new value for option $option " "[$current_value]: ")
+        )
         failures = 0
 
-        w_std(_('Using configuration file: %s\n') % self._cfg_filename)
+        w_std(_("Using configuration file: %s\n") % self._cfg_filename)
         for section in sections:
             w_std(_("* Configuration section: '%s'") % section)
             for opt, val in self.items(section):
                 failures = 0
                 while True:
                     if isinstance(val, str):
-                        val = val.encode(ENCODING, 'replace').decode(ENCODING)
-                    newval = input(input_tpl.substitute(option=opt,
-                                                        current_value=val))
+                        val = val.encode(ENCODING, "replace").decode(ENCODING)
+                    newval = input(input_tpl.substitute(option=opt, current_value=val))
                     if newval and newval != val:
                         try:
-                            LazyConfig.set(self, '%s.%s' % (section, opt),
-                                           newval)
+                            LazyConfig.set(self, "%s.%s" % (section, opt), newval)
                             break
                         except (ValueError, ConfigValueError, VMMError) as err:
-                            w_err(0, _('Warning: %s') % err)
+                            w_err(0, _("Warning: %s") % err)
                             failures += 1
                             if failures > 2:
-                                raise ConfigError(_('Too many failures - try '
-                                                    'again later.'),
-                                                  VMM_TOO_MANY_FAILURES)
+                                raise ConfigError(
+                                    _("Too many failures - try " "again later."),
+                                    VMM_TOO_MANY_FAILURES,
+                                )
                     else:
                         break
             print()
@@ -91,8 +91,9 @@ class CliConfig(Config):
 
     def _save_changes(self):
         """Writes changes to the configuration file."""
-        copy2(self._cfg_filename, self._cfg_filename + '.bak')
-        with open(self._cfg_filename, 'w', encoding='utf-8') as self._cfg_file:
+        copy2(self._cfg_filename, self._cfg_filename + ".bak")
+        with open(self._cfg_filename, "w", encoding="utf-8") as self._cfg_file:
             self.write(self._cfg_file)
+
 
 del _

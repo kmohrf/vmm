@@ -9,9 +9,16 @@
 """
 
 from vmm.common import version_str, format_domain_default
-from vmm.constants import (ACCOUNT_EXISTS, ACCOUNT_MISSING_PASSWORD, ALIAS_PRESENT,
-                           INVALID_ARGUMENT, INVALID_MAIL_LOCATION, NO_SUCH_ACCOUNT,
-                           NO_SUCH_DOMAIN, VMM_ERROR)
+from vmm.constants import (
+    ACCOUNT_EXISTS,
+    ACCOUNT_MISSING_PASSWORD,
+    ALIAS_PRESENT,
+    INVALID_ARGUMENT,
+    INVALID_MAIL_LOCATION,
+    NO_SUCH_ACCOUNT,
+    NO_SUCH_DOMAIN,
+    VMM_ERROR,
+)
 from vmm.common import validate_transport
 from vmm.domain import Domain
 from vmm.emailaddress import EmailAddress
@@ -22,7 +29,7 @@ from vmm.quotalimit import QuotaLimit
 from vmm.transport import Transport
 from vmm.serviceset import ServiceSet
 
-__all__ = ('Account', 'get_account_by_uid')
+__all__ = ("Account", "get_account_by_uid")
 
 _ = lambda msg: msg
 cfg_dget = lambda option: None
@@ -30,8 +37,20 @@ cfg_dget = lambda option: None
 
 class Account(object):
     """Class to manage e-mail accounts."""
-    __slots__ = ('_addr', '_dbh', '_domain', '_mail', '_new', '_passwd',
-                 '_qlimit', '_services', '_transport', '_note', '_uid')
+
+    __slots__ = (
+        "_addr",
+        "_dbh",
+        "_domain",
+        "_mail",
+        "_new",
+        "_passwd",
+        "_qlimit",
+        "_services",
+        "_transport",
+        "_note",
+        "_uid",
+    )
 
     def __init__(self, dbh, address):
         """Creates a new Account instance.
@@ -55,8 +74,10 @@ class Account(object):
             # TP: Hm, what “quotation marks” should be used?
             # If you are unsure have a look at:
             # http://en.wikipedia.org/wiki/Quotation_mark,_non-English_usage
-            raise AErr(_("The domain '%s' does not exist.") %
-                       self._addr.domainname, NO_SUCH_DOMAIN)
+            raise AErr(
+                _("The domain '%s' does not exist.") % self._addr.domainname,
+                NO_SUCH_DOMAIN,
+            )
         self._uid = 0
         self._mail = None
         self._qlimit = None
@@ -75,9 +96,11 @@ class Account(object):
         """Load 'uid', 'mid', 'qid', 'ssid', 'tid' and 'note' from the
         database and set _new to `False` - if the user could be found. """
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT uid, mid, qid, ssid, tid, note FROM users '
-                    'WHERE gid = %s AND local_part = %s',
-                    (self._domain.gid, self._addr.localpart))
+        dbc.execute(
+            "SELECT uid, mid, qid, ssid, tid, note FROM users "
+            "WHERE gid = %s AND local_part = %s",
+            (self._domain.gid, self._addr.localpart),
+        )
         result = dbc.fetchone()
         dbc.close()
         if result:
@@ -92,11 +115,9 @@ class Account(object):
                     else:
                         return ctor(self._dbh, **kwargs)
 
-            self._qlimit = load_helper(QuotaLimit, self._qlimit, 'qid', _qid)
-            self._services = load_helper(ServiceSet, self._services, 'ssid',
-                                         _ssid)
-            self._transport = load_helper(Transport, self._transport, 'tid',
-                                          _tid)
+            self._qlimit = load_helper(QuotaLimit, self._qlimit, "qid", _qid)
+            self._services = load_helper(ServiceSet, self._services, "ssid", _ssid)
+            self._transport = load_helper(Transport, self._transport, "tid", _tid)
             self._mail = MailLocation(self._dbh, mid=_mid)
             self._note = _note
             self._new = False
@@ -113,12 +134,15 @@ class Account(object):
         """Check and set different attributes - before we store the
         information in the database.
         """
-        if maillocation.dovecot_version > cfg_dget('misc.dovecot_version'):
-            raise AErr(_("The mailbox format '%(mbfmt)s' requires Dovecot "
-                         ">= v%(version)s.") % {
-                       'mbfmt': maillocation.mbformat,
-                       'version': version_str(maillocation.dovecot_version)},
-                       INVALID_MAIL_LOCATION)
+        if maillocation.dovecot_version > cfg_dget("misc.dovecot_version"):
+            raise AErr(
+                _("The mailbox format '%(mbfmt)s' requires Dovecot " ">= v%(version)s.")
+                % {
+                    "mbfmt": maillocation.mbformat,
+                    "version": version_str(maillocation.dovecot_version),
+                },
+                INVALID_MAIL_LOCATION,
+            )
         transport = self._transport or self._domain.transport
         validate_transport(transport, maillocation)
         self._mail = maillocation
@@ -134,11 +158,12 @@ class Account(object):
         `value` : int
           The referenced key
         """
-        if column not in ('qid', 'ssid', 'tid'):
-            raise ValueError('Unknown column: %r' % column)
+        if column not in ("qid", "ssid", "tid"):
+            raise ValueError("Unknown column: %r" % column)
         dbc = self._dbh.cursor()
-        dbc.execute('UPDATE users SET %s = %%s WHERE uid = %%s' % column,
-                    (value, self._uid))
+        dbc.execute(
+            "UPDATE users SET %s = %%s WHERE uid = %%s" % column, (value, self._uid)
+        )
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
@@ -147,8 +172,10 @@ class Account(object):
         """Count all alias addresses where the destination address is the
         address of the Account."""
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT COUNT(destination) FROM alias WHERE destination '
-                    '= %s', (str(self._addr),))
+        dbc.execute(
+            "SELECT COUNT(destination) FROM alias WHERE destination " "= %s",
+            (str(self._addr),),
+        )
         a_count = dbc.fetchone()[0]
         dbc.close()
         return a_count
@@ -157,8 +184,9 @@ class Account(object):
         """Raise an AccountError if the Account is new - not yet saved in the
         database."""
         if self._new:
-            raise AErr(_("The account '%s' does not exist.") % self._addr,
-                       NO_SUCH_ACCOUNT)
+            raise AErr(
+                _("The account '%s' does not exist.") % self._addr, NO_SUCH_ACCOUNT
+            )
 
     @property
     def address(self):
@@ -183,7 +211,7 @@ class Account(object):
     def home(self):
         """The Account's home directory."""
         if not self._new:
-            return '%s/%s' % (self._domain.directory, self._uid)
+            return "%s/%s" % (self._domain.directory, self._uid)
         return None
 
     @property
@@ -213,11 +241,14 @@ class Account(object):
           The password for the new Account.
         """
         if not self._new:
-            raise AErr(_("The account '%s' already exists.") % self._addr,
-                       ACCOUNT_EXISTS)
+            raise AErr(
+                _("The account '%s' already exists.") % self._addr, ACCOUNT_EXISTS
+            )
         if not isinstance(password, str) or not password:
-            raise AErr(_("Could not accept password: '%s'") % password,
-                       ACCOUNT_MISSING_PASSWORD)
+            raise AErr(
+                _("Could not accept password: '%s'") % password,
+                ACCOUNT_MISSING_PASSWORD,
+            )
         self._passwd = password
 
     def set_note(self, note):
@@ -234,24 +265,38 @@ class Account(object):
     def save(self):
         """Save the new Account in the database."""
         if not self._new:
-            raise AErr(_("The account '%s' already exists.") % self._addr,
-                       ACCOUNT_EXISTS)
+            raise AErr(
+                _("The account '%s' already exists.") % self._addr, ACCOUNT_EXISTS
+            )
         if not self._passwd:
-            raise AErr(_("No password set for account: '%s'") % self._addr,
-                       ACCOUNT_MISSING_PASSWORD)
-        self._prepare(MailLocation(self._dbh, mbfmt=cfg_dget('mailbox.format'),
-                                   directory=cfg_dget('mailbox.root')))
+            raise AErr(
+                _("No password set for account: '%s'") % self._addr,
+                ACCOUNT_MISSING_PASSWORD,
+            )
+        self._prepare(
+            MailLocation(
+                self._dbh,
+                mbfmt=cfg_dget("mailbox.format"),
+                directory=cfg_dget("mailbox.root"),
+            )
+        )
         dbc = self._dbh.cursor()
-        dbc.execute('INSERT INTO users (local_part, passwd, uid, gid, mid, '
-                    'qid, ssid, tid, note) '
-                    'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)',
-                    (self._addr.localpart,
-                     pwhash(self._passwd, user=self._addr), self._uid,
-                     self._domain.gid, self._mail.mid,
-                     self._qlimit.qid if self._qlimit else None,
-                     self._services.ssid if self._services else None,
-                     self._transport.tid if self._transport else None,
-                     self._note))
+        dbc.execute(
+            "INSERT INTO users (local_part, passwd, uid, gid, mid, "
+            "qid, ssid, tid, note) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+            (
+                self._addr.localpart,
+                pwhash(self._passwd, user=self._addr),
+                self._uid,
+                self._domain.gid,
+                self._mail.mid,
+                self._qlimit.qid if self._qlimit else None,
+                self._services.ssid if self._services else None,
+                self._transport.tid if self._transport else None,
+                self._note,
+            ),
+        )
         self._dbh.commit()
         dbc.close()
         self._new = False
@@ -268,14 +313,15 @@ class Account(object):
         `value` : str
           The new value of the attribute.
         """
-        if field not in ('name', 'note', 'pwhash'):
+        if field not in ("name", "note", "pwhash"):
             raise AErr(_("Unknown field: '%s'") % field, INVALID_ARGUMENT)
-        if field == 'pwhash':
-            field = 'passwd'
+        if field == "pwhash":
+            field = "passwd"
         self._chk_state()
         dbc = self._dbh.cursor()
-        dbc.execute('UPDATE users SET %s = %%s WHERE uid = %%s' % field,
-                    (value, self._uid))
+        dbc.execute(
+            "UPDATE users SET %s = %%s WHERE uid = %%s" % field, (value, self._uid)
+        )
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
@@ -296,8 +342,10 @@ class Account(object):
         """
         self._chk_state()
         dbc = self._dbh.cursor()
-        dbc.execute('UPDATE users SET passwd = %s WHERE uid = %s',
-                    (pwhash(password, scheme, self._addr), self.uid))
+        dbc.execute(
+            "UPDATE users SET passwd = %s WHERE uid = %s",
+            (pwhash(password, scheme, self._addr), self.uid),
+        )
         if dbc.rowcount > 0:
             self._dbh.commit()
         dbc.close()
@@ -317,7 +365,7 @@ class Account(object):
         if quotalimit is not None:
             assert isinstance(quotalimit, QuotaLimit)
             quotalimit = quotalimit.qid
-        self._update_tables('qid', quotalimit)
+        self._update_tables("qid", quotalimit)
 
     def update_serviceset(self, serviceset):
         """Assign a different set of services to the Account.
@@ -334,7 +382,7 @@ class Account(object):
         if serviceset is not None:
             assert isinstance(serviceset, ServiceSet)
             serviceset = serviceset.ssid
-        self._update_tables('ssid', serviceset)
+        self._update_tables("ssid", serviceset)
 
     def update_transport(self, transport):
         """Sets a new transport for the Account.
@@ -352,7 +400,7 @@ class Account(object):
             assert isinstance(transport, Transport)
             validate_transport(transport, self._mail)
             transport = transport.tid
-        self._update_tables('tid', transport)
+        self._update_tables("tid", transport)
 
     def _get_info_transport(self):
         if self._transport:
@@ -371,7 +419,7 @@ class Account(object):
         for service, state in services.items():
             # TP: A service (e.g. pop3 or imap) may be enabled/usable or
             # disabled/unusable for a user.
-            ret[service] = fmt((_('disabled'), _('enabled'))[state])
+            ret[service] = fmt((_("disabled"), _("enabled"))[state])
         return ret
 
     def get_info(self):
@@ -384,44 +432,51 @@ class Account(object):
         """
         self._chk_state()
         dbc = self._dbh.cursor()
-        dbc.execute('SELECT name, CASE WHEN bytes IS NULL THEN 0 ELSE bytes '
-                    'END, CASE WHEN messages IS NULL THEN 0 ELSE messages END '
-                    'FROM users LEFT JOIN userquota USING (uid) WHERE '
-                    'users.uid = %s', (self._uid,))
+        dbc.execute(
+            "SELECT name, CASE WHEN bytes IS NULL THEN 0 ELSE bytes "
+            "END, CASE WHEN messages IS NULL THEN 0 ELSE messages END "
+            "FROM users LEFT JOIN userquota USING (uid) WHERE "
+            "users.uid = %s",
+            (self._uid,),
+        )
         info = dbc.fetchone()
         dbc.close()
         if info:
-            info = dict(list(zip(('name', 'uq_bytes', 'uq_messages'), info)))
+            info = dict(list(zip(("name", "uq_bytes", "uq_messages"), info)))
             info.update(self._get_info_serviceset())
-            info['address'] = self._addr
-            info['gid'] = self._domain.gid
-            info['home'] = '%s/%s' % (self._domain.directory, self._uid)
-            info['mail_location'] = self._mail.mail_location
+            info["address"] = self._addr
+            info["gid"] = self._domain.gid
+            info["home"] = "%s/%s" % (self._domain.directory, self._uid)
+            info["mail_location"] = self._mail.mail_location
             if self._qlimit:
-                info['ql_bytes'] = self._qlimit.bytes
-                info['ql_messages'] = self._qlimit.messages
-                info['ql_domaindefault'] = False
+                info["ql_bytes"] = self._qlimit.bytes
+                info["ql_messages"] = self._qlimit.messages
+                info["ql_domaindefault"] = False
             else:
-                info['ql_bytes'] = self._domain.quotalimit.bytes
-                info['ql_messages'] = self._domain.quotalimit.messages
-                info['ql_domaindefault'] = True
-            info['transport'] = self._get_info_transport()
-            info['note'] = self._note
-            info['uid'] = self._uid
+                info["ql_bytes"] = self._domain.quotalimit.bytes
+                info["ql_messages"] = self._domain.quotalimit.messages
+                info["ql_domaindefault"] = True
+            info["transport"] = self._get_info_transport()
+            info["note"] = self._note
+            info["uid"] = self._uid
             return info
         # nearly impossible‽
-        raise AErr(_("Could not fetch information for account: '%s'") %
-                   self._addr, NO_SUCH_ACCOUNT)
+        raise AErr(
+            _("Could not fetch information for account: '%s'") % self._addr,
+            NO_SUCH_ACCOUNT,
+        )
 
     def get_aliases(self):
         """Return a list with all alias e-mail addresses, whose destination
         is the address of the Account."""
         self._chk_state()
         dbc = self._dbh.cursor()
-        dbc.execute("SELECT address ||'@'|| domainname FROM alias, "
-                    "domain_name WHERE destination = %s AND domain_name.gid = "
-                    "alias.gid AND domain_name.is_primary ORDER BY address",
-                    (str(self._addr),))
+        dbc.execute(
+            "SELECT address ||'@'|| domainname FROM alias, "
+            "domain_name WHERE destination = %s AND domain_name.gid = "
+            "alias.gid AND domain_name.is_primary ORDER BY address",
+            (str(self._addr),),
+        )
         addresses = dbc.fetchall()
         dbc.close()
         aliases = []
@@ -440,25 +495,28 @@ class Account(object):
           `False`, an AccountError will be raised.
         """
         if not isinstance(force, bool):
-            raise TypeError('force must be a bool')
+            raise TypeError("force must be a bool")
         self._chk_state()
         dbc = self._dbh.cursor()
         if force:
-            dbc.execute('DELETE FROM users WHERE uid = %s', (self._uid,))
+            dbc.execute("DELETE FROM users WHERE uid = %s", (self._uid,))
             # delete also all aliases where the destination address is the same
             # as for this account.
-            dbc.execute("DELETE FROM alias WHERE destination = %s",
-                        (str(self._addr),))
+            dbc.execute("DELETE FROM alias WHERE destination = %s", (str(self._addr),))
             self._dbh.commit()
         else:  # check first for aliases
             a_count = self._count_aliases()
             if a_count > 0:
                 dbc.close()
-                raise AErr(_("There are %(count)d aliases with the "
-                             "destination address '%(address)s'.") %
-                           {'count': a_count, 'address': self._addr},
-                           ALIAS_PRESENT)
-            dbc.execute('DELETE FROM users WHERE uid = %s', (self._uid,))
+                raise AErr(
+                    _(
+                        "There are %(count)d aliases with the "
+                        "destination address '%(address)s'."
+                    )
+                    % {"count": a_count, "address": self._addr},
+                    ALIAS_PRESENT,
+                )
+            dbc.execute("DELETE FROM users WHERE uid = %s", (self._uid,))
             self._dbh.commit()
         dbc.close()
         self._new = True
@@ -483,20 +541,22 @@ def get_account_by_uid(uid, dbh):
     try:
         uid = int(uid)
     except ValueError:
-        raise AErr(_('UID must be an integer.'), INVALID_ARGUMENT)
+        raise AErr(_("UID must be an integer."), INVALID_ARGUMENT)
     if uid < 1:
-        raise AErr(_('UID must be greater than 0.'), INVALID_ARGUMENT)
+        raise AErr(_("UID must be greater than 0."), INVALID_ARGUMENT)
     dbc = dbh.cursor()
-    dbc.execute("SELECT local_part||'@'|| domain_name.domainname AS address, "
-                "uid, users.gid, note FROM users LEFT JOIN domain_name ON "
-                "(domain_name.gid = users.gid AND is_primary) WHERE uid = %s",
-                (uid,))
+    dbc.execute(
+        "SELECT local_part||'@'|| domain_name.domainname AS address, "
+        "uid, users.gid, note FROM users LEFT JOIN domain_name ON "
+        "(domain_name.gid = users.gid AND is_primary) WHERE uid = %s",
+        (uid,),
+    )
     info = dbc.fetchone()
     dbc.close()
     if not info:
-        raise AErr(_("There is no account with the UID: '%d'") % uid,
-                   NO_SUCH_ACCOUNT)
-    info = dict(list(zip(('address', 'uid', 'gid', 'note'), info)))
+        raise AErr(_("There is no account with the UID: '%d'") % uid, NO_SUCH_ACCOUNT)
+    info = dict(list(zip(("address", "uid", "gid", "note"), info)))
     return info
+
 
 del _, cfg_dget

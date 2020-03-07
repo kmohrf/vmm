@@ -15,7 +15,8 @@ from binascii import b2a_hex
 
 class NetInfo(object):
     """Simple class for CIDR network addresses an IP addresses."""
-    __slots__ = ('_addr', '_prefix', '_bits_max', '_family', '_nw_addr')
+
+    __slots__ = ("_addr", "_prefix", "_bits_max", "_family", "_nw_addr")
 
     def __init__(self, nw_address):
         """Creates a new `NetInfo` instance.
@@ -45,7 +46,7 @@ class NetInfo(object):
         """Parse the network range of `self._nw_addr and assign values
         to the class attributes.
         `"""
-        sep = '/'
+        sep = "/"
         if self._nw_addr.count(sep):
             ip_address, sep, self._prefix = self._nw_addr.partition(sep)
             self._family, self._addr = get_ip_addr_info(ip_address)
@@ -58,9 +59,9 @@ class NetInfo(object):
             try:
                 self._prefix = int(self._prefix)
             except ValueError:
-                raise ValueError('Invalid prefix length: %r' % self._prefix)
+                raise ValueError("Invalid prefix length: %r" % self._prefix)
         if self._prefix > self._bits_max or self._prefix < 0:
-            raise ValueError('Invalid prefix length: %r' % self._prefix)
+            raise ValueError("Invalid prefix length: %r" % self._prefix)
 
     @property
     def family(self):
@@ -72,8 +73,10 @@ class NetInfo(object):
         family, address = get_ip_addr_info(ip_address)
         if family != self._family:
             return False
-        return address >> self._bits_max - self._prefix == \
-               self._addr >> self._bits_max - self._prefix
+        return (
+            address >> self._bits_max - self._prefix
+            == self._addr >> self._bits_max - self._prefix
+        )
 
 
 def get_ip_addr_info(ip_address):
@@ -84,19 +87,19 @@ def get_ip_addr_info(ip_address):
     `address_family`will be either `socket.AF_INET` or `socket.AF_INET6`.
     """
     if not isinstance(ip_address, str) or not ip_address:
-        raise TypeError('ip_address must be a non empty string.')
-    if not ip_address.count(':'):
+        raise TypeError("ip_address must be a non empty string.")
+    if not ip_address.count(":"):
         family = socket.AF_INET
         try:
             address = socket.inet_aton(ip_address)
         except socket.error:
-            raise ValueError('Not a valid IPv4 address: %r' % ip_address)
+            raise ValueError("Not a valid IPv4 address: %r" % ip_address)
     elif not socket.has_ipv6:
-        raise ValueError('Unsupported IP address (IPv6): %r' % ip_address)
+        raise ValueError("Unsupported IP address (IPv6): %r" % ip_address)
     else:
         family = socket.AF_INET6
         try:
             address = socket.inet_pton(family, ip_address)
         except socket.error:
-            raise ValueError('Not a valid IPv6 address: %r' % ip_address)
+            raise ValueError("Not a valid IPv6 address: %r" % ip_address)
     return (family, int(b2a_hex(address), 16))

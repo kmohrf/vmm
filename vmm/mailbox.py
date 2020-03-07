@@ -21,8 +21,14 @@ from vmm.errors import VMMError
 from vmm.constants import VMM_ERROR
 
 
-__all__ = ('new', 'Maildir', 'SingleDbox', 'MultiDbox',
-           'utf8_to_mutf7', 'mutf7_to_utf8')
+__all__ = (
+    "new",
+    "Maildir",
+    "SingleDbox",
+    "MultiDbox",
+    "utf8_to_mutf7",
+    "mutf7_to_utf8",
+)
 
 _ = lambda msg: msg
 cfg_dget = lambda option: None
@@ -30,14 +36,13 @@ cfg_dget = lambda option: None
 
 def _mbase64_encode(inp, dest):
     if inp:
-        mb64 = b2a_base64(''.join(inp).encode('utf-16be')).decode()
-        dest.append('&%s-' % mb64.rstrip('\n=').replace('/', ','))
+        mb64 = b2a_base64("".join(inp).encode("utf-16be")).decode()
+        dest.append("&%s-" % mb64.rstrip("\n=").replace("/", ","))
         del inp[:]
 
 
 def _mbase64_to_unicode(mb64):
-    return str(a2b_base64(mb64.replace(',', '/').encode() + b'==='),
-               'utf-16be')
+    return str(a2b_base64(mb64.replace(",", "/").encode() + b"==="), "utf-16be")
 
 
 def utf8_to_mutf7(src):
@@ -54,11 +59,11 @@ def utf8_to_mutf7(src):
             ret.append(c)
         elif ordc == 0x26:
             _mbase64_encode(tmp, ret)
-            ret.append('&-')
+            ret.append("&-")
         else:
             tmp.append(c)
     _mbase64_encode(tmp, ret)
-    return ''.join(ret)
+    return "".join(ret)
 
 
 def mutf7_to_utf8(src):
@@ -68,29 +73,30 @@ def mutf7_to_utf8(src):
     ret = []
     tmp = []
     for c in src:
-        if c == '&' and not tmp:
+        if c == "&" and not tmp:
             tmp.append(c)
-        elif c == '-' and tmp:
+        elif c == "-" and tmp:
             if len(tmp) is 1:
-                ret.append('&')
+                ret.append("&")
             else:
-                ret.append(_mbase64_to_unicode(''.join(tmp[1:])))
+                ret.append(_mbase64_to_unicode("".join(tmp[1:])))
             tmp = []
         elif tmp:
             tmp.append(c)
         else:
             ret.append(c)
     if tmp:
-        ret.append(_mbase64_to_unicode(''.join(tmp[1:])))
-    return ''.join(ret)
+        ret.append(_mbase64_to_unicode("".join(tmp[1:])))
+    return "".join(ret)
 
 
 class Mailbox(object):
     """Base class of all mailbox classes."""
-    __slots__ = ('_boxes', '_root', '_sep', '_user')
+
+    __slots__ = ("_boxes", "_root", "_sep", "_user")
     FILE_MODE = 0o600
-    _ctrl_chr_re = re.compile('[\x00-\x1F\x7F-\x9F]')
-    _box_name_re = re.compile('^[\x20-\x25\x27-\x7E]+$')
+    _ctrl_chr_re = re.compile("[\x00-\x1F\x7F-\x9F]")
+    _box_name_re = re.compile("^[\x20-\x25\x27-\x7E]+$")
 
     def __init__(self, account):
         """
@@ -101,7 +107,7 @@ class Mailbox(object):
         self._user = account
         self._boxes = []
         self._root = self._user.mail_location.directory
-        self._sep = '/'
+        self._sep = "/"
         os.chdir(self._user.home)
 
     def _add_boxes(self, mailboxes, subscribe):
@@ -122,21 +128,25 @@ class Mailbox(object):
         if self.__class__._ctrl_chr_re.search(name):  # no control chars
             bad.append(name)
             return
-        if name[0] in (self._sep, '~'):
+        if name[0] in (self._sep, "~"):
             bad.append(name)
             return
-        if self._sep == '/':
-            if '//' in name or '/./' in name or '/../' in name or \
-               name.startswith('../'):
+        if self._sep == "/":
+            if (
+                "//" in name
+                or "/./" in name
+                or "/../" in name
+                or name.startswith("../")
+            ):
                 bad.append(name)
                 return
-        elif '/' in name or '..' in name:
+        elif "/" in name or ".." in name:
             bad.append(name)
             return
         if not self.__class__._box_name_re.match(name):
             tmp = utf8_to_mutf7(name)
             if name == mutf7_to_utf8(tmp):
-                if self._user.mail_location.mbformat == 'maildir':
+                if self._user.mail_location.mbformat == "maildir":
                     good.add(tmp)
                 else:
                     good.add(name)
@@ -157,8 +167,8 @@ class Mailbox(object):
         good = set()
         bad = []
         for box in mailboxes:
-            if self._sep == '/':
-                box = box.replace('.', self._sep)
+            if self._sep == "/":
+                box = box.replace(".", self._sep)
             self._validate_box_name(box, good, bad)
         self._add_boxes(good, subscribe)
         return bad
@@ -171,7 +181,7 @@ class Mailbox(object):
 class Maildir(Mailbox):
     """Class for Maildir++ mailboxes."""
 
-    __slots__ = ('_subdirs')
+    __slots__ = "_subdirs"
 
     def __init__(self, account):
         """
@@ -180,21 +190,24 @@ class Maildir(Mailbox):
         For additional mailboxes use the add_boxes() method.
         """
         super(self.__class__, self).__init__(account)
-        self._sep = '.'
-        self._subdirs = ('cur', 'new', 'tmp')
+        self._sep = "."
+        self._subdirs = ("cur", "new", "tmp")
 
     def _create_maildirfolder_file(self, path):
         """Mark the Maildir++ folder as Maildir folder."""
-        maildirfolder_file = os.path.join(self._sep + path, 'maildirfolder')
-        os.close(os.open(maildirfolder_file, os.O_CREAT | os.O_WRONLY,
-                         self.__class__.FILE_MODE))
+        maildirfolder_file = os.path.join(self._sep + path, "maildirfolder")
+        os.close(
+            os.open(
+                maildirfolder_file, os.O_CREAT | os.O_WRONLY, self.__class__.FILE_MODE
+            )
+        )
         os.chown(maildirfolder_file, self._user.uid, self._user.gid)
 
     def _make_maildir(self, path):
         """
         Create Maildir++ folders with the cur, new and tmp subdirectories.
         """
-        mode = cfg_dget('account.directory_mode')
+        mode = cfg_dget("account.directory_mode")
         uid = self._user.uid
         gid = self._user.gid
         os.mkdir(path, mode)
@@ -208,11 +221,11 @@ class Maildir(Mailbox):
         """Writes all created mailboxes to the subscriptions file."""
         if not self._boxes:
             return
-        with open('subscriptions', 'w') as subscriptions:
-            subscriptions.write('\n'.join(self._boxes))
-            subscriptions.write('\n')
-        os.chown('subscriptions', self._user.uid, self._user.gid)
-        os.chmod('subscriptions', self.__class__.FILE_MODE)
+        with open("subscriptions", "w") as subscriptions:
+            subscriptions.write("\n".join(self._boxes))
+            subscriptions.write("\n")
+        os.chown("subscriptions", self._user.uid, self._user.gid)
+        os.chmod("subscriptions", self.__class__.FILE_MODE)
         del self._boxes[:]
 
     def _add_boxes(self, mailboxes, subscribe):
@@ -243,28 +256,32 @@ class SingleDbox(Mailbox):
         Call the instance's create() method, in order to create the INBOX.
         For additional mailboxes use the add_boxes() method.
         """
-        assert cfg_dget('misc.dovecot_version') >= \
-            account.mail_location.dovecot_version
+        assert cfg_dget("misc.dovecot_version") >= account.mail_location.dovecot_version
         super(SingleDbox, self).__init__(account)
 
     def _doveadm_create(self, mailboxes, subscribe):
         """Wrap around Dovecot's doveadm"""
-        cmd_args = [cfg_dget('bin.doveadm'), 'mailbox', 'create', '-u',
-                    str(self._user.address)]
+        cmd_args = [
+            cfg_dget("bin.doveadm"),
+            "mailbox",
+            "create",
+            "-u",
+            str(self._user.address),
+        ]
         if subscribe:
-            cmd_args.append('-s')
+            cmd_args.append("-s")
         cmd_args.extend(mailboxes)
         process = Popen(cmd_args, stderr=PIPE)
         stderr = process.communicate()[1]
         if process.returncode:
-            e_msg = _('Failed to create mailboxes: %r\n') % mailboxes
+            e_msg = _("Failed to create mailboxes: %r\n") % mailboxes
             raise VMMError(e_msg + stderr.strip().decode(ENCODING), VMM_ERROR)
 
     def create(self):
         """Create a dbox INBOX"""
-        os.mkdir(self._root, cfg_dget('account.directory_mode'))
+        os.mkdir(self._root, cfg_dget("account.directory_mode"))
         os.chown(self._root, self._user.uid, self._user.gid)
-        self._doveadm_create(('INBOX',), False)
+        self._doveadm_create(("INBOX",), False)
         os.chdir(self._root)
 
     def _add_boxes(self, mailboxes, subscribe):
@@ -283,12 +300,13 @@ class MultiDbox(SingleDbox):
 def new(account):
     """Create a new Mailbox instance for the given Account."""
     mbfmt = account.mail_location.mbformat
-    if mbfmt == 'maildir':
+    if mbfmt == "maildir":
         return Maildir(account)
-    elif mbfmt == 'mdbox':
+    elif mbfmt == "mdbox":
         return MultiDbox(account)
-    elif mbfmt == 'sdbox':
+    elif mbfmt == "sdbox":
         return SingleDbox(account)
-    raise ValueError('unsupported mailbox format: %r' % mbfmt)
+    raise ValueError("unsupported mailbox format: %r" % mbfmt)
+
 
 del _, cfg_dget
