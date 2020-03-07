@@ -11,7 +11,7 @@
 from configparser import NoOptionError, NoSectionError
 from gettext import gettext as _
 
-from vmm import ENCODING, errors
+from vmm import errors
 from vmm.config import BadOptionError, ConfigValueError
 from vmm.cli import w_err
 from vmm.cli.handler import CliHandler

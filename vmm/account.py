@@ -19,12 +19,11 @@ from vmm.constants import (
     INVALID_MAIL_LOCATION,
     NO_SUCH_ACCOUNT,
     NO_SUCH_DOMAIN,
-    VMM_ERROR,
 )
 from vmm.common import validate_transport
 from vmm.domain import Domain
 from vmm.emailaddress import EmailAddress
-from vmm.errors import VMMError, AccountError as AErr
+from vmm.errors import AccountError as AErr
 from vmm.maillocation import MailLocation
 from vmm.password import pwhash
 from vmm.quotalimit import QuotaLimit
@@ -411,7 +410,10 @@ class Account(object):
     def _get_info_serviceset(self):
         if self._services:
             services = self._services.services
-            fmt = lambda s: s
+
+            def fmt(s):
+                return s
+
         else:
             services = self._domain.serviceset.services
             fmt = format_domain_default

@@ -182,14 +182,16 @@ def catchall_info(ctx):
 
 def config_get(ctx):
     """show the actual value of the configuration option"""
-    noop = lambda option: option
     opt_formater = {
         "misc.dovecot_version": version_str,
         "domain.quota_bytes": human_size,
     }
 
     option = ctx.args.option.lower()
-    w_std("%s = %s" % (option, opt_formater.get(option, noop)(ctx.cget(option))))
+    w_std(
+        "%s = %s"
+        % (option, opt_formater.get(option, lambda option: option)(ctx.cget(option)))
+    )
 
 
 def config_set(ctx):
@@ -525,8 +527,12 @@ def setup_parser():
 
     old_rw = txt_wrpr.replace_whitespace
     txt_wrpr.replace_whitespace = False
-    fill = lambda t: "\n".join(txt_wrpr.fill(l) for l in t.splitlines(True))
-    mklst = lambda iterable: "\n\t - " + "\n\t - ".join(iterable)
+
+    def fill(t):
+        return "\n".join(txt_wrpr.fill(l) for l in t.splitlines(True))
+
+    def mklst(iterable):
+        return "\n\t - " + "\n\t - ".join(iterable)
 
     description = _(
         "%(prog)s - command line tool to manage email " "domains/accounts/aliases/..."

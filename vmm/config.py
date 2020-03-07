@@ -82,7 +82,7 @@ class LazyConfig(RawConfigParser):
         self._modified = False
         # sample _cfg dict.  Create your own in your derived class.
         self._cfg = {
-            "sectionname": {"optionname": LazyConfigOption(int, 1, self.getint),}
+            "sectionname": {"optionname": LazyConfigOption(int, 1, self.getint)}
         }
 
     def bool_new(self, value):
@@ -151,7 +151,7 @@ class LazyConfig(RawConfigParser):
         """
         if section in self._sections:  # check if the section was parsed
             sect = self._sections[section]
-        elif not section in self._cfg:
+        elif section not in self._cfg:
             raise NoSectionError(section)
         else:
             return (
@@ -450,7 +450,7 @@ class Config(LazyConfig):
         if not miss_vers:
             value = self.get("misc", "dovecot_version")
             try:
-                checked = check_dovecot_version(value)
+                check_dovecot_version(value)
             except ConfigValueError as err:
                 self._missing["misc"] = ["dovecot_version: %s" % str(err)]
         # section database
@@ -508,9 +508,11 @@ def check_size_value(value):
     Returns the validated value string if it has the expected format.
     Otherwise a `ConfigValueError` will be raised."""
     try:
-        tmp = size_in_bytes(value)
+        size_in_bytes(value)
     except (TypeError, ValueError) as err:
-        raise ConfigValueError(_("Not a valid size value: '%s'") % get_unicode(value))
+        raise ConfigValueError(
+            _("Not a valid size value: '%s'") % get_unicode(value)
+        ) from err
     return value
 
 

@@ -53,7 +53,7 @@ class NetInfo(object):
         else:
             self._family, self._addr = get_ip_addr_info(self._nw_addr)
         self._bits_max = (128, 32)[self._family is socket.AF_INET]
-        if self._prefix is 0:
+        if self._prefix == 0:
             self._prefix = self._bits_max
         else:
             try:

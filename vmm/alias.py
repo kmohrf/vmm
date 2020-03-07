@@ -129,16 +129,16 @@ Hint: Delete some destination addresses."""
         assert destinations and all(
             isinstance(dest, EmailAddress) for dest in destinations
         )
-        if not warnings is None:
+        if warnings is not None:
             assert isinstance(warnings, list)
         if self._addr in destinations:
             destinations.remove(self._addr)
-            if not warnings is None:
+            if warnings is not None:
                 warnings.append(self._addr)
         duplicates = destinations.intersection(set(self._dests))
         if duplicates:
             destinations.difference_update(set(self._dests))
-            if not warnings is None:
+            if warnings is not None:
                 warnings.extend(duplicates)
         if not destinations:
             return destinations
@@ -163,18 +163,18 @@ Hint: Delete some destination addresses."""
         assert destinations and all(
             isinstance(dest, EmailAddress) for dest in destinations
         )
-        if not warnings is None:
+        if warnings is not None:
             assert isinstance(warnings, list)
         if self._addr in destinations:
             destinations.remove(self._addr)
-            if not warnings is None:
+            if warnings is not None:
                 warnings.append(self._addr)
         if not self._dests:
             raise AErr(_("The alias '%s' does not exist.") % self._addr, NO_SUCH_ALIAS)
         unknown = destinations.difference(set(self._dests))
         if unknown:
             destinations.intersection_update(set(self._dests))
-            if not warnings is None:
+            if warnings is not None:
                 warnings.extend(unknown)
         if not destinations:
             raise AErr(

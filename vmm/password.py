@@ -55,7 +55,10 @@ SALTED_ALGO_SALT_LEN = 4
 cfg_dget = lambda option: None
 _sys_rand = SystemRandom()
 _choice = _sys_rand.choice
-_get_salt = lambda s_len: "".join(_choice(SALTCHARS) for x in range(s_len))
+
+
+def _get_salt(s_len):
+    return "".join(_choice(SALTCHARS) for _ in range(s_len))
 
 
 def _doveadmpw(password, scheme, encoding):

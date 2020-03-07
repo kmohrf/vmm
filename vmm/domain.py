@@ -20,10 +20,9 @@ from vmm.constants import (
     DOMAIN_INVALID,
     DOMAIN_TOO_LONG,
     NO_SUCH_DOMAIN,
-    VMM_ERROR,
 )
 from vmm.common import validate_transport
-from vmm.errors import VMMError, DomainError as DomErr
+from vmm.errors import DomainError as DomErr
 from vmm.maillocation import MailLocation
 from vmm.quotalimit import QuotaLimit
 from vmm.serviceset import ServiceSet
@@ -626,7 +625,7 @@ def search(dbh, pattern=None, like=False):
     domains = {}
     for gid, domain, is_primary in result:
         if is_primary:
-            if not gid in domains:
+            if gid not in domains:
                 domains[gid] = [domain]
             else:
                 domains[gid].insert(0, domain)

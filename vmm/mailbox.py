@@ -76,7 +76,7 @@ def mutf7_to_utf8(src):
         if c == "&" and not tmp:
             tmp.append(c)
         elif c == "-" and tmp:
-            if len(tmp) is 1:
+            if len(tmp) == 1:
                 ret.append("&")
             else:
                 ret.append(_mbase64_to_unicode("".join(tmp[1:])))

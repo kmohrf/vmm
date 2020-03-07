@@ -68,7 +68,7 @@ from vmm.transport import Transport
 
 CFG_FILE = "vmm.cfg"
 CFG_PATH = "/root:/usr/local/etc:/etc"
-RE_DOMAIN_SEARCH = """^[a-z0-9-\.]+$"""
+RE_DOMAIN_SEARCH = re.compile(r"^[a-z0-9-.]+$")
 OTHER_TYPES = {
     TYPE_ACCOUNT: (_("an account"), ACCOUNT_EXISTS),
     TYPE_ALIAS: (_("an alias"), ALIAS_EXISTS),
@@ -628,7 +628,7 @@ class Handler(object):
         like = False
         if pattern and (pattern.startswith("%") or pattern.endswith("%")):
             like = True
-            if not re.match(RE_DOMAIN_SEARCH, pattern.strip("%")):
+            if not RE_DOMAIN_SEARCH.match(pattern.strip("%")):
                 raise VMMError(
                     _("The pattern '%s' contains invalid " "characters.") % pattern,
                     DOMAIN_INVALID,
@@ -663,7 +663,7 @@ class Handler(object):
                 dlike = dpattern.startswith("%") or dpattern.endswith("%")
 
             checkp = dpattern.strip("%") if dlike else dpattern
-            if len(checkp) > 0 and not re.match(RE_DOMAIN_SEARCH, checkp):
+            if len(checkp) > 0 and not RE_DOMAIN_SEARCH.match(checkp):
                 raise VMMError(
                     _("The pattern '%s' contains invalid " "characters.") % pattern,
                     DOMAIN_INVALID,
