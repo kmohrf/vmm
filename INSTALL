@@ -3,7 +3,7 @@ You should already have installed and configured Postfix, Dovecot ≥ 1.2.0
 and PostgreSQL.
 
 The Virtual Mail Manager depends on:
-    - Python (≥ 3.2)
+    - Python (≥ 3.7)
     - Psycopg¹ (≥ 2.0)
 
 [1] Psycopg: <http://initd.org/psycopg/> (Debian: python3-psycopg2)
@@ -137,7 +137,7 @@ Start or restart Dovecot
 
 
 Configuring Postfix's master.cf
-    
+
 /!\ Only required with Dovecot v.1.2.x.
     # Add Dovecot's deliver agent
     dovecot   unix  -       n       n       -       -       pipe

@@ -92,7 +92,7 @@ PostgreSQL use the ``postconf`` and ``dovecot`` commands as shown below::
 
 Dependences
 -----------
-vmm (≥ 0.7.0) depends on Python (≥ 3.2) and Psycopg_ (≥ 2.0).
+vmm (≥ 0.7.0) depends on Python (≥ 3.7) and Psycopg_ (≥ 2.0).
 
 Source code
 ===========

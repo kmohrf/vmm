@@ -20,7 +20,7 @@ shown below:
   root@host:~# dovecot --build-options | grep postgresql
   SQL drivers: mysql postgresql sqlite
 
-vmm depends on Python (≥ 3.2) and Psycopg_ (≥ 2.0).
+vmm depends on Python (≥ 3.7) and Psycopg_ (≥ 2.0).
 
 If your Dovecot and/or Postfix installation shouldn't support PostgreSQL you
 could possibly fix this by installing the missing package (see below) or by
@@ -73,7 +73,7 @@ Packages
  ‣ postfix-2.x.y-pgsql
  ‣ dovecot-2.x.y and dovecot-postgresql-2.x.y
  ‣ postgresql-client
- ‣ python-3.2.x
+ ‣ python-3.7.x
 
 Build from source
  ‣ Psycopg_
