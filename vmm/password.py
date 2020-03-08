@@ -214,81 +214,27 @@ def _ntlm_hash(password, scheme, encoding):
     return _doveadmpw(password, scheme, encoding)
 
 
-def _sha1_hash(password, scheme, encoding):
-    """Generates SHA1 aka SHA hashes."""
-    sha1 = hashlib.sha1(password)
-    if encoding in DEFAULT_B64:
-        digest = b64encode(sha1.digest()).decode()
-    else:
-        digest = sha1.hexdigest()
-    return _format_digest(digest, scheme, encoding)
+def _create_hashlib_hash(algorithm, with_salt=False):
+    def hash_password(password, scheme, encoding):
+        # we default to an empty byte-string to keep the internal logic
+        # clean as it behaves like we would not have used a salt
+        salt = _get_salt(SALTED_ALGO_SALT_LEN).encode() if with_salt else b""
+        _hash = algorithm(password + salt)
+        if encoding in DEFAULT_B64:
+            digest = b64encode(_hash.digest() + salt).decode()
+        else:
+            digest = _hash.hexdigest() + b2a_hex(salt).decode()
+        return _format_digest(digest, scheme, encoding)
+    return hash_password
 
 
-def _sha256_hash(password, scheme, encoding):
-    """Generates SHA256 hashes."""
-    sha256 = hashlib.sha256(password)
-    if encoding in DEFAULT_B64:
-        digest = b64encode(sha256.digest()).decode()
-    else:
-        digest = sha256.hexdigest()
-    return _format_digest(digest, scheme, encoding)
-
-
-def _sha512_hash(password, scheme, encoding):
-    """Generates SHA512 hashes."""
-    sha512 = hashlib.sha512(password)
-    if encoding in DEFAULT_B64:
-        digest = b64encode(sha512.digest()).decode()
-    else:
-        digest = sha512.hexdigest()
-    return _format_digest(digest, scheme, encoding)
-
-
-def _smd5_hash(password, scheme, encoding):
-    """Generates SMD5 (salted PLAIN-MD5) hashes."""
-    md5 = hashlib.md5(password)
-    salt = _get_salt(SALTED_ALGO_SALT_LEN).encode()
-    md5.update(salt)
-    if encoding in DEFAULT_B64:
-        digest = b64encode(md5.digest() + salt).decode()
-    else:
-        digest = md5.hexdigest() + b2a_hex(salt).decode()
-    return _format_digest(digest, scheme, encoding)
-
-
-def _ssha1_hash(password, scheme, encoding):
-    """Generates SSHA (salted SHA/SHA1) hashes."""
-    sha1 = hashlib.sha1(password)
-    salt = _get_salt(SALTED_ALGO_SALT_LEN).encode()
-    sha1.update(salt)
-    if encoding in DEFAULT_B64:
-        digest = b64encode(sha1.digest() + salt).decode()
-    else:
-        digest = sha1.hexdigest() + b2a_hex(salt).decode()
-    return _format_digest(digest, scheme, encoding)
-
-
-def _ssha256_hash(password, scheme, encoding):
-    """Generates SSHA256 (salted SHA256) hashes."""
-    sha256 = hashlib.sha256(password)
-    salt = _get_salt(SALTED_ALGO_SALT_LEN).encode()
-    sha256.update(salt)
-    if encoding in DEFAULT_B64:
-        digest = b64encode(sha256.digest() + salt).decode()
-    else:
-        digest = sha256.hexdigest() + b2a_hex(salt).decode()
-    return _format_digest(digest, scheme, encoding)
-
-
-def _ssha512_hash(password, scheme, encoding):
-    """Generates SSHA512 (salted SHA512) hashes."""
-    salt = _get_salt(SALTED_ALGO_SALT_LEN).encode()
-    sha512 = hashlib.sha512(password + salt)
-    if encoding in DEFAULT_B64:
-        digest = b64encode(sha512.digest() + salt).decode()
-    else:
-        digest = sha512.hexdigest() + b2a_hex(salt).decode()
-    return _format_digest(digest, scheme, encoding)
+_sha1_hash = _create_hashlib_hash(hashlib.sha1)
+_sha256_hash = _create_hashlib_hash(hashlib.sha256)
+_sha512_hash = _create_hashlib_hash(hashlib.sha512)
+_smd5_hash = _create_hashlib_hash(hashlib.md5, with_salt=True)
+_ssha1_hash = _create_hashlib_hash(hashlib.sha1, with_salt=True)
+_ssha256_hash = _create_hashlib_hash(hashlib.sha256, with_salt=True)
+_ssha512_hash = _create_hashlib_hash(hashlib.sha512, with_salt=True)
 
 
 _scheme_info = {
