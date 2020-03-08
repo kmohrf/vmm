@@ -349,13 +349,12 @@ def pwhash(password, scheme=None, user=None):
     return _scheme_info[scheme][0](password, scheme, encoding)
 
 
-def randompw():
+def randompw(pw_len):
     """Generates a plain text random password.
 
     The length of the password can be configured in the ``vmm.cfg``
     (account.password_length).
     """
-    pw_len = cfg_dget("account.password_length")
     if pw_len < 8:
         pw_len = 8
     return "".join(_sys_rand.sample(PASSWDCHARS, pw_len))

@@ -74,15 +74,18 @@ class CliHandler(Handler):
                 _("The account '%s' already exists.") % acc.address, ACCOUNT_EXISTS
             )
         self._is_other_address(acc.address, TYPE_ACCOUNT)
-        rand_pass = self._cfg.dget("account.random_password")
+        should_create_random_password = self._cfg.dget("account.random_password")
         if password is None:
-            password = (read_pass, randompw)[rand_pass]()
+            if should_create_random_password:
+                password = randompw(self._cfg.dget("account.password_length"))
+            else:
+                password = read_pass()
         acc.set_password(password)
         if note:
             acc.set_note(note)
         acc.save()
         self._make_account_dirs(acc)
-        return (None, password)[rand_pass]
+        return password if should_create_random_password else None
 
     def user_password(self, emailaddress, password=None, scheme=None):
         """Override the parent user_password() - add the interactive
