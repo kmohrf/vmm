@@ -35,7 +35,7 @@ __all__ = ("Account", "get_account_by_uid")
 cfg_dget = lambda option: None
 
 
-class Account(object):
+class Account:
     """Class to manage e-mail accounts."""
 
     __slots__ = (

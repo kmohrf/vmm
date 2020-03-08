@@ -30,7 +30,7 @@ from vmm.constants import ALIAS_EXCEEDS_EXPANSION_LIMIT, NO_SUCH_ALIAS, NO_SUCH_
 cfg_dget = lambda option: None
 
 
-class CatchallAlias(object):
+class CatchallAlias:
     """Class to manage domain catch-all aliases."""
 
     __slots__ = ("_domain", "_dests", "_gid", "_dbh")

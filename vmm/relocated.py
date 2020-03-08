@@ -21,7 +21,7 @@ from vmm.constants import (
 )
 
 
-class Relocated(object):
+class Relocated:
     """Class to handle e-mail addresses of relocated users."""
 
     __slots__ = ("_addr", "_dest", "_gid", "_dbh")

@@ -20,7 +20,7 @@ from vmm.constants import ALIAS_EXCEEDS_EXPANSION_LIMIT, NO_SUCH_ALIAS, NO_SUCH_
 cfg_dget = lambda option: None
 
 
-class Alias(object):
+class Alias:
     """Class to manage e-mail aliases."""
 
     __slots__ = ("_addr", "_dests", "_gid", "_dbh")

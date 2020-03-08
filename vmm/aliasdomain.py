@@ -21,7 +21,7 @@ from vmm.constants import (
 from vmm.errors import AliasDomainError as ADErr
 
 
-class AliasDomain(object):
+class AliasDomain:
     """Class to manage e-mail alias domains."""
 
     __slots__ = ("_gid", "_name", "_domain", "_dbh")

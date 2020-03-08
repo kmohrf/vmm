@@ -10,7 +10,7 @@
 """
 
 
-class QuotaLimit(object):
+class QuotaLimit:
     """Class to handle quota limit specific data."""
 
     __slots__ = ("_dbh", "_qid", "_bytes", "_messages")

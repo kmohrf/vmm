@@ -91,7 +91,7 @@ WS_ROWS = get_winsize()[1] - 2
 txt_wrpr = TextWrapper(width=WS_ROWS)
 
 
-class RunContext(object):
+class RunContext:
     """Contains all information necessary to run a subcommand."""
 
     __slots__ = ("args", "cget", "hdlr")

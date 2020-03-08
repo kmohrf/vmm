@@ -21,7 +21,7 @@ from vmm.errors import VMMError
 from vmm.constants import VMM_ERROR
 
 
-class Postconf(object):
+class Postconf:
     """Wrapper class for Postfix's postconf."""
 
     __slots__ = ("_bin", "_val")

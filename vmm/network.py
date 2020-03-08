@@ -13,7 +13,7 @@ import socket
 from binascii import b2a_hex
 
 
-class NetInfo(object):
+class NetInfo:
     """Simple class for CIDR network addresses an IP addresses."""
 
     __slots__ = ("_addr", "_prefix", "_bits_max", "_family", "_nw_addr")

@@ -76,7 +76,7 @@ OTHER_TYPES = {
 }
 
 
-class Handler(object):
+class Handler:
     """Wrapper class to simplify the access on all the stuff from vmm"""
 
     __slots__ = ("_cfg", "_cfg_fname", "_dbh", "_warnings")

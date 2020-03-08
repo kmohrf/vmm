@@ -24,7 +24,7 @@ from vmm.errors import DomainError, EmailAddressError as EAErr
 RE_LOCALPART = re.compile(r"[^\w!#$%&'\*\+-\.\/=?^_`{\|}~]", re.ASCII)
 
 
-class EmailAddress(object):
+class EmailAddress:
     """Simple class for validated e-mail addresses."""
 
     __slots__ = ("_localpart", "_domainname")

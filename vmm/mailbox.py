@@ -90,7 +90,7 @@ def mutf7_to_utf8(src):
     return "".join(ret)
 
 
-class Mailbox(object):
+class Mailbox:
     """Base class of all mailbox classes."""
 
     __slots__ = ("_boxes", "_root", "_sep", "_user")

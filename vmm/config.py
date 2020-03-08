@@ -233,7 +233,7 @@ class LazyConfig(RawConfigParser):
         return iter(self._cfg.keys())
 
 
-class LazyConfigOption(object):
+class LazyConfigOption:
     """A simple container class for configuration settings.
 
     `LazyConfigOption` instances are required by `LazyConfig` instances,

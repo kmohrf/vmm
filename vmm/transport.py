@@ -10,7 +10,7 @@
 """
 
 
-class Transport(object):
+class Transport:
     """A wrapper class that provides access to the transport table"""
 
     __slots__ = ("_tid", "_transport", "_dbh")

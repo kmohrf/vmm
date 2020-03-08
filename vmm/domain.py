@@ -39,7 +39,7 @@ RE_DOMAIN = re.compile(
 cfg_dget = lambda option: None
 
 
-class Domain(object):
+class Domain:
     """Class to manage e-mail domains."""
 
     __slots__ = (

@@ -12,7 +12,7 @@
 SERVICES = ("smtp", "pop3", "imap", "sieve")
 
 
-class ServiceSet(object):
+class ServiceSet:
     """A wrapper class that provides access to the service_set table.
 
     Each ServiceSet object provides following - read only - attributes:

@@ -25,7 +25,7 @@ _format_info = {
 }
 
 
-class MailLocation(object):
+class MailLocation:
     """Class to handle mail_location relevant information."""
 
     __slots__ = ("_directory", "_mbfmt", "_mid", "_dbh")
